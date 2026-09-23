@@ -10,7 +10,8 @@ Status key: `[ ]` not started, `[~]` in progress, `[x]` done.
 One model, three precisions, measured honestly on the laptop.
 
 - [x] 1.1 Project skeleton: package, `pyproject.toml`, first test, CI on every push
-- [ ] 1.2 Machine fingerprint: CPU, OS, threads, package versions, git commit attached to every result
+- [x] 1.2 Machine fingerprint: CPU, OS, package versions, git commit attached to every result
+  (the thread count is a benchmark setting, recorded by the benchmark in 1.4)
 - [ ] 1.3 Export MobileNetV3 (torchvision) to ONNX FP32
 - [ ] 1.4 Speed benchmark: fixed threads, >=20 warm-up, >=100 timed runs, p50/p95/p99 -> JSON
 - [ ] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
