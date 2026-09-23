@@ -1,8 +1,10 @@
-# Runs the test suite on every push and pull request.
+# Runs the test suite on pushes to main and on every pull request.
+# (Branch pushes are tested through their pull request, so tests don't run twice.)
 name: tests
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
