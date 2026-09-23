@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brokkr"
+version = "0.0.1"
+description = "Shrink vision models for edge hardware, stress-test them, and make them say when they're unsure."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+# Runtime dependencies are added when the code that needs them is written.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["brokkr*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
