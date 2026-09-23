@@ -9,8 +9,16 @@ description = "Shrink vision models for edge hardware, stress-test them, and mak
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.10"
-# Runtime dependencies are added when the code that needs them is written.
-dependencies = []
+# Minimum versions are the ones Brokkr has been tested with.
+# Install the CPU-only PyTorch first: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+dependencies = [
+    "numpy>=2.2",
+    "torch>=2.14",
+    "torchvision>=0.29",
+    "onnx>=1.23",
+    "onnxruntime>=1.23",
+    "onnxscript>=0.7",  # needed by torch.onnx.export
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
