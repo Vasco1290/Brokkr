@@ -23,6 +23,14 @@ def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224)
     Same steps as torchvision's transforms for these weights: shrink so the shorter side
     is 232 pixels, cut out the central 224x224 square, scale to 0-1, normalise colours.
     """
+    return normalize(resize_and_crop(image, resize_size, crop_size))
+
+
+def resize_and_crop(image: Image.Image, resize_size: int = 232, crop_size: int = 224) -> np.ndarray:
+    """First half of preprocessing: the (224, 224, 3) picture as uint8 pixels (0-255).
+
+    Image corruptions are applied here, to the picture the model will actually see.
+    """
     image = image.convert("RGB")  # some photos are greyscale or CMYK
     w, h = image.size
     if w <= h:
@@ -34,10 +42,14 @@ def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224)
     left = int(round((new_w - crop_size) / 2.0))
     top = int(round((new_h - crop_size) / 2.0))
     image = image.crop((left, top, left + crop_size, top + crop_size))
+    return np.asarray(image, dtype=np.uint8)
 
-    pixels = np.asarray(image, dtype=np.float32) / 255.0  # (224, 224, 3)
+
+def normalize(pixels: np.ndarray) -> np.ndarray:
+    """Second half of preprocessing: uint8 (224, 224, 3) -> normalised float (3, 224, 224)."""
+    pixels = pixels.astype(np.float32) / 255.0
     pixels = (pixels - IMAGENET_MEAN) / IMAGENET_STD
-    return pixels.transpose(2, 0, 1)  # channels first: (3, 224, 224)
+    return pixels.transpose(2, 0, 1)  # channels first
 
 
 def topk_correct(logits: np.ndarray, labels: np.ndarray, k: int) -> np.ndarray:
