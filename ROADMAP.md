@@ -12,7 +12,7 @@ Languages: Python for the factory, test lab, and site builder; HTML/CSS (+ a lit
 search) for the website; a shell script for the installer. The device runner starts in Python and moves
 to C++ only if measurements show Python overhead matters.
 
-## Stage 1 — Core measurement `[~]`
+## Stage 1 — Core measurement `[x]`
 
 One model, three precisions, measured honestly on the laptop.
 
@@ -41,17 +41,30 @@ the results page, and tests pass.
 - [ ] Publish the results page to GitHub Pages
 - [ ] Re-read README and ROADMAP for anything that overclaims
 
-## Stage 2 — Stress test `[ ]`
+## Stage 2 — Stress test `[~]`
 
-- Corruptions (fog, blur, noise, darkness, shake) at 5 severities — self-contained module shared with Argos
-- Reliability: calibration error (ECE), conformal prediction coverage and set size, risk–coverage curves
-- Bootstrap confidence intervals on every accuracy/reliability number
+How much worse does each precision get on damaged photos, and does it still know when it's wrong?
+
+- [ ] 2.0 Hypotheses written down *before* measuring (`docs/hypotheses.md`), committed first
+- [ ] 2.1 Fixed, non-overlapping image splits: test 10,000 / conformal calibration 5,000 /
+  tuning 5,000 (kept for Stage 3) / INT8 calibration 512
+- [ ] 2.2 Corruptions: fog, defocus blur, motion blur, noise, darkness at 5 severities —
+  self-contained module shared with Argos (no Brokkr imports), plus a sample image sheet
+- [ ] 2.3 Save compact per-image confidence data so every reliability number can be recomputed
+- [ ] 2.4 Calibration: expected calibration error (ECE) and reliability diagram data
+- [ ] 2.5 Conformal prediction: 90% sets tuned on clean calibration images; coverage and set
+  size on clean and corrupted test images
+- [ ] 2.6 Selective prediction: risk–coverage curves and AURC
+- [ ] 2.7 Full sweep: 3 precisions x (clean + 5 corruptions x 5 severities) on the 10,000 test
+  images (overnight, plugged in)
+- [ ] 2.8 Headline chart and a robustness section on the results page, generated from JSON
+
+Bootstrap confidence intervals on every accuracy/reliability number.
 
 **Done when:** the headline chart (precision × corruption × reliability) is generated from JSON.
 
 ## Stage 3 — Fixes and the study `[ ]`
 
-- Hypotheses written down *before* measuring (`docs/hypotheses.md`)
 - Fixes: recalibration after quantization, mixed precision, shift-aware conformal
 - INT8 calibration study: MinMax vs Percentile vs Entropy, chosen on a tuning set disjoint from both
   calibration and test images, then measured on the test set. Motivation: in task 1.6, ONNX Runtime's

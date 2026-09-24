@@ -7,7 +7,7 @@ Usage:  python scripts/02_benchmark_speed.py [--model NAME] [--precision fp32 fp
                                              [--threads 1 4] [--sessions 5] [--pause 5]
 Needs:  models/<model>_<precision>.onnx  (scripts/01_export_model.py, scripts/04_quantize.py)
 Writes: results/speed/<model>_<precision>_<N>threads_<power>.json, one per precision and thread
-        count, where <power> is "ac", "battery", or "unknownpower" (so each state is kept)
+        count, where <power> is "ac", "battery", or "unknownpower", plus the Windows power mode
 """
 
 import argparse
@@ -40,6 +40,8 @@ if power["on_ac_power"] is False:
     print("WARNING: running on battery. Results will be recorded as such and may be slower.")
 print(f"Models:  {', '.join(str(p) for p in paths.values())}\n")
 power_label = {True: "ac", False: "battery", None: "unknownpower"}[power["on_ac_power"]]
+if power["power_mode"]:  # e.g. "ac-bestperformance", so different modes never overwrite each other
+    power_label += "-" + power["power_mode"].replace(" ", "")
 
 # Each session takes turns over every (precision, threads) pair, so if the machine speeds up
 # or slows down over time, every combination is affected equally and comparisons stay fair.
