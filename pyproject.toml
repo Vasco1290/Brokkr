@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brokkr"
+version = "0.0.1"
+description = "Shrink vision models for edge hardware, stress-test them, and make them say when they're unsure."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+# Minimum versions are the ones Brokkr has been tested with.
+# Install the CPU-only PyTorch first: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+dependencies = [
+    "numpy>=2.2",
+    "torch>=2.14",
+    "torchvision>=0.29",
+    "onnx>=1.23",
+    "onnxruntime>=1.23",
+    "onnxscript>=0.7",  # needed by torch.onnx.export
+    "onnxconverter-common>=1.16",  # FP16 conversion (MIT)
+    "pillow>=12.3",
+    "pyarrow>=25.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+data = ["huggingface_hub>=1.32"]  # only needed to download datasets
+
+[tool.setuptools.packages.find]
+include = ["brokkr*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

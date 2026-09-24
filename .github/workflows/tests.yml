@@ -1,0 +1,21 @@
+# Runs the test suite on pushes to main and on every pull request.
+# (Branch pushes are tested through their pull request, so tests don't run twice.)
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      # CPU-only PyTorch: much smaller download than the default GPU build.
+      - run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -e ".[dev]"
+      - run: pytest -v

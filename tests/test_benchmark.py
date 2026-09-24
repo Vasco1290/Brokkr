@@ -1,0 +1,89 @@
+"""Checks for brokkr.benchmark and brokkr.results.
+
+Uses a tiny one-operation ONNX model built by hand, so the tests run in about a second.
+"""
+
+import onnx
+import pytest
+from onnx import TensorProto, helper
+
+from brokkr.benchmark import benchmark_latency, combine_sessions, summarise
+from brokkr.fingerprint import machine_fingerprint
+from brokkr.results import load_records, make_record, save_record
+
+
+@pytest.fixture
+def tiny_model(tmp_path):
+    """An ONNX model that just applies ReLU to a (1, 3, 8, 8) input."""
+    x = helper.make_tensor_value_info("x", TensorProto.FLOAT, [1, 3, 8, 8])
+    y = helper.make_tensor_value_info("y", TensorProto.FLOAT, [1, 3, 8, 8])
+    graph = helper.make_graph([helper.make_node("Relu", ["x"], ["y"])], "tiny", [x], [y])
+    # ir_version 10: the newest onnx library writes a file format ONNX Runtime can't read yet.
+    model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 17)], ir_version=10)
+    path = tmp_path / "tiny.onnx"
+    onnx.save(model, str(path))
+    return path
+
+
+def test_benchmark_records_settings_and_all_runs(tiny_model):
+    result = benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), num_threads=2)
+    assert result["settings"]["num_threads"] == 2
+    assert result["settings"]["warmup_runs"] >= 20
+    assert len(result["raw"]["latencies_ms"]) == result["settings"]["timed_runs"] >= 100
+
+
+def test_percentiles_are_ordered(tiny_model):
+    m = benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), num_threads=1)["metrics"]
+    assert 0 < m["min_ms"] <= m["p50_ms"] <= m["p95_ms"] <= m["p99_ms"] <= m["max_ms"]
+
+
+def test_too_few_runs_is_refused(tiny_model):
+    with pytest.raises(ValueError):
+        benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), runs=10)
+    with pytest.raises(ValueError):
+        benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), warmup=5)
+
+
+def test_summarise_on_known_numbers():
+    m = summarise(list(range(1, 101)))  # 1, 2, ..., 100
+    assert m["min_ms"] == 1 and m["max_ms"] == 100
+    assert m["p50_ms"] == pytest.approx(50.5)
+    assert m["mean_ms"] == pytest.approx(50.5)
+
+
+def test_combine_sessions_uses_median_and_reports_spread():
+    # Three fake sessions whose p50s are 10, 12, and 20 ms.
+    sessions = [
+        {"settings": {"num_threads": 1, "timed_runs": 100},
+         "metrics": {"mean_ms": p, "p50_ms": p, "p95_ms": p + 1, "p99_ms": p + 2},
+         "raw": {"latencies_ms": [p] * 100}}
+        for p in (10.0, 12.0, 20.0)
+    ]
+    result = combine_sessions(sessions)
+    m = result["metrics"]
+    assert m["p50_ms"] == 12.0  # median, so the slow 20 ms session doesn't drag it up
+    assert (m["p50_ms_min"], m["p50_ms_max"]) == (10.0, 20.0)
+    assert m["p50_spread_pct"] == pytest.approx((20 - 10) / 12 * 100)
+    assert result["settings"]["sessions"] == 3
+    assert len(result["raw"]["sessions"]) == 3
+
+
+def test_combine_needs_at_least_two_sessions(tiny_model):
+    one = benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), num_threads=1)
+    with pytest.raises(ValueError):
+        combine_sessions([one])
+
+
+def test_record_round_trip(tiny_model, tmp_path):
+    result = benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), num_threads=1)
+    record = make_record("speed", "tiny", "fp32", result, machine_fingerprint())
+    save_record(record, tmp_path / "out" / "tiny.json")
+
+    [loaded] = load_records(tmp_path / "out")
+    assert loaded["source"] == "brokkr"
+    assert loaded["metrics"] == record["metrics"]
+
+
+def test_incomplete_record_is_refused(tmp_path):
+    with pytest.raises(ValueError):
+        save_record({"kind": "speed"}, tmp_path / "bad.json")

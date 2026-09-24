@@ -1,3 +1,11 @@
+# Brokkr: models, datasets and generated results are never committed
+models/
+data/
+results/
+*.onnx
+*.pt
+*.pth
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
