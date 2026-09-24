@@ -64,6 +64,25 @@ def open_image(source) -> Image.Image:
     return Image.open(io.BytesIO(source) if isinstance(source, bytes) else source)
 
 
+def paired_bootstrap_diff(correct_a: np.ndarray, correct_b: np.ndarray, n_resamples: int = 1000,
+                          seed: int = 0) -> tuple:
+    """Accuracy of B minus accuracy of A, with a 95% CI, when both saw the SAME images.
+
+    Resampling the same image positions for both models cancels out "this image is just hard",
+    so the difference is measured much more precisely than by comparing two separate intervals.
+    """
+    if len(correct_a) != len(correct_b):
+        raise ValueError("both models must be evaluated on the same images")
+    rng = np.random.default_rng(seed)
+    n = len(correct_a)
+    diffs = []
+    for _ in range(n_resamples):
+        idx = rng.integers(0, n, n)
+        diffs.append(correct_b[idx].mean() - correct_a[idx].mean())
+    low, high = np.percentile(diffs, [2.5, 97.5])
+    return float(correct_b.mean() - correct_a.mean()), float(low), float(high)
+
+
 def evaluate(onnx_path, samples, batch_size: int = 32, num_threads: int = 4, seed: int = 0) -> dict:
     """Run the model on (image, label) samples and report top-1/top-5 accuracy.
 

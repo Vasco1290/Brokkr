@@ -27,11 +27,19 @@ One model, three precisions, measured honestly on the laptop.
 - [x] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
   (ImageNet-1k validation; correctness check against torchvision's published top-1 passes)
 - [x] 1.6 FP16 and INT8 versions, same measurements (INT8 with ONNX Runtime default settings)
-- [ ] 1.7 Walking-skeleton website: a Python script turns results JSON into one plain HTML page,
-  published on GitHub Pages. Real numbers only, no design yet.
+- [x] 1.7 Walking-skeleton website: a Python script turns results JSON into one plain HTML page
+  (`scripts/05_build_site.py` -> `site/index.html`). Real numbers only, no design yet.
+  - [ ] Publish on GitHub Pages (gh-pages branch) — waiting until the repository is made public
 
 **Done when:** one command produces real speed/size/accuracy numbers for FP32/FP16/INT8, they appear on
-the live page, and tests pass.
+the results page, and tests pass.
+
+### Before making the repository public
+
+- [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
+  contain the personal email
+- [ ] Publish the results page to GitHub Pages
+- [ ] Re-read README and ROADMAP for anything that overclaims
 
 ## Stage 2 — Stress test `[ ]`
 
