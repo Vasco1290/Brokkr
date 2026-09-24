@@ -125,9 +125,9 @@ def accuracy_from_logits(logits: np.ndarray, labels: np.ndarray, seed: int = 0) 
     return {
         "metrics": {
             "top1": float(top1_correct.mean()),
-            "top1_ci95": bootstrap_ci(top1_correct, seed=seed),
+            "top1_ci95": list(bootstrap_ci(top1_correct, seed=seed)),  # list, as JSON stores it
             "top5": float(top5_correct.mean()),
-            "top5_ci95": bootstrap_ci(top5_correct, seed=seed),
+            "top5_ci95": list(bootstrap_ci(top5_correct, seed=seed)),
         },
         "raw": {"labels": labels.tolist(), "top5_predictions": top5.tolist()},
     }

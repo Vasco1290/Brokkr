@@ -147,3 +147,14 @@ def test_edited_array_file_is_detected(tmp_path):
     np.savez_compressed(tmp_path / "r.npz", logits=np.ones((2, 3), dtype=np.float32))  # tamper
     with pytest.raises(ValueError):
         load_arrays(json_path)
+
+
+def test_metrics_survive_a_json_round_trip_unchanged():
+    import json
+
+    import numpy as np
+
+    from brokkr.accuracy import accuracy_from_logits
+    rng = np.random.default_rng(1)
+    metrics = accuracy_from_logits(rng.standard_normal((20, 10)), rng.integers(0, 10, 20))["metrics"]
+    assert json.loads(json.dumps(metrics)) == metrics
