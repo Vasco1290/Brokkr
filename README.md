@@ -28,7 +28,11 @@ Brackets are 95% bootstrap confidence intervals; "vs FP32" is the paired differe
 |---|---|---|---|---|
 | FP32 | 22.2 MB | 75.58% (74.70–76.48) | — | 92.70% |
 | FP16 | 11.3 MB | 75.63% (74.78–76.53) | +0.05 pts (−0.02 to +0.13) | 92.71% |
-| INT8 | 5.9 MB | 60.33% (59.34–61.32) | −15.25 pts (−16.12 to −14.41) | 83.34% |
+| INT8 | 5.9 MB | 60.15% (59.14–61.11)\* | −15.43 pts (−16.30 to −14.59) | 83.37% |
+
+\* INT8 outputs take only 237 distinct values, so on 262 of the 10,000 images two classes tie
+exactly for the top score. Ties go to the lower class number; any other tie-break would give a top-1
+between 59.62% and 61.01%.
 
 Correctness check: on all 50,000 validation images our FP32 pipeline scores 75.26% (74.88–75.61);
 torchvision publishes 75.27% for these weights.
@@ -37,7 +41,8 @@ torchvision publishes 75.27% for these weights.
 
 - FP16 halves the file size with no measurable accuracy change.
 - INT8 made with ONNX Runtime's default static quantization (MinMax calibration, 512 images) is 3.75x
-  smaller but loses about 15 points of top-1 accuracy. Improving this is planned for Stage 3.
+  smaller but loses about 15 points of top-1 accuracy, and its rounded outputs cause exact ties.
+  Improving this is planned for Stage 3.
 
 **Speed on this laptop: rough, development machine only.** The i5-1235U mixes fast "performance" and
 slow "efficiency" cores. Unpinned, Windows moved the benchmark between them, so timings jumped between
