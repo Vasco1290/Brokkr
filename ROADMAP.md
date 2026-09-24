@@ -59,7 +59,7 @@ How much worse does each precision get on damaged photos, and does it still know
 - [x] 2.4 Calibration: expected calibration error (ECE) and reliability diagram data
 - [x] 2.5 Conformal prediction: 90% sets tuned on clean calibration images; coverage and set
   size on clean and corrupted test images
-- [ ] 2.6 Selective prediction: risk–coverage curves and AURC
+- [x] 2.6 Selective prediction: risk–coverage curves and AURC
 - [ ] 2.7 Full sweep: 3 precisions x (clean + 5 corruptions x 5 severities) on the 10,000 test
   images (overnight, plugged in)
 - [ ] 2.8 Headline chart and a robustness section on the results page, generated from JSON

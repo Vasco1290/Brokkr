@@ -5,11 +5,14 @@ Needs:  results/accuracy/*_test.json (and *_conformal_calibration.json for confo
         each with its .npz logits (scripts/03_evaluate_accuracy.py)
 Writes: results/reliability/<model>_<precision>_<dataset>_test_calibration.json
         results/reliability/<model>_<precision>_<dataset>_test_conformal.json
+        results/reliability/<model>_<precision>_<dataset>_test_selective.json
 
 Calibration: expected calibration error (ECE) with a bootstrap 95% CI, average confidence vs
 accuracy, and per-bin data for a reliability diagram.
 Conformal: a threshold tuned on the conformal_calibration split for 90% coverage, then coverage
 and set size on the test split.
+Selective prediction: the risk-coverage curve, AURC and E-AURC with bootstrap 95% CIs, and the
+error rate when answering only the most confident 80% / 50% of images.
 """
 
 import json
@@ -21,7 +24,8 @@ import numpy as np
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.results import load_arrays, make_record, save_record
 from brokkr.shift.conformal import conformal_threshold, evaluate_sets
-from brokkr.shift.reliability import calibration, softmax
+from brokkr.shift.reliability import calibration, confidence_and_correct, softmax
+from brokkr.shift.selective import selective_prediction
 
 TARGET_COVERAGE = 0.90
 OUT = Path("results/reliability")
@@ -57,6 +61,20 @@ for test_path in tests:
     print(f"  ECE {cal['ece']:.4f} ({lo:.4f}-{hi:.4f}); mean confidence {cal['mean_confidence']:.2%} "
           f"vs accuracy {cal['accuracy']:.2%}")
     passed &= lo <= cal["ece"] <= hi and abs(cal["accuracy"] - acc["metrics"]["top1"]) < 1e-9
+
+    # Selective prediction
+    confidence, correct = confidence_and_correct(arrays["logits"], arrays["labels"])
+    sel = selective_prediction(confidence, correct)
+    curve = sel.pop("curve")
+    record = make_record("selective", acc["model"], acc["precision"],
+                         {"settings": {**base_settings, "confidence": "probability of the top answer"},
+                          "metrics": sel, "raw": {"risk_coverage_curve": curve}}, machine)
+    save_record(record, OUT / f"{stem}_selective.json")
+    alo, ahi = sel["aurc_ci95"]
+    print(f"  selective: AURC {sel['aurc']:.4f} ({alo:.4f}-{ahi:.4f}), E-AURC {sel['e_aurc']:.4f}; "
+          f"error at 100% / 80% / 50% answered: {sel['risk_at_full_coverage']:.1%} / "
+          f"{sel['risk_at_80pct_coverage']:.1%} / {sel['risk_at_50pct_coverage']:.1%}")
+    passed &= alo <= sel["aurc"] <= ahi and abs(sel["risk_at_full_coverage"] - (1 - cal["accuracy"])) < 1e-9
 
     # Conformal prediction
     cal_path = test_path.with_name(stem.removesuffix("_test") + "_conformal_calibration.json")
