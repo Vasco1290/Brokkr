@@ -1,20 +1,22 @@
 """Compute reliability numbers from saved accuracy results (no model is re-run).
 
-Usage:  python scripts/07_reliability.py
-Needs:  results/accuracy/*_test.json (and *_conformal_calibration.json for conformal sets),
-        each with its .npz logits (scripts/03_evaluate_accuracy.py)
-Writes: results/reliability/<model>_<precision>_<dataset>_test_calibration.json
-        results/reliability/<model>_<precision>_<dataset>_test_conformal.json
-        results/reliability/<model>_<precision>_<dataset>_test_selective.json
+Usage:  python scripts/07_reliability.py [--sources results/accuracy results/sweep] [--out DIR]
+Needs:  test-split results with .npz logits: results/accuracy/*_test.json (scripts/03) and
+        results/sweep/*.json (scripts/08, corrupted images); for conformal sets also
+        results/accuracy/<model>_<precision>_<dataset>_conformal_calibration.json
+Writes: <out>/<source name>_calibration.json, _selective.json, _conformal.json
+        (default out: results/reliability)
 
 Calibration: expected calibration error (ECE) with a bootstrap 95% CI, average confidence vs
 accuracy, and per-bin data for a reliability diagram.
-Conformal: a threshold tuned on the conformal_calibration split for 90% coverage, then coverage
-and set size on the test split.
+Conformal: a threshold tuned on CLEAN conformal_calibration images for 90% coverage, then coverage
+and set size on the test split (clean or corrupted: corrupted images test whether the promise
+survives when test images no longer look like the calibration images).
 Selective prediction: the risk-coverage curve, AURC and E-AURC with bootstrap 95% CIs, and the
 error rate when answering only the most confident 80% / 50% of images.
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -28,7 +30,6 @@ from brokkr.shift.reliability import calibration, confidence_and_correct, softma
 from brokkr.shift.selective import selective_prediction
 
 TARGET_COVERAGE = 0.90
-OUT = Path("results/reliability")
 
 
 def load(path: Path) -> tuple:
@@ -36,8 +37,20 @@ def load(path: Path) -> tuple:
     return json.loads(path.read_text()), load_arrays(path)
 
 
-tests = sorted(p for p in Path("results/accuracy").glob("*_test.json")
-               if "raw_arrays" in json.loads(p.read_text()))
+parser = argparse.ArgumentParser()
+parser.add_argument("--sources", nargs="+", default=["results/accuracy", "results/sweep"])
+parser.add_argument("--out", default="results/reliability")
+args = parser.parse_args()
+OUT = Path(args.out)
+
+
+def is_test_result_with_logits(path: Path) -> bool:
+    record = json.loads(path.read_text())
+    return record.get("settings", {}).get("split") == "test" and "raw_arrays" in record
+
+
+tests = sorted(p for folder in args.sources for p in Path(folder).glob("*.json")
+               if is_test_result_with_logits(p))
 if not tests:
     sys.exit("FAIL: no test-split results with saved logits. Run scripts/03_evaluate_accuracy.py first.")
 
@@ -46,10 +59,12 @@ passed = True
 for test_path in tests:
     acc, arrays = load(test_path)
     stem = test_path.stem
-    base_settings = {"dataset": acc["settings"]["dataset"], "split": "test",
+    corruption = {k: acc["settings"][k] for k in ("corruption", "severity") if k in acc["settings"]}
+    base_settings = {"dataset": acc["settings"]["dataset"], "split": "test", **corruption,
                      "n_images": acc["settings"]["n_images"], "source_result": test_path.name,
                      "source_arrays_sha256": acc["raw_arrays"]["sha256"], "bootstrap_resamples": 1000}
-    print(f"\n{acc['model']} {acc['precision']} ({acc['settings']['n_images']:,} test images)")
+    label = f"{corruption['corruption']} s{corruption['severity']}" if corruption else "clean"
+    print(f"\n{acc['model']} {acc['precision']} {label} ({acc['settings']['n_images']:,} test images)")
 
     # Calibration
     cal = calibration(arrays["logits"], arrays["labels"])
@@ -77,7 +92,9 @@ for test_path in tests:
     passed &= alo <= sel["aurc"] <= ahi and abs(sel["risk_at_full_coverage"] - (1 - cal["accuracy"])) < 1e-9
 
     # Conformal prediction
-    cal_path = test_path.with_name(stem.removesuffix("_test") + "_conformal_calibration.json")
+    # Always the CLEAN calibration split, also for corrupted test images.
+    cal_name = f"{acc['model']}_{acc['precision']}_{acc['settings']['dataset']}_conformal_calibration.json"
+    cal_path = Path("results/accuracy") / cal_name
     if not cal_path.exists():
         print(f"  conformal: skipped, no {cal_path.name} (run 03 with --split conformal_calibration)")
         continue
