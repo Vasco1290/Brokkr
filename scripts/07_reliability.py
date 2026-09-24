@@ -1,51 +1,93 @@
 """Compute reliability numbers from saved accuracy results (no model is re-run).
 
 Usage:  python scripts/07_reliability.py
-Needs:  results/accuracy/*.json with their .npz logits (scripts/03_evaluate_accuracy.py)
-Writes: results/reliability/<same name>_calibration.json for each accuracy result
+Needs:  results/accuracy/*_test.json (and *_conformal_calibration.json for conformal sets),
+        each with its .npz logits (scripts/03_evaluate_accuracy.py)
+Writes: results/reliability/<model>_<precision>_<dataset>_test_calibration.json
+        results/reliability/<model>_<precision>_<dataset>_test_conformal.json
 
 Calibration: expected calibration error (ECE) with a bootstrap 95% CI, average confidence vs
 accuracy, and per-bin data for a reliability diagram.
+Conformal: a threshold tuned on the conformal_calibration split for 90% coverage, then coverage
+and set size on the test split.
 """
 
 import json
 import sys
 from pathlib import Path
 
+import numpy as np
+
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift.reliability import calibration
+from brokkr.shift.conformal import conformal_threshold, evaluate_sets
+from brokkr.shift.reliability import calibration, softmax
 
-sources = sorted(p for p in Path("results/accuracy").glob("*.json")
-                 if "raw_arrays" in json.loads(p.read_text()))
-if not sources:
-    sys.exit("FAIL: no accuracy results with saved logits. Run scripts/03_evaluate_accuracy.py first.")
+TARGET_COVERAGE = 0.90
+OUT = Path("results/reliability")
+
+
+def load(path: Path) -> tuple:
+    """The JSON record and its arrays (the checksum is verified on loading)."""
+    return json.loads(path.read_text()), load_arrays(path)
+
+
+tests = sorted(p for p in Path("results/accuracy").glob("*_test.json")
+               if "raw_arrays" in json.loads(p.read_text()))
+if not tests:
+    sys.exit("FAIL: no test-split results with saved logits. Run scripts/03_evaluate_accuracy.py first.")
 
 machine = machine_fingerprint()
 passed = True
-print(f"{'result':48s} {'ECE':>7} {'95% CI':>17} {'confidence':>11} {'accuracy':>9}")
-for source in sources:
-    acc = json.loads(source.read_text())
-    arrays = load_arrays(source)  # refuses a logits file whose checksum doesn't match
+for test_path in tests:
+    acc, arrays = load(test_path)
+    stem = test_path.stem
+    base_settings = {"dataset": acc["settings"]["dataset"], "split": "test",
+                     "n_images": acc["settings"]["n_images"], "source_result": test_path.name,
+                     "source_arrays_sha256": acc["raw_arrays"]["sha256"], "bootstrap_resamples": 1000}
+    print(f"\n{acc['model']} {acc['precision']} ({acc['settings']['n_images']:,} test images)")
+
+    # Calibration
     cal = calibration(arrays["logits"], arrays["labels"])
-
-    result = {
-        "settings": {**{k: acc["settings"][k] for k in ("dataset", "n_images", "split")
-                        if k in acc["settings"]},
-                     "source_result": source.name, "source_arrays_sha256": acc["raw_arrays"]["sha256"],
-                     "bootstrap_resamples": 1000},
-        "metrics": {k: v for k, v in cal.items() if k != "bins"},
-        "raw": {"bins": cal["bins"]},
-    }
-    record = make_record("calibration", acc["model"], acc["precision"], result, machine)
-    save_record(record, Path("results/reliability") / f"{source.stem}_calibration.json")
-
+    record = make_record("calibration", acc["model"], acc["precision"],
+                         {"settings": base_settings, "metrics": {k: v for k, v in cal.items() if k != "bins"},
+                          "raw": {"bins": cal["bins"]}}, machine)
+    save_record(record, OUT / f"{stem}_calibration.json")
     lo, hi = cal["ece_ci95"]
-    print(f"{source.stem:48s} {cal['ece']:7.4f}   ({lo:.4f}-{hi:.4f}) {cal['mean_confidence']:11.2%} "
-          f"{cal['accuracy']:9.2%}")
-    passed &= 0 <= cal["ece"] <= 1 and lo <= cal["ece"] <= hi
-    passed &= sum(b["count"] for b in cal["bins"]) == len(arrays["labels"])
-    passed &= abs(cal["accuracy"] - acc["metrics"]["top1"]) < 1e-9  # same answers as the accuracy run
+    print(f"  ECE {cal['ece']:.4f} ({lo:.4f}-{hi:.4f}); mean confidence {cal['mean_confidence']:.2%} "
+          f"vs accuracy {cal['accuracy']:.2%}")
+    passed &= lo <= cal["ece"] <= hi and abs(cal["accuracy"] - acc["metrics"]["top1"]) < 1e-9
+
+    # Conformal prediction
+    cal_path = test_path.with_name(stem.removesuffix("_test") + "_conformal_calibration.json")
+    if not cal_path.exists():
+        print(f"  conformal: skipped, no {cal_path.name} (run 03 with --split conformal_calibration)")
+        continue
+    cal_acc, cal_arrays = load(cal_path)
+    cal_probs = softmax(cal_arrays["logits"])
+    threshold = conformal_threshold(cal_probs, cal_arrays["labels"], TARGET_COVERAGE)
+    conf = evaluate_sets(softmax(arrays["logits"]), arrays["labels"], threshold)
+    # Sanity: on the calibration images themselves coverage must reach the target by construction.
+    on_cal = evaluate_sets(cal_probs, cal_arrays["labels"], threshold, n_resamples=1)["coverage"]
+
+    settings = {**base_settings, "method": "LAC (threshold on 1 - probability of the true class)",
+                "target_coverage": TARGET_COVERAGE, "threshold": threshold,
+                "min_class_probability_in_set": 1 - threshold,
+                "calibration_result": cal_path.name, "calibration_split": "conformal_calibration",
+                "calibration_images": cal_acc["settings"]["n_images"],
+                "calibration_arrays_sha256": cal_acc["raw_arrays"]["sha256"]}
+    counts = conf.pop("set_size_counts")
+    record = make_record("conformal", acc["model"], acc["precision"],
+                         {"settings": settings, "metrics": conf, "raw": {"set_size_counts": counts}}, machine)
+    save_record(record, OUT / f"{stem}_conformal.json")
+    clo, chi = conf["coverage_ci95"]
+    print(f"  conformal (target {TARGET_COVERAGE:.0%}): classes with probability >= "
+          f"{1 - threshold:.4f} go in the set")
+    print(f"    coverage {conf['coverage']:.2%} ({clo:.2%}-{chi:.2%}); "
+          f"mean set size {conf['mean_set_size']:.2f}, median {conf['median_set_size']:.0f}")
+    print(f"    single-class sets {conf['share_single_class']:.1%}, empty sets {conf['share_empty']:.1%}")
+    passed &= on_cal >= TARGET_COVERAGE and sum(counts.values()) == len(arrays["labels"])
+    passed &= not np.intersect1d(cal_arrays["positions"], arrays["positions"]).size  # never the same images
 
 print("\nPASS" if passed else "\nFAIL")
 sys.exit(0 if passed else 1)

@@ -33,7 +33,12 @@ def top1_correct(record) -> np.ndarray:
 
 
 def accuracy_rows(records: list) -> list:
-    """One row per accuracy result, with the paired change vs FP32 on the same images."""
+    """One row per accuracy result, with the paired change vs FP32 on the same images.
+
+    Only the test split and the full dataset are shown; calibration/tuning splits are inputs
+    to other measurements, not results in their own right.
+    """
+    records = [r for r in records if r["settings"].get("split", "test") in ("test", "all")]
     by_key = {(r["model"], r["precision"], r["settings"]["dataset"], r["settings"]["n_images"]): r
               for r in records}
     rows = []

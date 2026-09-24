@@ -1,10 +1,13 @@
 """Measure top-1/top-5 accuracy of an exported ONNX model on the ImageNet validation set.
 
-Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32] [--split test|all]
-        --split test: the fixed 10,000-image test split (brokkr.datasets.make_splits)
-        --split all:  all 50,000 images (includes the 512 INT8 calibration images; FP32 check only)
+Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32]
+                                                [--split test|conformal_calibration|tuning|all]
+        test:                  the fixed 10,000-image test split (brokkr.datasets.make_splits)
+        conformal_calibration: 5,000 images for tuning conformal prediction sets
+        tuning:                5,000 images held back for Stage 3
+        all:                   all 50,000 images (includes the INT8 calibration images; FP32 check only)
 Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/ (see README)
-Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<n>.json, plus a .npz file with
+Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<split>.json, plus a .npz file with
         every class score (logit) for every image, so reliability metrics can be computed later
 
 Correctness check (FP32 only): torchvision publishes its own top-1 accuracy for these FP32
@@ -33,7 +36,8 @@ DATASET = "imagenet-1k-val"
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
 parser.add_argument("--precision", default="fp32")
-parser.add_argument("--split", choices=["test", "all"], default="test")
+parser.add_argument("--split", default="test",
+                    choices=["test", "conformal_calibration", "tuning", "all"])
 parser.add_argument("--threads", type=int, default=4)
 parser.add_argument("--seed", type=int, default=0, help="seed for the bootstrap intervals")
 args = parser.parse_args()
@@ -44,7 +48,7 @@ if not onnx_path.exists():
 
 files = parquet_files(DATASET)
 total = count_images(files)
-positions = np.arange(total) if args.split == "all" else make_splits(total)["test"]
+positions = np.arange(total) if args.split == "all" else make_splits(total)[args.split]
 print(f"Evaluating {onnx_path} on {len(positions)} of {total} images ({DATASET})...")
 
 start = time.time()
@@ -60,7 +64,7 @@ result["reference"] = {"top1_reported_by_torchvision": reported,
                        "note": "Published by torchvision for the PyTorch model on all 50,000 images."}
 
 record = make_record("accuracy", args.model, args.precision, result, machine_fingerprint())
-out = Path("results/accuracy") / f"{args.model}_{args.precision}_{DATASET}_{len(positions)}.json"
+out = Path("results/accuracy") / f"{args.model}_{args.precision}_{DATASET}_{args.split}.json"
 save_arrays(record, out, logits=logits, labels=np.array(result["raw"]["labels"]),
             positions=positions)
 save_record(record, out)
@@ -70,7 +74,7 @@ lo, hi = m["top1_ci95"]
 print(f"Done in {time.time() - start:.0f} s. Saved to {out}\n")
 print(f"Top-1: {m['top1']:.2%}  (95% CI {lo:.2%} - {hi:.2%})")
 print(f"Top-5: {m['top5']:.2%}  (95% CI {m['top5_ci95'][0]:.2%} - {m['top5_ci95'][1]:.2%})")
-if args.precision == "fp32":
+if args.precision == "fp32" and args.split in ("test", "all"):
     print(f"torchvision's published top-1: {reported:.2%}")
     passed = lo <= reported <= hi
     print("PASS: published number is inside our confidence interval" if passed else
