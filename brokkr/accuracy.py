@@ -95,43 +95,52 @@ def paired_bootstrap_diff(correct_a: np.ndarray, correct_b: np.ndarray, n_resamp
     return float(correct_b.mean() - correct_a.mean()), float(low), float(high)
 
 
-def evaluate(onnx_path, samples, batch_size: int = 32, num_threads: int = 4, seed: int = 0) -> dict:
-    """Run the model on (image, label) samples and report top-1/top-5 accuracy.
+def predict_logits(onnx_path, samples, batch_size: int = 32, num_threads: int = 4) -> tuple:
+    """Run the model on (image, label) samples. Returns (logits, labels).
 
+    logits: float32 array (n_images, n_classes), the model's raw scores before softmax.
     `samples` can be a list or a generator; each image is a file path or raw file bytes.
     Images are processed a batch at a time, so large datasets don't fill up memory.
     """
     session = make_session(onnx_path, num_threads)
     input_name = session.get_inputs()[0].name
 
-    labels, top5, batch = [], [], []
-
-    def run_batch():
-        logits = session.run(None, {input_name: np.stack(batch)})[0]
-        top5.append(np.argsort(-logits, axis=1)[:, :5])
-        batch.clear()
-
+    labels, logits, batch = [], [], []
     for image, label in samples:
         batch.append(preprocess(open_image(image)))
         labels.append(label)
         if len(batch) == batch_size:
-            run_batch()
+            logits.append(session.run(None, {input_name: np.stack(batch)})[0])
+            batch.clear()
     if batch:
-        run_batch()
+        logits.append(session.run(None, {input_name: np.stack(batch)})[0])
+    return np.concatenate(logits).astype(np.float32), np.array(labels)
 
-    labels = np.array(labels)
-    top5 = np.concatenate(top5)
+
+def accuracy_from_logits(logits: np.ndarray, labels: np.ndarray, seed: int = 0) -> dict:
+    """Top-1/top-5 accuracy with bootstrap intervals, computed from saved logits."""
+    top5 = np.argsort(-logits, axis=1)[:, :5]
     top1_correct = (top5[:, 0] == labels).astype(np.float64)
     top5_correct = (top5 == labels[:, None]).any(axis=1).astype(np.float64)
     return {
-        "settings": {"n_images": len(labels), "batch_size": batch_size, "num_threads": num_threads,
-                     "bootstrap_resamples": 1000, "seed": seed},
         "metrics": {
             "top1": float(top1_correct.mean()),
             "top1_ci95": bootstrap_ci(top1_correct, seed=seed),
             "top5": float(top5_correct.mean()),
             "top5_ci95": bootstrap_ci(top5_correct, seed=seed),
         },
-        # Enough to recompute every number above without re-running the model.
         "raw": {"labels": labels.tolist(), "top5_predictions": top5.tolist()},
     }
+
+
+def evaluate(onnx_path, samples, batch_size: int = 32, num_threads: int = 4, seed: int = 0) -> tuple:
+    """Run the model and score it. Returns (result, logits).
+
+    result has settings/metrics/raw for the JSON record; logits (all class scores for every
+    image) are too big for JSON and are saved separately with results.save_arrays.
+    """
+    logits, labels = predict_logits(onnx_path, samples, batch_size, num_threads)
+    result = accuracy_from_logits(logits, labels, seed=seed)
+    result["settings"] = {"n_images": len(labels), "batch_size": batch_size, "num_threads": num_threads,
+                          "bootstrap_resamples": 1000, "seed": seed}
+    return result, logits

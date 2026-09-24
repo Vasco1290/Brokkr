@@ -46,3 +46,13 @@ def test_bootstrap_ci_contains_accuracy_and_shrinks_with_more_images():
 def test_bootstrap_is_reproducible():
     data = (np.random.default_rng(1).random(500) < 0.5).astype(float)
     assert bootstrap_ci(data, seed=3) == bootstrap_ci(data, seed=3)
+
+
+def test_accuracy_from_logits_on_known_scores():
+    from brokkr.accuracy import accuracy_from_logits
+    logits = np.array([[0.1, 3.0, 0.2, 0.0, -1.0, -2.0],   # top-1 is class 1
+                       [2.0, 0.0, 0.1, 0.2, 0.3, 0.4]])    # top-1 is class 0, class 1 is last
+    result = accuracy_from_logits(logits, np.array([1, 1]))
+    assert result["metrics"]["top1"] == 0.5
+    assert result["metrics"]["top5"] == 0.5  # class 1 is 6th of 6 for the second image
+    assert result["raw"]["top5_predictions"][0][0] == 1

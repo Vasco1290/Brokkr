@@ -110,3 +110,40 @@ def test_pinning_to_one_cpu_then_back(tiny_model):
         assert result["metrics"]["p50_ms"] > 0
     finally:
         pin_to_cpus(list(range(os.cpu_count())))  # don't leave the test process pinned
+
+
+def test_arrays_saved_with_checksum_and_reproduce_metrics(tmp_path):
+    import numpy as np
+
+    from brokkr.accuracy import accuracy_from_logits
+    from brokkr.results import load_arrays, save_arrays
+
+    rng = np.random.default_rng(0)
+    logits = rng.standard_normal((50, 1000)).astype(np.float32)
+    labels = rng.integers(0, 1000, 50)
+    result = accuracy_from_logits(logits, labels)
+    record = make_record("accuracy", "m", "fp32", {"settings": {}, **result}, machine_fingerprint())
+    json_path = tmp_path / "r.json"
+    save_arrays(record, json_path, logits=logits, labels=labels)
+    save_record(record, json_path)
+
+    arrays = load_arrays(json_path)
+    assert np.array_equal(arrays["logits"], logits)  # exact, not approximately equal
+    again = accuracy_from_logits(arrays["logits"], arrays["labels"])
+    assert again["metrics"] == result["metrics"]
+    assert record["raw_arrays"]["arrays"]["logits"]["shape"] == [50, 1000]
+
+
+def test_edited_array_file_is_detected(tmp_path):
+    import numpy as np
+
+    from brokkr.results import load_arrays, save_arrays
+
+    record = make_record("accuracy", "m", "fp32", {"settings": {}, "metrics": {}},
+                         machine_fingerprint())
+    json_path = tmp_path / "r.json"
+    save_arrays(record, json_path, logits=np.zeros((2, 3), dtype=np.float32))
+    save_record(record, json_path)
+    np.savez_compressed(tmp_path / "r.npz", logits=np.ones((2, 3), dtype=np.float32))  # tamper
+    with pytest.raises(ValueError):
+        load_arrays(json_path)

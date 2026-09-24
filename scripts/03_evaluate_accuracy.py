@@ -4,7 +4,8 @@ Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32]
         --split test: the fixed 10,000-image test split (brokkr.datasets.make_splits)
         --split all:  all 50,000 images (includes the 512 INT8 calibration images; FP32 check only)
 Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/ (see README)
-Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<n>.json
+Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<n>.json, plus a .npz file with
+        every class score (logit) for every image, so reliability metrics can be computed later
 
 Correctness check (FP32 only): torchvision publishes its own top-1 accuracy for these FP32
 weights on this same dataset. If our pipeline is right, that published number should fall
@@ -25,7 +26,7 @@ from brokkr.accuracy import evaluate
 from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
 from brokkr.export import MODELS
 from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import make_record, save_record
+from brokkr.results import make_record, save_arrays, save_record
 
 DATASET = "imagenet-1k-val"
 
@@ -47,7 +48,7 @@ positions = np.arange(total) if args.split == "all" else make_splits(total)["tes
 print(f"Evaluating {onnx_path} on {len(positions)} of {total} images ({DATASET})...")
 
 start = time.time()
-result = evaluate(onnx_path, read_parquet_images(files, positions),
+result, logits = evaluate(onnx_path, read_parquet_images(files, positions),
                   num_threads=args.threads, seed=args.seed)
 result["settings"].update({"dataset": DATASET, "dataset_total_images": total,
                            "dataset_licence": DATASETS[DATASET]["licence"],
@@ -60,6 +61,8 @@ result["reference"] = {"top1_reported_by_torchvision": reported,
 
 record = make_record("accuracy", args.model, args.precision, result, machine_fingerprint())
 out = Path("results/accuracy") / f"{args.model}_{args.precision}_{DATASET}_{len(positions)}.json"
+save_arrays(record, out, logits=logits, labels=np.array(result["raw"]["labels"]),
+            positions=positions)
 save_record(record, out)
 
 m = result["metrics"]
