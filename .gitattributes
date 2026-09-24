@@ -1,0 +1,9 @@
+# Store text files with LF line endings in git and in the working folder on every OS,
+# so Windows and Linux (CI, Raspberry Pi) see identical files.
+* text=auto eol=lf
+
+# Never touch binary files
+*.onnx binary
+*.parquet binary
+*.png binary
+*.jpg binary

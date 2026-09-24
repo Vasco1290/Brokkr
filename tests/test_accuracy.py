@@ -1,8 +1,6 @@
 """Checks for brokkr.accuracy (no real dataset needed)."""
 
 import numpy as np
-import pytest
-import torch
 from PIL import Image
 from torchvision.models import MobileNet_V3_Large_Weights
 

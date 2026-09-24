@@ -22,8 +22,8 @@ One model, three precisions, measured honestly on the laptop.
 - [x] 1.3 Export MobileNetV3 (torchvision) to ONNX FP32
 - [x] 1.4 Speed benchmark: fixed threads, >=20 warm-up, >=100 timed runs, p50/p95/p99 -> JSON;
   5 interleaved sessions (median + spread); power state recorded
-  - [ ] Run plugged in, "Best performance" mode, to compare with the battery runs
-    (battery runs so far: session-to-session spread 24% to over 1000%)
+  - [x] Run plugged in, "Best performance" mode. Remaining instability traced to hybrid cores
+    (fixed by pinning, `--cores`) and run-to-run drift of 10-20% on this laptop; see README
 - [x] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
   (ImageNet-1k validation; correctness check against torchvision's published top-1 passes)
 - [x] 1.6 FP16 and INT8 versions, same measurements (INT8 with ONNX Runtime default settings)
@@ -33,6 +33,10 @@ One model, three precisions, measured honestly on the laptop.
 
 **Done when:** one command produces real speed/size/accuracy numbers for FP32/FP16/INT8, they appear on
 the results page, and tests pass.
+
+Hardening after Stage 1: one-command runner (`scripts/run_stage1.py`), all results regenerated from
+committed code, speed benchmark pinned to one core type with IQR-based stability flags, ruff in CI,
+`.gitattributes` (LF line endings), `requirements-lock.txt`, README with real results.
 
 ### Before making the repository public
 

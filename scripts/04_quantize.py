@@ -22,8 +22,14 @@ import numpy as np
 
 from brokkr.accuracy import open_image, preprocess
 from brokkr.benchmark import make_session
-from brokkr.datasets import (DATASETS, choose_calibration, choose_subset, count_images,
-                             parquet_files, read_parquet_images)
+from brokkr.datasets import (
+    DATASETS,
+    choose_calibration,
+    choose_subset,
+    count_images,
+    parquet_files,
+    read_parquet_images,
+)
 from brokkr.export import MODELS, file_info
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.quantize import INT8_SETTINGS, to_fp16, to_int8

@@ -155,8 +155,8 @@ def render_html(accuracy: list, speed: list, sizes: list, machines: list, licenc
 </head>
 <body>
 <h1>Brokkr: measured results</h1>
-<p>Early development (Stage 1 of 7). Every number below was measured by Brokkr's own code on the
-machine listed; nothing is estimated or copied from elsewhere.</p>
+<p>Early development (see ROADMAP.md for progress). Every number below was measured by
+Brokkr's own code on the machine listed; nothing is estimated or copied from elsewhere.</p>
 {"".join(sections)}
 <hr>
 <p><small>Built {built} from code at commit {e(commit[:7])}.

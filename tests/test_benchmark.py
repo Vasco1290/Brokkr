@@ -102,6 +102,7 @@ def test_incomplete_record_is_refused(tmp_path):
 
 def test_pinning_to_one_cpu_then_back(tiny_model):
     import os
+
     from brokkr.benchmark import pin_to_cpus
     try:
         pin_to_cpus([0])

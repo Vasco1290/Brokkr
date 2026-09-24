@@ -62,7 +62,7 @@ def read_parquet_images(files: list, positions: np.ndarray):
         for batch in pq.ParquetFile(f).iter_batches(batch_size=256, columns=["image", "label"]):
             images = batch.column("image").to_pylist()  # each is {"bytes": ..., "path": ...}
             labels = batch.column("label").to_pylist()
-            for image, label in zip(images, labels):
+            for image, label in zip(images, labels, strict=True):
                 if position in wanted:
                     yield image["bytes"], label
                 position += 1
