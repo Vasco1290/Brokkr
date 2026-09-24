@@ -41,7 +41,7 @@ def accuracy_rows(records: list) -> list:
         s, m = r["settings"], r["metrics"]
         row = {"model": r["model"], "precision": r["precision"], "dataset": s["dataset"],
                "n_images": s["n_images"], "top1": m["top1"], "top1_ci95": m["top1_ci95"],
-               "top5": m["top5"], "diff_vs_fp32": None}
+               "top5": m["top5"], "diff_vs_fp32": None, "ties": m.get("top1_tied_images", 0)}
         fp32 = by_key.get((r["model"], "fp32", s["dataset"], s["n_images"]))
         if fp32 and r["precision"] != "fp32" and fp32["raw"]["labels"] == r["raw"]["labels"]:
             row["diff_vs_fp32"] = paired_bootstrap_diff(top1_correct(fp32), top1_correct(r))
@@ -101,11 +101,16 @@ def render_html(accuracy: list, speed: list, sizes: list, machines: list, licenc
             if r["diff_vs_fp32"]:
                 d, dlo, dhi = r["diff_vs_fp32"]
                 diff = f"{d * 100:+.2f} pts ({dlo * 100:+.2f} to {dhi * 100:+.2f})"
+            top1 = f"{pct(r['top1'])} ({pct(lo)} – {pct(hi)})"
+            if r["ties"]:
+                top1 += f" · {r['ties']:,} tied"
             rows.append([e(r["model"]), e(r["precision"]), e(r["dataset"]), f"{r['n_images']:,}",
-                         f"{pct(r['top1'])} ({pct(lo)} – {pct(hi)})", pct(r["top5"]), diff])
+                         top1, pct(r["top5"]), diff])
         sections.append(
             "<h2>Accuracy</h2><p>Top-1 = the model's first guess is right. Brackets are 95% "
-            "bootstrap confidence intervals. “vs FP32” is the paired difference on the same images.</p>"
+            "bootstrap confidence intervals. “vs FP32” is the paired difference on the same images. "
+            "“Tied” counts images where two classes had exactly the same top score (common for INT8, "
+            "whose outputs are rounded); ties go to the lower class number.</p>"
             + table(["Model", "Precision", "Dataset", "Images", "Top-1 (95% CI)", "Top-5", "Top-1 vs FP32"],
                     rows))
 

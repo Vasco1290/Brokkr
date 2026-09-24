@@ -118,16 +118,30 @@ def predict_logits(onnx_path, samples, batch_size: int = 32, num_threads: int = 
 
 
 def accuracy_from_logits(logits: np.ndarray, labels: np.ndarray, seed: int = 0) -> dict:
-    """Top-1/top-5 accuracy with bootstrap intervals, computed from saved logits."""
-    top5 = np.argsort(-logits, axis=1)[:, :5]
+    """Top-1/top-5 accuracy with bootstrap intervals, computed from saved logits.
+
+    Ties: INT8 models output only a few hundred distinct score values, so two classes can tie
+    exactly for first place. Ties are always broken the same way, towards the lower class
+    number (as np.argmax does), and the number of tied images plus the lowest and highest
+    top-1 accuracy any tie-break could give are recorded.
+    """
+    top5 = np.argsort(-logits, axis=1, kind="stable")[:, :5]  # stable: lower class wins ties
     top1_correct = (top5[:, 0] == labels).astype(np.float64)
     top5_correct = (top5 == labels[:, None]).any(axis=1).astype(np.float64)
+
+    best = logits.max(axis=1)
+    tied = (logits == best[:, None]).sum(axis=1) > 1
+    label_among_best = logits[np.arange(len(labels)), labels] == best
     return {
         "metrics": {
             "top1": float(top1_correct.mean()),
             "top1_ci95": list(bootstrap_ci(top1_correct, seed=seed)),  # list, as JSON stores it
             "top5": float(top5_correct.mean()),
             "top5_ci95": list(bootstrap_ci(top5_correct, seed=seed)),
+            "top1_tied_images": int(tied.sum()),
+            # Worst case: every tie resolved wrongly. Best case: every tie containing the label won.
+            "top1_range_over_tie_breaks": [float((top1_correct * ~tied).mean()),
+                                           float(((top1_correct > 0) | (tied & label_among_best)).mean())],
         },
         "raw": {"labels": labels.tolist(), "top5_predictions": top5.tolist()},
     }
