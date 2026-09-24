@@ -4,7 +4,8 @@ For stable numbers: plug the laptop in, set Windows power mode to "Best performa
 and close other programs. The script records the power state either way.
 
 Usage:  python scripts/02_benchmark_speed.py [--model NAME] [--precision fp32 fp16 int8]
-                    [--threads 1 4] [--cores performance|efficiency|all] [--sessions 5] [--pause 5]
+                    [--threads 1 4] [--cores performance|efficiency|all] [--sessions 10]
+                    [--pause 5] [--cooldown 0]
 Needs:  models/<model>_<precision>.onnx  (scripts/01_export_model.py, scripts/04_quantize.py)
 Writes: results/speed/<model>_<precision>_<N>threads_<cores>_<power>.json, one per precision and
         thread count; <power> is "ac", "battery", or "unknownpower", plus the Windows power mode
@@ -28,7 +29,9 @@ parser.add_argument("--model", default="mobilenet_v3_large")
 parser.add_argument("--precision", nargs="+", default=["fp32"])
 parser.add_argument("--threads", type=int, nargs="+", default=[1, 4])
 parser.add_argument("--cores", choices=["performance", "efficiency", "all"], default="performance")
-parser.add_argument("--sessions", type=int, default=5, help="repeat everything this many times")
+parser.add_argument("--sessions", type=int, default=10, help="repeat everything this many times")
+parser.add_argument("--cooldown", type=float, default=0,
+                    help="seconds to rest before starting, e.g. after heavy work heated the machine")
 parser.add_argument("--pause", type=float, default=5, help="seconds to rest between sessions")
 args = parser.parse_args()
 
@@ -67,6 +70,10 @@ for t in sorted(set(args.threads) - set(threads_list)):
     print(f"Skipping {t} threads: more than the {len(cpu_ids)} chosen CPUs.")
 print()
 
+if args.cooldown:
+    print(f"Cooling down for {args.cooldown:.0f} s before measuring...")
+    time.sleep(args.cooldown)
+
 # Each session takes turns over every (precision, threads) pair, so if the machine speeds up
 # or slows down over time, every combination is affected equally and comparisons stay fair.
 combos = [(p, t) for p in args.precision for t in threads_list]
@@ -80,6 +87,7 @@ for session in range(args.sessions):
 
 print(f"\n{'precision':>9} {'threads':>7} {'p50 ms':>8} {'p95 ms':>8} {'p99 ms':>8}   "
       "p50 range across sessions")
+# IQR = spread of the middle half of sessions; full spread = fastest vs slowest session.
 passed = True
 for (precision, threads), sessions in runs.items():
     result = combine_sessions(sessions)
@@ -90,7 +98,8 @@ for (precision, threads), sessions in runs.items():
 
     m = result["metrics"]
     print(f"{precision:>9} {threads:>7} {m['p50_ms']:>8.2f} {m['p95_ms']:>8.2f} {m['p99_ms']:>8.2f}   "
-          f"{m['p50_ms_min']:.2f}-{m['p50_ms_max']:.2f} (spread {m['p50_spread_pct']:.0f}%)")
+          f"{m['p50_ms_min']:.2f}-{m['p50_ms_max']:.2f} "
+          f"(IQR {m['p50_iqr_pct']:.0f}%, full spread {m['p50_spread_pct']:.0f}%)")
     # Sanity checks: percentiles in order, every session and run recorded.
     passed &= 0 < m["p50_ms"] <= m["p95_ms"] <= m["p99_ms"]
     passed &= len(result["raw"]["sessions"]) == args.sessions

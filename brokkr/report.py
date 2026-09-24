@@ -15,7 +15,7 @@ from brokkr.accuracy import paired_bootstrap_diff
 from brokkr.fingerprint import git_info
 
 PRECISION_ORDER = {"fp32": 0, "fp16": 1, "int8": 2}
-UNSTABLE_SPREAD_PCT = 10  # sessions disagreeing by more than this are flagged
+UNSTABLE_IQR_PCT = 10  # middle half of sessions disagreeing by more than this is flagged
 
 
 def load_json_files(folder) -> list:
@@ -59,7 +59,8 @@ def speed_rows(records: list) -> list:
         rows.append({
             "model": r["model"], "precision": r["precision"], "threads": r["settings"]["num_threads"],
             "p50_ms": m["p50_ms"], "p95_ms": m["p95_ms"], "p99_ms": m["p99_ms"],
-            "spread_pct": m.get("p50_spread_pct"), "sessions": r["settings"].get("sessions", 1),
+            "spread_pct": m.get("p50_spread_pct"), "iqr_pct": m.get("p50_iqr_pct"),
+            "sessions": r["settings"].get("sessions", 1),
             "cores": r["settings"].get("cores", "not pinned"),
             "power": {True: "plugged in", False: "battery", None: "unknown"}[power["on_ac_power"]],
             "power_mode": power.get("power_mode") or "unknown",
@@ -112,17 +113,19 @@ def render_html(accuracy: list, speed: list, sizes: list, machines: list, licenc
         rows = []
         for r in speed:
             spread = "—" if r["spread_pct"] is None else f"{r['spread_pct']:.1f}%"
-            if r["spread_pct"] is not None and r["spread_pct"] > UNSTABLE_SPREAD_PCT:
-                spread += " ⚠ unstable"
+            iqr = "—" if r["iqr_pct"] is None else f"{r['iqr_pct']:.1f}%"
+            if r["iqr_pct"] is not None and r["iqr_pct"] > UNSTABLE_IQR_PCT:
+                iqr += " ⚠ unstable"
             rows.append([e(r["model"]), e(r["precision"]), r["threads"], e(r["cores"]), f"{r['p50_ms']:.2f}",
-                         f"{r['p95_ms']:.2f}", f"{r['p99_ms']:.2f}", spread, r["sessions"],
+                         f"{r['p95_ms']:.2f}", f"{r['p99_ms']:.2f}", iqr, spread, r["sessions"],
                          e(f"{r['power']}, {r['power_mode']}"), e(r["cpu"])])
         sections.append(
             "<h2>Speed</h2><p>Time to classify one image, in milliseconds (median across sessions). "
-            f"“Spread” is how much the sessions disagreed; above {UNSTABLE_SPREAD_PCT}% the machine was "
-            "not stable and the numbers are rough.</p>"
-            + table(["Model", "Precision", "Threads", "Cores", "p50 ms", "p95 ms", "p99 ms", "Spread",
-                     "Sessions", "Power", "CPU"], rows))
+            "“IQR” is how much the middle half of sessions disagreed; above "
+            f"{UNSTABLE_IQR_PCT}% the machine was not stable and the numbers are rough. “Full spread” "
+            "compares the fastest and slowest session, so one unlucky session makes it large.</p>"
+            + table(["Model", "Precision", "Threads", "Cores", "p50 ms", "p95 ms", "p99 ms", "IQR",
+                     "Full spread", "Sessions", "Power", "CPU"], rows))
 
     if not sections:
         sections.append("<p>No results yet.</p>")

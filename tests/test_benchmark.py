@@ -64,8 +64,19 @@ def test_combine_sessions_uses_median_and_reports_spread():
     assert m["p50_ms"] == 12.0  # median, so the slow 20 ms session doesn't drag it up
     assert (m["p50_ms_min"], m["p50_ms_max"]) == (10.0, 20.0)
     assert m["p50_spread_pct"] == pytest.approx((20 - 10) / 12 * 100)
+    # IQR of [10, 12, 20]: 25th percentile 11, 75th percentile 16
+    assert m["p50_iqr_pct"] == pytest.approx((16 - 11) / 12 * 100)
     assert result["settings"]["sessions"] == 3
     assert len(result["raw"]["sessions"]) == 3
+
+
+def test_iqr_ignores_one_unlucky_session():
+    p50s = [5.0, 5.1, 5.0, 5.2, 5.1, 5.0, 5.1, 5.2, 5.0, 11.0]  # one hot session
+    sessions = [{"settings": {}, "metrics": {"mean_ms": p, "p50_ms": p, "p95_ms": p, "p99_ms": p},
+                 "raw": {"latencies_ms": [p]}} for p in p50s]
+    m = combine_sessions(sessions)["metrics"]
+    assert m["p50_spread_pct"] > 100  # full spread is dominated by the one bad session
+    assert m["p50_iqr_pct"] < 5  # the typical sessions agreed closely
 
 
 def test_combine_needs_at_least_two_sessions(tiny_model):

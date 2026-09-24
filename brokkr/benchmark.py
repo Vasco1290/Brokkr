@@ -112,7 +112,12 @@ def combine_sessions(sessions: list) -> dict:
     metrics["p50_ms_min"] = float(min(p50s))
     metrics["p50_ms_max"] = float(max(p50s))
     # Spread: gap between the fastest and slowest session, as a % of the median.
+    # One unlucky session (e.g. the laptop heating up) is enough to make this large.
     metrics["p50_spread_pct"] = float((max(p50s) - min(p50s)) / metrics["p50_ms"] * 100)
+    # IQR spread: gap between the 25th and 75th percentile sessions, as a % of the median.
+    # It ignores the most extreme sessions, so it measures how stable the typical session was.
+    q1, q3 = np.percentile(p50s, [25, 75])
+    metrics["p50_iqr_pct"] = float((q3 - q1) / metrics["p50_ms"] * 100)
 
     return {
         "settings": {**sessions[0]["settings"], "sessions": len(sessions)},
