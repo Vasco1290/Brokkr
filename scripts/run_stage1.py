@@ -33,7 +33,7 @@ steps = [
     ["03_evaluate_accuracy.py", "--precision", "int8"],
 ]
 if args.full:
-    steps.append(["03_evaluate_accuracy.py", "--precision", "fp32", "--n", "0"])
+    steps.append(["03_evaluate_accuracy.py", "--precision", "fp32", "--split", "all"])
 steps.append(["05_build_site.py"])
 
 git = git_info()

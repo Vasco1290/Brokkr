@@ -50,7 +50,7 @@ committed code, speed benchmark pinned to one core type with IQR-based stability
 How much worse does each precision get on damaged photos, and does it still know when it's wrong?
 
 - [x] 2.0 Hypotheses written down *before* measuring (`docs/hypotheses.md`), committed first
-- [ ] 2.1 Fixed, non-overlapping image splits: test 10,000 / conformal calibration 5,000 /
+- [x] 2.1 Fixed, non-overlapping image splits: test 10,000 / conformal calibration 5,000 /
   tuning 5,000 (kept for Stage 3) / INT8 calibration 512
 - [ ] 2.2 Corruptions: fog, defocus blur, motion blur, noise, darkness at 5 severities —
   self-contained module shared with Argos (no Brokkr imports), plus a sample image sheet

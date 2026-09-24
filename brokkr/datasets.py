@@ -54,6 +54,37 @@ def choose_calibration(total: int, n: int, exclude: np.ndarray, seed: int = 1) -
     return np.sort(rng.choice(available, size=n, replace=False))
 
 
+# The one place that decides which ImageNet validation images are used for what.
+# No image is in two groups. "test" and "int8_calibration" are built exactly as in Stage 1
+# (same functions, same seeds), so every Stage 1 result still refers to the same images.
+SPLIT_SIZES = {"test": 10_000, "int8_calibration": 512, "conformal_calibration": 5_000, "tuning": 5_000}
+SPLIT_SEEDS = {"test": 0, "int8_calibration": 1, "other_splits": 2}
+
+
+def make_splits(total: int) -> dict:
+    """Return {split name: sorted image positions} for a dataset of `total` images.
+
+    test                   the images every accuracy/reliability result is measured on
+    int8_calibration       used to build the INT8 model
+    conformal_calibration  used to tune conformal prediction sets (Stage 2)
+    tuning                 held back for choosing settings in Stage 3 fixes
+    """
+    test = choose_subset(total, SPLIT_SIZES["test"], seed=SPLIT_SEEDS["test"])
+    int8 = choose_calibration(total, SPLIT_SIZES["int8_calibration"], exclude=test,
+                              seed=SPLIT_SEEDS["int8_calibration"])
+    remaining = np.setdiff1d(np.arange(total), np.concatenate([test, int8]))
+    shuffled = np.random.default_rng(SPLIT_SEEDS["other_splits"]).permutation(remaining)
+    n_conf, n_tune = SPLIT_SIZES["conformal_calibration"], SPLIT_SIZES["tuning"]
+    if len(shuffled) < n_conf + n_tune:
+        raise ValueError(f"only {total} images: not enough for all splits")
+    return {
+        "test": test,
+        "int8_calibration": int8,
+        "conformal_calibration": np.sort(shuffled[:n_conf]),
+        "tuning": np.sort(shuffled[n_conf:n_conf + n_tune]),
+    }
+
+
 def read_parquet_images(files: list, positions: np.ndarray):
     """Yield (image_bytes, label) for the chosen positions, reading one chunk at a time."""
     wanted = set(positions.tolist())

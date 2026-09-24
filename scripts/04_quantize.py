@@ -1,12 +1,12 @@
 """Make FP16 and INT8 versions of an exported FP32 model.
 
-Usage:  python scripts/04_quantize.py [--model NAME] [--calibration-images 512]
+Usage:  python scripts/04_quantize.py [--model NAME]
 Needs:  models/<model>_fp32.onnx and data/imagenet-1k/
 Writes: models/<model>_fp16.onnx, models/<model>_int8.onnx, and a .json record for each
 
-INT8 calibration images come from the ImageNet validation set but are chosen so they never
-overlap the fixed 10,000-image test subset used by scripts/03_evaluate_accuracy.py (seed 0).
-They DO fall inside the full 50,000 set, which a --n 0 accuracy run must disclose.
+INT8 calibration uses the "int8_calibration" split (512 images) from brokkr.datasets.make_splits,
+which never overlaps the "test" split. Those images DO fall inside the full 50,000 set, which a
+--split all accuracy run must disclose.
 
 Sanity check (not a result): on 256 test images, how often does each smaller model pick the
 same top class as FP32? Below 90% prints a WARNING - a real accuracy loss worth studying.
@@ -22,27 +22,17 @@ import numpy as np
 
 from brokkr.accuracy import open_image, preprocess
 from brokkr.benchmark import make_session
-from brokkr.datasets import (
-    DATASETS,
-    choose_calibration,
-    choose_subset,
-    count_images,
-    parquet_files,
-    read_parquet_images,
-)
+from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
 from brokkr.export import MODELS, file_info
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.quantize import INT8_SETTINGS, to_fp16, to_int8
 
 DATASET = "imagenet-1k-val"
-TEST_SUBSET = {"n": 10_000, "seed": 0}  # must match scripts/03_evaluate_accuracy.py defaults
 WARN_AGREEMENT = 0.90
 FAIL_AGREEMENT = 0.20
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
-parser.add_argument("--calibration-images", type=int, default=512)
-parser.add_argument("--calibration-seed", type=int, default=1)
 args = parser.parse_args()
 
 fp32_path = Path("models") / f"{args.model}_fp32.onnx"
@@ -63,10 +53,8 @@ def batches_of(samples, size=32):
 
 files = parquet_files(DATASET)
 total = count_images(files)
-test_positions = choose_subset(total, TEST_SUBSET["n"], seed=TEST_SUBSET["seed"])
-calib_positions = choose_calibration(total, args.calibration_images, exclude=test_positions,
-                                     seed=args.calibration_seed)
-assert not set(calib_positions) & set(test_positions), "calibration overlaps test images"
+splits = make_splits(total)
+test_positions, calib_positions = splits["test"], splits["int8_calibration"]
 
 paths = {"fp16": Path("models") / f"{args.model}_fp16.onnx",
          "int8": Path("models") / f"{args.model}_int8.onnx"}
@@ -79,8 +67,8 @@ settings = {
     "fp16": {"method": "onnxconverter-common float16, inputs/outputs kept FP32"},
     "int8": {**INT8_SETTINGS, "calibration": {
         "dataset": DATASET, "dataset_licence": DATASETS[DATASET]["licence"],
-        "n_images": len(calib_positions), "seed": args.calibration_seed,
-        "excludes": f"the {TEST_SUBSET['n']}-image test subset (seed {TEST_SUBSET['seed']})"}},
+        "split": "int8_calibration", "n_images": len(calib_positions),
+        "excludes": "all other splits, including test"}},
 }
 
 # Sanity check: compare top-1 choices with FP32 on 256 test images.

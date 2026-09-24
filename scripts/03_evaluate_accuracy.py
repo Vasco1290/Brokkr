@@ -1,7 +1,8 @@
 """Measure top-1/top-5 accuracy of an exported ONNX model on the ImageNet validation set.
 
-Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32] [--n 10000 | --n 0]
-        --n 0 means all 50,000 images.
+Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32] [--split test|all]
+        --split test: the fixed 10,000-image test split (brokkr.datasets.make_splits)
+        --split all:  all 50,000 images (includes the 512 INT8 calibration images; FP32 check only)
 Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/ (see README)
 Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<n>.json
 
@@ -18,8 +19,10 @@ import sys
 import time
 from pathlib import Path
 
+import numpy as np
+
 from brokkr.accuracy import evaluate
-from brokkr.datasets import DATASETS, choose_subset, count_images, parquet_files, read_parquet_images
+from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
 from brokkr.export import MODELS
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.results import make_record, save_record
@@ -29,9 +32,9 @@ DATASET = "imagenet-1k-val"
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
 parser.add_argument("--precision", default="fp32")
-parser.add_argument("--n", type=int, default=10_000, help="number of images; 0 = all")
+parser.add_argument("--split", choices=["test", "all"], default="test")
 parser.add_argument("--threads", type=int, default=4)
-parser.add_argument("--seed", type=int, default=0)
+parser.add_argument("--seed", type=int, default=0, help="seed for the bootstrap intervals")
 args = parser.parse_args()
 
 onnx_path = Path("models") / f"{args.model}_{args.precision}.onnx"
@@ -40,7 +43,7 @@ if not onnx_path.exists():
 
 files = parquet_files(DATASET)
 total = count_images(files)
-positions = choose_subset(total, args.n or None, seed=args.seed)
+positions = np.arange(total) if args.split == "all" else make_splits(total)["test"]
 print(f"Evaluating {onnx_path} on {len(positions)} of {total} images ({DATASET})...")
 
 start = time.time()
@@ -48,7 +51,7 @@ result = evaluate(onnx_path, read_parquet_images(files, positions),
                   num_threads=args.threads, seed=args.seed)
 result["settings"].update({"dataset": DATASET, "dataset_total_images": total,
                            "dataset_licence": DATASETS[DATASET]["licence"],
-                           "subset_seed": args.seed})
+                           "split": args.split})
 
 # Published number from torchvision, kept separate from our own measurements.
 reported = MODELS[args.model]["weights"].meta["_metrics"]["ImageNet-1K"]["acc@1"] / 100
