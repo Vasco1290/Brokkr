@@ -56,7 +56,7 @@ How much worse does each precision get on damaged photos, and does it still know
   self-contained module shared with Argos (no Brokkr imports), plus a sample image sheet
 - [x] 2.3 Save every class score (logits, float32 .npz with checksum) so every reliability number
   can be recomputed
-- [ ] 2.4 Calibration: expected calibration error (ECE) and reliability diagram data
+- [x] 2.4 Calibration: expected calibration error (ECE) and reliability diagram data
 - [ ] 2.5 Conformal prediction: 90% sets tuned on clean calibration images; coverage and set
   size on clean and corrupted test images
 - [ ] 2.6 Selective prediction: risk–coverage curves and AURC
