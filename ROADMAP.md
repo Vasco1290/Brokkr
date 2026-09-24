@@ -24,7 +24,8 @@ One model, three precisions, measured honestly on the laptop.
   5 interleaved sessions (median + spread); power state recorded
   - [ ] Run plugged in, "Best performance" mode, to compare with the battery runs
     (battery runs so far: session-to-session spread 24% to over 1000%)
-- [ ] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
+- [x] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
+  (ImageNet-1k validation; correctness check against torchvision's published top-1 passes)
 - [ ] 1.6 FP16 and INT8 versions, same measurements
 - [ ] 1.7 Walking-skeleton website: a Python script turns results JSON into one plain HTML page,
   published on GitHub Pages. Real numbers only, no design yet.

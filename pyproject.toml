@@ -18,10 +18,13 @@ dependencies = [
     "onnx>=1.23",
     "onnxruntime>=1.23",
     "onnxscript>=0.7",  # needed by torch.onnx.export
+    "pillow>=12.3",
+    "pyarrow>=25.0",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
+data = ["huggingface_hub>=1.32"]  # only needed to download datasets
 
 [tool.setuptools.packages.find]
 include = ["brokkr*"]
