@@ -5,6 +5,13 @@ so stopping at any stage still leaves something finished.
 
 Status key: `[ ]` not started, `[~]` in progress, `[x]` done.
 
+The website grows with every stage as a **walking skeleton**: the thinnest end-to-end version
+(results JSON -> HTML page) exists from Stage 1, and each stage adds only what it actually measured.
+
+Languages: Python for the factory, test lab, and site builder; HTML/CSS (+ a little JavaScript for
+search) for the website; a shell script for the installer. The device runner starts in Python and moves
+to C++ only if measurements show Python overhead matters.
+
 ## Stage 1 — Core measurement `[~]`
 
 One model, three precisions, measured honestly on the laptop.
@@ -13,11 +20,17 @@ One model, three precisions, measured honestly on the laptop.
 - [x] 1.2 Machine fingerprint: CPU, OS, package versions, git commit attached to every result
   (the thread count is a benchmark setting, recorded by the benchmark in 1.4)
 - [x] 1.3 Export MobileNetV3 (torchvision) to ONNX FP32
-- [ ] 1.4 Speed benchmark: fixed threads, >=20 warm-up, >=100 timed runs, p50/p95/p99 -> JSON
+- [x] 1.4 Speed benchmark: fixed threads, >=20 warm-up, >=100 timed runs, p50/p95/p99 -> JSON;
+  5 interleaved sessions (median + spread); power state recorded
+  - [ ] Run plugged in, "Best performance" mode, to compare with the battery runs
+    (battery runs so far: session-to-session spread 24% to over 1000%)
 - [ ] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
 - [ ] 1.6 FP16 and INT8 versions, same measurements
+- [ ] 1.7 Walking-skeleton website: a Python script turns results JSON into one plain HTML page,
+  published on GitHub Pages. Real numbers only, no design yet.
 
-**Done when:** one command produces real speed/size/accuracy numbers for FP32/FP16/INT8, and tests pass.
+**Done when:** one command produces real speed/size/accuracy numbers for FP32/FP16/INT8, they appear on
+the live page, and tests pass.
 
 ## Stage 2 — Stress test `[ ]`
 

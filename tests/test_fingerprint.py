@@ -29,6 +29,12 @@ def test_git_commit_is_recorded():
     assert commit is not None and re.fullmatch(r"[0-9a-f]{40}", commit)
 
 
+def test_power_state_has_valid_values():
+    power = machine_fingerprint()["power"]
+    assert power["on_ac_power"] in (True, False, None)
+    assert power["battery_percent"] is None or 0 <= power["battery_percent"] <= 100
+
+
 def test_missing_package_is_none_not_an_error():
     versions = package_versions(("brokkr", "definitely-not-a-real-package-xyz"))
     assert versions["brokkr"] is not None

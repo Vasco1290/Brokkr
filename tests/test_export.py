@@ -5,33 +5,38 @@ correct does not depend on which weights are inside.
 """
 
 import onnxruntime as ort
+import pytest
 import torch
 
 from brokkr.export import compare_with_pytorch, export_onnx, file_info, load_model
 
 
-def test_export_matches_pytorch(tmp_path):
+@pytest.fixture(scope="module")
+def exported(tmp_path_factory):
+    """Export once and share the result between tests (exporting takes several seconds)."""
     torch.manual_seed(0)
     model = load_model("mobilenet_v3_large", pretrained=False)
-    path = export_onnx(model, tmp_path / "model.onnx")
+    path = export_onnx(model, tmp_path_factory.mktemp("export") / "model.onnx")
+    return model, path
 
+
+def test_export_matches_pytorch(exported):
+    model, path = exported
     check = compare_with_pytorch(model, path)
     assert check["max_abs_diff"] < 1e-4
     assert check["top1_agreement"] == 1.0
 
 
-def test_exported_model_accepts_any_batch_size(tmp_path):
-    model = load_model("mobilenet_v3_large", pretrained=False)
-    path = export_onnx(model, tmp_path / "model.onnx")
+def test_exported_model_accepts_any_batch_size(exported):
+    _, path = exported
     session = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
-
     for batch in (1, 3):
         out = session.run(None, {"images": torch.zeros(batch, 3, 224, 224).numpy()})[0]
         assert out.shape == (batch, 1000)
 
 
-def test_file_info(tmp_path):
-    path = export_onnx(load_model("mobilenet_v3_large", pretrained=False), tmp_path / "m.onnx")
+def test_file_info(exported):
+    _, path = exported
     info = file_info(path)
     assert info["size_bytes"] > 0
     assert len(info["sha256"]) == 64

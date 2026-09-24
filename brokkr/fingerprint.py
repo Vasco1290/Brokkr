@@ -11,6 +11,7 @@ import platform
 import subprocess
 import sys
 from importlib import metadata
+from pathlib import Path
 
 DEFAULT_PACKAGES = ("brokkr", "numpy", "torch", "torchvision", "onnx", "onnxruntime")
 
@@ -80,6 +81,62 @@ def git_info() -> dict:
         return {"commit": None, "dirty": None}
 
 
+# Windows 10/11 power mode slider ("Best power efficiency" ... "Best performance").
+WINDOWS_POWER_MODES = {
+    "961cc777-2547-4f9d-8174-7d86181b8a7a": "best power efficiency",
+    "00000000-0000-0000-0000-000000000000": "balanced",
+    "ded574b5-45a0-4f42-8737-46345c09c238": "best performance",
+}
+
+
+def power_state() -> dict:
+    """Is the machine plugged in, and (on Windows) which power mode is it in?
+
+    Laptops on battery or in power-saving modes run slower, so speed results must record this.
+    None means "could not tell" (e.g. a desktop or board with no battery information).
+    """
+    state = {"on_ac_power": None, "battery_percent": None, "battery_saver": None, "power_mode": None}
+    if platform.system() == "Windows":
+        import ctypes
+
+        class SystemPowerStatus(ctypes.Structure):
+            _fields_ = [("ACLineStatus", ctypes.c_ubyte), ("BatteryFlag", ctypes.c_ubyte),
+                        ("BatteryLifePercent", ctypes.c_ubyte), ("SystemStatusFlag", ctypes.c_ubyte),
+                        ("BatteryLifeTime", ctypes.c_ulong), ("BatteryFullLifeTime", ctypes.c_ulong)]
+
+        status = SystemPowerStatus()
+        if ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(status)):
+            if status.ACLineStatus in (0, 1):  # 255 = unknown
+                state["on_ac_power"] = bool(status.ACLineStatus)
+            if status.BatteryLifePercent <= 100:  # 255 = unknown
+                state["battery_percent"] = status.BatteryLifePercent
+            state["battery_saver"] = bool(status.SystemStatusFlag)
+
+        class Guid(ctypes.Structure):
+            _fields_ = [("d1", ctypes.c_ulong), ("d2", ctypes.c_ushort), ("d3", ctypes.c_ushort),
+                        ("d4", ctypes.c_ubyte * 8)]
+
+        guid = Guid()
+        try:
+            if ctypes.windll.powrprof.PowerGetEffectiveOverlayScheme(ctypes.byref(guid)) == 0:
+                d4 = bytes(guid.d4).hex()
+                text = f"{guid.d1:08x}-{guid.d2:04x}-{guid.d3:04x}-{d4[:4]}-{d4[4:]}"
+                state["power_mode"] = WINDOWS_POWER_MODES.get(text, text)
+        except (AttributeError, OSError):  # older Windows versions lack this function
+            pass
+    elif platform.system() == "Linux":
+        # Mains adapters appear as /sys/class/power_supply/<name>/ with type "Mains".
+        for supply in Path("/sys/class/power_supply").glob("*"):
+            try:
+                if (supply / "type").read_text().strip() == "Mains":
+                    state["on_ac_power"] = (supply / "online").read_text().strip() == "1"
+                elif (supply / "type").read_text().strip() == "Battery":
+                    state["battery_percent"] = int((supply / "capacity").read_text())
+            except (OSError, ValueError):
+                pass
+    return state
+
+
 def os_release() -> str:
     """Return the OS release, e.g. '11' for Windows 11.
 
@@ -104,6 +161,7 @@ def machine_fingerprint(packages=DEFAULT_PACKAGES) -> dict:
         "os": platform.system(),
         "os_release": os_release(),
         "os_version": platform.version(),
+        "power": power_state(),
         "python_version": sys.version.split()[0],
         "packages": package_versions(packages),
         "git": git_info(),
