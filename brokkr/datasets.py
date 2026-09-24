@@ -47,6 +47,13 @@ def choose_subset(total: int, n: int | None, seed: int = 0) -> np.ndarray:
     return np.sort(rng.choice(total, size=n, replace=False))
 
 
+def choose_calibration(total: int, n: int, exclude: np.ndarray, seed: int = 1) -> np.ndarray:
+    """Pick n image positions for calibration that are NOT in `exclude` (the test images)."""
+    available = np.setdiff1d(np.arange(total), exclude)
+    rng = np.random.default_rng(seed)
+    return np.sort(rng.choice(available, size=n, replace=False))
+
+
 def read_parquet_images(files: list, positions: np.ndarray):
     """Yield (image_bytes, label) for the chosen positions, reading one chunk at a time."""
     wanted = set(positions.tolist())

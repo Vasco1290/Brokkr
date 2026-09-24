@@ -18,6 +18,7 @@ dependencies = [
     "onnx>=1.23",
     "onnxruntime>=1.23",
     "onnxscript>=0.7",  # needed by torch.onnx.export
+    "onnxconverter-common>=1.16",  # FP16 conversion (MIT)
     "pillow>=12.3",
     "pyarrow>=25.0",
 ]

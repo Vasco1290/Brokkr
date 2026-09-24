@@ -26,7 +26,7 @@ One model, three precisions, measured honestly on the laptop.
     (battery runs so far: session-to-session spread 24% to over 1000%)
 - [x] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
   (ImageNet-1k validation; correctness check against torchvision's published top-1 passes)
-- [ ] 1.6 FP16 and INT8 versions, same measurements
+- [x] 1.6 FP16 and INT8 versions, same measurements (INT8 with ONNX Runtime default settings)
 - [ ] 1.7 Walking-skeleton website: a Python script turns results JSON into one plain HTML page,
   published on GitHub Pages. Real numbers only, no design yet.
 
@@ -45,6 +45,10 @@ the live page, and tests pass.
 
 - Hypotheses written down *before* measuring (`docs/hypotheses.md`)
 - Fixes: recalibration after quantization, mixed precision, shift-aware conformal
+- INT8 calibration study: MinMax vs Percentile vs Entropy, chosen on a tuning set disjoint from both
+  calibration and test images, then measured on the test set. Motivation: in task 1.6, ONNX Runtime's
+  default (MinMax) INT8 MobileNetV3 disagreed with FP32 on about a third of images; a quick diagnostic
+  (on test images, so not a result) suggested outlier-robust calibration recovers much of it.
 - Experiment: INT8 calibration on clean vs corrupted images
 - Write-up with a limitations section
 

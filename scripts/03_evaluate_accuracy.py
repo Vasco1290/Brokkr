@@ -5,12 +5,15 @@ Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32]
 Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/ (see README)
 Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<n>.json
 
-Correctness check: torchvision publishes its own top-1 accuracy for these weights on this
-same dataset. If our pipeline is right, that published number should fall inside our 95%
-confidence interval. (Even a correct pipeline misses about 1 time in 20 by chance.)
+Correctness check (FP32 only): torchvision publishes its own top-1 accuracy for these FP32
+weights on this same dataset. If our pipeline is right, that published number should fall
+inside our 95% confidence interval. (Even a correct pipeline misses about 1 time in 20.)
+For FP16/INT8 a lower accuracy is a finding, not an error, so instead the script prints the
+change versus our own FP32 result on the same images, if that result exists.
 """
 
 import argparse
+import json
 import sys
 import time
 from pathlib import Path
@@ -61,9 +64,20 @@ lo, hi = m["top1_ci95"]
 print(f"Done in {time.time() - start:.0f} s. Saved to {out}\n")
 print(f"Top-1: {m['top1']:.2%}  (95% CI {lo:.2%} - {hi:.2%})")
 print(f"Top-5: {m['top5']:.2%}  (95% CI {m['top5_ci95'][0]:.2%} - {m['top5_ci95'][1]:.2%})")
-print(f"torchvision's published top-1: {reported:.2%}")
-
-passed = lo <= reported <= hi
-print("PASS: published number is inside our confidence interval" if passed else
-      "FAIL: published number is outside our confidence interval - check preprocessing/labels")
+if args.precision == "fp32":
+    print(f"torchvision's published top-1: {reported:.2%}")
+    passed = lo <= reported <= hi
+    print("PASS: published number is inside our confidence interval" if passed else
+          "FAIL: published number is outside our confidence interval - check preprocessing/labels")
+else:
+    fp32_file = out.with_name(out.name.replace(f"_{args.precision}_", "_fp32_"))
+    if fp32_file.exists():
+        fp32_top1 = json.loads(fp32_file.read_text())["metrics"]["top1"]
+        print(f"Change vs our FP32 on the same images: {(m['top1'] - fp32_top1) * 100:+.2f} points "
+              f"(FP32 {fp32_top1:.2%})")
+    else:
+        print(f"(No FP32 result at {fp32_file} to compare with.)")
+    # Basic sanity: every requested image was evaluated and the metrics make sense.
+    passed = result["settings"]["n_images"] == len(positions) and 0 <= m["top1"] <= m["top5"] <= 1
+    print("PASS" if passed else "FAIL: evaluation incomplete or metrics inconsistent")
 sys.exit(0 if passed else 1)
