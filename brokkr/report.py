@@ -52,13 +52,15 @@ def accuracy_rows(records: list) -> list:
 def speed_rows(records: list) -> list:
     rows = []
     # Group by power state first, so battery and plugged-in runs aren't mixed together.
-    for r in sorted(records, key=lambda r: (str(r["machine"]["power"]["on_ac_power"]),) + order(r)
+    for r in sorted(records, key=lambda r: (str(r["machine"]["power"]["on_ac_power"]),
+                                           r["settings"].get("cores", "not pinned")) + order(r)
                     + (r["settings"]["num_threads"],)):
         m, power = r["metrics"], r["machine"]["power"]
         rows.append({
             "model": r["model"], "precision": r["precision"], "threads": r["settings"]["num_threads"],
             "p50_ms": m["p50_ms"], "p95_ms": m["p95_ms"], "p99_ms": m["p99_ms"],
             "spread_pct": m.get("p50_spread_pct"), "sessions": r["settings"].get("sessions", 1),
+            "cores": r["settings"].get("cores", "not pinned"),
             "power": {True: "plugged in", False: "battery", None: "unknown"}[power["on_ac_power"]],
             "power_mode": power.get("power_mode") or "unknown",
             "cpu": r["machine"]["cpu_model"],
@@ -112,14 +114,14 @@ def render_html(accuracy: list, speed: list, sizes: list, machines: list, licenc
             spread = "—" if r["spread_pct"] is None else f"{r['spread_pct']:.1f}%"
             if r["spread_pct"] is not None and r["spread_pct"] > UNSTABLE_SPREAD_PCT:
                 spread += " ⚠ unstable"
-            rows.append([e(r["model"]), e(r["precision"]), r["threads"], f"{r['p50_ms']:.2f}",
+            rows.append([e(r["model"]), e(r["precision"]), r["threads"], e(r["cores"]), f"{r['p50_ms']:.2f}",
                          f"{r['p95_ms']:.2f}", f"{r['p99_ms']:.2f}", spread, r["sessions"],
                          e(f"{r['power']}, {r['power_mode']}"), e(r["cpu"])])
         sections.append(
             "<h2>Speed</h2><p>Time to classify one image, in milliseconds (median across sessions). "
             f"“Spread” is how much the sessions disagreed; above {UNSTABLE_SPREAD_PCT}% the machine was "
             "not stable and the numbers are rough.</p>"
-            + table(["Model", "Precision", "Threads", "p50 ms", "p95 ms", "p99 ms", "Spread",
+            + table(["Model", "Precision", "Threads", "Cores", "p50 ms", "p95 ms", "p99 ms", "Spread",
                      "Sessions", "Power", "CPU"], rows))
 
     if not sections:

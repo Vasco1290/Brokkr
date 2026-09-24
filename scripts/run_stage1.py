@@ -26,7 +26,8 @@ args = parser.parse_args()
 steps = [
     ["01_export_model.py"],
     ["04_quantize.py"],
-    ["02_benchmark_speed.py", "--precision", "fp32", "fp16", "int8", "--threads", "1", "2", "4", "8"],
+    ["02_benchmark_speed.py", "--precision", "fp32", "fp16", "int8", "--threads", "1", "2", "4", "8",
+     "--cores", "performance"],
     ["03_evaluate_accuracy.py", "--precision", "fp32"],
     ["03_evaluate_accuracy.py", "--precision", "fp16"],
     ["03_evaluate_accuracy.py", "--precision", "int8"],

@@ -5,6 +5,8 @@ at least 20 warm-up runs that are thrown away, then at least 100 timed runs.
 This module has no Brokkr-specific assumptions: it only needs an .onnx file.
 """
 
+import os
+import platform
 import time
 
 import numpy as np
@@ -12,6 +14,27 @@ import onnxruntime as ort
 
 MIN_WARMUP = 20
 MIN_RUNS = 100
+
+
+def pin_to_cpus(cpu_ids: list) -> None:
+    """Make this process (and every thread it starts) run only on the given logical CPUs.
+
+    On hybrid CPUs, pinning to one kind of core stops the OS from moving the benchmark
+    between fast and slow cores, which otherwise makes timings jump between two speeds.
+    """
+    if platform.system() == "Linux":
+        os.sched_setaffinity(0, set(cpu_ids))
+    elif platform.system() == "Windows":
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        kernel32.GetCurrentProcess.restype = ctypes.c_void_p
+        mask = sum(1 << cpu for cpu in cpu_ids)
+        if not kernel32.SetProcessAffinityMask(ctypes.c_void_p(kernel32.GetCurrentProcess()),
+                                               ctypes.c_size_t(mask)):
+            raise OSError(f"could not pin to CPUs {cpu_ids}")
+    else:
+        raise NotImplementedError(f"CPU pinning not supported on {platform.system()}")
 
 
 def make_session(onnx_path, num_threads: int) -> ort.InferenceSession:

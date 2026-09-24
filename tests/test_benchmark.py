@@ -87,3 +87,14 @@ def test_record_round_trip(tiny_model, tmp_path):
 def test_incomplete_record_is_refused(tmp_path):
     with pytest.raises(ValueError):
         save_record({"kind": "speed"}, tmp_path / "bad.json")
+
+
+def test_pinning_to_one_cpu_then_back(tiny_model):
+    import os
+    from brokkr.benchmark import pin_to_cpus
+    try:
+        pin_to_cpus([0])
+        result = benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), num_threads=1)
+        assert result["metrics"]["p50_ms"] > 0
+    finally:
+        pin_to_cpus(list(range(os.cpu_count())))  # don't leave the test process pinned
