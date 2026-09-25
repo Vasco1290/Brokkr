@@ -6,7 +6,9 @@ predictions (`docs/hypotheses_stage3.md`, task 3.0) are committed. Task 3.1 is d
 on the clean and damaged `tuning` and `conformal_calibration` images are saved. No Stage 3 setting
 was chosen from them in 3.1. Task 3.2 is done: Percentile 99.99 was chosen as "best INT8" on the
 tuning split. Task 3.3 is done: the five leave-one-corruption-out INT8 models (half-damaged
-calibration images) are built and checked. No Stage 3 fix has been measured on the test split yet.
+calibration images) are built and checked. Task 3.4 is done: best INT8 with an unrounded final output
+is built. A calibration-luck analysis (noise floor for 3.7) is done. No Stage 3 fix has been measured
+on the test split yet.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -161,9 +163,11 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `11_choose_int8.py` | `results/choices/*_int8_method.json` (the pre-registered choice rule) |
 | `12_int8_grouping_check.py` | `results/checks/*_grouping.json`: repeat build + group-64 comparison |
 | `13_int8_damaged_calibration.py` | `models/*_mixed_without_<corruption>.onnx` + records (task 3.3) |
+| `14_int8_calibration_luck.py` | `models/*_calibseed<seed>.onnx`, `results/checks/*_calibration_luck.json` |
+| `15_int8_unrounded_output.py` | `models/*_unrounded.onnx` + record (task 3.4) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (108 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (112 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -176,11 +180,13 @@ design rules and predictions, committed before measuring).
 | `data/cache/` | 2.9 GB | Test, tuning and conformal-calibration images, resized and cropped, plus labels | sweep script |
 | `data/old_results_stage1/` | 98 MB | Superseded results, kept for the record | various |
 | `data/old_results_3.1_dirty/` | 3.8 GB | First 3.1 run (records say `dirty`); identical to the clean rerun, safe to delete | `237effa` + uncommitted |
-| `models/` | 89 MB | FP32, FP16, default INT8 `.onnx` + records | `run_stage1` |
+| `models/` | 112 MB | FP32, FP16, default INT8 `.onnx` + records | `run_stage1` |
 | | | INT8 candidates: Percentile 99.99, Percentile 99.999, Entropy | `9c3ae84` (task 3.2) |
 | | | Group-64 Percentile 99.99 (sensitivity check only); five 3.3 models | `6844c3a` |
+| | | Three calibration-luck models (seeds 6–8); the 3.4 unrounded-output model | `3771a0b` |
 | `results/choices/` | 4 KB | Which INT8 method was chosen, and by how much | `9c3ae84` (task 3.2) |
-| `results/checks/` | 6 MB | Grouping check (with the group-64 tuning scores) | `6844c3a` |
+| `results/checks/` | 23 MB | Grouping check (with the group-64 tuning scores) | `6844c3a` |
+| | | Calibration-luck check (with the three new models' tuning scores) | `3771a0b` |
 | `results/accuracy/` | 352 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
 | | | Tuning results (3 precisions) and the FP32 50,000-image check | task 3.1, rerun at `096461e` (clean) |
 | `results/sweep/` | 4.4 GB | Test split: 78 results (3 precisions x 26 conditions), with logits | `404a68c` |
@@ -222,8 +228,8 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Task 3.4, unrounded final output** (explained below), built from Percentile 99.99.
-   Tasks 3.0–3.3 are done (see the "Task 3.x results" sections below), and
+1. **Task 3.5, temperature scaling** (explained below): one number T per model, fitted on clean
+   tuning images. Tasks 3.0–3.4 are done (see the "Task 3.x results" sections below), and
    `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
@@ -286,6 +292,33 @@ All candidates use the same 512 calibration images (in groups of 128, see the da
 - H12 (darkness) and H13 (clean cost) are about the test split and are judged in the final run (3.7).
 - All records are from the clean commit `6844c3a`. The weights were confirmed per-channel from the
   model files, and recorded in the hypotheses file's dated note.
+
+### Calibration luck: the noise floor for INT8 comparisons (extra analysis, before 3.4)
+
+Percentile 99.99 rebuilt from three more random sets of 512 calibration images (seeds 6, 7, 8, drawn
+from the 29,488 images in no split). Clean tuning split, 5,000 images:
+
+| Calibration images | Top-1 | E-AURC |
+|---|---|---|
+| int8_calibration split (the original) | 72.10% | 0.0539 |
+| unassigned, seed 6 | 71.90% | 0.0514 |
+| unassigned, seed 7 | 71.82% | 0.0535 |
+| unassigned, seed 8 | 72.10% | 0.0528 |
+| **Range (largest − smallest)** | **0.28 points** | **0.0026** |
+| Standard deviation | 0.14 points | 0.0011 |
+
+In 3.7, INT8 differences smaller than the range are also labelled "within noise" (dated note in the
+hypotheses file). The E-AURC range is about 5% of its value; H11 asks for at least 10%.
+
+### Task 3.4 results (model built; H11 judged on the test split in 3.7)
+
+- Percentile 99.99 with the final layer's output left in float (`OpTypesToExcludeOutputQuantization
+  = ["Gemm"]`); weights still int8 per-channel (64 of 64); same calibration images and groups.
+- Checks passed, including that the final output is really not rounded. Tool check on clean tuning
+  images: tied top scores 58 with rounding, 0 without. File size 5.925 MB in both (−0.01%: removing
+  the output's rounding step saves a few bytes).
+- Every result record now also lists CPU instruction-set features. This laptop (Windows): AVX yes,
+  AVX2 yes, AVX-512F no; VNNI recorded as unknown (Windows has no standard-library way to read it).
 
 ### Stage 3 in plain words: each step, how, and why
 
