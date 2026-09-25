@@ -9,7 +9,8 @@ tuning split. Task 3.3 is done: the five leave-one-corruption-out INT8 models (h
 calibration images) are built and checked. Task 3.4 is done: best INT8 with an unrounded final output
 is built. A calibration-luck analysis (noise floor for 3.7) is done. Task 3.5 is done: one temperature
 per model is fitted on clean tuning images. Task 3.6 is done: robust conformal and alarm thresholds
-are computed (raw scores). No Stage 3 fix has been measured on the test split yet; that is task 3.7.
+are computed (raw scores). Task 3.7 is prepared: the judging script (tested on fake data) and the
+final-run script are committed, and the final run starts from the tag `stage3-final-run`.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -141,6 +142,7 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `accuracy.py` | Preprocessing, running a model, top-1/top-5, bootstrap intervals, paired differences |
 | `results.py` | Standard JSON record format; `.npz` arrays with checksums |
 | `report.py` | Builds the results page from the JSON files |
+| `judge.py` | The Stage 3 judging rules (thresholds from the hypotheses file only) |
 | `charts.py` | SVG line charts for the page |
 | `shift/corruptions.py` | The five corruptions (shared with Argos) |
 | `shift/reliability.py` | Softmax, ECE, reliability-diagram data |
@@ -170,9 +172,11 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `15_int8_unrounded_output.py` | `models/*_unrounded.onnx` + record (task 3.4) |
 | `16_temperature.py` | `results/choices/*_temperatures.json` (task 3.5) |
 | `17_shift_aware.py` | `results/choices/*_shift_aware.json`: robust conformal and alarm thresholds (3.6) |
+| `run_stage3_final.py` | The final run on the test split (3.7): resumable, keeps Windows awake, checks files |
+| `18_judge_stage3.py` | `results/final/*_stage3_verdicts.json`: PASS / FAIL / NOT RUN per prediction |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (122 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (134 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -235,8 +239,9 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Task 3.7, the final run** (explained below): every chosen fix measured once on the 10,000 test
-   images under all 26 conditions, and H10–H16 judged. Tasks 3.0–3.6 are done (see the "Task 3.x results" sections below), and
+1. **Task 3.7, the final run** (explained below): running from the tag `stage3-final-run`
+   (`scripts/run_stage3_final.py`, then `scripts/18_judge_stage3.py`). H17 is postponed to 3.9.
+   Tasks 3.0–3.6 are done (see the "Task 3.x results" sections below), and
    `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
@@ -366,6 +371,10 @@ robust conformal for FP32, FP16 and default INT8 (the models with damaged calibr
   1.00% of the clean tuning windows fire for every model, as built.
 - Final-report wording fixed in advance: "improved coverage in our tests", never "guaranteed".
 - The record is from the clean commit `88703f7`.
+- **Extra analysis (not a prediction), added before the final run:** best INT8 on
+  conformal_calibration, clean and damaged (sweep PASS, largest logit difference 0.00). Its
+  clean-only threshold is 0.9684; its robust thresholds 0.9948–0.9966, set sizes on their own
+  calibration mix 12.6–20.2 classes. Rerunning the script left every earlier threshold identical.
 
 ### Stage 3 in plain words: each step, how, and why
 
