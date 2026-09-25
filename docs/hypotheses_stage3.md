@@ -136,3 +136,36 @@ code, before any candidate was built or measured.
 - **The build sanity check uses 256 tuning images**, not test images.
 - **An exact tie in tuning top-1 is not covered by the rule**: `scripts/11_choose_int8.py` stops,
   and the decision will be written here before going on.
+
+## Note added 25 September 2026, before the grouping checks and before any task 3.3 build
+
+Nothing above has been changed; no design rule changes.
+
+- **Group size 128 is a fixed part of the INT8 method** for all of Stage 3: calibration images are
+  fed in 4 batches of 32 per group, in the calibration split's fixed order. The 3.3 models use it
+  exactly as the 3.2 candidates did. It will not be changed, whatever the checks below show.
+- **Grouping checks for the histogram method** (`scripts/12_int8_grouping_check.py`). The MinMax
+  check does not cover Percentile or Entropy, whose histograms are re-binned as groups arrive.
+  - (a) *Repeatability:* Percentile 99.99 is rebuilt with groups of 128 a second time. Expected: the
+    same model (every stored number equal) and identical scores on all 5,000 tuning images. If not,
+    stop and report before going on.
+  - (b) *Sensitivity:* Percentile 99.99 is built once with groups of 64. Its clean tuning top-1 and
+    the paired difference from the group-128 model are reported. This is information only: it does
+    not change the choice of method or the group size.
+- **Weights are per-channel, as the design rule says, and this was checked in the files.** In the
+  chosen Percentile 99.99 model, all 64 int8 weight tensors have one scale per output channel and
+  none has a single scale; all 142 activation quantizers have one scale each and use uint8. This is
+  recorded in `brokkr/quantize.py` (`INT8_SETTINGS`, `per_channel=True`), in every INT8 model's
+  `.json` record, and in the design rules above; every 3.3 model is checked the same way
+  (`brokkr.quantize.weight_quantization`).
+- **3.3 calibration images, exactly** (the design rule says "half clean, half damaged with a random
+  corruption (from the four allowed) at a random severity 1–5"): exactly 256 of the 512 images,
+  chosen at random, are damaged; each gets a corruption drawn uniformly from the four allowed and a
+  severity drawn uniformly from 1–5, all from one random generator with seed 5
+  (`brokkr.quantize.damaged_calibration_plan`). The five leave-one-out models damage the same images
+  at the same severities; only the list of allowed corruptions differs. Each image's damage pattern
+  is seeded by its dataset position, as in the sweep, and damage is applied to the 224x224 picture
+  before normalisation, as everywhere.
+- **3.3 build safety:** each model is written to a temporary file and only kept if it loads, gives
+  finite scores of the right shape on 256 clean tuning images, agrees with FP32's top answer on at
+  least 20% of them, and has only per-channel weights. The run stops at the first failure.
