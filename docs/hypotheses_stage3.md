@@ -393,8 +393,10 @@ points (14.5 to 15.3); clean average set size 2.63 -> 10.32 classes.
 
 ### Findings not predicted
 
-- **Best INT8's remaining gap is mostly a darkness gap:** 2.0 points below FP32 on clean images, but
-  13.6 points below at darkness severity 5 (default INT8 was 53 points below there).
+- **Best INT8's remaining gap is largest under heavy fog and darkness:** 2.0 points below FP32 on
+  clean images, but 13.6 points below at darkness severity 5 (default INT8: 53 points below) and
+  21.5 points below at fog severity 5 (default INT8: 42.0 points below). Under severity-5 blur and
+  noise it is within 2.5 points of FP32.
 - **The alarm separated clean from harmful conditions completely** (100% vs 0%), even with its
   threshold set on the harder tuning split. Only single-condition windows were tested; how fast it
   reacts when conditions change was not measured.
