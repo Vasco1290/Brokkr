@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "ruff>=0.16"]
 data = ["huggingface_hub>=1.32"]  # only needed to download datasets
 
 [tool.setuptools.packages.find]
@@ -32,3 +32,11 @@ include = ["brokkr*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+# E/W: style errors and warnings, F: real mistakes (unused or undefined names),
+# I: import order, B: common bug patterns
+select = ["E", "F", "W", "I", "B"]

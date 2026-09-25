@@ -23,6 +23,14 @@ def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224)
     Same steps as torchvision's transforms for these weights: shrink so the shorter side
     is 232 pixels, cut out the central 224x224 square, scale to 0-1, normalise colours.
     """
+    return normalize(resize_and_crop(image, resize_size, crop_size))
+
+
+def resize_and_crop(image: Image.Image, resize_size: int = 232, crop_size: int = 224) -> np.ndarray:
+    """First half of preprocessing: the (224, 224, 3) picture as uint8 pixels (0-255).
+
+    Image corruptions are applied here, to the picture the model will actually see.
+    """
     image = image.convert("RGB")  # some photos are greyscale or CMYK
     w, h = image.size
     if w <= h:
@@ -34,10 +42,14 @@ def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224)
     left = int(round((new_w - crop_size) / 2.0))
     top = int(round((new_h - crop_size) / 2.0))
     image = image.crop((left, top, left + crop_size, top + crop_size))
+    return np.asarray(image, dtype=np.uint8)
 
-    pixels = np.asarray(image, dtype=np.float32) / 255.0  # (224, 224, 3)
+
+def normalize(pixels: np.ndarray) -> np.ndarray:
+    """Second half of preprocessing: uint8 (224, 224, 3) -> normalised float (3, 224, 224)."""
+    pixels = pixels.astype(np.float32) / 255.0
     pixels = (pixels - IMAGENET_MEAN) / IMAGENET_STD
-    return pixels.transpose(2, 0, 1)  # channels first: (3, 224, 224)
+    return pixels.transpose(2, 0, 1)  # channels first
 
 
 def topk_correct(logits: np.ndarray, labels: np.ndarray, k: int) -> np.ndarray:
@@ -83,43 +95,66 @@ def paired_bootstrap_diff(correct_a: np.ndarray, correct_b: np.ndarray, n_resamp
     return float(correct_b.mean() - correct_a.mean()), float(low), float(high)
 
 
-def evaluate(onnx_path, samples, batch_size: int = 32, num_threads: int = 4, seed: int = 0) -> dict:
-    """Run the model on (image, label) samples and report top-1/top-5 accuracy.
+def predict_logits(onnx_path, samples, batch_size: int = 32, num_threads: int = 4) -> tuple:
+    """Run the model on (image, label) samples. Returns (logits, labels).
 
+    logits: float32 array (n_images, n_classes), the model's raw scores before softmax.
     `samples` can be a list or a generator; each image is a file path or raw file bytes.
     Images are processed a batch at a time, so large datasets don't fill up memory.
     """
     session = make_session(onnx_path, num_threads)
     input_name = session.get_inputs()[0].name
 
-    labels, top5, batch = [], [], []
-
-    def run_batch():
-        logits = session.run(None, {input_name: np.stack(batch)})[0]
-        top5.append(np.argsort(-logits, axis=1)[:, :5])
-        batch.clear()
-
+    labels, logits, batch = [], [], []
     for image, label in samples:
         batch.append(preprocess(open_image(image)))
         labels.append(label)
         if len(batch) == batch_size:
-            run_batch()
+            logits.append(session.run(None, {input_name: np.stack(batch)})[0])
+            batch.clear()
     if batch:
-        run_batch()
+        logits.append(session.run(None, {input_name: np.stack(batch)})[0])
+    return np.concatenate(logits).astype(np.float32), np.array(labels)
 
-    labels = np.array(labels)
-    top5 = np.concatenate(top5)
+
+def accuracy_from_logits(logits: np.ndarray, labels: np.ndarray, seed: int = 0) -> dict:
+    """Top-1/top-5 accuracy with bootstrap intervals, computed from saved logits.
+
+    Ties: INT8 models output only a few hundred distinct score values, so two classes can tie
+    exactly for first place. Ties are always broken the same way, towards the lower class
+    number (as np.argmax does), and the number of tied images plus the lowest and highest
+    top-1 accuracy any tie-break could give are recorded.
+    """
+    top5 = np.argsort(-logits, axis=1, kind="stable")[:, :5]  # stable: lower class wins ties
     top1_correct = (top5[:, 0] == labels).astype(np.float64)
     top5_correct = (top5 == labels[:, None]).any(axis=1).astype(np.float64)
+
+    best = logits.max(axis=1)
+    tied = (logits == best[:, None]).sum(axis=1) > 1
+    label_among_best = logits[np.arange(len(labels)), labels] == best
     return {
-        "settings": {"n_images": len(labels), "batch_size": batch_size, "num_threads": num_threads,
-                     "bootstrap_resamples": 1000, "seed": seed},
         "metrics": {
             "top1": float(top1_correct.mean()),
-            "top1_ci95": bootstrap_ci(top1_correct, seed=seed),
+            "top1_ci95": list(bootstrap_ci(top1_correct, seed=seed)),  # list, as JSON stores it
             "top5": float(top5_correct.mean()),
-            "top5_ci95": bootstrap_ci(top5_correct, seed=seed),
+            "top5_ci95": list(bootstrap_ci(top5_correct, seed=seed)),
+            "top1_tied_images": int(tied.sum()),
+            # Worst case: every tie resolved wrongly. Best case: every tie containing the label won.
+            "top1_range_over_tie_breaks": [float((top1_correct * ~tied).mean()),
+                                           float(((top1_correct > 0) | (tied & label_among_best)).mean())],
         },
-        # Enough to recompute every number above without re-running the model.
         "raw": {"labels": labels.tolist(), "top5_predictions": top5.tolist()},
     }
+
+
+def evaluate(onnx_path, samples, batch_size: int = 32, num_threads: int = 4, seed: int = 0) -> tuple:
+    """Run the model and score it. Returns (result, logits).
+
+    result has settings/metrics/raw for the JSON record; logits (all class scores for every
+    image) are too big for JSON and are saved separately with results.save_arrays.
+    """
+    logits, labels = predict_logits(onnx_path, samples, batch_size, num_threads)
+    result = accuracy_from_logits(logits, labels, seed=seed)
+    result["settings"] = {"n_images": len(labels), "batch_size": batch_size, "num_threads": num_threads,
+                          "bootstrap_resamples": 1000, "seed": seed}
+    return result, logits

@@ -12,8 +12,14 @@ from pathlib import Path
 import numpy as np
 import onnx
 from onnxconverter_common import float16
-from onnxruntime.quantization import (CalibrationDataReader, CalibrationMethod, QuantFormat,
-                                      QuantType, quant_pre_process, quantize_static)
+from onnxruntime.quantization import (
+    CalibrationDataReader,
+    CalibrationMethod,
+    QuantFormat,
+    QuantType,
+    quant_pre_process,
+    quantize_static,
+)
 
 # Settings are kept in one place so they can be saved alongside the results.
 INT8_SETTINGS = {

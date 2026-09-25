@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-import torch
 from PIL import Image
 from torchvision.models import MobileNet_V3_Large_Weights
 
@@ -48,3 +47,29 @@ def test_bootstrap_ci_contains_accuracy_and_shrinks_with_more_images():
 def test_bootstrap_is_reproducible():
     data = (np.random.default_rng(1).random(500) < 0.5).astype(float)
     assert bootstrap_ci(data, seed=3) == bootstrap_ci(data, seed=3)
+
+
+def test_accuracy_from_logits_on_known_scores():
+    from brokkr.accuracy import accuracy_from_logits
+    logits = np.array([[0.1, 3.0, 0.2, 0.0, -1.0, -2.0],   # top-1 is class 1
+                       [2.0, 0.0, 0.1, 0.2, 0.3, 0.4]])    # top-1 is class 0, class 1 is last
+    result = accuracy_from_logits(logits, np.array([1, 1]))
+    assert result["metrics"]["top1"] == 0.5
+    assert result["metrics"]["top5"] == 0.5  # class 1 is 6th of 6 for the second image
+    assert result["raw"]["top5_predictions"][0][0] == 1
+
+
+def test_ties_are_broken_consistently_and_reported():
+    from brokkr.accuracy import accuracy_from_logits
+    from brokkr.shift.reliability import confidence_and_correct
+    logits = np.array([[5.0, 5.0, 1.0, 0.0, 0.0, 0.0],   # classes 0 and 1 tie; label 1
+                       [5.0, 5.0, 1.0, 0.0, 0.0, 0.0],   # same tie; label 0
+                       [0.0, 9.0, 1.0, 0.0, 0.0, 0.0]])  # no tie; label 1
+    labels = np.array([1, 0, 1])
+    m = accuracy_from_logits(logits, labels)["metrics"]
+    assert m["top1"] == pytest.approx(2 / 3)  # lower class wins the tie: image 2 right, image 1 wrong
+    assert m["top1_tied_images"] == 2
+    assert m["top1_range_over_tie_breaks"] == pytest.approx([1 / 3, 1.0])
+    # Calibration code must agree with the accuracy code on which answer the model gave.
+    _, correct = confidence_and_correct(logits, labels)
+    assert correct.mean() == pytest.approx(m["top1"])

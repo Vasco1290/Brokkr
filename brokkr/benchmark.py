@@ -5,6 +5,8 @@ at least 20 warm-up runs that are thrown away, then at least 100 timed runs.
 This module has no Brokkr-specific assumptions: it only needs an .onnx file.
 """
 
+import os
+import platform
 import time
 
 import numpy as np
@@ -12,6 +14,27 @@ import onnxruntime as ort
 
 MIN_WARMUP = 20
 MIN_RUNS = 100
+
+
+def pin_to_cpus(cpu_ids: list) -> None:
+    """Make this process (and every thread it starts) run only on the given logical CPUs.
+
+    On hybrid CPUs, pinning to one kind of core stops the OS from moving the benchmark
+    between fast and slow cores, which otherwise makes timings jump between two speeds.
+    """
+    if platform.system() == "Linux":
+        os.sched_setaffinity(0, set(cpu_ids))
+    elif platform.system() == "Windows":
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        kernel32.GetCurrentProcess.restype = ctypes.c_void_p
+        mask = sum(1 << cpu for cpu in cpu_ids)
+        if not kernel32.SetProcessAffinityMask(ctypes.c_void_p(kernel32.GetCurrentProcess()),
+                                               ctypes.c_size_t(mask)):
+            raise OSError(f"could not pin to CPUs {cpu_ids}")
+    else:
+        raise NotImplementedError(f"CPU pinning not supported on {platform.system()}")
 
 
 def make_session(onnx_path, num_threads: int) -> ort.InferenceSession:
@@ -89,7 +112,12 @@ def combine_sessions(sessions: list) -> dict:
     metrics["p50_ms_min"] = float(min(p50s))
     metrics["p50_ms_max"] = float(max(p50s))
     # Spread: gap between the fastest and slowest session, as a % of the median.
+    # One unlucky session (e.g. the laptop heating up) is enough to make this large.
     metrics["p50_spread_pct"] = float((max(p50s) - min(p50s)) / metrics["p50_ms"] * 100)
+    # IQR spread: gap between the 25th and 75th percentile sessions, as a % of the median.
+    # It ignores the most extreme sessions, so it measures how stable the typical session was.
+    q1, q3 = np.percentile(p50s, [25, 75])
+    metrics["p50_iqr_pct"] = float((q3 - q1) / metrics["p50_ms"] * 100)
 
     return {
         "settings": {**sessions[0]["settings"], "sessions": len(sessions)},

@@ -12,7 +12,7 @@ Languages: Python for the factory, test lab, and site builder; HTML/CSS (+ a lit
 search) for the website; a shell script for the installer. The device runner starts in Python and moves
 to C++ only if measurements show Python overhead matters.
 
-## Stage 1 — Core measurement `[~]`
+## Stage 1 — Core measurement `[x]`
 
 One model, three precisions, measured honestly on the laptop.
 
@@ -22,8 +22,8 @@ One model, three precisions, measured honestly on the laptop.
 - [x] 1.3 Export MobileNetV3 (torchvision) to ONNX FP32
 - [x] 1.4 Speed benchmark: fixed threads, >=20 warm-up, >=100 timed runs, p50/p95/p99 -> JSON;
   5 interleaved sessions (median + spread); power state recorded
-  - [ ] Run plugged in, "Best performance" mode, to compare with the battery runs
-    (battery runs so far: session-to-session spread 24% to over 1000%)
+  - [x] Run plugged in, "Best performance" mode. Remaining instability traced to hybrid cores
+    (fixed by pinning, `--cores`) and run-to-run drift of 10-20% on this laptop; see README
 - [x] 1.5 Accuracy on a fixed, seeded image set (split + image count recorded) -> JSON
   (ImageNet-1k validation; correctness check against torchvision's published top-1 passes)
 - [x] 1.6 FP16 and INT8 versions, same measurements (INT8 with ONNX Runtime default settings)
@@ -34,6 +34,10 @@ One model, three precisions, measured honestly on the laptop.
 **Done when:** one command produces real speed/size/accuracy numbers for FP32/FP16/INT8, they appear on
 the results page, and tests pass.
 
+Hardening after Stage 1: one-command runner (`scripts/run_stage1.py`), all results regenerated from
+committed code, speed benchmark pinned to one core type with IQR-based stability flags, ruff in CI,
+`.gitattributes` (LF line endings), `requirements-lock.txt`, README with real results.
+
 ### Before making the repository public
 
 - [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
@@ -41,23 +45,43 @@ the results page, and tests pass.
 - [ ] Publish the results page to GitHub Pages
 - [ ] Re-read README and ROADMAP for anything that overclaims
 
-## Stage 2 — Stress test `[ ]`
+## Stage 2 — Stress test `[x]`
 
-- Corruptions (fog, blur, noise, darkness, shake) at 5 severities — self-contained module shared with Argos
-- Reliability: calibration error (ECE), conformal prediction coverage and set size, risk–coverage curves
-- Bootstrap confidence intervals on every accuracy/reliability number
+How much worse does each precision get on damaged photos, and does it still know when it's wrong?
+
+- [x] 2.0 Hypotheses written down *before* measuring (`docs/hypotheses.md`), committed first
+- [x] 2.1 Fixed, non-overlapping image splits: test 10,000 / conformal calibration 5,000 /
+  tuning 5,000 (kept for Stage 3) / INT8 calibration 512
+- [x] 2.2 Corruptions: fog, defocus blur, motion blur, noise, darkness at 5 severities —
+  self-contained module shared with Argos (no Brokkr imports), plus a sample image sheet
+- [x] 2.3 Save every class score (logits, float32 .npz with checksum) so every reliability number
+  can be recomputed
+- [x] 2.4 Calibration: expected calibration error (ECE) and reliability diagram data
+- [x] 2.5 Conformal prediction: 90% sets tuned on clean calibration images; coverage and set
+  size on clean and corrupted test images
+- [x] 2.6 Selective prediction: risk–coverage curves and AURC
+- [x] 2.7 Full sweep: 3 precisions x (clean + 5 corruptions x 5 severities) on the 10,000 test
+  images (overnight, plugged in)
+- [x] 2.8 Headline chart and a robustness section on the results page, generated from JSON;
+  outcomes recorded in `docs/hypotheses.md` (6 confirmed, 3 rejected)
+
+Bootstrap confidence intervals on every accuracy/reliability number.
 
 **Done when:** the headline chart (precision × corruption × reliability) is generated from JSON.
 
 ## Stage 3 — Fixes and the study `[ ]`
 
-- Hypotheses written down *before* measuring (`docs/hypotheses.md`)
 - Fixes: recalibration after quantization, mixed precision, shift-aware conformal
 - INT8 calibration study: MinMax vs Percentile vs Entropy, chosen on a tuning set disjoint from both
   calibration and test images, then measured on the test set. Motivation: in task 1.6, ONNX Runtime's
   default (MinMax) INT8 MobileNetV3 disagreed with FP32 on about a third of images; a quick diagnostic
   (on test images, so not a result) suggested outlier-robust calibration recovers much of it.
-- Experiment: INT8 calibration on clean vs corrupted images
+- Experiment: INT8 calibration on clean vs corrupted images. Motivation from Stage 2: darkness barely
+  affects FP32 (75.6% -> 73.7% at severity 5) but drops default INT8 from 60.2% to 20.5%
+- Shift-aware conformal prediction. Motivation from Stage 2: FP32 coverage fell to 20-37% under
+  severe blur and noise while set sizes barely grew
+- Keep the INT8 model's final output unrounded, to remove exact score ties (262 of 10,000 test
+  images) that hurt its ability to rank its own confidence
 - Write-up with a limitations section
 
 **Done when:** one finding can be explained in two minutes, with the numbers behind it.

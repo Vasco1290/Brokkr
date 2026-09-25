@@ -43,3 +43,38 @@ def test_subset_is_reproducible_and_sorted():
 
 def test_subset_none_means_everything():
     assert choose_subset(7, None).tolist() == list(range(7))
+
+
+def test_splits_have_the_right_sizes_and_never_overlap():
+    from brokkr.datasets import SPLIT_SIZES, make_splits
+    splits = make_splits(50_000)
+    assert {name: len(pos) for name, pos in splits.items()} == SPLIT_SIZES
+    names = list(splits)
+    for i, a in enumerate(names):
+        for b in names[i + 1:]:
+            assert not set(splits[a].tolist()) & set(splits[b].tolist()), f"{a} overlaps {b}"
+
+
+def test_splits_keep_stage1_images():
+    # Stage 1 used choose_subset(seed 0) for test and choose_calibration(seed 1) for INT8.
+    # The central splits must be exactly those images, or Stage 1 results would no longer match.
+    from brokkr.datasets import choose_calibration, make_splits
+    splits = make_splits(50_000)
+    stage1_test = choose_subset(50_000, 10_000, seed=0)
+    stage1_int8 = choose_calibration(50_000, 512, exclude=stage1_test, seed=1)
+    assert np.array_equal(splits["test"], stage1_test)
+    assert np.array_equal(splits["int8_calibration"], stage1_int8)
+
+
+def test_splits_are_reproducible():
+    from brokkr.datasets import make_splits
+    a, b = make_splits(50_000), make_splits(50_000)
+    assert all(np.array_equal(a[k], b[k]) for k in a)
+
+
+def test_too_few_images_for_all_splits_is_refused():
+    import pytest
+
+    from brokkr.datasets import make_splits
+    with pytest.raises(ValueError):
+        make_splits(12_000)
