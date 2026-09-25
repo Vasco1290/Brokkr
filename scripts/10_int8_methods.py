@@ -35,11 +35,11 @@ from brokkr.benchmark import make_session
 from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
 from brokkr.export import MODELS, file_info
 from brokkr.fingerprint import machine_fingerprint
+from brokkr.quantize import CALIBRATION_BATCH as BATCH
+from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
 from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, to_int8
 
 DATASET = "imagenet-1k-val"
-BATCH = 32
-GROUP_BATCHES = 4  # 4 batches x 32 images = 128 images per group
 FAIL_AGREEMENT = 0.20
 
 parser = argparse.ArgumentParser()

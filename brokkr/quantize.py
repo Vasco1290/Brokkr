@@ -11,6 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import onnx
+from onnx import numpy_helper
 from onnxconverter_common import float16
 from onnxruntime.quantization import (
     CalibrationDataReader,
@@ -57,6 +58,12 @@ def to_fp16(fp32_path, out_path) -> Path:
     model_fp16 = float16.convert_float_to_float16(model, keep_io_types=True)
     onnx.save(model_fp16, str(out_path))
     return Path(out_path)
+
+
+# Stage 3 feeds calibration images in batches of 32, 4 batches (128 images) per group. The group size
+# is a fixed part of the INT8 method: it can shift Percentile/Entropy ranges (see to_int8).
+CALIBRATION_BATCH = 32
+CALIBRATION_GROUP_BATCHES = 4
 
 
 class ImageBatches(CalibrationDataReader):
@@ -114,3 +121,39 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
     )
     prepared.unlink()
     return out_path
+
+
+def weight_quantization(path) -> dict:
+    """Count the int8 weight tensors stored with one scale per output channel vs one scale in total.
+
+    Read from the model file itself, so it shows what was actually built, not what was requested.
+    """
+    model = onnx.load(str(path))
+    stored = {init.name: init for init in model.graph.initializer}
+    counts = {"per_channel": 0, "per_tensor": 0}
+    for node in model.graph.node:
+        if node.op_type == "DequantizeLinear" and node.input[0] in stored:
+            values = numpy_helper.to_array(stored[node.input[0]])
+            if values.dtype == np.int8 and values.ndim >= 2:  # a weight matrix or filter bank
+                scale = numpy_helper.to_array(stored[node.input[1]])
+                counts["per_channel" if scale.size > 1 else "per_tensor"] += 1
+    return counts
+
+
+def damaged_calibration_plan(n_images: int, allowed: list, seed: int = 5) -> list:
+    """Which calibration images get damaged, and how (task 3.3).
+
+    Exactly half the images, chosen at random, get a random corruption from `allowed` at a random
+    severity 1-5; the rest stay clean. Returns (corruption name or None, severity) per image, in the
+    calibration split's order. The random draws depend only on n_images, len(allowed) and seed, so
+    the five leave-one-out models damage the same images at the same severities; only the list of
+    allowed corruptions differs.
+    """
+    rng = np.random.default_rng(seed)
+    damaged = rng.permutation(n_images)[: n_images // 2]
+    kinds = rng.integers(0, len(allowed), n_images)
+    severities = rng.integers(1, 6, n_images)  # 1 to 5
+    plan = [(None, 0)] * n_images
+    for i in damaged:
+        plan[i] = (allowed[kinds[i]], int(severities[i]))
+    return plan

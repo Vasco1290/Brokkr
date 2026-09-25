@@ -8,7 +8,14 @@ import torch
 
 from brokkr.datasets import choose_calibration, choose_subset
 from brokkr.export import export_onnx
-from brokkr.quantize import INT8_METHODS, ImageBatches, to_fp16, to_int8
+from brokkr.quantize import (
+    INT8_METHODS,
+    ImageBatches,
+    damaged_calibration_plan,
+    to_fp16,
+    to_int8,
+    weight_quantization,
+)
 
 
 class TinyNet(torch.nn.Module):
@@ -85,3 +92,24 @@ def test_calibration_never_overlaps_test_images():
     calib = choose_calibration(50_000, 512, exclude=test, seed=1)
     assert len(calib) == 512
     assert not set(calib.tolist()) & set(test.tolist())
+
+
+def test_int8_weights_are_per_channel_in_the_file(fp32_model, tmp_path):
+    rng = np.random.default_rng(0)
+    calibration = [rng.standard_normal((8, 3, 32, 32)).astype(np.float32) for _ in range(2)]
+    int8 = to_int8(fp32_model, tmp_path / "tiny_int8.onnx", calibration)
+    assert weight_quantization(int8) == {"per_channel": 2, "per_tensor": 0}  # the conv and the linear layer
+
+
+def test_damaged_calibration_plan():
+    allowed = ["fog", "noise", "darkness", "motion_blur"]
+    plan = damaged_calibration_plan(512, allowed)
+    damaged = [(name, severity) for name, severity in plan if name is not None]
+    assert len(damaged) == 256  # exactly half
+    assert {name for name, _ in damaged} <= set(allowed)
+    assert {severity for _, severity in damaged} == {1, 2, 3, 4, 5}
+    assert all(severity == 0 for name, severity in plan if name is None)
+    assert damaged_calibration_plan(512, allowed) == plan  # reproducible
+    # Another leave-one-out list: same images damaged at the same severities.
+    other = damaged_calibration_plan(512, ["fog", "noise", "darkness", "defocus_blur"])
+    assert [(n is None, s) for n, s in other] == [(n is None, s) for n, s in plan]
