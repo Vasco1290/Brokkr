@@ -169,3 +169,40 @@ Nothing above has been changed; no design rule changes.
 - **3.3 build safety:** each model is written to a temporary file and only kept if it loads, gives
   finite scores of the right shape on 256 clean tuning images, agrees with FP32's top answer on at
   least 20% of them, and has only per-channel weights. The run stops at the first failure.
+
+## Note added 25 September 2026, before the calibration-luck analysis and before any task 3.4 build
+
+Nothing above has been changed; no prediction and no design rule changes.
+
+- **Extra analysis: calibration luck (noise floor).** Rebuilding with groups of 64 instead of 128
+  left tuning top-1 unchanged but gave the same top answer on only 95.2% of images, so part of any
+  INT8 model is luck in how it was calibrated. To measure that luck
+  (`scripts/14_int8_calibration_luck.py`):
+  - Percentile 99.99 is built 3 more times, each from a different random set of 512 calibration
+    images, seeds 6, 7 and 8. The sets are drawn (without replacement) from the 29,488 images that
+    belong to no split (`brokkr.datasets.unassigned`), so they never touch test, tuning or
+    conformal-calibration images. Everything else is unchanged (method, groups of 128, per-channel
+    weights), and each model passes the same build checks as the 3.3 models.
+  - For these 3 models plus the original (calibrated on the int8_calibration split), clean tuning
+    top-1 and E-AURC (confidence = probability of the top answer) are reported, with their spread:
+    the range (largest minus smallest of the 4) and the standard deviation.
+  - **Use in the final run (3.7):** when two INT8 variants are compared (top-1 or E-AURC), a
+    difference whose size is smaller than this range is also labelled "within noise". The verdicts
+    of the predictions are unchanged; this label is added next to them.
+  - Limitation, stated in advance: the range is measured on the 5,000 tuning images and applied to
+    the 10,000 test images, and 4 builds give only a rough range. It measures build luck only; the
+    paired bootstrap intervals already cover the luck of which images were tested.
+- **H11 already has numeric thresholds** (checked, nothing added): E-AURC at least 10% lower,
+  relative to best INT8 without unrounded output, with the paired 95% interval of the difference
+  excluding zero; 0 tied test images; file size increase under 5%.
+- **CPU details in every result from now on:** the machine record (`brokkr.fingerprint`) now also
+  lists instruction-set features, for the later laptop-vs-Raspberry-Pi comparison. On this laptop
+  Windows reports AVX yes, AVX2 yes, AVX-512F no; Windows gives no standard-library way to read VNNI,
+  so it is recorded as unknown rather than guessed. On Linux (e.g. the Pi) all are read from
+  `/proc/cpuinfo`.
+- **3.4 build, exactly** (`scripts/15_int8_unrounded_output.py`): Percentile 99.99, the same 512
+  int8_calibration images, groups of 128, per-channel int8 weights, with onnxruntime's
+  `OpTypesToExcludeOutputQuantization = ["Gemm"]` so the final layer's output stays in float; its
+  weights stay int8. It passes the same build checks, plus a check that the final output really is
+  not rounded. Tied top scores on clean tuning images are reported as a tool check; H11 is judged
+  on the test split in 3.7.
