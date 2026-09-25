@@ -4,7 +4,8 @@ Snapshot as of **25 September 2026**. Branch `stage-3` (from `main` at `5da3bde`
 Stages 1 and 2 are complete and merged. Stage 3 has started: its task list and its pre-registered
 predictions (`docs/hypotheses_stage3.md`, task 3.0) are committed. Task 3.1 is done: model outputs
 on the clean and damaged `tuning` and `conformal_calibration` images are saved. No Stage 3 setting
-has been chosen yet, and no Stage 3 fix has been measured.
+was chosen from them in 3.1. Task 3.2 is done: Percentile 99.99 was chosen as "best INT8" on the
+tuning split. No Stage 3 fix has been measured on the test split yet.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -155,9 +156,11 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `07_reliability.py` | `results/reliability/*_{calibration,conformal,selective}.json` |
 | `08_corruption_sweep.py --split test\|tuning\|conformal_calibration` | `results/sweep/*_<split>_<corruption>_s<severity>.json` + `.npz` |
 | `09_compare_splits.py` | Prints FP32 clean accuracy per split, differences vs test, images per class |
+| `10_int8_methods.py` | `models/*_int8_<method>.onnx` + records (Percentile 99.99/99.999, Entropy) |
+| `11_choose_int8.py` | `results/choices/*_int8_method.json` (the pre-registered choice rule) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (100 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (106 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -170,7 +173,9 @@ design rules and predictions, committed before measuring).
 | `data/cache/` | 2.9 GB | Test, tuning and conformal-calibration images, resized and cropped, plus labels | sweep script |
 | `data/old_results_stage1/` | 98 MB | Superseded results, kept for the record | various |
 | `data/old_results_3.1_dirty/` | 3.8 GB | First 3.1 run (records say `dirty`); identical to the clean rerun, safe to delete | `237effa` + uncommitted |
-| `models/` | 38 MB | FP32, FP16, default INT8 `.onnx` + records | `run_stage1` |
+| `models/` | 55 MB | FP32, FP16, default INT8 `.onnx` + records | `run_stage1` |
+| | | INT8 candidates: Percentile 99.99, Percentile 99.999, Entropy | `9c3ae84` (task 3.2) |
+| `results/choices/` | 4 KB | Which INT8 method was chosen, and by how much | `9c3ae84` (task 3.2) |
 | `results/accuracy/` | 352 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
 | | | Tuning results (3 precisions) and the FP32 50,000-image check | task 3.1, rerun at `096461e` (clean) |
 | `results/sweep/` | 4.4 GB | Test split: 78 results (3 precisions x 26 conditions), with logits | `404a68c` |
@@ -212,9 +217,9 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Task 3.2, INT8 calibration methods** (explained below). Tasks 3.0 and 3.1 are done: the
-   tuning-split outputs exist (see "Task 3.1 results" below), and `docs/hypotheses_stage3.md`
-   is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
+1. **Task 3.3, INT8 calibrated on damaged images** (explained below), built with Percentile 99.99.
+   Tasks 3.0–3.2 are done (see "Task 3.1 results" and "Task 3.2 results" below), and
+   `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
    paired 95% intervals for every comparison.
@@ -240,6 +245,28 @@ Machine: the same i5-1235U laptop. All three runs printed PASS.
   precisions. Runtimes 90 and 69 minutes (the first minutes were on battery, which is slower).
 - The results page shows only test-split sweeps (`brokkr/report.py`, tested), so tuning outputs can
   never appear there as results.
+
+### Task 3.2 results (a choice made on the tuning split, not a finding)
+
+All candidates use the same 512 calibration images (in groups of 128, see the dated note in
+`docs/hypotheses_stage3.md`), per-channel int8 weights and per-tensor uint8 activations; all are
+5.9 MB. Clean tuning split, 5,000 images; paired differences on the same images:
+
+| Candidate | Tuning top-1 | vs MinMax (paired 95% CI) |
+|---|---|---|
+| MinMax (default INT8) | 58.46% | — |
+| **Percentile 99.99** | **72.10%** | +13.64 points (+12.60 to +14.76) |
+| Percentile 99.999 | 71.06% | +12.60 points (+11.58 to +13.70) |
+| Entropy | 56.12% | −2.34 points (−3.42 to −1.24) |
+
+- **Chosen: Percentile 99.99** (the rule: highest clean tuning top-1). Margin over Percentile
+  99.999: +1.04 points (paired 95% CI +0.30 to +1.76), so the choice is not a coin flip.
+- On tuning images it is 1.80 points below FP32 (73.90%), where MinMax was 15.44 below.
+- **H10 is not judged yet.** It is about the test split and is measured once, in the final run (3.7).
+- Entropy was worse than MinMax. Only onnxruntime's default Entropy settings (128 bins) were tried;
+  per the design rules nothing was tuned after seeing this.
+- Checks: MinMax built in groups gave exactly the default INT8's outputs; every record is from the
+  clean commit `9c3ae84`.
 
 ### Stage 3 in plain words: each step, how, and why
 

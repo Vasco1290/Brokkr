@@ -77,9 +77,10 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 
 - [x] 3.0 Hypotheses written down before measuring (`docs/hypotheses_stage3.md`), committed first
 - [x] 3.1 Tuning-split tooling: model outputs on clean and damaged tuning images, for choosing settings
-- [ ] 3.2 INT8 calibration methods: MinMax vs Percentile vs Entropy, chosen on the tuning split.
+- [x] 3.2 INT8 calibration methods: MinMax vs Percentile vs Entropy, chosen on the tuning split.
   Motivation: in task 1.6 default (MinMax) INT8 disagreed with FP32 on about a third of images; a
-  quick diagnostic (on test images, so not a result) suggested outlier-robust calibration helps
+  quick diagnostic (on test images, so not a result) suggested outlier-robust calibration helps.
+  Chosen: Percentile 99.99 (tuning top-1 72.10% vs MinMax 58.46%); H10 is judged on test in 3.7
 - [ ] 3.3 INT8 calibrated on clean + damaged images. Motivation from Stage 2: darkness barely affects
   FP32 (75.6% -> 73.7% at severity 5) but drops default INT8 from 60.2% to 20.5%
 - [ ] 3.4 INT8 with the final layer's output kept unrounded (mixed precision), to remove exact score
