@@ -85,6 +85,15 @@ def make_splits(total: int) -> dict:
     }
 
 
+def unassigned(total: int) -> np.ndarray:
+    """Sorted positions of the images in no split (29,488 of ImageNet's 50,000).
+
+    Stage 3 draws extra INT8 calibration sets from these, to measure how much a model depends on
+    which calibration images it happened to get.
+    """
+    return np.setdiff1d(np.arange(total), np.concatenate(list(make_splits(total).values())))
+
+
 def read_parquet_images(files: list, positions: np.ndarray):
     """Yield (image_bytes, label) for the chosen positions, reading one chunk at a time."""
     wanted = set(positions.tolist())

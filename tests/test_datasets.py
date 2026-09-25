@@ -125,3 +125,12 @@ def test_real_splits_are_validation_images_and_never_overlap():
     for i, a in enumerate(split_names):
         for b in split_names[i + 1:]:
             assert not by_name[a] & by_name[b], f"{a} and {b} share images"
+
+
+def test_unassigned_images_are_in_no_split():
+    from brokkr.datasets import SPLIT_SIZES, make_splits, unassigned
+
+    free = unassigned(50_000)
+    assert len(free) == 50_000 - sum(SPLIT_SIZES.values()) == 29_488
+    for positions in make_splits(50_000).values():
+        assert not np.intersect1d(free, positions).size

@@ -22,6 +22,8 @@ from onnxruntime.quantization import (
     quantize_static,
 )
 
+from brokkr.benchmark import make_session
+
 # Settings are kept in one place so they can be saved alongside the results.
 INT8_SETTINGS = {
     "method": "static post-training quantization (onnxruntime)",
@@ -91,7 +93,7 @@ class ImageBatches(CalibrationDataReader):
 
 
 def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
-            group_batches: int | None = None) -> Path:
+            group_batches: int | None = None, unrounded_output_ops: list | None = None) -> Path:
     """Static INT8 quantization, using `calibration_batches` (arrays of shape (N, 3, H, W)).
 
     method: a key of INT8_METHODS.
@@ -100,6 +102,8 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
         keep every layer's output for all images in memory at once (about 22 GB for 512 images of
         MobileNetV3-Large). MinMax gives identical ranges either way; for the histogram methods the
         first group sets the bin width, so the group size is recorded with the model.
+    unrounded_output_ops: operation types whose OUTPUT stays in float (their weights stay int8),
+        e.g. ["Gemm"] for the final layer (task 3.4; onnxruntime's OpTypesToExcludeOutputQuantization).
     """
     out_path = Path(out_path)
     prepared = out_path.with_name(out_path.stem + "_prep.onnx")
@@ -108,6 +112,8 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
     extra_options = dict(INT8_METHODS[method]["extra_options"])
     if group_batches:
         extra_options["CalibStridedMinMax"] = group_batches
+    if unrounded_output_ops:
+        extra_options["OpTypesToExcludeOutputQuantization"] = list(unrounded_output_ops)
     quantize_static(
         str(prepared),
         str(out_path),
@@ -157,3 +163,22 @@ def damaged_calibration_plan(n_images: int, allowed: list, seed: int = 5) -> lis
     for i in damaged:
         plan[i] = (allowed[kinds[i]], int(severities[i]))
     return plan
+
+
+def check_int8_build(path, images: np.ndarray, fp32_top1: np.ndarray, expected_weights: dict,
+                     min_agreement: float = 0.20) -> dict:
+    """Safety checks for a freshly built INT8 model. Returns {description: passed}.
+
+    It loads and gives finite scores of the right shape on `images`; its top answer agrees with
+    FP32's (`fp32_top1`) on at least `min_agreement` of them; its weights are stored as expected.
+    """
+    session = make_session(path, num_threads=4)
+    scores = np.concatenate([session.run(None, {"images": images[i:i + CALIBRATION_BATCH]})[0]
+                             for i in range(0, len(images), CALIBRATION_BATCH)])
+    agreement = float(np.mean(scores.argmax(1) == fp32_top1))
+    weights = weight_quantization(path)
+    return {f"loads and gives {(len(images), 1000)} scores": scores.shape == (len(images), 1000),
+            "all scores finite": bool(np.isfinite(scores).all()),
+            f"top-1 agreement with FP32 >= {min_agreement:.0%} (got {agreement:.1%})":
+                agreement >= min_agreement,
+            f"weights stored as expected {expected_weights}": weights == expected_weights}

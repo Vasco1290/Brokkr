@@ -113,3 +113,18 @@ def test_damaged_calibration_plan():
     # Another leave-one-out list: same images damaged at the same severities.
     other = damaged_calibration_plan(512, ["fog", "noise", "darkness", "defocus_blur"])
     assert [(n is None, s) for n, s in other] == [(n is None, s) for n, s in plan]
+
+
+def test_unrounded_output_leaves_the_final_layer_in_float(fp32_model, tmp_path):
+    rng = np.random.default_rng(0)
+    calibration = [rng.standard_normal((8, 3, 32, 32)).astype(np.float32) for _ in range(2)]
+
+    def gemm_output_is_quantized(path):
+        graph = onnx.load(str(path)).graph
+        gemm_out = next(n for n in graph.node if n.op_type == "Gemm").output[0]
+        return any(n.op_type == "QuantizeLinear" and n.input[0] == gemm_out for n in graph.node)
+
+    rounded = to_int8(fp32_model, tmp_path / "rounded.onnx", calibration)
+    unrounded = to_int8(fp32_model, tmp_path / "unrounded.onnx", calibration, unrounded_output_ops=["Gemm"])
+    assert gemm_output_is_quantized(rounded) and not gemm_output_is_quantized(unrounded)
+    assert weight_quantization(unrounded) == {"per_channel": 2, "per_tensor": 0}  # weights still int8
