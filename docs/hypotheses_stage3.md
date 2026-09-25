@@ -242,3 +242,46 @@ Nothing above has been changed; no prediction and no design rule changes.
 - **CPU features (optional check done):** py-cpuinfo 9.0.0 (MIT) was tried on this laptop. It reads
   the AVX-512 VNNI flag (absent, as expected without AVX-512) but not AVX-VNNI, the variant this CPU
   family would have, so VNNI stays recorded as unknown and py-cpuinfo is not added.
+
+## Note added 25 September 2026, before any task 3.6 threshold is computed
+
+Nothing above has been changed; no prediction changes. This note fills in details the design rules
+left open, before anything is computed.
+
+- **H16 test windows: already fully specified above, confirmed.** Per condition: the 10,000 test
+  images in one fixed random order (seed 3; the same order for every condition and every model),
+  cut into 100 consecutive, non-overlapping windows of 100 images. Every window holds one condition
+  only (no mixing); 26 conditions, so 100 clean windows and 1,200 windows over the 12 harmful
+  conditions. Details now fixed as well:
+  - The order is `numpy.random.default_rng(3).permutation(10000)`, applied to the test split's
+    sorted image order (the order of every saved result file); window w holds places 100w to 100w+99.
+  - Confidence is the raw softmax probability of the top answer (raw, per the 3.5 note).
+  - The alarm fires when a window's average confidence is strictly below the threshold.
+- **Alarm threshold details (tuning split):** one random generator with seed 4 draws 10,000 windows
+  one after another; each window is 100 different images (drawn without replacement), and windows
+  are drawn independently, so two windows may share images. The threshold is
+  `numpy.percentile(window averages, 1)` (NumPy's default linear interpolation). One threshold for
+  every final-run model (the ten listed in the 3.5 note); H16 is judged for FP32.
+- **Known before computing: the tuning split is harder than the test split** (FP32 clean top-1 73.90%
+  vs 75.58%). If harder images also mean lower confidence, the threshold set on tuning sits slightly
+  low, so on test the alarm should give fewer clean false alarms but also be less sensitive. This
+  direction will be reported next to the H16 outcome.
+- **Conformal score: identical to Stage 2, unchanged since the Stage 2 results.** Score = 1 minus
+  the raw softmax probability of the true class (LAC); threshold = the exact k-th smallest score,
+  k = ceil((n + 1) x 0.9) (`brokkr/shift/conformal.py`, last changed in task 2.5, `2a77a66`). The
+  softmax it uses (`brokkr/shift/reliability.py`) is unchanged: since Stage 2 that file has only had
+  lines added (temperature functions), none changed or removed. The clean-tuned baseline threshold
+  is recomputed and must equal Stage 2's saved one.
+- **Robust conformal calibration mix, exactly** (the design rule says one-third clean, two-thirds
+  damaged, the four allowed corruptions and severities 1–5 equally): the 5,000 conformal_calibration
+  images are shuffled once (seed 9; the same shuffle for every held-out corruption and every model).
+  The first 1,667 stay clean. The other 3,333 are damaged; the k-th of them gets the (k mod 20)-th of
+  the 20 (corruption, severity) pairs, the four allowed corruptions in Brokkr's order times
+  severities 1 to 5, so each pair gets 166 or 167 images. Every image is used once, in one version.
+  The damaged scores come from the task 3.1 sweep (damage pattern seeded by dataset position).
+  n = 5,000, so k = 4,501.
+- **Which models get robust conformal thresholds:** FP32, FP16 and default INT8, the three models
+  with damaged conformal_calibration outputs from task 3.1. H15 is about FP32. The best-INT8
+  variants are not included here (they would need new damage sweeps on conformal_calibration).
+- **Final-report wording:** robust conformal has no coverage guarantee under corruptions it was not
+  calibrated on. Results are described as "improved coverage in our tests", never "guaranteed".
