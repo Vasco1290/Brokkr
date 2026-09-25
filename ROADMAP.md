@@ -85,7 +85,7 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
   FP32 (75.6% -> 73.7% at severity 5) but drops default INT8 from 60.2% to 20.5%
 - [x] 3.4 INT8 with the final layer's output kept unrounded (mixed precision), to remove exact score
   ties (262 of 10,000 test images) that hurt its ability to rank its own confidence
-- [ ] 3.5 Temperature scaling for the model's under-confidence (58% confidence vs 76% accuracy)
+- [x] 3.5 Temperature scaling for the model's under-confidence (58% confidence vs 76% accuracy)
 - [ ] 3.6 Shift-aware "I'm not sure": conformal thresholds tuned on clean + damaged images, and an
   alarm that watches average confidence. Motivation from Stage 2: FP32 coverage fell to 20-37%
   under severe blur and noise while set sizes barely grew

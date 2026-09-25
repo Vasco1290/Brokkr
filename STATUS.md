@@ -7,8 +7,8 @@ on the clean and damaged `tuning` and `conformal_calibration` images are saved. 
 was chosen from them in 3.1. Task 3.2 is done: Percentile 99.99 was chosen as "best INT8" on the
 tuning split. Task 3.3 is done: the five leave-one-corruption-out INT8 models (half-damaged
 calibration images) are built and checked. Task 3.4 is done: best INT8 with an unrounded final output
-is built. A calibration-luck analysis (noise floor for 3.7) is done. No Stage 3 fix has been measured
-on the test split yet.
+is built. A calibration-luck analysis (noise floor for 3.7) is done. Task 3.5 is done: one temperature
+per model is fitted on clean tuning images. No Stage 3 fix has been measured on the test split yet.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -165,9 +165,10 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `13_int8_damaged_calibration.py` | `models/*_mixed_without_<corruption>.onnx` + records (task 3.3) |
 | `14_int8_calibration_luck.py` | `models/*_calibseed<seed>.onnx`, `results/checks/*_calibration_luck.json` |
 | `15_int8_unrounded_output.py` | `models/*_unrounded.onnx` + record (task 3.4) |
+| `16_temperature.py` | `results/choices/*_temperatures.json` (task 3.5) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (112 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (116 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -185,6 +186,7 @@ design rules and predictions, committed before measuring).
 | | | Group-64 Percentile 99.99 (sensitivity check only); five 3.3 models | `6844c3a` |
 | | | Three calibration-luck models (seeds 6–8); the 3.4 unrounded-output model | `3771a0b` |
 | `results/choices/` | 4 KB | Which INT8 method was chosen, and by how much | `9c3ae84` (task 3.2) |
+| | | One temperature per final-run model | `bfc623b` (task 3.5) |
 | `results/checks/` | 23 MB | Grouping check (with the group-64 tuning scores) | `6844c3a` |
 | | | Calibration-luck check (with the three new models' tuning scores) | `3771a0b` |
 | `results/accuracy/` | 352 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
@@ -228,8 +230,8 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Task 3.5, temperature scaling** (explained below): one number T per model, fitted on clean
-   tuning images. Tasks 3.0–3.4 are done (see the "Task 3.x results" sections below), and
+1. **Task 3.6, shift-aware "I'm not sure"** (explained below): robust conformal thresholds and the
+   confidence alarm, both on raw scores (decided in advance). Tasks 3.0–3.5 are done (see the "Task 3.x results" sections below), and
    `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
@@ -319,6 +321,27 @@ hypotheses file). The E-AURC range is about 5% of its value; H11 asks for at lea
   the output's rounding step saves a few bytes).
 - Every result record now also lists CPU instruction-set features. This laptop (Windows): AVX yes,
   AVX2 yes, AVX-512F no; VNNI recorded as unknown (Windows has no standard-library way to read it).
+
+### Task 3.5 results (temperatures fitted on the tuning split; H14 judged on test in 3.7)
+
+Rules fixed in a dated note before fitting: NLL on clean tuning images, golden-section search over
+T = 0.1 to 10, stop if T is within 1% of an end; 3.6 uses raw scores for every model. All ten T are
+far from the ends, NLL fell for every model, and no top answer changed. Clean tuning, 5,000 images
+(ECE: Stage 2's 15 bins; a tool check, not a result):
+
+| Model | T | ECE before | ECE after |
+|---|---|---|---|
+| FP32 | 0.743 | 0.169 | 0.025 |
+| FP16 | 0.743 | 0.169 | 0.025 |
+| Default INT8 | 0.726 | 0.181 | 0.034 |
+| Best INT8 (Percentile 99.99) | 0.729 | 0.188 | 0.023 |
+| Best INT8, unrounded output | 0.730 | 0.186 | 0.024 |
+| Leave-one-out INT8 (five models) | 0.729–0.734 | 0.179–0.190 | 0.022–0.028 |
+
+- Every T is below 1: all models are made more confident, as H14 expects for FP32.
+- Clean tuning top-1 of the new models (scores from `scripts/03`, for the fits): unrounded 72.12%;
+  leave-one-out 71.80–72.34% (best INT8 72.10%). H11 and H13 are judged on the test split in 3.7.
+- All records are from the clean commit `bfc623b`.
 
 ### Stage 3 in plain words: each step, how, and why
 
