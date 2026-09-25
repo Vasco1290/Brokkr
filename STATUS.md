@@ -1,7 +1,8 @@
 # Brokkr status
 
 Snapshot as of **26 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2"),
-pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is not merged into `main` yet (your decision).
+pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is merged into `main`; the merge is tagged
+`report-1` (Brokkr Technical Report 1, `docs/writeup.md`).
 
 ## 0. Start here (a new session needs nothing else)
 
@@ -9,10 +10,10 @@ pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is not merged into `main` ye
 - **Stage 3 is done** (tasks 3.0–3.9). Predictions and outcomes: `docs/hypotheses_stage3.md`. Final-run
   record: `docs/stage3_final_run_log.md` (no reruns). Verdicts:
   `results/final/mobilenet_v3_large_stage3_verdicts.json` (3.7) and `..._verdicts_with_h17.json` (3.9).
-- **`docs/writeup.md` (task 3.8) is drafted but NOT committed:** it waits for your review. Do not commit
-  it until you say so.
-- **Open decisions (yours):** review and commit the write-up; merge `stage-3` into `main`; start Stage 4;
-  confirm the "reliability envelope" wording (below).
+- **Brokkr Technical Report 1** (`docs/writeup.md`, task 3.8) is approved and committed. Its "Related
+  work" section is a placeholder marked "To be written by H"; do not draft it.
+- **Open decisions (yours):** start Stage 4 (on a new branch from `main`); confirm the "reliability
+  envelope" wording (below).
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
