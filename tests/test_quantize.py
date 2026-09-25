@@ -8,7 +8,7 @@ import torch
 
 from brokkr.datasets import choose_calibration, choose_subset
 from brokkr.export import export_onnx
-from brokkr.quantize import ImageBatches, to_fp16, to_int8
+from brokkr.quantize import INT8_METHODS, ImageBatches, to_fp16, to_int8
 
 
 class TinyNet(torch.nn.Module):
@@ -54,6 +54,30 @@ def test_calibration_reader_ends():
     reader = ImageBatches([np.zeros((2, 3, 4, 4))])
     assert reader.get_next()["images"].shape == (2, 3, 4, 4)
     assert reader.get_next() is None
+
+
+def test_calibration_reader_reads_one_group_at_a_time():
+    reader = ImageBatches([np.full((1, 3, 4, 4), i) for i in range(4)])
+    assert len(reader) == 4
+    reader.set_range(2, 4)
+    assert [reader.get_next()["images"][0, 0, 0, 0] for _ in range(2)] == [2, 3]
+    assert reader.get_next() is None
+
+
+@pytest.mark.parametrize("method", list(INT8_METHODS))
+def test_every_calibration_method_builds_a_working_model(fp32_model, tmp_path, method):
+    rng = np.random.default_rng(0)
+    calibration = [rng.standard_normal((8, 3, 32, 32)).astype(np.float32) for _ in range(4)]
+    int8 = to_int8(fp32_model, tmp_path / f"tiny_{method}.onnx", calibration, method=method, group_batches=2)
+    assert np.abs(run(int8, calibration[0]) - run(fp32_model, calibration[0])).max() < 0.5
+
+
+def test_grouping_does_not_change_minmax(fp32_model, tmp_path):
+    rng = np.random.default_rng(0)
+    calibration = [rng.standard_normal((8, 3, 32, 32)).astype(np.float32) for _ in range(4)]
+    whole = to_int8(fp32_model, tmp_path / "whole.onnx", calibration)
+    grouped = to_int8(fp32_model, tmp_path / "grouped.onnx", calibration, group_batches=2)
+    assert np.array_equal(run(whole, calibration[1]), run(grouped, calibration[1]))
 
 
 def test_calibration_never_overlaps_test_images():
