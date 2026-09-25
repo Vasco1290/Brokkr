@@ -384,8 +384,9 @@ points (14.5 to 15.3); clean average set size 2.63 -> 10.32 classes.
   proven, explanation is that MinMax spent its 256 levels on rare extreme values, which Percentile
   ignores.
 - **H11: removing ties did not improve confidence ranking.** Every tie disappeared, but E-AURC got
-  slightly worse, by less than the build-to-build luck. Ties were rarer with Percentile calibration
-  (58 of 5,000 tuning images) than with default INT8, so there was little to gain.
+  slightly worse, by less than the build-to-build luck. Ties were already rarer with Percentile
+  calibration (110 of the 10,000 clean test images, vs 262 for default INT8), so there was little to
+  gain.
 - **H14 passed on its 3-of-5 rule, but the picture is mixed.** Sharpening made confidence less
   honest under blur and noise, as predicted, but more honest under fog and darkness, where the model
   stays under-confident. "Temperature scaling backfires under damage" holds only for some damage.
