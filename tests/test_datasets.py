@@ -134,3 +134,26 @@ def test_unassigned_images_are_in_no_split():
     assert len(free) == 50_000 - sum(SPLIT_SIZES.values()) == 29_488
     for positions in make_splits(50_000).values():
         assert not np.intersect1d(free, positions).size
+
+
+def test_folder_images_take_the_label_from_the_folder_name(tmp_path, monkeypatch):
+    from brokkr import datasets
+
+    monkeypatch.setitem(datasets.DATASETS, "fake-v2", {"folder": "v2", "licence": "test"})
+    for label in (10, 2, 0):  # folder names sort as numbers, not text: 0, 2, 10
+        (tmp_path / "v2" / str(label)).mkdir(parents=True)
+        for k in range(2):
+            buf = io.BytesIO()
+            Image.new("RGB", (4, 4), color=(label, k, 0)).save(buf, format="JPEG")
+            (tmp_path / "v2" / str(label) / f"img{k}.jpeg").write_bytes(buf.getvalue())
+    paths, labels = datasets.folder_images("fake-v2", root=tmp_path)
+    assert labels.tolist() == [0, 0, 2, 2, 10, 10]
+    samples = list(datasets.read_folder_images(paths, labels))
+    assert [label for _, label in samples] == [0, 0, 2, 2, 10, 10]
+    assert samples[0][0] == paths[0].read_bytes()
+
+
+def test_every_dataset_has_a_licence():
+    from brokkr.datasets import DATASETS
+
+    assert all(spec.get("licence") for spec in DATASETS.values())  # hard rule 8

@@ -1,16 +1,18 @@
-"""Measure top-1/top-5 accuracy of an exported ONNX model on the ImageNet validation set.
+"""Measure top-1/top-5 accuracy of an exported ONNX model on the ImageNet validation set (or ImageNetV2).
 
 Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32]
                                                 [--split test|conformal_calibration|tuning|all]
+                                                [--dataset imagenet-1k-val|imagenetv2-matched-frequency]
         test:                  the fixed 10,000-image test split (brokkr.datasets.make_splits)
         conformal_calibration: 5,000 images for tuning conformal prediction sets
         tuning:                5,000 images held back for Stage 3
         all:                   all 50,000 images (includes the INT8 calibration images; FP32 check only)
-Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/ (see README)
-Writes: results/accuracy/<model>_<precision>_imagenet-1k-val_<split>.json, plus a .npz file with
+        ImageNetV2 (task 3.9) has no splits: use --split all (its 10,000 images).
+Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/ (see README), or data/imagenetv2/
+Writes: results/accuracy/<model>_<precision>_<dataset>_<split>.json, plus a .npz file with
         every class score (logit) for every image, so reliability metrics can be computed later
 
-Correctness check (FP32 only): torchvision publishes its own top-1 accuracy for these FP32
+Correctness check (FP32 on ImageNet only): torchvision publishes its own top-1 accuracy for these FP32
 weights on this same dataset. If our pipeline is right, that published number should fall
 inside our 95% confidence interval. (Even a correct pipeline misses about 1 time in 20.)
 For FP16/INT8 a lower accuracy is a finding, not an error, so instead the script prints the
@@ -26,12 +28,18 @@ from pathlib import Path
 import numpy as np
 
 from brokkr.accuracy import evaluate
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr.datasets import (
+    DATASETS,
+    count_images,
+    folder_images,
+    make_splits,
+    parquet_files,
+    read_folder_images,
+    read_parquet_images,
+)
 from brokkr.export import MODELS
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.results import make_record, save_arrays, save_record
-
-DATASET = "imagenet-1k-val"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
@@ -40,28 +48,38 @@ parser.add_argument("--split", default="test",
                     choices=["test", "conformal_calibration", "tuning", "all"])
 parser.add_argument("--threads", type=int, default=4)
 parser.add_argument("--seed", type=int, default=0, help="seed for the bootstrap intervals")
+parser.add_argument("--dataset", default="imagenet-1k-val", choices=list(DATASETS))
 args = parser.parse_args()
+DATASET = args.dataset
 
 onnx_path = Path("models") / f"{args.model}_{args.precision}.onnx"
 if not onnx_path.exists():
     sys.exit(f"FAIL: {onnx_path} not found. Run scripts/01_export_model.py first.")
 
-files = parquet_files(DATASET)
-total = count_images(files)
-positions = np.arange(total) if args.split == "all" else make_splits(total)[args.split]
+if DATASET == "imagenet-1k-val":
+    files = parquet_files(DATASET)
+    total = count_images(files)
+    positions = np.arange(total) if args.split == "all" else make_splits(total)[args.split]
+    samples = read_parquet_images(files, positions)
+else:  # stored as one folder per class (ImageNetV2); no splits, every image is used
+    if args.split != "all":
+        sys.exit(f"FAIL: {DATASET} has no splits; use --split all")
+    paths, labels = folder_images(DATASET)
+    total, positions = len(paths), np.arange(len(paths))
+    samples = read_folder_images(paths, labels)
 print(f"Evaluating {onnx_path} on {len(positions)} of {total} images ({DATASET})...")
 
 start = time.time()
-result, logits = evaluate(onnx_path, read_parquet_images(files, positions),
-                  num_threads=args.threads, seed=args.seed)
+result, logits = evaluate(onnx_path, samples, num_threads=args.threads, seed=args.seed)
 result["settings"].update({"dataset": DATASET, "dataset_total_images": total,
                            "dataset_licence": DATASETS[DATASET]["licence"],
                            "split": args.split})
 
 # Published number from torchvision, kept separate from our own measurements.
 reported = MODELS[args.model]["weights"].meta["_metrics"]["ImageNet-1K"]["acc@1"] / 100
-result["reference"] = {"top1_reported_by_torchvision": reported,
-                       "note": "Published by torchvision for the PyTorch model on all 50,000 images."}
+if DATASET == "imagenet-1k-val":
+    result["reference"] = {"top1_reported_by_torchvision": reported,
+                           "note": "Published by torchvision for the PyTorch model on all 50,000 images."}
 
 record = make_record("accuracy", args.model, args.precision, result, machine_fingerprint())
 out = Path("results/accuracy") / f"{args.model}_{args.precision}_{DATASET}_{args.split}.json"
@@ -74,7 +92,7 @@ lo, hi = m["top1_ci95"]
 print(f"Done in {time.time() - start:.0f} s. Saved to {out}\n")
 print(f"Top-1: {m['top1']:.2%}  (95% CI {lo:.2%} - {hi:.2%})")
 print(f"Top-5: {m['top5']:.2%}  (95% CI {m['top5_ci95'][0]:.2%} - {m['top5_ci95'][1]:.2%})")
-if args.precision == "fp32" and args.split in ("test", "all"):
+if args.precision == "fp32" and args.split in ("test", "all") and DATASET == "imagenet-1k-val":
     print(f"torchvision's published top-1: {reported:.2%}")
     passed = lo <= reported <= hi
     print("PASS: published number is inside our confidence interval" if passed else
