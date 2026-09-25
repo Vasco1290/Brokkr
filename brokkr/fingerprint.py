@@ -44,6 +44,58 @@ def cpu_model() -> str:
     return platform.processor() or platform.machine() or "unknown"
 
 
+# Instruction-set features that matter for INT8 speed. x86: AVX2 and AVX-512 are wider vector units,
+# VNNI (avx512_vnni, or avx_vnni on newer laptop CPUs) is an 8-bit dot-product instruction.
+# ARM (e.g. Raspberry Pi 5): asimd is the vector unit, asimddp its 8-bit dot product, i8mm an 8-bit
+# matrix multiply.
+X86_FEATURES = ("avx", "avx2", "avx512f", "avx512_vnni", "avx_vnni")
+ARM_FEATURES = ("asimd", "asimddp", "i8mm")
+# Windows reports a few features through IsProcessorFeaturePresent (numbers from winnt.h).
+WINDOWS_FEATURE_NUMBERS = {"avx": 39, "avx2": 40, "avx512f": 41}
+
+
+def features_from_cpuinfo(text: str) -> dict:
+    """{feature: True/False} from the text of Linux's /proc/cpuinfo ("flags" on x86, "Features" on ARM)."""
+    for line in text.splitlines():
+        if line.split(":")[0].strip().lower() in ("flags", "features"):
+            flags = set(line.split(":", 1)[1].split())
+            return {name: name in flags for name in X86_FEATURES + ARM_FEATURES}
+    return dict.fromkeys(X86_FEATURES + ARM_FEATURES)
+
+
+def cpu_features() -> dict:
+    """Which notable instruction-set features the CPU has, as reported by the operating system.
+
+    Each feature is True, False, or None ("this OS gives no standard-library way to tell"; on
+    Windows that includes both VNNI variants).
+    """
+    features = dict.fromkeys(X86_FEATURES + ARM_FEATURES)
+    source = None
+    try:
+        if platform.system() == "Linux":
+            features, source = features_from_cpuinfo(Path("/proc/cpuinfo").read_text()), "/proc/cpuinfo"
+        elif platform.system() == "Windows":
+            import ctypes
+
+            present = ctypes.windll.kernel32.IsProcessorFeaturePresent
+            for name, number in WINDOWS_FEATURE_NUMBERS.items():
+                features[name] = bool(present(number))
+            source = "Windows IsProcessorFeaturePresent"
+    except OSError:
+        pass
+    # An x86 CPU has none of the ARM features, and the other way round.
+    machine = platform.machine().lower()
+    if machine in ("amd64", "x86_64"):
+        other = ARM_FEATURES
+    elif machine in ("aarch64", "arm64"):
+        other = X86_FEATURES
+    else:
+        other = ()
+    for name in other:
+        features[name] = False
+    return {"source": source, "features": features}
+
+
 def board_model() -> str | None:
     """Return the board name on single-board computers (e.g. 'Raspberry Pi 5 Model B'), else None."""
     try:
@@ -219,6 +271,7 @@ def machine_fingerprint(packages=DEFAULT_PACKAGES) -> dict:
     return {
         "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         "cpu_model": cpu_model(),
+        "cpu_features": cpu_features(),
         "cpu_count_logical": os.cpu_count(),
         "board_model": board_model(),
         "architecture": platform.machine(),

@@ -13,6 +13,11 @@ Calibration: when the model says "80% sure", is it right about 80% of the time?
 Standard setup from Guo et al., "On Calibration of Modern Neural Networks" (2017): 15 equal-width
 bins. Uses only NumPy, so it can be shared with the Argos project.
 
+Temperature scaling (Guo et al., 2017): divide every score by one number T before softmax. T > 1
+makes the model sound less sure, T < 1 more sure. It never changes the top answer. T is fitted by
+minimising the negative log-likelihood (NLL): the average of -log(probability given to the true
+class), which is lowest when the confidence is honest.
+
 Caution: ECE can't go below 0, so random noise in a finite test set can only push it up. It is
 biased upwards, most of all when the model is nearly perfectly calibrated. The bootstrap interval
 inherits this: for very small ECE (below about 0.02) the whole interval can sit above the measured
@@ -86,3 +91,36 @@ def calibration(logits: np.ndarray, labels: np.ndarray, n_resamples: int = 1000,
         "n_bins": N_BINS,
         "bins": reliability_bins(confidence, correct),
     }
+
+
+def nll(logits: np.ndarray, labels: np.ndarray, temperature: float = 1.0) -> float:
+    """Average negative log-likelihood of the true class, with scores divided by `temperature`."""
+    z = logits.astype(np.float64) / temperature
+    z_max = z.max(axis=1, keepdims=True)
+    log_sum_exp = np.log(np.exp(z - z_max).sum(axis=1)) + z_max[:, 0]  # stable log(sum(exp(z)))
+    return float((log_sum_exp - z[np.arange(len(labels)), labels]).mean())
+
+
+def fit_temperature(logits: np.ndarray, labels: np.ndarray, low: float = 0.1, high: float = 10.0,
+                    tolerance: float = 1e-4) -> float:
+    """The temperature T in [low, high] with the lowest NLL, by golden-section search over log T.
+
+    Golden-section search keeps narrowing an interval that contains the minimum, like a binary
+    search; it works because NLL is convex in 1/T, so it has a single minimum. Stops when the
+    interval is narrower than `tolerance` in log T. The caller should check that T is not at an
+    end of the range (then the true minimum may lie outside it).
+    """
+    ratio = (np.sqrt(5) - 1) / 2  # 0.618...
+    a, b = np.log(low), np.log(high)
+    c, d = b - ratio * (b - a), a + ratio * (b - a)
+    f_c, f_d = nll(logits, labels, np.exp(c)), nll(logits, labels, np.exp(d))
+    while b - a > tolerance:
+        if f_c < f_d:  # the minimum is in [a, d]
+            b, d, f_d = d, c, f_c
+            c = b - ratio * (b - a)
+            f_c = nll(logits, labels, np.exp(c))
+        else:  # the minimum is in [c, b]
+            a, c, f_c = c, d, f_d
+            d = a + ratio * (b - a)
+            f_d = nll(logits, labels, np.exp(d))
+    return float(np.exp((a + b) / 2))

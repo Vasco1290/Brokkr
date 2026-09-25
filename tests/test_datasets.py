@@ -78,3 +78,82 @@ def test_too_few_images_for_all_splits_is_refused():
     from brokkr.datasets import make_splits
     with pytest.raises(ValueError):
         make_splits(12_000)
+
+
+def test_real_splits_are_validation_images_and_never_overlap():
+    """On the real data: every split image is an ImageNet VALIDATION image, and no image is in two splits.
+
+    Checked by each image's original ImageNet file name, stored in the dataset next to the image:
+    validation images are named ILSVRC2012_val_<number>_<class id>.JPEG, training images
+    <class id>_<number>.JPEG. Also checks each label matches the class id in its file name.
+    Skipped where the dataset isn't downloaded (e.g. on GitHub's test servers).
+    """
+    import re
+
+    import pyarrow.parquet as pq
+    import pytest
+
+    from brokkr.datasets import DATASETS, make_splits, parquet_files
+
+    try:
+        files = parquet_files("imagenet-1k-val")
+    except FileNotFoundError:
+        pytest.skip("ImageNet validation data not downloaded")
+    assert DATASETS["imagenet-1k-val"]["files"].startswith("validation-")
+    assert all(f.name.startswith("validation-") for f in files)
+
+    names, labels = [], []
+    for f in files:
+        table = pq.read_table(f, columns=["image.path", "label"])
+        names += table.column(0).to_pylist()
+        labels += table.column(1).to_pylist()
+    assert len(names) == 50_000 and len(set(names)) == 50_000
+
+    pattern = re.compile(r"ILSVRC2012_val_\d{8}_(n\d{8})\.JPEG")
+    matches = [pattern.fullmatch(n) for n in names]
+    assert all(matches), "found an image that is not named like an ImageNet validation image"
+
+    # Labels 0-999 follow the sorted order of the 1,000 class ids.
+    class_ids = sorted({m.group(1) for m in matches})
+    assert len(class_ids) == 1000
+    assert all(class_ids.index(m.group(1)) == label for m, label in zip(matches, labels, strict=True))
+
+    splits = make_splits(len(names))
+    by_name = {split: {names[i] for i in positions} for split, positions in splits.items()}
+    assert {split: len(s) for split, s in by_name.items()} == {k: len(v) for k, v in splits.items()}
+    split_names = list(by_name)
+    for i, a in enumerate(split_names):
+        for b in split_names[i + 1:]:
+            assert not by_name[a] & by_name[b], f"{a} and {b} share images"
+
+
+def test_unassigned_images_are_in_no_split():
+    from brokkr.datasets import SPLIT_SIZES, make_splits, unassigned
+
+    free = unassigned(50_000)
+    assert len(free) == 50_000 - sum(SPLIT_SIZES.values()) == 29_488
+    for positions in make_splits(50_000).values():
+        assert not np.intersect1d(free, positions).size
+
+
+def test_folder_images_take_the_label_from_the_folder_name(tmp_path, monkeypatch):
+    from brokkr import datasets
+
+    monkeypatch.setitem(datasets.DATASETS, "fake-v2", {"folder": "v2", "licence": "test"})
+    for label in (10, 2, 0):  # folder names sort as numbers, not text: 0, 2, 10
+        (tmp_path / "v2" / str(label)).mkdir(parents=True)
+        for k in range(2):
+            buf = io.BytesIO()
+            Image.new("RGB", (4, 4), color=(label, k, 0)).save(buf, format="JPEG")
+            (tmp_path / "v2" / str(label) / f"img{k}.jpeg").write_bytes(buf.getvalue())
+    paths, labels = datasets.folder_images("fake-v2", root=tmp_path)
+    assert labels.tolist() == [0, 0, 2, 2, 10, 10]
+    samples = list(datasets.read_folder_images(paths, labels))
+    assert [label for _, label in samples] == [0, 0, 2, 2, 10, 10]
+    assert samples[0][0] == paths[0].read_bytes()
+
+
+def test_every_dataset_has_a_licence():
+    from brokkr.datasets import DATASETS
+
+    assert all(spec.get("licence") for spec in DATASETS.values())  # hard rule 8

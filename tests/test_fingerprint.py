@@ -3,7 +3,13 @@
 import json
 import re
 
-from brokkr.fingerprint import machine_fingerprint, package_versions
+from brokkr.fingerprint import (
+    ARM_FEATURES,
+    X86_FEATURES,
+    features_from_cpuinfo,
+    machine_fingerprint,
+    package_versions,
+)
 
 
 def test_fingerprint_has_required_fields():
@@ -55,3 +61,18 @@ def test_core_types_cover_every_cpu_once():
     all_ids = types["performance"] + types["efficiency"]
     assert types["performance"], "there must be at least one performance core"
     assert sorted(all_ids) == list(range(os.cpu_count()))
+
+
+def test_cpu_features_are_recorded():
+    features = machine_fingerprint()["cpu_features"]["features"]
+    assert set(features) == set(X86_FEATURES + ARM_FEATURES)
+    assert all(value in (True, False, None) for value in features.values())
+
+
+def test_cpu_features_from_linux_cpuinfo():
+    pi5 = "processor\t: 0\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics asimddp\n"
+    arm = features_from_cpuinfo(pi5)
+    assert arm["asimddp"] and not arm["i8mm"] and not arm["avx2"]
+    laptop = "flags\t\t: fpu sse4_2 avx avx2 fma avx_vnni\n"
+    x86 = features_from_cpuinfo(laptop)
+    assert x86["avx2"] and x86["avx_vnni"] and not x86["avx512f"] and not x86["asimd"]

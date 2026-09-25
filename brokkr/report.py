@@ -292,7 +292,9 @@ def build_site(results_dir, models_dir, out_dir) -> Path:
     results = load_json_files(results_dir)
     ours = [r for r in results if r.get("source") == "brokkr"]
     accuracy = [r for r in ours if r["kind"] == "accuracy" and "corruption" not in r["settings"]]
-    sweep = [r for r in ours if r["kind"] == "accuracy" and "corruption" in r["settings"]]
+    # Sweeps on the tuning/calibration splits are inputs for choosing Stage 3 settings, not results.
+    sweep = [r for r in ours if r["kind"] == "accuracy" and "corruption" in r["settings"]
+             and r["settings"].get("split", "test") == "test"]
     reliability = [r for r in ours if r["kind"] in ("calibration", "conformal", "selective")]
     speed = [r for r in results if r.get("kind") == "speed" and r.get("source") == "brokkr"]
     model_records = [r for r in load_json_files(models_dir) if "file" in r]

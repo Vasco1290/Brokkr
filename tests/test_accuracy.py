@@ -5,7 +5,7 @@ import pytest
 from PIL import Image
 from torchvision.models import MobileNet_V3_Large_Weights
 
-from brokkr.accuracy import bootstrap_ci, preprocess, topk_correct
+from brokkr.accuracy import bootstrap_ci, preprocess, topk_correct, unpaired_bootstrap_diff
 
 
 def test_preprocess_matches_torchvision():
@@ -73,3 +73,16 @@ def test_ties_are_broken_consistently_and_reported():
     # Calibration code must agree with the accuracy code on which answer the model gave.
     _, correct = confidence_and_correct(logits, labels)
     assert correct.mean() == pytest.approx(m["top1"])
+
+
+def test_unpaired_diff_matches_the_textbook_interval():
+    rng = np.random.default_rng(0)
+    a = (rng.random(10_000) < 0.75).astype(float)
+    b = (rng.random(5_000) < 0.74).astype(float)
+    diff, low, high = unpaired_bootstrap_diff(a, b)
+    assert diff == pytest.approx(b.mean() - a.mean())
+    assert low < diff < high
+    # Normal approximation for two independent proportions: half-width 1.96 * sqrt(pa(1-pa)/na + ...)
+    half = 1.96 * np.sqrt(a.mean() * (1 - a.mean()) / len(a) + b.mean() * (1 - b.mean()) / len(b))
+    assert (high - low) / 2 == pytest.approx(half, rel=0.15)
+    assert unpaired_bootstrap_diff(a, b) == (diff, low, high)  # same seed, same answer

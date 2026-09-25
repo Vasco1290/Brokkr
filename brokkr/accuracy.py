@@ -95,6 +95,21 @@ def paired_bootstrap_diff(correct_a: np.ndarray, correct_b: np.ndarray, n_resamp
     return float(correct_b.mean() - correct_a.mean()), float(low), float(high)
 
 
+def unpaired_bootstrap_diff(correct_a: np.ndarray, correct_b: np.ndarray, n_resamples: int = 1000,
+                            seed: int = 0) -> tuple:
+    """Accuracy of B minus accuracy of A, with a 95% CI, when A and B are DIFFERENT images.
+
+    Used to compare two splits (e.g. tuning vs test). Each side is resampled on its own, so the
+    interval includes the chance variation of both image sets. Wider than a paired interval.
+    """
+    rng = np.random.default_rng(seed)
+    na, nb = len(correct_a), len(correct_b)
+    diffs = [correct_b[rng.integers(0, nb, nb)].mean() - correct_a[rng.integers(0, na, na)].mean()
+             for _ in range(n_resamples)]
+    low, high = np.percentile(diffs, [2.5, 97.5])
+    return float(correct_b.mean() - correct_a.mean()), float(low), float(high)
+
+
 def predict_logits(onnx_path, samples, batch_size: int = 32, num_threads: int = 4) -> tuple:
     """Run the model on (image, label) samples. Returns (logits, labels).
 

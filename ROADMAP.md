@@ -69,22 +69,32 @@ Bootstrap confidence intervals on every accuracy/reliability number.
 
 **Done when:** the headline chart (precision × corruption × reliability) is generated from JSON.
 
-## Stage 3 — Fixes and the study `[ ]`
+## Stage 3 — Fixes and the study `[x]`
 
-- Fixes: recalibration after quantization, mixed precision, shift-aware conformal
-- INT8 calibration study: MinMax vs Percentile vs Entropy, chosen on a tuning set disjoint from both
-  calibration and test images, then measured on the test set. Motivation: in task 1.6, ONNX Runtime's
-  default (MinMax) INT8 MobileNetV3 disagreed with FP32 on about a third of images; a quick diagnostic
-  (on test images, so not a result) suggested outlier-robust calibration recovers much of it.
-- Experiment: INT8 calibration on clean vs corrupted images. Motivation from Stage 2: darkness barely
-  affects FP32 (75.6% -> 73.7% at severity 5) but drops default INT8 from 60.2% to 20.5%
-- Shift-aware conformal prediction. Motivation from Stage 2: FP32 coverage fell to 20-37% under
-  severe blur and noise while set sizes barely grew
-- Keep the INT8 model's final output unrounded, to remove exact score ties (262 of 10,000 test
-  images) that hurt its ability to rank its own confidence
-- Write-up with a limitations section
+Can each Stage 2 problem be fixed, and at what cost? No Stage 3 setting is tuned on the test split;
+the test split was used for Stage 2 baselines. Settings are chosen on the tuning and calibration splits. Fixes that learn from damaged images are judged
+leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 
-**Done when:** one finding can be explained in two minutes, with the numbers behind it.
+- [x] 3.0 Hypotheses written down before measuring (`docs/hypotheses_stage3.md`), committed first
+- [x] 3.1 Tuning-split tooling: model outputs on clean and damaged tuning images, for choosing settings
+- [x] 3.2 INT8 calibration methods: MinMax vs Percentile vs Entropy, chosen on the tuning split.
+  Motivation: in task 1.6 default (MinMax) INT8 disagreed with FP32 on about a third of images; a
+  quick diagnostic (on test images, so not a result) suggested outlier-robust calibration helps.
+  Chosen: Percentile 99.99 (tuning top-1 72.10% vs MinMax 58.46%); H10 is judged on test in 3.7
+- [x] 3.3 INT8 calibrated on clean + damaged images. Motivation from Stage 2: darkness barely affects
+  FP32 (75.6% -> 73.7% at severity 5) but drops default INT8 from 60.2% to 20.5%
+- [x] 3.4 INT8 with the final layer's output kept unrounded (mixed precision), to remove exact score
+  ties (262 of 10,000 test images) that hurt its ability to rank its own confidence
+- [x] 3.5 Temperature scaling for the model's under-confidence (58% confidence vs 76% accuracy)
+- [x] 3.6 Shift-aware "I'm not sure": conformal thresholds tuned on clean + damaged images, and an
+  alarm that watches average confidence. Motivation from Stage 2: FP32 coverage fell to 20-37%
+  under severe blur and noise while set sizes barely grew
+- [x] 3.7 Final run: chosen fixes measured once on the 10,000 test images under all 26 conditions
+- [x] 3.8 Write-up (`docs/writeup.md`) with a limitations section
+- [x] 3.9 Real-world shift check on ImageNetV2 (10,000 new photos, natural rather than simulated shift)
+
+**Done when:** one finding can be explained in two minutes, with the numbers behind it, and the
+write-up exists.
 
 ## Stage 4 — Nutrition label + search `[ ]`
 

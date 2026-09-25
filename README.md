@@ -18,8 +18,8 @@ commit it came from.
 
 ## Stage 1 results
 
-MobileNetV3-Large (torchvision weights) run with ONNX Runtime 1.23.2 on a laptop
-(Intel Core i5-1235U, Windows 11, CPU only).
+Model: MobileNetV3-Large with torchvision's `IMAGENET1K_V2` weights (`brokkr/export.py`), run with
+ONNX Runtime 1.23.2 on a laptop (Intel Core i5-1235U, Windows 11, CPU only).
 
 **Size and accuracy** on a fixed 10,000-image subset of the ImageNet-1k validation split.
 Brackets are 95% bootstrap confidence intervals; "vs FP32" is the paired difference on the same images.
