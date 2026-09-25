@@ -1,8 +1,8 @@
 # Brokkr status
 
 Snapshot as of **25 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2").
-Stages 1 and 2 are complete and merged. Stage 3 has started: its task list is committed, and its
-predictions are drafted but not yet committed.
+Stages 1 and 2 are complete and merged. Stage 3 has started: its task list and its pre-registered
+predictions (`docs/hypotheses_stage3.md`, task 3.0) are committed. No Stage 3 measurement has run yet.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -154,8 +154,11 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `08_corruption_sweep.py` | `results/sweep/*_test_<corruption>_s<severity>.json` + `.npz` |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (97 tests, run with `pytest`; style check `ruff check .`).
-Docs: `docs/hypotheses.md` (Stage 2), `docs/hypotheses_stage3.md` (Stage 3 draft, uncommitted).
+Tests: `tests/` (98 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
+original ImageNet file names, and no two splits share an image.
+Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
+design rules and predictions, committed before measuring).
 
 ### Data and results on disk (all gitignored)
 | Location | Size | Contents | Made by commit |
@@ -198,27 +201,28 @@ images, so it is only used for the FP32 correctness check.
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
    accuracy script needs PyTorch installed. Move the model list to its own file before Stage 5.
 5. **ImageNetV2 not downloaded yet** (planned for task 3.9, 1.26 GB; to be confirmed before download).
-6. **`docs/hypotheses_stage3.md` is an uncommitted draft.** It must be committed before any Stage 3
-   measurement.
 
 ---
 
 ## 5. What happens next: Stage 3 ("fix what broke")
 
-### The very next task: 3.0, agree and commit the Stage 3 predictions
+### The very next steps
 
-`docs/hypotheses_stage3.md` has two parts. **Design rules** fix, in advance, how every Stage 3 setting
-will be chosen, so nothing can be adjusted after seeing test results. **Predictions H10–H17** state what
-we expect, with thresholds. You review it, change or add anything, and it gets committed. Nothing is
-measured until then.
+1. **Restore the 50,000-image correctness result** (loose end 1 above): one 15-minute run.
+2. **Task 3.1, tuning-split tooling** (explained below). Task 3.0 is done: `docs/hypotheses_stage3.md`
+   is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
+   (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
+   "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
+   paired 95% intervals for every comparison.
 
 ### Stage 3 in plain words: each step, how, and why
 
 **The two rules behind everything**
-- *Use the test images once.* Every Stage 3 fix has knobs to set (which INT8 method, what temperature,
-  what alarm level). If we set knobs by looking at test results, we'd be marking our own exam, and the
-  results would look better than reality. So knobs are set on other splits (mainly `tuning`), and the
-  test split is measured once, at the very end (3.7).
+- *No Stage 3 setting is tuned on the test split; the test split was used for Stage 2 baselines.*
+  Every Stage 3 fix has knobs to set (which INT8 method, what temperature, what alarm level). If we set
+  knobs by looking at test results, we'd be marking our own exam, and the results would look better
+  than reality. So knobs are set on other splits (mainly `tuning`), and the fixes are measured on the
+  test split in the final run (3.7).
 - *Leave one damage type out.* A fix that learns from damaged images might only work on the damage it
   practised on. So each such fix is built five times, each time hiding one damage type, and tested
   only on the hidden type. That tells us whether it helps with *new* kinds of trouble, which is what a

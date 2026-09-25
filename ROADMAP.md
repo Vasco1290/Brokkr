@@ -71,11 +71,11 @@ Bootstrap confidence intervals on every accuracy/reliability number.
 
 ## Stage 3 — Fixes and the study `[~]`
 
-Can each Stage 2 problem be fixed, and at what cost? Every setting is chosen on the tuning split;
-the test split is measured once, at the end. Fixes that learn from damaged images are judged
+Can each Stage 2 problem be fixed, and at what cost? No Stage 3 setting is tuned on the test split;
+the test split was used for Stage 2 baselines. Settings are chosen on the tuning and calibration splits. Fixes that learn from damaged images are judged
 leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 
-- [ ] 3.0 Hypotheses written down before measuring (`docs/hypotheses_stage3.md`), committed first
+- [x] 3.0 Hypotheses written down before measuring (`docs/hypotheses_stage3.md`), committed first
 - [ ] 3.1 Tuning-split tooling: model outputs on clean and damaged tuning images, for choosing settings
 - [ ] 3.2 INT8 calibration methods: MinMax vs Percentile vs Entropy, chosen on the tuning split.
   Motivation: in task 1.6 default (MinMax) INT8 disagreed with FP32 on about a third of images; a
