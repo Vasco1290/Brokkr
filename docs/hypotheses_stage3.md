@@ -285,3 +285,64 @@ left open, before anything is computed.
   variants are not included here (they would need new damage sweeps on conformal_calibration).
 - **Final-report wording:** robust conformal has no coverage guarantee under corruptions it was not
   calibrated on. Results are described as "improved coverage in our tests", never "guaranteed".
+
+## Note added 25 September 2026, before the final run (task 3.7)
+
+Nothing above has been changed; no prediction and no threshold changes. This note fixes how the
+final run is done and judged, before any Stage 3 model has seen a test image.
+
+- **H17 is postponed to task 3.9, not part of 3.7.** Reasons: ImageNetV2 is not downloaded (1.26 GB,
+  which needs your go-ahead), and its licence is not recorded yet, so hard rule 8 forbids using it.
+  H17 involves only FP32 and the existing clean-tuned conformal threshold, so running it later does
+  not reuse the ImageNet test images. The judging script already contains H17's rule; it reports
+  "NOT RUN" until the ImageNetV2 result exists (FP32 on all 10,000 matched-frequency images, saved
+  as `results/accuracy/mobilenet_v3_large_fp32_imagenetv2-matched-frequency_all.json`).
+- **Extra analysis (not a prediction): robust conformal for best INT8.** Before the final run,
+  Percentile 99.99 is measured on the conformal_calibration split, clean and damaged (the task 3.1
+  sweep, same settings), and its robust thresholds are computed exactly as for FP32 (dated 3.6 note).
+  In the final run its coverage and set size on the held-out corruptions are reported, labelled as
+  an extra analysis.
+- **What the final run measures on the test split (10,000 images).** Best INT8 and best INT8 with
+  unrounded output: clean and all 25 damaged conditions. Each leave-one-out INT8 model: clean and
+  its held-out corruption at severities 1–5 only (the design rule). FP32, FP16 and default INT8 are
+  not rerun: their Stage 2 test results are the baselines.
+- **How each prediction is judged** (`scripts/18_judge_stage3.py`, written and tested on fake data
+  before the run). "Paired CI" = paired bootstrap 95% interval of the difference, 1,000 resamples
+  of the same test images for both sides, seed 0.
+  - H10: best INT8 clean test top-1 >= 67.9%.
+  - H11 (clean test): unrounded has 0 tied images; E-AURC of best INT8 minus E-AURC of unrounded is
+    at least 10% of best INT8's E-AURC, with its paired CI excluding zero; file size increase < 5%.
+  - H12: at darkness severity 5, top-1 of the model calibrated without darkness minus top-1 of best
+    INT8 >= 10 points, with its paired CI excluding zero.
+  - H13: the average over the five leave-one-out models of clean test top-1, minus best INT8's,
+    is between −1 and +1 point. *Interpretation fixed now:* H13 claims the two are close, so the
+    rule "the paired CI must exclude zero" cannot sensibly apply (it would need a real difference
+    to confirm "no big difference"). H13 is judged on the measured value; its paired CI is reported.
+  - H14 (FP32): fitted T < 1 (from 3.5); clean test ECE with scaling < 0.03; at severity 5, ECE
+    with scaling minus ECE without >= 0.02 with its paired CI excluding zero, for at least 3 of 5
+    corruptions.
+  - H15 (FP32): for each held-out corruption at severity 3, coverage with its robust threshold minus
+    coverage with the clean-tuned threshold; averaged over the five: >= 10 points, paired CI (of the
+    per-image average) excluding zero. Clean test average set size with the robust thresholds
+    (averaged over the five) at least 2x that with the clean-tuned threshold, paired CI of the
+    difference excluding zero. Both parts must hold.
+  - H16 (FP32): the alarm fires in >= 90% of the 1,200 harmful-condition windows and in at most 2 of
+    the 100 clean windows.
+  - H17 (FP32, ImageNetV2): top-1 between 60% and 68%, and the upper end of the bootstrap 95%
+    interval of clean-tuned coverage below 88%.
+  - Verdicts: PASS (every part holds), FAIL, or NOT RUN. **"Within noise"** is added next to the
+    verdict when an INT8-vs-INT8 difference (H11 E-AURC, H12 and H13 top-1) is smaller than the
+    calibration-luck range (top-1 0.28 points, E-AURC 0.0026). **H11 wording:** if the relative
+    E-AURC improvement is under 15%, the output adds that it is within about 3x the build-to-build
+    range, from only 4 builds.
+- **Coverage is never shown without set size.** Every coverage number in the judging output and the
+  write-up is shown next to its average set size, clean and damaged. A coverage gain is never called
+  a win without its set size.
+- **Rerun rule.** A test-split measurement may be rerun only for a technical failure (crash,
+  corrupted or incomplete output file, power loss), never because of its result. Every rerun is
+  logged with its reason in `docs/stage3_final_run_log.md`.
+- **Running it.** The run starts from a commit tagged `stage3-final-run`, with no uncommitted
+  changes. The laptop is kept awake by the run script itself (Windows' keep-awake request, which ends
+  when the script ends; no system setting is changed). The run is resumable (finished steps are
+  skipped), and at the end every expected result file is checked to exist and be complete (it
+  loads, its checksum matches, and it has scores for all 10,000 images).
