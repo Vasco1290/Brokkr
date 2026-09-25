@@ -117,3 +117,22 @@ seeds and are not stratified by class, so this is a chance draw.
 
 **Decision: all design rules stay exactly as committed.** Changing them after seeing tuning data is
 what pre-registration is meant to prevent.
+
+## Note added 25 September 2026, before any task 3.2 measurement: how the INT8 candidates are built
+
+Nothing above has been changed; no design rule changes. These details were fixed while writing the
+code, before any candidate was built or measured.
+
+- **Calibration images are fed in groups of 128** (4 batches of 32, in the split's fixed order;
+  onnxruntime's `CalibStridedMinMax` option). The Percentile and Entropy methods otherwise keep every
+  layer's output for all 512 images in memory at once, about 22 GB, and this laptop has 15.7 GB.
+  MinMax gives exactly the same model either way (checked by `scripts/10_int8_methods.py` and a test).
+  For Percentile and Entropy the first group sets the histogram's bin width, so the group size can
+  shift the ranges slightly; it is fixed here and will not be tuned.
+- **Histogram settings are onnxruntime 1.23.2's defaults** (`quantize_static` cannot change them):
+  Percentile uses 2,048 bins on absolute values, with the range clipped to the smallest and largest
+  value seen; Entropy uses 128 bins and 128 quantized bins.
+- **The MinMax candidate is the existing default INT8 model** (`models/*_int8.onnx`).
+- **The build sanity check uses 256 tuning images**, not test images.
+- **An exact tie in tuning top-1 is not covered by the rule**: `scripts/11_choose_int8.py` stops,
+  and the decision will be written here before going on.
