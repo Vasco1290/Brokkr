@@ -50,3 +50,14 @@ def test_calibration_from_logits():
     assert result["ece"] == pytest.approx(result["overconfidence"])  # one bin, so ECE = the gap
     lo, hi = result["ece_ci95"]
     assert lo <= result["ece"] <= hi
+
+
+def test_ece_is_biased_upwards_for_an_honest_model():
+    # Why the ECE interval can miss the measured value: for a nearly perfectly calibrated model,
+    # resampled ECEs mostly come out HIGHER than the measured one, because ECE can't go below 0.
+    rng = np.random.default_rng(5)
+    confidence = rng.uniform(0.1, 1.0, 2000)
+    correct = (rng.random(2000) < confidence).astype(float)
+    measured = ece(confidence, correct)
+    resampled = [ece(confidence[i], correct[i]) for i in (rng.integers(0, 2000, 2000) for _ in range(300))]
+    assert np.mean(np.array(resampled) > measured) > 0.7

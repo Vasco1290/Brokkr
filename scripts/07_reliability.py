@@ -75,7 +75,10 @@ for test_path in tests:
     lo, hi = cal["ece_ci95"]
     print(f"  ECE {cal['ece']:.4f} ({lo:.4f}-{hi:.4f}); mean confidence {cal['mean_confidence']:.2%} "
           f"vs accuracy {cal['accuracy']:.2%}")
-    passed &= lo <= cal["ece"] <= hi and abs(cal["accuracy"] - acc["metrics"]["top1"]) < 1e-9
+    # Not "lo <= ece <= hi": ECE is biased upwards, so for near-zero ECE the bootstrap interval can
+    # sit entirely above it (see brokkr/shift/reliability.py).
+    passed &= 0 <= cal["ece"] <= 1 and 0 <= lo <= hi <= 1
+    passed &= abs(cal["accuracy"] - acc["metrics"]["top1"]) < 1e-9
 
     # Selective prediction
     confidence, correct = confidence_and_correct(arrays["logits"], arrays["labels"])

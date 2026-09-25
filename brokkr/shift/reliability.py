@@ -12,6 +12,11 @@ Calibration: when the model says "80% sure", is it right about 80% of the time?
 
 Standard setup from Guo et al., "On Calibration of Modern Neural Networks" (2017): 15 equal-width
 bins. Uses only NumPy, so it can be shared with the Argos project.
+
+Caution: ECE can't go below 0, so random noise in a finite test set can only push it up. It is
+biased upwards, most of all when the model is nearly perfectly calibrated. The bootstrap interval
+inherits this: for very small ECE (below about 0.02) the whole interval can sit above the measured
+value. Don't over-read small ECE differences.
 """
 
 import numpy as np
