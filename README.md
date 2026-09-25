@@ -1,8 +1,8 @@
 # Brokkr
 Shrink AI models for edge hardware, stress-test them in real-world conditions, and deploy them to know when they're unsure.
 
-**Status:** Stage 1 of 7 complete (core measurement). Stage 2 (damaged images and reliability) is in
-progress. See [ROADMAP.md](ROADMAP.md).
+**Status:** Stages 1–2 of 7 complete (core measurement; damaged images and reliability). Next: Stage 3,
+fixing what broke. See [ROADMAP.md](ROADMAP.md).
 
 ## What works now
 
@@ -58,6 +58,38 @@ laptop disagreed by 10–20%, so only these conclusions held up (plugged in, "Be
   unstable (sessions varied by 33%).
 
 Speed will be measured properly on a Raspberry Pi 5 in Stage 5.
+
+## Stage 2 results: damaged images and "knowing when it's wrong"
+
+The same 10,000 test images, damaged by fog, defocus blur, motion blur, noise, and darkness at
+severities 1–5 (`brokkr/shift`, our own implementations in the style of ImageNet-C). Nine predictions
+were written down and committed before measuring; full outcomes are in
+[docs/hypotheses.md](docs/hypotheses.md): 6 confirmed, 3 rejected. The results page
+(`scripts/05_build_site.py`) has the charts and every number.
+
+- **FP16 behaves like FP32 everywhere:** the largest accuracy difference in any of 26 conditions was
+  0.25 points.
+- **Default INT8 falls apart faster than FP32 under every kind of damage.** At severity 3 it keeps
+  38–65% of FP32's accuracy, against 80% on clean images.
+- **Darkness hurts only INT8.** FP32 goes from 75.6% (clean) to 73.7% at severity 5; default INT8
+  from 60.2% to 20.5%.
+- **The 90% conformal promise holds on clean images** (FP32 90.6%, FP16 90.5%, INT8 89.8%) **but
+  breaks under blur and noise** (FP32 at severity 5: 20–37%), **while prediction sets barely grow**
+  (2.3 classes clean, 2.1–2.8 at severity 5). The model gives no warning that it is failing.
+- **Calibration numbers can mislead.** This model is under-confident on clean images (average
+  confidence 57.9% vs accuracy 75.6%); damage lowered accuracy toward its confidence, so ECE
+  *improved* while accuracy collapsed.
+- **Default INT8 is worse at knowing when it's wrong:** it needs sets of 8.3 classes (vs 2.3) to keep
+  the 90% promise on clean images, and its error when answering its most confident half is 16.2%
+  (vs 5.2% for FP32).
+
+To reproduce (about 2.5 hours on this laptop, plus calibration-split runs of `scripts/03`):
+
+```bash
+python scripts/03_evaluate_accuracy.py --precision fp32 --split conformal_calibration   # and fp16, int8
+python scripts/08_corruption_sweep.py
+python scripts/07_reliability.py
+```
 
 ## Development setup
 
