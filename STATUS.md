@@ -8,7 +8,8 @@ was chosen from them in 3.1. Task 3.2 is done: Percentile 99.99 was chosen as "b
 tuning split. Task 3.3 is done: the five leave-one-corruption-out INT8 models (half-damaged
 calibration images) are built and checked. Task 3.4 is done: best INT8 with an unrounded final output
 is built. A calibration-luck analysis (noise floor for 3.7) is done. Task 3.5 is done: one temperature
-per model is fitted on clean tuning images. No Stage 3 fix has been measured on the test split yet.
+per model is fitted on clean tuning images. Task 3.6 is done: robust conformal and alarm thresholds
+are computed (raw scores). No Stage 3 fix has been measured on the test split yet; that is task 3.7.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -145,6 +146,8 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `shift/reliability.py` | Softmax, ECE, reliability-diagram data |
 | `shift/conformal.py` | Conformal thresholds, sets, coverage |
 | `shift/selective.py` | Risk-coverage curves, AURC, E-AURC |
+| `shift/robust_conformal.py` | The one-third clean, two-thirds damaged calibration mix (Stage 3) |
+| `shift/alarm.py` | Confidence alarm: window averages, threshold, fires (Stage 3) |
 
 ### Scripts (`scripts/`, run from the project folder)
 | Script | Produces |
@@ -166,9 +169,10 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `14_int8_calibration_luck.py` | `models/*_calibseed<seed>.onnx`, `results/checks/*_calibration_luck.json` |
 | `15_int8_unrounded_output.py` | `models/*_unrounded.onnx` + record (task 3.4) |
 | `16_temperature.py` | `results/choices/*_temperatures.json` (task 3.5) |
+| `17_shift_aware.py` | `results/choices/*_shift_aware.json`: robust conformal and alarm thresholds (3.6) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (116 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (122 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -187,6 +191,7 @@ design rules and predictions, committed before measuring).
 | | | Three calibration-luck models (seeds 6–8); the 3.4 unrounded-output model | `3771a0b` |
 | `results/choices/` | 4 KB | Which INT8 method was chosen, and by how much | `9c3ae84` (task 3.2) |
 | | | One temperature per final-run model | `bfc623b` (task 3.5) |
+| | | Robust conformal and alarm thresholds | `88703f7` (task 3.6) |
 | `results/checks/` | 23 MB | Grouping check (with the group-64 tuning scores) | `6844c3a` |
 | | | Calibration-luck check (with the three new models' tuning scores) | `3771a0b` |
 | `results/accuracy/` | 352 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
@@ -230,8 +235,8 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Task 3.6, shift-aware "I'm not sure"** (explained below): robust conformal thresholds and the
-   confidence alarm, both on raw scores (decided in advance). Tasks 3.0–3.5 are done (see the "Task 3.x results" sections below), and
+1. **Task 3.7, the final run** (explained below): every chosen fix measured once on the 10,000 test
+   images under all 26 conditions, and H10–H16 judged. Tasks 3.0–3.6 are done (see the "Task 3.x results" sections below), and
    `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
@@ -342,6 +347,25 @@ far from the ends, NLL fell for every model, and no top answer changed. Clean tu
 - Clean tuning top-1 of the new models (scores from `scripts/03`, for the fits): unrounded 72.12%;
   leave-one-out 71.80–72.34% (best INT8 72.10%). H11 and H13 are judged on the test split in 3.7.
 - All records are from the clean commit `bfc623b`.
+
+### Task 3.6 results (thresholds set on calibration/tuning images; H15, H16 judged on test in 3.7)
+
+Details fixed in a dated note before computing: raw scores; H16 test windows (seed-3 order, 100
+non-overlapping single-condition windows per condition, fires if strictly below); the exact
+robust mix (seed 9: 1,667 clean, 3,333 damaged over 20 balanced corruption/severity pairs);
+robust conformal for FP32, FP16 and default INT8 (the models with damaged calibration outputs).
+
+- **Check passed:** the clean-only conformal thresholds recomputed here equal Stage 2's exactly
+  (FP32 0.963033, FP16 0.962827, INT8 0.991209).
+- **Robust thresholds** (one per held-out corruption): FP32 0.9932–0.9960, FP16 0.9931–0.9960,
+  default INT8 0.9988–0.9991. On their own calibration mix they give 90.0% coverage, as built.
+  Set sizes on that mix (mostly damaged images): FP32 8.7–15.3 classes, default INT8 91–127.
+  These are calibration images; clean and held-out-corruption test numbers come in 3.7.
+- **Alarm thresholds** (raw confidence, clean tuning): FP32 0.512 (mean confidence 0.570), FP16
+  0.512, default INT8 0.345, best INT8 0.477, unrounded 0.479, leave-one-out 0.475–0.482. Exactly
+  1.00% of the clean tuning windows fire for every model, as built.
+- Final-report wording fixed in advance: "improved coverage in our tests", never "guaranteed".
+- The record is from the clean commit `88703f7`.
 
 ### Stage 3 in plain words: each step, how, and why
 
