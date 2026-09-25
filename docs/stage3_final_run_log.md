@@ -31,3 +31,7 @@ None so far.
   which side of zero it is on and passes only on the side the prediction claims. To confirm no
   verdict changes, the judging script was run again on the same saved test scores (no new test
   measurement), into a separate file; the original verdict record is kept unchanged.
+  *Result:* the re-run at `a497ec3` (no uncommitted changes) gave identical verdicts for H10–H17 and
+  the extra analysis (`results/final/mobilenet_v3_large_stage3_verdicts_recheck_after_ci_fix.json`).
+  Interval sides: H11 below zero (unrounded worse), H12 and H13 include zero, H15 both above zero,
+  H14 above zero for defocus blur, motion blur and noise, below zero for fog and darkness.
