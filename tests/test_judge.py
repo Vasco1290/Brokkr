@@ -40,8 +40,21 @@ def calibrated(seed: int = 2, scale: float = 2.0, n: int = 20_000):
 
 def test_paired_ci_of_a_constant_difference_is_that_constant():
     assert judge.paired_ci(lambda i: 0.5, N) == [0.5, 0.5]
-    assert judge.excludes_zero([0.1, 0.3]) and judge.excludes_zero([-0.3, -0.1])
-    assert not judge.excludes_zero([-0.1, 0.1])
+    assert judge.ci_side([0.1, 0.3]) == "above zero"
+    assert judge.ci_side([-0.3, -0.1]) == "below zero"
+    assert judge.ci_side([-0.1, 0.1]) == "includes zero"
+
+
+def test_an_interval_on_the_wrong_side_does_not_count():
+    """The final run's H11 case: unrounded slightly WORSE, interval entirely below zero."""
+    best = scores_with_accuracy(0.7)
+    right = np.arange(N) < int(0.7 * N)
+    best[right, LABELS[right]] += 3  # best ranks its mistakes well
+    worse = scores_with_accuracy(0.7)  # same accuracy, blurrier ranking
+    r = judge.h11(best, worse, LABELS, size_best=100, size_unrounded=100, e_aurc_noise=0.0026)
+    assert r["numbers"]["ci_side"] == "below zero"
+    assert not r["parts"]["paired CI of the E-AURC difference above zero (unrounded better)"]
+    assert r["verdict"] == "FAIL"
 
 
 def test_h10():

@@ -28,6 +28,7 @@ V2_RESULT = Path("results/accuracy/mobilenet_v3_large_fp32_imagenetv2-matched-fr
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
+parser.add_argument("--out", default=None, help="default: results/final/<model>_stage3_verdicts.json")
 args = parser.parse_args()
 m = args.model
 
@@ -137,5 +138,5 @@ record = make_record("verdicts", m, "all", {
                 for name, r in verdicts.items()},
     "raw": verdicts,
 }, machine_fingerprint())
-out = save_record(record, Path("results/final") / f"{m}_stage3_verdicts.json")
+out = save_record(record, Path(args.out or Path("results/final") / f"{m}_stage3_verdicts.json"))
 print(f"\nSaved to {out}")

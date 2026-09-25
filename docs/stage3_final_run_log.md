@@ -20,3 +20,14 @@ result. Every rerun is listed below with its reason.
 ## Reruns (technical failures only)
 
 None so far.
+
+## Changes after the run (none changes a Stage 3 verdict)
+
+- **26 Sep 2026, judging script interval check (found after the verdicts).** The first version's
+  interval check, `excludes_zero`, passed an interval on *either* side of zero. For H11 it printed
+  "paired CI of the E-AURC difference excludes zero: yes" although the interval (−0.0030 to −0.0001)
+  lay entirely on the side where unrounded is *worse*. The verdict was still right, because H11's
+  other part (at least 10% better) failed. Fixed in `brokkr/judge.py`: every interval check now says
+  which side of zero it is on and passes only on the side the prediction claims. To confirm no
+  verdict changes, the judging script was run again on the same saved test scores (no new test
+  measurement), into a separate file; the original verdict record is kept unchanged.

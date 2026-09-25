@@ -11,7 +11,9 @@ Each returns a dict:
      "notes": [...]}                           reporting rules (e.g. H11 under 15%)
 
 "Paired CI" = paired bootstrap 95% interval of a difference: the same resampled test images for both
-sides, 1,000 resamples, seed 0.
+sides, 1,000 resamples, seed 0. Every interval check says which side of zero the interval is on, and
+passes only on the side the prediction claims. (Changed after the final run: the first version only
+checked "excludes zero" in either direction. It changed no verdict; docs/stage3_final_run_log.md.)
 """
 
 import numpy as np
@@ -31,8 +33,11 @@ def paired_ci(difference, n: int) -> list:
     return [float(v) for v in np.percentile(values, [2.5, 97.5])]
 
 
-def excludes_zero(ci: list) -> bool:
-    return ci[0] > 0 or ci[1] < 0
+def ci_side(ci: list) -> str:
+    """Where a 95% interval lies: "above zero", "below zero", or "includes zero"."""
+    if ci[0] > 0:
+        return "above zero"
+    return "below zero" if ci[1] < 0 else "includes zero"
 
 
 def plain(value):
@@ -86,10 +91,12 @@ def h11(best: np.ndarray, unrounded: np.ndarray, labels: np.ndarray, size_best: 
                      f"({e_aurc_noise:.4f}), which comes from only 4 builds")
     return result({"0 tied test images": ties == 0,
                    "E-AURC at least 10% lower (relative)": relative >= 0.10,
-                   "paired CI of the E-AURC difference excludes zero": excludes_zero(ci),
+                   "paired CI of the E-AURC difference above zero (unrounded better)":
+                       ci_side(ci) == "above zero",
                    "file size increase under 5%": growth < 0.05},
                   {"tied_images": ties, "e_aurc_best": e_b, "e_aurc_unrounded": e_u,
-                   "e_aurc_best_minus_unrounded": diff, "ci95": ci, "relative_improvement": relative,
+                   "e_aurc_best_minus_unrounded": diff, "ci95": ci, "ci_side": ci_side(ci),
+                   "relative_improvement": relative,
                    "file_size_increase": growth},
                   within_noise=abs(diff) < e_aurc_noise, notes=notes)
 
@@ -101,9 +108,9 @@ def h12(best_dark5: np.ndarray, without_darkness_dark5: np.ndarray, labels: np.n
     diff = float(b.mean() - a.mean())
     ci = paired_ci(lambda i: b[i].mean() - a[i].mean(), len(labels))
     return result({"at least 10 points higher": diff >= 0.10,
-                   "paired CI excludes zero": excludes_zero(ci)},
+                   "paired CI above zero": ci_side(ci) == "above zero"},
                   {"top1_best": float(a.mean()), "top1_without_darkness": float(b.mean()),
-                   "difference": diff, "ci95": ci},
+                   "difference": diff, "ci95": ci, "ci_side": ci_side(ci)},
                   within_noise=abs(diff) < top1_noise)
 
 
@@ -116,7 +123,7 @@ def h13(best_clean: np.ndarray, leave_one_out_clean: list, labels: np.ndarray, t
     ci = paired_ci(lambda i: b[i].mean() - a[i].mean(), len(labels))
     return result({"within 1 point (between -1 and +1)": -0.01 <= diff <= 0.01},
                   {"top1_best": float(a.mean()), "top1_leave_one_out_average": float(b.mean()),
-                   "difference": diff, "ci95_reported_only": ci},
+                   "difference": diff, "ci95_reported_only": ci, "ci_side": ci_side(ci)},
                   within_noise=abs(diff) < top1_noise)
 
 
@@ -131,10 +138,10 @@ def h14(temperature: float, clean: np.ndarray, severity5: dict, labels: np.ndarr
         scaled, _ = confidence_and_correct(logits / temperature, labels)
         diff = ece(scaled, correct5) - ece(raw, correct5)
         ci = paired_ci(lambda i, s=scaled, r=raw, c=correct5: ece(s[i], c[i]) - ece(r[i], c[i]), len(labels))
-        holds = diff >= 0.02 and excludes_zero(ci)
+        holds = diff >= 0.02 and ci_side(ci) == "above zero"
         backfires += holds
         per_corruption[name] = {"ece_raw": ece(raw, correct5), "ece_scaled": ece(scaled, correct5),
-                                "scaled_minus_raw": diff, "ci95": ci, "holds": holds}
+                                "scaled_minus_raw": diff, "ci95": ci, "ci_side": ci_side(ci), "holds": holds}
     return result({"T < 1": temperature < 1, "clean ECE with scaling < 0.03": clean_ece < 0.03,
                    "scaling backfires at severity 5 for at least 3 of 5": backfires >= 3},
                   {"temperature": temperature, "clean_ece_scaled": clean_ece,
@@ -170,9 +177,9 @@ def h15(clean: np.ndarray, severity3: dict, labels: np.ndarray, clean_threshold:
     size_ci = paired_ci(lambda i: size_robust[i].mean() - size_clean[i].mean(), len(labels))
     ratio = float(size_robust.mean() / size_clean.mean())
     return result({"coverage at least 10 points higher": d.mean() >= 0.10,
-                   "paired CI of coverage difference excludes zero": excludes_zero(cov_ci),
+                   "paired CI of coverage difference above zero": ci_side(cov_ci) == "above zero",
                    "clean set size at least doubles": ratio >= 2,
-                   "paired CI of set size difference excludes zero": excludes_zero(size_ci)},
+                   "paired CI of set size difference above zero": ci_side(size_ci) == "above zero"},
                   {"coverage_gain_severity3": float(d.mean()), "coverage_gain_ci95": cov_ci,
                    "clean_set_size_clean_tuned": float(size_clean.mean()),
                    "clean_set_size_robust": float(size_robust.mean()), "clean_set_size_ratio": ratio,
