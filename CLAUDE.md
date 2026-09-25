@@ -47,6 +47,21 @@ else is built on its measurements.
   confidence intervals.
 * Seeds: set random seeds so results are reproducible.
 
+## Reporting and study rules (standing, from Stage 3)
+
+* Differences are "new minus old" (the fix minus what it replaces), with paired bootstrap 95% intervals;
+  always state the direction (accuracy/coverage: positive = better; E-AURC/ECE: positive = worse).
+* Coverage is never reported without its average set size.
+* No example numbers unless measured: no illustrative figures that could be mistaken for results.
+* Hypotheses are committed before measuring; later implementation details go in a dated note committed
+  before running; outcomes are appended, never edited above.
+* No setting is tuned on the test split. Test-split reruns only for technical failure, logged with the
+  reason; never because of a result.
+* Analyses done after the verdicts are labelled "after the verdicts" or "exploratory"; likely
+  explanations are labelled "likely".
+* Report absolute weakness (FP32 also fails) separately from compression-caused weakness (INT8 minus
+  FP32 on the same images).
+
 ## Architecture principles
 
 * "Where a model runs" is a pluggable target (laptop now, Raspberry Pi 5 over SSH later, community devices

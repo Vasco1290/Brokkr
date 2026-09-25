@@ -69,7 +69,7 @@ Bootstrap confidence intervals on every accuracy/reliability number.
 
 **Done when:** the headline chart (precision × corruption × reliability) is generated from JSON.
 
-## Stage 3 — Fixes and the study `[~]`
+## Stage 3 — Fixes and the study `[x]`
 
 Can each Stage 2 problem be fixed, and at what cost? No Stage 3 setting is tuned on the test split;
 the test split was used for Stage 2 baselines. Settings are chosen on the tuning and calibration splits. Fixes that learn from damaged images are judged
@@ -90,8 +90,8 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
   alarm that watches average confidence. Motivation from Stage 2: FP32 coverage fell to 20-37%
   under severe blur and noise while set sizes barely grew
 - [x] 3.7 Final run: chosen fixes measured once on the 10,000 test images under all 26 conditions
-- [ ] 3.8 Write-up (`docs/writeup.md`) with a limitations section
-- [ ] 3.9 Real-world shift check on ImageNetV2 (10,000 new photos, natural rather than simulated shift)
+- [x] 3.8 Write-up (`docs/writeup.md`) with a limitations section
+- [x] 3.9 Real-world shift check on ImageNetV2 (10,000 new photos, natural rather than simulated shift)
 
 **Done when:** one finding can be explained in two minutes, with the numbers behind it, and the
 write-up exists.

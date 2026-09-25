@@ -1,18 +1,95 @@
 # Brokkr status
 
-Snapshot as of **25 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2").
-Stages 1 and 2 are complete and merged. Stage 3 has started: its task list and its pre-registered
-predictions (`docs/hypotheses_stage3.md`, task 3.0) are committed. Task 3.1 is done: model outputs
-on the clean and damaged `tuning` and `conformal_calibration` images are saved. No Stage 3 setting
-was chosen from them in 3.1. Task 3.2 is done: Percentile 99.99 was chosen as "best INT8" on the
-tuning split. Task 3.3 is done: the five leave-one-corruption-out INT8 models (half-damaged
-calibration images) are built and checked. Task 3.4 is done: best INT8 with an unrounded final output
-is built. A calibration-luck analysis (noise floor for 3.7) is done. Task 3.5 is done: one temperature
-per model is fitted on clean tuning images. Task 3.6 is done: robust conformal and alarm thresholds
-are computed (raw scores). Task 3.7 is prepared: the judging script (tested on fake data) and the
-final-run script are committed. Task 3.7 is done: the final run (tag `stage3-final-run`) completed
-without reruns, and the predictions are judged: H10, H13, H14, H15, H16 PASS; H11, H12 FAIL; H17
-postponed to 3.9.
+Snapshot as of **26 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2"),
+pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is not merged into `main` yet (your decision).
+
+## 0. Start here (a new session needs nothing else)
+
+### Where things stand
+- **Stage 3 is done** (tasks 3.0–3.9). Predictions and outcomes: `docs/hypotheses_stage3.md`. Final-run
+  record: `docs/stage3_final_run_log.md` (no reruns). Verdicts:
+  `results/final/mobilenet_v3_large_stage3_verdicts.json` (3.7) and `..._verdicts_with_h17.json` (3.9).
+- **`docs/writeup.md` (task 3.8) is drafted but NOT committed:** it waits for your review. Do not commit
+  it until you say so.
+- **Open decisions (yours):** review and commit the write-up; merge `stage-3` into `main`; start Stage 4;
+  confirm the "reliability envelope" wording (below).
+- Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
+  `ruff check .`.
+
+### Stage 3 headline results (10,000 ImageNet test images unless stated; MobileNetV3-Large, laptop CPU)
+- **Default INT8 broke the model:** 60.15% clean vs FP32 75.58%; 20.48% at darkness severity 5 vs FP32
+  73.73%.
+- **Percentile 99.99 calibration ("best INT8", chosen on the tuning split) fixed most of it:** 73.60%
+  clean (2.0 points below FP32), same 5.9 MB size; 60.15% at darkness 5 (13.6 below FP32; default INT8
+  was 53 below); 31.3% at fog 5 (21.5 below FP32).
+- **Verdicts:** H10, H13, H14, H15, H16, H17 PASS; H11, H12 FAIL.
+  - H11: unrounded output removed all ties but E-AURC got 2.7% worse (within build-to-build noise).
+  - H12: calibrating on damaged images did not help unseen darkness (−0.67 points).
+  - H14 passed on its 3-of-5 rule but is mixed: temperature hurt calibration under blur and noise,
+    helped under fog and darkness.
+  - H15: robust conformal +12.8 points coverage at severity 3, with clean sets 2.28 -> 7.72 classes
+    (clean coverage 96.8%).
+  - H16: the FP32 alarm fired on 1,200 of 1,200 harmful windows and 0 of 100 clean ones.
+  - H17 (ImageNetV2, real new photos): FP32 62.10%, clean-tuned coverage 80.72% with set size 2.64
+    (ImageNet test: 90.58% with 2.28). Best INT8 (extra): 59.83%, 80.64% with 3.03.
+- **Main lesson:** the model's "I'm not sure" signal fails silently under shift (coverage falls, sets
+  barely grow), on simulated damage and on real new photos alike.
+
+### Standing conventions (also in `CLAUDE.md`)
+- **Differences are "new minus old"** (the fix minus what it replaces), with paired bootstrap 95%
+  intervals (same resampled images, 1,000 resamples, seed 0). State the direction: for accuracy and
+  coverage positive = better; for E-AURC and ECE positive = worse.
+- **Coverage is never reported without its average set size** (clean and damaged). A coverage gain is
+  never called a win without its set size.
+- **No example numbers unless measured.** Docs, plans and comments contain no illustrative numbers
+  that could be mistaken for results.
+- **Hypotheses are committed before measuring.** Every later implementation detail is added as a dated
+  note, committed before it is run. Outcomes are appended; nothing above them is edited.
+- **No setting is tuned on the test split.** Settings come from `tuning`, `conformal_calibration` or
+  `int8_calibration`; fixes that learn from damage are judged leave-one-corruption-out.
+- **Test-split reruns only for technical failure** (crash, corrupted/incomplete file, power loss),
+  never because of a result; every rerun is logged with its reason.
+- **Label what came later:** analyses done after the verdicts are marked "after the verdicts" or
+  "exploratory"; likely explanations are marked "likely", never stated as proven.
+- **Report absolute and compression-caused weakness separately** (see below).
+
+### Absolute weakness vs compression-caused weakness
+- **Absolute weakness:** FP32 itself fails, so every precision inherits it. Example (measured): at
+  defocus blur severity 5 FP32 scores 22.4%; best INT8 is only 2.5 points lower. Quantization is not
+  the problem there.
+- **Compression-caused weakness:** INT8 minus FP32 on the same images. Example (measured): at darkness
+  severity 5 FP32 holds 73.7% but best INT8 is 13.6 points lower (default INT8: 53 lower). Fog 5 has
+  both: FP32 drops 22.8 points from clean, and best INT8 loses another 21.5.
+- Reports and nutrition labels should show both, so a user can tell "this model is weak here" from
+  "compressing it made it weak here".
+
+### Proposed definition of "harm" (proposal only; not applied to Stage 3)
+From the dated 3.9 note in `docs/hypotheses_stage3.md`: a condition is *harmful* for a model if,
+measured on the tuning split before any alarm result is looked at, (a) its clean-tuned 90% conformal
+coverage falls below 80%, or (b) its top-1 is more than 10 points below the same model's clean top-1.
+Alarm firing on a harmful condition = catch; on a condition that is neither harmful nor clean = "early
+warning" (reported separately, not a false alarm); on clean images = false alarm.
+
+### "Reliability envelope": wording NOT yet agreed
+The term does not appear in any Brokkr file or earlier decision. **Draft for you to confirm or
+replace (not agreed):** a model's reliability envelope is the set of conditions (damage type x
+severity) under which it stays within stated bounds on both accuracy and its 90% coverage promise
+(with set size), measured on a named split and machine.
+
+### Stage 4 plan (not started)
+From `ROADMAP.md`: standard nutrition label per (model, precision, device) generated from JSON;
+`brokkr recommend --task ... --device ... --min-fps ... --condition night`; add object detection
+(permissive models only, e.g. YOLOX or torchvision detection). Done when labels and recommendations come
+straight from results files. Candidate inputs from Stage 3 (suggestions, not decided): show absolute vs
+compression-caused weakness and coverage with set size on the label; use the proposed harm definition.
+
+### Suggestions parked for later (not decided)
+- ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
+  dataset "research only" / "commercial use allowed" in `brokkr/datasets.py`.
+- Robust conformal for more INT8 variants (needs damage sweeps on `conformal_calibration`).
+- Alarm behaviour when conditions switch mid-stream (only single-condition windows were tested).
+- Charts for the write-up, built into the local results page (`site/`, not committed; rule 4).
+- ImageNetV2: evaluation only; never show or redistribute its images; cite Recht et al., ICML 2019.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -176,9 +253,12 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `17_shift_aware.py` | `results/choices/*_shift_aware.json`: robust conformal and alarm thresholds (3.6) |
 | `run_stage3_final.py` | The final run on the test split (3.7): resumable, keeps Windows awake, checks files |
 | `18_judge_stage3.py` | `results/final/*_stage3_verdicts.json`: PASS / FAIL / NOT RUN per prediction |
+| `19_alarm_all_conditions.py` | Exploratory, after the verdicts: alarm firing rate for every test condition |
+| `20_robust_conformal_clean.py` | After the verdicts: robust thresholds' coverage and set size on clean test images |
+| `21_imagenetv2_summary.py` | ImageNetV2 (3.9): top-1 and coverage with set size, FP32 and best INT8 |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (134 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (137 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -188,6 +268,7 @@ design rules and predictions, committed before measuring).
 | Location | Size | Contents | Made by commit |
 |---|---|---|---|
 | `data/imagenet-1k/` | 6.5 GB | ImageNet validation set, 14 Parquet files, 50,000 images | downloaded |
+| `data/imagenetv2/` | 2.4 GB | ImageNetV2 matched-frequency, 10,000 images (archive + extracted) | downloaded (3.9) |
 | `data/cache/` | 2.9 GB | Test, tuning and conformal-calibration images, resized and cropped, plus labels | sweep script |
 | `data/old_results_stage1/` | 98 MB | Superseded results, kept for the record | various |
 | `data/old_results_3.1_dirty/` | 3.8 GB | First 3.1 run (records say `dirty`); identical to the clean rerun, safe to delete | `237effa` + uncommitted |
@@ -233,20 +314,13 @@ images, so it is only used for the FP32 correctness check.
 3. **The results page isn't published** (repository is private). See ROADMAP's "before going public".
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
    accuracy script needs PyTorch installed. Move the model list to its own file before Stage 5.
-5. **ImageNetV2 not downloaded yet** (planned for task 3.9, 1.26 GB; to be confirmed before download).
+5. ~~ImageNetV2 not downloaded yet.~~ Done in task 3.9 (licence recorded as the sources state it).
 
 ---
 
-## 5. What happens next: Stage 3 ("fix what broke")
+## 5. Stage 3 record ("fix what broke"), complete
 
-### The very next steps
-
-1. **Task 3.8, the write-up** (explained below), after the outcomes are recorded in
-   `docs/hypotheses_stage3.md`. Tasks 3.0–3.7 are done (see the "Task 3.x results" sections below), and
-   `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
-   (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
-   "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
-   paired 95% intervals for every comparison.
+Detailed results per task, in the order they were done. Section 0 has the summary.
 
 ### Task 3.1 results (inputs for choosing settings, not findings)
 
@@ -403,6 +477,13 @@ Extra analysis (no prediction), best INT8 robust conformal: coverage at s3 +14.9
 
 Not a prediction, but visible in the run: best INT8 (Percentile 99.99, clean calibration) scores
 60.15% at darkness s5, where default INT8 scored 20.48% (FP32 73.73%).
+
+### Task 3.9 results: ImageNetV2 (real new photos)
+
+Run at `e7f5b9b`, no reruns. **H17 PASS:** FP32 top-1 62.10% (61.16 to 62.99); clean-tuned coverage
+80.72% (79.93 to 81.44) with average set size 2.64 (ImageNet test: 75.58%; 90.58% with 2.28). Extra
+analysis, best INT8: 59.83%; coverage 80.64% with set size 3.03. A proposed definition of "harm" for
+future alarm checks is in the dated 3.9 note (not applied to Stage 3).
 
 ### Stage 3 in plain words: each step, how, and why
 
