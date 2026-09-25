@@ -400,3 +400,32 @@ points (14.5 to 15.3); clean average set size 2.63 -> 10.32 classes.
 - **The alarm separated clean from harmful conditions completely** (100% vs 0%), even with its
   threshold set on the harder tuning split. Only single-condition windows were tested; how fast it
   reacts when conditions change was not measured.
+
+## Note added 26 September 2026, before any ImageNetV2 measurement (task 3.9)
+
+Nothing above has been changed; H17's prediction and thresholds are unchanged.
+
+- **Data and licence.** ImageNetV2 matched-frequency (Recht et al., ICML 2019), 10,000 images, 10
+  per class, downloaded from the authors' Hugging Face page (1,264,079,360 bytes; SHA-256 checked
+  against the published value). Licence recorded in `brokkr/datasets.py` exactly as the sources state
+  it: the Hugging Face card says "mit"; the authors' README says the licence file "does not apply to
+  the actual image data. The images come from Flickr which provides corresponding license
+  information." Used for evaluation only: the images are never shown, committed or redistributed,
+  and the dataset paper is cited wherever its results appear. Labels are the folder names, as in the
+  authors' own loader.
+- **H17 run.** FP32 on all 10,000 images (`scripts/03_evaluate_accuracy.py --dataset
+  imagenetv2-matched-frequency --split all`), judged by `scripts/18_judge_stage3.py` (the
+  direction-aware version) with FP32's clean-tuned threshold (0.963033). The verdicts are saved to a
+  separate file; the original 3.7 verdict record is kept unchanged. Same rerun rule as 3.7: technical
+  failures only, each logged with its reason in `docs/stage3_final_run_log.md`.
+- **Extra analysis (not a prediction): best INT8 on ImageNetV2.** Percentile 99.99, same images,
+  reported next to FP32: top-1 and coverage with average set size, using its own clean-tuned
+  threshold (0.968429) (`scripts/21_imagenetv2_summary.py`).
+- **Proposed definition of "harm" for future stages (proposal only; not applied to Stage 3).** A
+  condition is *harmful* for a model if, measured on the tuning split before any alarm result is
+  looked at, either (a) its clean-tuned 90% conformal coverage falls below 80%, or (b) its top-1 is
+  more than 10 points below the same model's clean top-1. An alarm firing on a harmful condition is a
+  catch; firing on a condition that is neither harmful nor clean is reported separately as an "early
+  warning", not counted as a false alarm; firing on clean images is a false alarm. Reason: (a) is
+  Stage 3's rule; (b) adds accuracy loss that coverage can miss (for example best INT8 in darkness);
+  defining it on tuning keeps the test split untouched.
