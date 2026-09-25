@@ -76,7 +76,7 @@ the test split was used for Stage 2 baselines. Settings are chosen on the tuning
 leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 
 - [x] 3.0 Hypotheses written down before measuring (`docs/hypotheses_stage3.md`), committed first
-- [ ] 3.1 Tuning-split tooling: model outputs on clean and damaged tuning images, for choosing settings
+- [x] 3.1 Tuning-split tooling: model outputs on clean and damaged tuning images, for choosing settings
 - [ ] 3.2 INT8 calibration methods: MinMax vs Percentile vs Entropy, chosen on the tuning split.
   Motivation: in task 1.6 default (MinMax) INT8 disagreed with FP32 on about a third of images; a
   quick diagnostic (on test images, so not a result) suggested outlier-robust calibration helps

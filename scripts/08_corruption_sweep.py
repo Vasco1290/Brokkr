@@ -1,13 +1,18 @@
-"""Run every model on every corrupted version of the test images and save all class scores.
+"""Run every model on every corrupted version of one split's images and save all class scores.
 
-Usage:  python scripts/08_corruption_sweep.py [--precision fp32 fp16 int8]
-            [--corruptions fog defocus_blur ...] [--severities 0 1 2 3 4 5] [--limit N] [--out DIR]
+Usage:  python scripts/08_corruption_sweep.py [--split test|tuning|conformal_calibration]
+            [--precision fp32 fp16 int8] [--corruptions fog defocus_blur ...]
+            [--severities 0 1 2 3 4 5] [--limit N] [--out DIR]
+        test:                  the 10,000 images every reported result is measured on (default)
+        tuning:                5,000 images for choosing Stage 3 settings (never the test split)
+        conformal_calibration: 5,000 images for tuning conformal thresholds (Stage 3: also damaged)
 Needs:  models/<model>_<precision>.onnx and data/imagenet-1k/
-Writes: <out>/<model>_<precision>_imagenet-1k-val_test_<corruption>_s<severity>.json (+ .npz logits)
+Writes: <out>/<model>_<precision>_imagenet-1k-val_<split>_<corruption>_s<severity>.json (+ .npz logits)
         (default out: results/sweep). Severity 0 = clean images.
 
 How it runs:
-- The 10,000 test images are decoded and resized once and cached in data/cache/ (about 1.5 GB).
+- The split's images are decoded and resized once and cached in data/cache/ (about 1.5 GB for the
+  10,000 test images, 0.75 GB for a 5,000-image split).
 - For each condition, each image is corrupted once and the same corrupted image goes to every
   precision, so precisions are compared on identical inputs.
 - Each image's corruption seed is its position in the dataset: every run gets the same fog, noise
@@ -15,8 +20,9 @@ How it runs:
 - Resumable: conditions whose result file already exists are skipped, so an interrupted overnight
   run can just be started again.
 
-Check at the end: the clean condition (severity 0) must reproduce the saved test-split logits from
-scripts/03_evaluate_accuracy.py for the same images, so the cached path matches the validated one.
+Check at the end: the clean condition (severity 0) must reproduce the saved logits from
+scripts/03_evaluate_accuracy.py for the same split and images, so the cached path matches the
+validated one. (Run 03 with the same --split first, or the check is skipped and the run FAILS.)
 """
 
 import argparse
@@ -38,10 +44,11 @@ BATCH = 32
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
+parser.add_argument("--split", default="test", choices=["test", "tuning", "conformal_calibration"])
 parser.add_argument("--precision", nargs="+", default=["fp32", "fp16", "int8"])
 parser.add_argument("--corruptions", nargs="+", default=list(CORRUPTIONS), choices=list(CORRUPTIONS))
 parser.add_argument("--severities", nargs="+", type=int, default=[0, 1, 2, 3, 4, 5])
-parser.add_argument("--limit", type=int, default=None, help="only the first N test images (for trials)")
+parser.add_argument("--limit", type=int, default=None, help="only the first N images (for trials)")
 parser.add_argument("--threads", type=int, default=4)
 parser.add_argument("--out", default="results/sweep")
 args = parser.parse_args()
@@ -51,13 +58,14 @@ for path in paths.values():
     if not path.exists():
         sys.exit(f"FAIL: {path} not found. Run scripts/01_export_model.py and 04_quantize.py first.")
 
-# 1. Decode and resize the test images once (cached on disk, reused by every condition).
+# 1. Decode and resize the split's images once (cached on disk, reused by every condition).
 files = parquet_files(DATASET)
-positions = make_splits(count_images(files))["test"]
+positions = make_splits(count_images(files))[args.split]
 cache_dir = Path("data/cache")
-crops_path, labels_path = cache_dir / f"{DATASET}_test_crops.npy", cache_dir / f"{DATASET}_test_labels.npy"
+crops_path = cache_dir / f"{DATASET}_{args.split}_crops.npy"
+labels_path = cache_dir / f"{DATASET}_{args.split}_labels.npy"
 if not crops_path.exists():
-    print(f"Caching {len(positions):,} resized test images to {crops_path} (one-off)...")
+    print(f"Caching {len(positions):,} resized {args.split} images to {crops_path} (one-off)...")
     cache_dir.mkdir(parents=True, exist_ok=True)
     crops = np.lib.format.open_memmap(crops_path.with_suffix(".tmp.npy"), mode="w+", dtype=np.uint8,
                                       shape=(len(positions), 224, 224, 3))
@@ -81,7 +89,7 @@ conditions += [(c, s) for c in args.corruptions for s in args.severities if s > 
 # 2. Every condition: corrupt each image once, run every precision on the same batch.
 start = time.time()
 for done, (name, severity) in enumerate(conditions):
-    outputs = {p: out_dir / f"{args.model}_{p}_{DATASET}_test_{name}_s{severity}.json" for p in paths}
+    outputs = {p: out_dir / f"{args.model}_{p}_{DATASET}_{args.split}_{name}_s{severity}.json" for p in paths}
     todo = [p for p, o in outputs.items() if not o.exists()]
     if not todo:
         print(f"[{done + 1}/{len(conditions)}] {name} s{severity}: already done, skipping")
@@ -102,7 +110,7 @@ for done, (name, severity) in enumerate(conditions):
         top1[p] = result["metrics"]["top1"]
         result["settings"] = {"n_images": n, "batch_size": BATCH, "num_threads": args.threads,
                               "bootstrap_resamples": 1000, "seed": 0, "dataset": DATASET,
-                              "dataset_licence": DATASETS[DATASET]["licence"], "split": "test",
+                              "dataset_licence": DATASETS[DATASET]["licence"], "split": args.split,
                               "corruption": name, "severity": severity,
                               "corruption_seed": "dataset position of each image"}
         record = make_record("accuracy", args.model, p, result, machine)
@@ -114,12 +122,16 @@ for done, (name, severity) in enumerate(conditions):
     print(f"[{done + 1}/{len(conditions)}] {name} s{severity}: {scores}  "
           f"({time.time() - t0:.0f} s; about {remaining / 60:.0f} min left)", flush=True)
 
-# 3. Check: the clean condition must match the validated test-split results.
+# 3. Check: the clean condition must match the validated results for the same split.
 passed = True
 for p in paths:
-    clean = out_dir / f"{args.model}_{p}_{DATASET}_test_clean_s0.json"
-    reference = Path("results/accuracy") / f"{args.model}_{p}_{DATASET}_test.json"
-    if clean.exists() and reference.exists():
+    clean = out_dir / f"{args.model}_{p}_{DATASET}_{args.split}_clean_s0.json"
+    reference = Path("results/accuracy") / f"{args.model}_{p}_{DATASET}_{args.split}.json"
+    if not reference.exists():
+        print(f"clean check {p}: no {reference.name} to compare with "
+              f"(run scripts/03_evaluate_accuracy.py --precision {p} --split {args.split} first)")
+        passed = False
+    elif clean.exists():
         a, r = load_arrays(clean), load_arrays(reference)
         m = len(a["labels"])
         same_images = np.array_equal(a["positions"], r["positions"][:m])
@@ -129,7 +141,7 @@ for p in paths:
               f"same top-1 answers {same_answers}")
         passed &= same_images and same_answers and max_diff < 1e-3
     else:
-        print(f"clean check {p}: skipped (missing {clean.name} or {reference.name})")
+        print(f"clean check {p}: skipped (severity 0 not run, no {clean.name})")
 
 print(f"\nFinished in {(time.time() - start) / 60:.1f} min")
 print("PASS" if passed else "FAIL")

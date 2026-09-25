@@ -60,3 +60,15 @@ def test_build_site_escapes_text_and_ignores_community_results(tmp_path):
     page = build_site(results, tmp_path / "no_models", tmp_path / "site").read_text(encoding="utf-8")
     assert "&lt;script&gt;" in page and "<script>" not in page
     assert "fp16" not in page  # community results are not mixed in (hard rule 7)
+
+
+def test_build_site_shows_only_test_split_sweeps(tmp_path):
+    results = tmp_path / "results"
+    results.mkdir()
+    (results / "a.json").write_text(json.dumps(accuracy_record("fp32", [1, 2], [1, 2])))
+    tuning_sweep = accuracy_record("fp32", [1, 2], [1, 2])
+    tuning_sweep["settings"].update({"split": "tuning", "corruption": "fog", "severity": 3})
+    (results / "b.json").write_text(json.dumps(tuning_sweep))
+
+    page = build_site(results, tmp_path / "no_models", tmp_path / "site").read_text(encoding="utf-8")
+    assert "Robustness" not in page  # tuning images are for choosing settings, never shown as results
