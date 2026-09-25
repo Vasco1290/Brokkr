@@ -1,8 +1,9 @@
 # Brokkr status
 
-Snapshot as of **26 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2"),
-pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is merged into `main`; the merge is tagged
-`report-1` (Brokkr Technical Report 1, `docs/writeup.md`).
+Snapshot as of **26 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+(merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). Stage 4
+work happens on branch `stage-4`, created from `main` at `be01206`; so far it holds only the revised
+Stage 4 plan (`ROADMAP.md`).
 
 ## 0. Start here (a new session needs nothing else)
 
@@ -12,8 +13,8 @@ pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is merged into `main`; the m
   `results/final/mobilenet_v3_large_stage3_verdicts.json` (3.7) and `..._verdicts_with_h17.json` (3.9).
 - **Brokkr Technical Report 1** (`docs/writeup.md`, task 3.8) is approved and committed. Its "Related
   work" section is a placeholder marked "To be written by H"; do not draft it.
-- **Open decisions (yours):** start Stage 4 (on a new branch from `main`); confirm the "reliability
-  envelope" wording (below).
+- **Stage 4 is planned, not started.** The revised plan (tasks 4.0–4.5) is in `ROADMAP.md`. Next
+  step: task 4.0 (result schema, `docs/hypotheses_stage4.md`, mechanism test).
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -71,18 +72,20 @@ coverage falls below 80%, or (b) its top-1 is more than 10 points below the same
 Alarm firing on a harmful condition = catch; on a condition that is neither harmful nor clean = "early
 warning" (reported separately, not a false alarm); on clean images = false alarm.
 
-### "Reliability envelope": wording NOT yet agreed
-The term does not appear in any Brokkr file or earlier decision. **Draft for you to confirm or
-replace (not agreed):** a model's reliability envelope is the set of conditions (damage type x
-severity) under which it stays within stated bounds on both accuracy and its 90% coverage promise
-(with set size), measured on a named split and machine.
+### "Reliability envelope": direction agreed, exact wording not yet fixed
+Agreed in the Stage 4 plan (26 September 2026): a model's reliability envelope is the set of *tested*
+conditions (damage type x severity) in which it is not harmful by the proposed harm definition above,
+measured on a named split and machine; untested conditions are shown as "not tested". The exact
+wording, and how intervals are handled, are fixed in `docs/hypotheses_stage4.md` before task 4.3 runs.
 
-### Stage 4 plan (not started)
-From `ROADMAP.md`: standard nutrition label per (model, precision, device) generated from JSON;
-`brokkr recommend --task ... --device ... --min-fps ... --condition night`; add object detection
-(permissive models only, e.g. YOLOX or torchvision detection). Done when labels and recommendations come
-straight from results files. Candidate inputs from Stage 3 (suggestions, not decided): show absolute vs
-compression-caused weakness and coverage with set size on the label; use the proposed harm definition.
+### Stage 4 plan (revised 26 September 2026, not started)
+Full plan in `ROADMAP.md`. In short: 4.0 unified result schema, Stage 4 hypotheses file, and a test of
+the quantization-levels explanation for darkness; 4.1 breadth study (8–10 torchvision models, FP32 vs
+Percentile INT8, Brokkr's own and ImageNet-C corruptions, labelled separately); 4.2 full Stage 3
+pipeline on EfficientNet-B0 and ResNet-18; 4.3 `brokkr shrink` / `brokkr test` and a label for any
+ONNX classifier; 4.4 Raspberry Pi 5 over SSH; 4.5 `brokkr recommend` (laptop results; Pi rows "not
+measured" until 4.4). Order: 4.0 -> 4.1 -> 4.3 -> 4.5, 4.2 alongside; 4.4 when the Pi 5 arrives (a
+few weeks away). Object detection, runtime monitoring and adaptation moved to "Later".
 
 ### Suggestions parked for later (not decided)
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
@@ -120,7 +123,7 @@ Intel Core i5-1235U laptop (Windows 11, CPU only). Accuracy and reliability are 
 - **Speed (rough, laptop only):** the CPU has fast "performance" and slow "efficiency" cores; unpinned,
   Windows moved the benchmark between them. What held up across runs: one performance core is about
   2x as fast as one efficiency core (FP32 7.50 vs 13.74 ms/image); FP16 is never faster; default INT8
-  is not reliably faster. Proper speed measurement waits for the Raspberry Pi 5 (Stage 5).
+  is not reliably faster. Proper speed measurement waits for the Raspberry Pi 5 (task 4.4).
 
 ### Stage 2: damaged images, and whether the model knows when it's wrong
 
@@ -311,10 +314,10 @@ images, so it is only used for the FP32 correctness check.
 
 1. ~~The 50,000-image correctness result isn't in `results/`.~~ Fixed 25 September 2026: rerun gave
    75.26% (95% CI 74.88–75.61%), torchvision publishes 75.27%, PASS; back on the results page.
-2. **Speed numbers are laptop-only and rough.** Real speed study is Stage 5 (Raspberry Pi 5).
+2. **Speed numbers are laptop-only and rough.** Real speed study is task 4.4 (Raspberry Pi 5).
 3. **The results page isn't published** (repository is private). See ROADMAP's "before going public".
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
-   accuracy script needs PyTorch installed. Move the model list to its own file before Stage 5.
+   accuracy script needs PyTorch installed. Move the model list to its own file (planned in task 4.3).
 5. ~~ImageNetV2 not downloaded yet.~~ Done in task 3.9 (licence recorded as the sources state it).
 
 ---

@@ -57,7 +57,7 @@ laptop disagreed by 10–20%, so only these conclusions held up (plugged in, "Be
   both stable); on one performance core it looked faster (6.37 ms vs 7.50 ms), but that measurement was
   unstable (sessions varied by 33%).
 
-Speed will be measured properly on a Raspberry Pi 5 in Stage 5.
+Speed will be measured properly on a Raspberry Pi 5 in Stage 4 (task 4.4).
 
 ## Stage 2 results: damaged images and "knowing when it's wrong"
 
