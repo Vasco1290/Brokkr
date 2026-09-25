@@ -429,3 +429,20 @@ Nothing above has been changed; H17's prediction and thresholds are unchanged.
   warning", not counted as a false alarm; firing on clean images is a false alarm. Reason: (a) is
   Stage 3's rule; (b) adds accuracy loss that coverage can miss (for example best INT8 in darkness);
   defining it on tuning keeps the test split untouched.
+
+## H17 outcome (added 26 September 2026, after the ImageNetV2 run, task 3.9)
+
+Measured once on ImageNetV2 matched-frequency (Recht et al., ICML 2019; 10,000 images) at `e7f5b9b`,
+with no reruns; judged by the direction-aware `scripts/18_judge_stage3.py`
+(`results/final/mobilenet_v3_large_stage3_verdicts_with_h17.json`). Nothing above was changed.
+
+| | Prediction | Verdict | Measured |
+|---|---|---|---|
+| H17 | FP32 top-1 between 60% and 68%; upper end of clean-tuned coverage interval below 88% | **PASS** | Top-1 62.10% (61.16 to 62.99); coverage 80.72% (79.93 to 81.44) with average set size 2.64 (ImageNet test: 75.58%; coverage 90.58% with set size 2.28) |
+
+- **The model does not notice the new photos.** Accuracy falls 13.5 points and the 90% promise falls
+  to about 81%, but the sets grow only from 2.28 to 2.64 classes: the same silent failure Stage 2 found
+  under simulated blur and noise, now on real photos.
+- **Extra analysis (not a prediction), best INT8:** top-1 59.83% (58.83 to 60.73), 2.27 points below
+  FP32 on the same images (on ImageNet test: 1.98 below); coverage 80.64% (79.84 to 81.39) with
+  average set size 3.03. The INT8 gap does not widen noticeably on the new photos.
