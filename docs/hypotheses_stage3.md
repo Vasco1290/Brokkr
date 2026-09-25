@@ -94,3 +94,26 @@ points on ImageNetV2 for many ImageNet models; the coverage part is our own gues
 - Temperature scaling making damaged-image calibration better (H14 reversed).
 - The alarm firing often on clean images despite being tuned for 1% (would suggest the clean tuning
   and test images differ more than expected).
+
+## Note added 25 September 2026, before any task 3.2–3.6 measurement
+
+Nothing above has been changed. This records a fact learned in task 3.1, before any Stage 3 setting
+was chosen or any Stage 3 fix was measured.
+
+**The tuning split is harder than the test split.** FP32 clean top-1: tuning 73.90% (5,000 images),
+test 75.58% (10,000 images). Tuning minus test: −1.68 points, 95% interval −3.20 to −0.14 (unpaired
+bootstrap, 1,000 resamples, seed 0; `scripts/09_compare_splits.py`). Conformal_calibration minus test:
+−0.30 points (−1.68 to +1.15), no measurable difference. The splits are drawn at random with fixed
+seeds and are not stratified by class, so this is a chance draw.
+
+**What it could affect, stated in advance:**
+- *INT8 method choice (3.2):* not affected; methods are compared on the same tuning images.
+- *Temperature (3.5):* T is fitted on clean tuning images, so its value may differ slightly from a
+  fit on images like the test split.
+- *Alarm (3.6, H16):* the threshold comes from average confidence on clean tuning images. If harder
+  images mean lower confidence, the threshold is lower and the alarm fires less often on test images:
+  fewer false alarms on clean test windows, and fewer detections in harmful windows. When H16 is
+  judged, this direction will be reported alongside the outcome.
+
+**Decision: all design rules stay exactly as committed.** Changing them after seeing tuning data is
+what pre-registration is meant to prevent.

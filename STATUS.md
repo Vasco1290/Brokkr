@@ -169,11 +169,12 @@ design rules and predictions, committed before measuring).
 | `data/imagenet-1k/` | 6.5 GB | ImageNet validation set, 14 Parquet files, 50,000 images | downloaded |
 | `data/cache/` | 2.9 GB | Test, tuning and conformal-calibration images, resized and cropped, plus labels | sweep script |
 | `data/old_results_stage1/` | 98 MB | Superseded results, kept for the record | various |
+| `data/old_results_3.1_dirty/` | 3.8 GB | First 3.1 run (records say `dirty`); identical to the clean rerun, safe to delete | `237effa` + uncommitted |
 | `models/` | 38 MB | FP32, FP16, default INT8 `.onnx` + records | `run_stage1` |
 | `results/accuracy/` | 352 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
-| | | Tuning results (3 precisions) and the FP32 50,000-image check | task 3.1 (on `237effa` plus the uncommitted 3.1 code, so records say `dirty`) |
+| | | Tuning results (3 precisions) and the FP32 50,000-image check | task 3.1, rerun at `096461e` (clean) |
 | `results/sweep/` | 4.4 GB | Test split: 78 results (3 precisions x 26 conditions), with logits | `404a68c` |
-| | | Tuning and conformal-calibration splits: 78 results each, same layout | task 3.1 (on `237effa` plus the uncommitted 3.1 code, so records say `dirty`) |
+| | | Tuning and conformal-calibration splits: 78 results each, same layout | task 3.1, rerun at `096461e` (clean) |
 | `results/reliability/` | 1.8 MB | 243 calibration/conformal/selective results | `62c47f4` |
 | `results/speed/` | 0.5 MB | 21 pinned speed results (performance and efficiency cores) | `b42db22` |
 | `results/samples/` | 7 MB | Corruption picture sheets (for viewing only, not measurements) | task 2.2, before its commit |
@@ -230,7 +231,10 @@ Machine: the same i5-1235U laptop. All three runs printed PASS.
   stratified by class (tuning: 0–12 images per class, 4 classes absent), so this is a chance draw,
   but a real one. Comparing options on the same tuning images (3.2) is unaffected; settings whose
   *level* comes from clean tuning images (temperature, alarm threshold) may be shifted. No design
-  rule has been changed because of this.
+  rule has been changed because of this; a dated note in `docs/hypotheses_stage3.md` records it.
+- **Clean rerun:** all 3.1 results were rerun from commit `096461e` with no uncommitted changes. All
+  160 result files (logits, labels, images, metrics) and the rebuilt image caches are identical to
+  the first run.
 - Damage sweeps on `tuning` and `conformal_calibration` (26 conditions x 3 precisions each): the
   clean condition reproduced the validated logits exactly (largest difference 0.00) for all
   precisions. Runtimes 90 and 69 minutes (the first minutes were on battery, which is slower).
