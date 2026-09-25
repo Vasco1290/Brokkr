@@ -206,3 +206,39 @@ Nothing above has been changed; no prediction and no design rule changes.
   weights stay int8. It passes the same build checks, plus a check that the final output really is
   not rounded. Tied top scores on clean tuning images are reported as a tool check; H11 is judged
   on the test split in 3.7.
+
+## Note added 25 September 2026, before any temperature is fitted (task 3.5)
+
+Nothing above has been changed; no prediction and no design rule changes.
+
+- **Task 3.6 uses raw scores, not temperature-scaled scores, for every model** (robust conformal
+  thresholds, their clean-tuned baselines, and the confidence alarm). Decided now, before any T is
+  fitted. Reasons: (1) H15 and H16 and their baselines (clean set size 2.28, the 12 "harmful"
+  conditions, Stage 2 coverage) were all set on raw scores, so switching would change what the
+  predictions are about; (2) one change at a time: if 3.6 used scaled scores, its results would mix
+  the effect of the 3.6 method with the effect of temperature, and neither could be read on its own;
+  (3) H14 predicts that temperature makes the model over-confident under damage, which would work
+  directly against the confidence alarm, so the alarm is judged on the model's own scores.
+  Temperature-scaled scores are used only for the calibration numbers of task 3.5 and H14.
+- **Which models get a temperature:** every model in the final run, each its own T: FP32, FP16,
+  default INT8, best INT8 (Percentile 99.99), best INT8 with unrounded output, and the five
+  leave-one-out INT8 models. Not the check-only models (group-64, calibration-luck seeds).
+- **How T is fitted:** minimise the average negative log-likelihood (NLL) of the true class on the
+  clean tuning split (5,000 images; logits from `scripts/03_evaluate_accuracy.py --split tuning`),
+  scores divided by T before softmax, computed in float64.
+  - *Search:* golden-section search over log T in the range **T = 0.1 to 10**, stopping when the
+    interval is narrower than 0.0001 in log T (T known to about 0.01%). NLL is convex in 1/T, so it
+    has a single minimum and the search cannot get stuck in a wrong dip.
+  - *Edge check:* if a fitted T lies within 1% of either end of the range (below 0.101 or above
+    9.9), the run stops and reports it instead of using it.
+  - *Sanity checks:* NLL at the fitted T is not above NLL at T = 1, and the top answer of every image
+    is unchanged.
+- **ECE uses exactly Stage 2's binning:** `brokkr.shift.reliability.ece`, 15 equal-width bins on
+  the probability of the top answer, bin k = (k/15, (k+1)/15]. That code is unchanged since the
+  Stage 2 results (no commit to `brokkr/shift/` or `scripts/07_reliability.py` after `1ed5d65`).
+- **Reporting rule for H11:** if best INT8 with unrounded output improves E-AURC by less than 15%
+  (relative), the report adds that this is within about 3 times the build-to-build range (0.0026,
+  about 5% of best INT8's tuning E-AURC of 0.0539), and that the range comes from only 4 builds.
+- **CPU features (optional check done):** py-cpuinfo 9.0.0 (MIT) was tried on this laptop. It reads
+  the AVX-512 VNNI flag (absent, as expected without AVX-512) but not AVX-VNNI, the variant this CPU
+  family would have, so VNNI stays recorded as unknown and py-cpuinfo is not added.
