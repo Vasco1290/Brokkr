@@ -10,7 +10,9 @@ calibration images) are built and checked. Task 3.4 is done: best INT8 with an u
 is built. A calibration-luck analysis (noise floor for 3.7) is done. Task 3.5 is done: one temperature
 per model is fitted on clean tuning images. Task 3.6 is done: robust conformal and alarm thresholds
 are computed (raw scores). Task 3.7 is prepared: the judging script (tested on fake data) and the
-final-run script are committed, and the final run starts from the tag `stage3-final-run`.
+final-run script are committed. Task 3.7 is done: the final run (tag `stage3-final-run`) completed
+without reruns, and the predictions are judged: H10, H13, H14, H15, H16 PASS; H11, H12 FAIL; H17
+postponed to 3.9.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -239,9 +241,8 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Task 3.7, the final run** (explained below): running from the tag `stage3-final-run`
-   (`scripts/run_stage3_final.py`, then `scripts/18_judge_stage3.py`). H17 is postponed to 3.9.
-   Tasks 3.0–3.6 are done (see the "Task 3.x results" sections below), and
+1. **Task 3.8, the write-up** (explained below), after the outcomes are recorded in
+   `docs/hypotheses_stage3.md`. Tasks 3.0–3.7 are done (see the "Task 3.x results" sections below), and
    `docs/hypotheses_stage3.md` is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
@@ -375,6 +376,33 @@ robust conformal for FP32, FP16 and default INT8 (the models with damaged calibr
   conformal_calibration, clean and damaged (sweep PASS, largest logit difference 0.00). Its
   clean-only threshold is 0.9684; its robust thresholds 0.9948–0.9966, set sizes on their own
   calibration mix 12.6–20.2 classes. Rerunning the script left every earlier threshold identical.
+
+### Task 3.7 results: the final run on the test split (10,000 images)
+
+Run once from the tag `stage3-final-run` (`54026c9`); no reruns (`docs/stage3_final_run_log.md`).
+Judged by `scripts/18_judge_stage3.py` with the rules fixed before the run. Paired 95% intervals.
+
+| | Prediction | Verdict | What was measured |
+|---|---|---|---|
+| H10 | Best INT8 top-1 >= 67.9% | **PASS** | 73.60% (FP32 75.58%, default INT8 60.15%) |
+| H11 | Unrounded output: 0 ties, E-AURC >= 10% lower | **FAIL** (within noise) | 0 ties, same size; but E-AURC 0.0510 -> 0.0524, 2.7% *worse* (interval −0.0030 to −0.0001); smaller than build-to-build luck (0.0026) |
+| H12 | Calibrated without darkness: +10 points at darkness s5 | **FAIL** | 60.15% -> 59.48%, −0.67 points (−1.41 to +0.06) |
+| H13 | Leave-one-out models within 1 point on clean | **PASS** (within noise) | +0.25 points (−0.12 to +0.59) |
+| H14 | Temperature fixes clean ECE, backfires at s5 for >= 3 of 5 | **PASS** | T 0.743; clean ECE 0.018; worse for defocus/motion blur/noise (+0.12 to +0.15), *better* for fog (−0.09) and darkness (−0.16) |
+| H15 | Robust conformal: +10 points coverage at s3, clean sets >= 2x | **PASS** | +12.8 points (12.4 to 13.2); clean sets 2.28 -> 7.72 classes (3.4x) |
+| H16 | Alarm: >= 90% of harmful windows, <= 2 of 100 clean | **PASS** | 1,200 of 1,200 harmful windows; 0 of 100 clean |
+| H17 | ImageNetV2 | NOT RUN | Postponed to 3.9 (download and licence first) |
+
+Coverage with set size, FP32 at severity 3 (clean-tuned -> robust threshold): fog 88.4% (2.4) -> 96.4%
+(10.3); defocus blur 72.6% (2.8) -> 88.0% (12.6); motion blur 66.6% (2.9) -> 84.6% (13.6); noise
+72.3% (3.0) -> 87.6% (12.0); darkness 89.8% (2.3) -> 97.2% (9.8). Improved coverage in our tests, not
+guaranteed: under three of the five held-out corruptions it is still below 90%.
+
+Extra analysis (no prediction), best INT8 robust conformal: coverage at s3 +14.9 points; clean sets
+2.63 -> 10.32 classes.
+
+Not a prediction, but visible in the run: best INT8 (Percentile 99.99, clean calibration) scores
+60.15% at darkness s5, where default INT8 scored 20.48% (FP32 73.73%).
 
 ### Stage 3 in plain words: each step, how, and why
 

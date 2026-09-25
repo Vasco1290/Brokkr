@@ -14,6 +14,8 @@ result. Every rerun is listed below with its reason.
 
 | Date | What | Outcome |
 |---|---|---|
+| 25 Sep 2026, 20:50–00:07 IST | `run_stage3_final.py` at `54026c9` (tag `stage3-final-run`), laptop on mains power | All 13 steps exit 0 (7 clean test runs 2.3–3.3 min each; best INT8 + unrounded, 26 conditions, 110 min; five leave-one-out sweeps 9.8–19.6 min). Every sweep's clean check: largest logit difference 0.00. Completeness check: 105 of 105 files complete. |
+| 26 Sep 2026, 00:08 IST | `18_judge_stage3.py`, run once, at `54026c9`, no uncommitted changes | H10 PASS; H11 FAIL (within noise); H12 FAIL; H13 PASS (within noise); H14 PASS; H15 PASS; H16 PASS; H17 NOT RUN (postponed to 3.9). Saved to `results/final/mobilenet_v3_large_stage3_verdicts.json`. |
 
 ## Reruns (technical failures only)
 

@@ -89,7 +89,7 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 - [x] 3.6 Shift-aware "I'm not sure": conformal thresholds tuned on clean + damaged images, and an
   alarm that watches average confidence. Motivation from Stage 2: FP32 coverage fell to 20-37%
   under severe blur and noise while set sizes barely grew
-- [ ] 3.7 Final run: chosen fixes measured once on the 10,000 test images under all 26 conditions
+- [x] 3.7 Final run: chosen fixes measured once on the 10,000 test images under all 26 conditions
 - [ ] 3.8 Write-up (`docs/writeup.md`) with a limitations section
 - [ ] 3.9 Real-world shift check on ImageNetV2 (10,000 new photos, natural rather than simulated shift)
 
