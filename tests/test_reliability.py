@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from brokkr.shift.reliability import calibration, ece, reliability_bins, softmax
+from brokkr.shift.reliability import calibration, ece, fit_temperature, nll, reliability_bins, softmax
 
 
 def test_softmax_sums_to_one_and_survives_huge_scores():
@@ -61,3 +61,29 @@ def test_ece_is_biased_upwards_for_an_honest_model():
     measured = ece(confidence, correct)
     resampled = [ece(confidence[i], correct[i]) for i in (rng.integers(0, 2000, 2000) for _ in range(300))]
     assert np.mean(np.array(resampled) > measured) > 0.7
+
+
+def test_nll_matches_the_definition():
+    logits = np.array([[2.0, 0.0, -1.0], [0.0, 1.0, 0.0]])
+    labels = np.array([0, 2])
+    expected = -np.mean(np.log(softmax(logits / 2.0)[[0, 1], labels]))
+    assert nll(logits, labels, temperature=2.0) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("true_temperature", [0.5, 2.0])
+def test_fit_temperature_recovers_a_known_temperature(true_temperature):
+    # Labels drawn from softmax(scores / T): the best-fitting temperature is close to T.
+    rng = np.random.default_rng(0)
+    logits = rng.normal(0, 3, size=(20_000, 10))
+    probs = softmax(logits / true_temperature)
+    labels = np.array([rng.choice(10, p=p) for p in probs])
+    t = fit_temperature(logits, labels)
+    assert t == pytest.approx(true_temperature, rel=0.05)
+    assert nll(logits, labels, t) <= min(nll(logits, labels, t * 1.01), nll(logits, labels, t / 1.01))
+
+
+def test_fit_temperature_stays_inside_its_range():
+    rng = np.random.default_rng(1)
+    logits = rng.normal(0, 1, size=(2_000, 10))
+    labels = logits.argmax(axis=1)  # always right: the best T is as small as allowed
+    assert fit_temperature(logits, labels, low=0.5, high=2.0) == pytest.approx(0.5, rel=1e-3)
