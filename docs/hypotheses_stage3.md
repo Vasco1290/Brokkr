@@ -346,3 +346,54 @@ final run is done and judged, before any Stage 3 model has seen a test image.
   when the script ends; no system setting is changed). The run is resumable (finished steps are
   skipped), and at the end every expected result file is checked to exist and be complete (it
   loads, its checksum matches, and it has scores for all 10,000 images).
+
+## Outcomes (added 26 September 2026, after the final run)
+
+Measured once on the 10,000 test images, from the tag `stage3-final-run` (`54026c9`), with no reruns
+(`docs/stage3_final_run_log.md`). Judged by `scripts/18_judge_stage3.py` using only the rules above
+(`results/final/mobilenet_v3_large_stage3_verdicts.json`). Intervals are paired bootstrap 95%.
+"Within noise": the INT8-vs-INT8 difference is smaller than the calibration-luck range (top-1 0.28
+points, E-AURC 0.0026). Nothing above this section was changed.
+
+| | Prediction | Verdict | Measured |
+|---|---|---|---|
+| H10 | Best INT8 recovers half the clean gap (>= 67.9%) | **PASS** | 73.60% (FP32 75.58%, default INT8 60.15%): the gap shrinks from 15.4 to 2.0 points. |
+| H11 | Unrounded output: 0 ties, E-AURC >= 10% lower, file < 5% bigger | **FAIL** (within noise) | 0 tied images and the same file size, but E-AURC went from 0.0510 to 0.0524, 2.7% *worse*: best minus unrounded −0.0014 (−0.0030 to −0.0001). Under 15%: within about 3x the build-to-build range, which comes from only 4 builds. |
+| H12 | Calibrated without darkness: >= 10 points better at darkness s5 | **FAIL** | 60.15% for best INT8, 59.48% calibrated without darkness: −0.67 points (−1.41 to +0.06). |
+| H13 | Damaged calibration within 1 point on clean images | **PASS** (within noise) | Average of the five leave-one-out models 73.85% vs 73.60%: +0.25 points (−0.12 to +0.59). |
+| H14 | Temperature: T < 1, clean ECE < 0.03, backfires at s5 for >= 3 of 5 | **PASS** | T 0.743; clean ECE 0.018. At severity 5, scaled minus raw ECE: defocus blur +0.123, motion blur +0.147, noise +0.140 (backfires), but fog −0.088 and darkness −0.156 (scaling *helped*). |
+| H15 | Robust conformal: +10 points coverage at s3 (held-out), clean sets >= 2x | **PASS** | Coverage +12.8 points (12.4 to 13.2); clean average set size 2.28 -> 7.72 classes (3.4x; difference 5.3 to 5.6). |
+| H16 | Alarm fires in >= 90% of harmful windows, <= 2 of 100 clean | **PASS** | 1,200 of 1,200 harmful windows (100%); 0 of 100 clean windows. |
+| H17 | ImageNetV2 | **NOT RUN** | Postponed to task 3.9 (dataset not downloaded, licence not recorded). |
+
+Coverage with average set size, FP32 at severity 3, clean-tuned threshold -> robust threshold (H15):
+fog 88.4% (2.4) -> 96.4% (10.3); defocus blur 72.6% (2.8) -> 88.0% (12.6); motion blur 66.6% (2.9)
+-> 84.6% (13.6); noise 72.3% (3.0) -> 87.6% (12.0); darkness 89.8% (2.3) -> 97.2% (9.8). This is
+improved coverage in our tests, not a guarantee: under three of the five held-out corruptions it is
+still below 90%, and the price is sets about four times larger.
+
+Extra analysis (not a prediction), best INT8 with robust conformal: coverage at severity 3 +14.9
+points (14.5 to 15.3); clean average set size 2.63 -> 10.32 classes.
+
+### What the failures and the mixed result teach
+
+- **H12: there was little left to fix.** Percentile calibration on clean images already took best
+  INT8 at darkness severity 5 from default INT8's 20.48% to 60.15% (FP32 73.73%). Adding damaged
+  images to the calibration set gave nothing more for unseen darkness. The prediction's reasoning
+  ("value ranges fitted only to well-lit images") was probably the wrong mechanism; a likely, not
+  proven, explanation is that MinMax spent its 256 levels on rare extreme values, which Percentile
+  ignores.
+- **H11: removing ties did not improve confidence ranking.** Every tie disappeared, but E-AURC got
+  slightly worse, by less than the build-to-build luck. Ties were rarer with Percentile calibration
+  (58 of 5,000 tuning images) than with default INT8, so there was little to gain.
+- **H14 passed on its 3-of-5 rule, but the picture is mixed.** Sharpening made confidence less
+  honest under blur and noise, as predicted, but more honest under fog and darkness, where the model
+  stays under-confident. "Temperature scaling backfires under damage" holds only for some damage.
+
+### Findings not predicted
+
+- **Best INT8's remaining gap is mostly a darkness gap:** 2.0 points below FP32 on clean images, but
+  13.6 points below at darkness severity 5 (default INT8 was 53 points below there).
+- **The alarm separated clean from harmful conditions completely** (100% vs 0%), even with its
+  threshold set on the harder tuning split. Only single-condition windows were tested; how fast it
+  reacts when conditions change was not measured.
