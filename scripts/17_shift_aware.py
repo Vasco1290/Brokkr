@@ -10,11 +10,12 @@ Writes: results/choices/<model>_shift_aware.json
 Rules fixed before computing (docs/hypotheses_stage3.md, design rules and dated notes). All scores
 are RAW (no temperature).
 
-Robust conformal (FP32, FP16, default INT8): for each held-out corruption, the 5,000
+Robust conformal (FP32, FP16, default INT8; best INT8 as an extra analysis, dated 3.7 note): for
+each held-out corruption, the 5,000
 conformal_calibration images are one-third clean and two-thirds damaged with the four other
 corruptions at severities 1-5, balanced (brokkr.shift.robust_conformal, seed 9). The threshold is
-the same LAC threshold as Stage 2, only on these images. Check: the clean-only threshold recomputed
-here must equal Stage 2's saved one exactly.
+the same LAC threshold as Stage 2, only on these images. Check: for the models Stage 2 measured,
+the clean-only threshold recomputed here must equal Stage 2's saved one exactly.
 
 Alarm (every final-run model): threshold = 1st percentile of the average confidence of 10,000
 random windows of 100 clean tuning images (brokkr.shift.alarm, seed 4).
@@ -42,7 +43,6 @@ from brokkr.shift.robust_conformal import robust_calibration_plan
 DATASET = "imagenet-1k-val"
 COVERAGE = 0.9
 PLAN_SEED, ALARM_SEED = 9, 4
-CONFORMAL_MODELS = ["fp32", "fp16", "int8"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")
@@ -50,6 +50,7 @@ args = parser.parse_args()
 
 choice = json.loads((Path("results/choices") / f"{args.model}_int8_method.json").read_text())
 best = choice["metrics"]["chosen"]
+conformal_models = ["fp32", "fp16", "int8", best]  # best INT8: extra analysis, not a prediction
 alarm_models = (["fp32", "fp16", "int8", best, f"{best}_unrounded"]
                 + [f"{best}_mixed_without_{c}" for c in CORRUPTIONS])
 passed = True
@@ -57,18 +58,21 @@ passed = True
 # 1. Robust conformal thresholds.
 print("Robust conformal: calibration images one-third clean, two-thirds damaged (held-out type excluded)")
 robust = {}
-for precision in CONFORMAL_MODELS:
+for precision in conformal_models:
     clean_path = Path("results/accuracy") / f"{args.model}_{precision}_{DATASET}_conformal_calibration.json"
     clean = load_arrays(clean_path)
     labels, positions = clean["labels"], clean["positions"]
 
-    # Check: the clean-only threshold must equal the one Stage 2 used.
-    stage2 = json.loads((Path("results/reliability") /
-                         f"{args.model}_{precision}_{DATASET}_test_conformal.json").read_text())
+    # Check: the clean-only threshold must equal the one Stage 2 used (for the models it measured).
     clean_threshold = conformal_threshold(softmax(clean["logits"]), labels, COVERAGE)
-    same_as_stage2 = clean_threshold == stage2["settings"]["threshold"]
-    passed &= same_as_stage2
-    print(f"\n{precision}: clean-only threshold {clean_threshold:.6f}, equal to Stage 2's: {same_as_stage2}")
+    stage2_path = Path("results/reliability") / f"{args.model}_{precision}_{DATASET}_test_conformal.json"
+    if stage2_path.exists():
+        same_as_stage2 = clean_threshold == json.loads(stage2_path.read_text())["settings"]["threshold"]
+        passed &= same_as_stage2
+        print(f"\n{precision}: clean-only threshold {clean_threshold:.6f}, "
+              f"equal to Stage 2's: {same_as_stage2}")
+    else:
+        print(f"\n{precision} (extra analysis): clean-only threshold {clean_threshold:.6f} (not in Stage 2)")
 
     # Scores for every damaged version of the conformal_calibration images (task 3.1 sweep).
     damaged = {}
