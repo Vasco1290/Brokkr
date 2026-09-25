@@ -2,7 +2,9 @@
 
 Snapshot as of **25 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2").
 Stages 1 and 2 are complete and merged. Stage 3 has started: its task list and its pre-registered
-predictions (`docs/hypotheses_stage3.md`, task 3.0) are committed. No Stage 3 measurement has run yet.
+predictions (`docs/hypotheses_stage3.md`, task 3.0) are committed. Task 3.1 is done: model outputs
+on the clean and damaged `tuning` and `conformal_calibration` images are saved. No Stage 3 setting
+has been chosen yet, and no Stage 3 fix has been measured.
 
 This file is a snapshot. [ROADMAP.md](ROADMAP.md) is the live plan, [README.md](README.md) the public
 summary, and [docs/hypotheses.md](docs/hypotheses.md) the Stage 2 predictions and outcomes.
@@ -151,10 +153,11 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `05_build_site.py` | `site/index.html` |
 | `06_corruption_samples.py` | `results/samples/*.png` picture sheets |
 | `07_reliability.py` | `results/reliability/*_{calibration,conformal,selective}.json` |
-| `08_corruption_sweep.py` | `results/sweep/*_test_<corruption>_s<severity>.json` + `.npz` |
+| `08_corruption_sweep.py --split test\|tuning\|conformal_calibration` | `results/sweep/*_<split>_<corruption>_s<severity>.json` + `.npz` |
+| `09_compare_splits.py` | Prints FP32 clean accuracy per split, differences vs test, images per class |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (98 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (100 tests, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -164,11 +167,13 @@ design rules and predictions, committed before measuring).
 | Location | Size | Contents | Made by commit |
 |---|---|---|---|
 | `data/imagenet-1k/` | 6.5 GB | ImageNet validation set, 14 Parquet files, 50,000 images | downloaded |
-| `data/cache/` | 1.5 GB | The 10,000 test images, resized and cropped, plus labels | sweep script |
-| `data/old_results_stage1/` | 98 MB | Superseded results, kept for the record (incl. the 50,000-image check) | various |
+| `data/cache/` | 2.9 GB | Test, tuning and conformal-calibration images, resized and cropped, plus labels | sweep script |
+| `data/old_results_stage1/` | 98 MB | Superseded results, kept for the record | various |
 | `models/` | 38 MB | FP32, FP16, default INT8 `.onnx` + records | `run_stage1` |
-| `results/accuracy/` | 128 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
-| `results/sweep/` | 2.2 GB | 78 results (3 precisions x 26 conditions), with logits | `404a68c` |
+| `results/accuracy/` | 352 MB | Test and conformal-calibration results, 3 precisions, with logits | `2a77a66` |
+| | | Tuning results (3 precisions) and the FP32 50,000-image check | task 3.1 (on `237effa` plus the uncommitted 3.1 code, so records say `dirty`) |
+| `results/sweep/` | 4.4 GB | Test split: 78 results (3 precisions x 26 conditions), with logits | `404a68c` |
+| | | Tuning and conformal-calibration splits: 78 results each, same layout | task 3.1 (on `237effa` plus the uncommitted 3.1 code, so records say `dirty`) |
 | `results/reliability/` | 1.8 MB | 243 calibration/conformal/selective results | `62c47f4` |
 | `results/speed/` | 0.5 MB | 21 pinned speed results (performance and efficiency cores) | `b42db22` |
 | `results/samples/` | 7 MB | Corruption picture sheets (for viewing only, not measurements) | task 2.2, before its commit |
@@ -181,8 +186,8 @@ Defined in `brokkr/datasets.py` (`make_splits`). No image is in two splits (test
 |---|---|---|---|---|
 | `test` | 10,000 | random, seed 0 | Every reported accuracy/reliability number | Yes: all Stage 1–2 results |
 | `int8_calibration` | 512 | random from the rest, seed 1 | Setting INT8's value ranges | Yes: default INT8 |
-| `conformal_calibration` | 5,000 | shuffled remainder, seed 2 | Tuning conformal thresholds | Yes: Stage 2 thresholds (clean only) |
-| `tuning` | 5,000 | shuffled remainder, seed 2 | Choosing Stage 3 settings | **No: untouched, reserved for Stage 3** |
+| `conformal_calibration` | 5,000 | shuffled remainder, seed 2 | Tuning conformal thresholds | Yes: Stage 2 thresholds (clean only); damaged outputs saved in 3.1 |
+| `tuning` | 5,000 | shuffled remainder, seed 2 | Choosing Stage 3 settings | Outputs saved in 3.1 (clean and damaged); no setting chosen from them yet |
 | (unassigned) | 29,488 | — | Nothing yet | — |
 
 The `all` option in `03_evaluate_accuracy.py` uses all 50,000 images; it overlaps the INT8 calibration
@@ -192,10 +197,8 @@ images, so it is only used for the FP32 correctness check.
 
 ## 4. Known gaps and loose ends
 
-1. **The 50,000-image correctness result isn't in `results/`.** It was produced under the old file
-   naming and archived in `data/old_results_stage1/count_named_2.4/` when results were renamed by
-   split, so the results page no longer shows it. Fix: rerun
-   `python scripts/03_evaluate_accuracy.py --precision fp32 --split all` (about 15 minutes).
+1. ~~The 50,000-image correctness result isn't in `results/`.~~ Fixed 25 September 2026: rerun gave
+   75.26% (95% CI 74.88–75.61%), torchvision publishes 75.27%, PASS; back on the results page.
 2. **Speed numbers are laptop-only and rough.** Real speed study is Stage 5 (Raspberry Pi 5).
 3. **The results page isn't published** (repository is private). See ROADMAP's "before going public".
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
@@ -208,12 +211,31 @@ images, so it is only used for the FP32 correctness check.
 
 ### The very next steps
 
-1. **Restore the 50,000-image correctness result** (loose end 1 above): one 15-minute run.
-2. **Task 3.1, tuning-split tooling** (explained below). Task 3.0 is done: `docs/hypotheses_stage3.md`
+1. **Task 3.2, INT8 calibration methods** (explained below). Tasks 3.0 and 3.1 are done: the
+   tuning-split outputs exist (see "Task 3.1 results" below), and `docs/hypotheses_stage3.md`
    is committed. Its **design rules** fix, in advance, how every Stage 3 setting will be chosen
    (including per-channel INT8 weights as a fixed setting, the exact alarm windows, and the 12
    "harmful" conditions), and **predictions H10–H17** state what we expect, with numeric thresholds and
    paired 95% intervals for every comparison.
+
+### Task 3.1 results (inputs for choosing settings, not findings)
+
+Machine: the same i5-1235U laptop. All three runs printed PASS.
+- Clean tuning split (5,000 images): FP32 73.90% (95% CI 72.76–75.16%), FP16 73.96%, default INT8
+  58.46%.
+- **The tuning split is measurably harder than the test split** (`scripts/09_compare_splits.py`):
+  FP32 tuning minus test = −1.68 points, 95% CI −3.20 to −0.14 (unpaired bootstrap: different
+  images, each side resampled on its own). Conformal_calibration minus test = −0.30 points
+  (−1.68 to +1.15), no measurable difference. Splits are drawn at random with fixed seeds, not
+  stratified by class (tuning: 0–12 images per class, 4 classes absent), so this is a chance draw,
+  but a real one. Comparing options on the same tuning images (3.2) is unaffected; settings whose
+  *level* comes from clean tuning images (temperature, alarm threshold) may be shifted. No design
+  rule has been changed because of this.
+- Damage sweeps on `tuning` and `conformal_calibration` (26 conditions x 3 precisions each): the
+  clean condition reproduced the validated logits exactly (largest difference 0.00) for all
+  precisions. Runtimes 90 and 69 minutes (the first minutes were on battery, which is slower).
+- The results page shows only test-split sweeps (`brokkr/report.py`, tested), so tuning outputs can
+  never appear there as results.
 
 ### Stage 3 in plain words: each step, how, and why
 
@@ -274,5 +296,5 @@ limitations (simulated damage isn't real weather; one model; one laptop).
 
 **3.9 Real-world check (ImageNetV2).** 10,000 new photos collected years after ImageNet: naturally
 "shifted" data rather than simulated damage. *Why:* the obvious weakness of Stage 2 is that fog and
-blur are simulated. *Prediction H17:* FP32 drops to 60–68%, and the clean-tuned 90% promise falls clearly
-below 88%; we then check whether the Stage 3 fixes help on real shift too.
+blur are simulated. *Prediction H17:* FP32 drops to 60–68%, and the upper end of the 95% interval of the
+clean-tuned 90% promise's coverage is below 88%; we then check whether the Stage 3 fixes help on real shift too.
