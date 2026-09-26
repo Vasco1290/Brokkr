@@ -13,22 +13,45 @@ import onnxruntime as ort
 import torch
 from torchvision import models
 
-# Every model Brokkr can use, with its licence recorded (hard rule 8).
-MODELS = {
-    "mobilenet_v3_large": {
-        "builder": models.mobilenet_v3_large,
-        "weights": models.MobileNet_V3_Large_Weights.IMAGENET1K_V2,
-        "image_size": 224,
-        "licence": {
-            "code": "BSD-3-Clause (torchvision)",
-            "weights": (
-                "Published by torchvision, trained on ImageNet-1k. torchvision states no separate "
-                "licence for the weights, and ImageNet's terms of access are for non-commercial "
-                "research. Check before redistributing."
-            ),
-        },
-    },
+# The licence of every torchvision model Brokkr uses, checked 26 September 2026. torchvision's
+# metadata gives a licence only for its SWAG weights (non-commercial; never used by Brokkr).
+TORCHVISION_LICENCE = {
+    "code": "BSD-3-Clause (torchvision)",
+    "weights": (
+        "Published by torchvision, trained on ImageNet-1k. torchvision states no separate "
+        "licence for the weights, and ImageNet's terms of access are for non-commercial "
+        "research. Check before redistributing."
+    ),
 }
+
+
+def _torchvision(builder, weights) -> dict:
+    return {"builder": builder, "weights": weights, "image_size": 224, "licence": TORCHVISION_LICENCE}
+
+
+# Every model Brokkr can use, with its licence recorded (hard rule 8). The first is the Stage 1-3 model;
+# the others are the task 4.1 candidates (docs/hypotheses_stage4.md).
+MODELS = {
+    "mobilenet_v3_large": _torchvision(models.mobilenet_v3_large,
+                                       models.MobileNet_V3_Large_Weights.IMAGENET1K_V2),
+    "mobilenet_v3_small": _torchvision(models.mobilenet_v3_small,
+                                       models.MobileNet_V3_Small_Weights.IMAGENET1K_V1),
+    "mobilenet_v2": _torchvision(models.mobilenet_v2, models.MobileNet_V2_Weights.IMAGENET1K_V2),
+    "efficientnet_b0": _torchvision(models.efficientnet_b0, models.EfficientNet_B0_Weights.IMAGENET1K_V1),
+    "shufflenet_v2_x1_0": _torchvision(models.shufflenet_v2_x1_0,
+                                       models.ShuffleNet_V2_X1_0_Weights.IMAGENET1K_V1),
+    "mnasnet1_0": _torchvision(models.mnasnet1_0, models.MNASNet1_0_Weights.IMAGENET1K_V1),
+    "regnet_y_400mf": _torchvision(models.regnet_y_400mf, models.RegNet_Y_400MF_Weights.IMAGENET1K_V2),
+    "resnet18": _torchvision(models.resnet18, models.ResNet18_Weights.IMAGENET1K_V1),
+    "resnet50": _torchvision(models.resnet50, models.ResNet50_Weights.IMAGENET1K_V2),
+    "convnext_tiny": _torchvision(models.convnext_tiny, models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1),
+}
+
+
+def preprocessing(name: str) -> dict:
+    """The model's own resize, crop and interpolation, read from its torchvision weights (not typed)."""
+    t = MODELS[name]["weights"].transforms()
+    return {"resize": t.resize_size[0], "crop": t.crop_size[0], "interpolation": t.interpolation.value}
 
 
 def load_model(name: str, pretrained: bool = True) -> torch.nn.Module:
