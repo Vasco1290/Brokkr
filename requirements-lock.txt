@@ -47,3 +47,12 @@ torch==2.14.0+cpu
 torchvision==0.29.0+cpu
 tqdm==4.70.1
 typing_extensions==4.16.0
+# Added 2026-09-26 for ImageNet-C corruptions (task 4.1). Licences: see pyproject.toml, extra "imagenet-c".
+# imagecorruptions must be installed with --no-deps (pip install --no-deps imagecorruptions==1.1.2).
+imagecorruptions==1.1.2
+imageio==2.37.0
+lazy-loader==0.4
+opencv-python-headless==4.14.0.94
+scikit-image==0.25.2
+scipy==1.15.3
+tifffile==2025.5.10

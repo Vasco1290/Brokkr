@@ -26,6 +26,14 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.16"]
 data = ["huggingface_hub>=1.32"]  # only needed to download datasets
+# ImageNet-C corruptions (task 4.1). Licences checked 26 Sep 2026 from each package's PyPI entry:
+# scipy 1.15.3 BSD-3-Clause; scikit-image 0.25.2 BSD-3-Clause; opencv-python-headless 4.14.0.94
+# Apache-2.0; imageio 2.37.0 BSD-2-Clause; tifffile 2025.5.10 BSD-3-Clause; lazy-loader 0.4
+# BSD-3-Clause. imagecorruptions 1.1.2 is Apache-2.0 (LICENSE file in its wheel); install it
+# separately with --no-deps, because it asks for opencv-python (the GUI build) instead of headless:
+#   pip install --no-deps imagecorruptions==1.1.2
+# These are the newest versions that still support Python 3.10.
+imagenet-c = ["scipy==1.15.3", "scikit-image==0.25.2", "opencv-python-headless==4.14.0.94"]
 
 [tool.setuptools.packages.find]
 include = ["brokkr*"]
