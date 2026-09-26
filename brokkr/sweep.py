@@ -154,3 +154,31 @@ def damaged_batch(crops, positions, indices, suite: str | None, corruption: str,
 def normalised(pictures: np.ndarray) -> np.ndarray:
     """uint8 (N, 224, 224, 3) -> the float (N, 3, 224, 224) batch every torchvision model here expects."""
     return np.stack([accuracy.normalize(p) for p in pictures])
+
+
+SLOW_LIMIT = 1.5  # a step taking more than 1.5 times its estimate gets a warning in the log
+
+
+def estimated_step_seconds(jobs: list, n_images: int, rates: dict, damage_rate: float | None,
+                           normalise_rate: float) -> float | None:
+    """Expected seconds for one sweep step: damage and normalise n_images once, then run every job.
+
+    rates: images per second for each (model, precision) job; damage_rate: images per second of the
+    condition's damage (None for clean). None if any rate is unknown.
+    """
+    if any(job not in rates for job in jobs):
+        return None
+    seconds = n_images / normalise_rate + (n_images / damage_rate if damage_rate else 0.0)
+    return seconds + sum(n_images / rates[job] for job in jobs)
+
+
+def slow_warning(actual_seconds: float, estimate_seconds: float | None,
+                 limit: float = SLOW_LIMIT) -> str | None:
+    """A warning sentence if a step took more than `limit` times its estimate, else None."""
+    if not estimate_seconds:
+        return None
+    ratio = actual_seconds / estimate_seconds
+    if ratio <= limit:
+        return None
+    return (f"WARNING: this step took {ratio:.1f}x its estimate (limit {limit}x): "
+            f"{actual_seconds / 60:.1f} min against {estimate_seconds / 60:.1f} min")

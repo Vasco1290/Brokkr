@@ -139,3 +139,17 @@ def test_real_imagenet_cache_sample_matches_fresh_crops(tmp_path):
             expected = resize_and_crop(open_image(image_bytes), prep["resize"], prep["crop"],
                                        prep["interpolation"])
             assert np.array_equal(crops[n], expected)
+
+
+def test_step_estimate_adds_damage_normalising_and_every_job():
+    rates = {("a", "fp32"): 100.0, ("a", "int8"): 200.0}
+    # 1000 images: normalise 1000/500 = 2 s, damage 1000/250 = 4 s, jobs 10 s + 5 s
+    assert sweep.estimated_step_seconds(list(rates), 1000, rates, 250.0, 500.0) == 21.0
+    assert sweep.estimated_step_seconds(list(rates), 1000, rates, None, 500.0) == 17.0   # clean: no damage
+    assert sweep.estimated_step_seconds([("b", "fp32")], 1000, rates, None, 500.0) is None
+
+
+def test_slow_warning_only_above_the_limit():
+    assert sweep.slow_warning(150.0, 100.0) is None                    # exactly 1.5x: no warning
+    assert "1.6x" in sweep.slow_warning(160.0, 100.0)
+    assert sweep.slow_warning(500.0, None) is None                     # no estimate, no warning

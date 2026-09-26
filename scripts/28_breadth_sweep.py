@@ -59,10 +59,12 @@ from brokkr.sweep import (
     build_caches,
     cache_key,
     damaged_batch,
+    estimated_step_seconds,
     free_gb,
     load_cache,
     missing_cache_bytes,
     normalised,
+    slow_warning,
 )
 
 DATASET, BATCH, TOLERANCE = "imagenet-1k-val", 32, 0.010
@@ -87,6 +89,8 @@ parser.add_argument("--split", choices=["test", "tuning"], default="test",
 parser.add_argument("--models", nargs="+", default=list(MODELS))
 parser.add_argument("--limit", type=int, default=None, help="first N images only (dry runs)")
 parser.add_argument("--out", default="results/breadth")
+parser.add_argument("--spinning", choices=["on", "off"], default="on",
+                    help="ONNX Runtime threads busy-wait between runs (on, its default) or sleep (off)")
 parser.add_argument("--min-free-gb", type=float, default=MIN_FREE_GB,
                     help="stop cleanly if free disk space would fall below this")
 args = parser.parse_args()
@@ -132,6 +136,49 @@ def complete(path: Path) -> bool:
         return record["arrays"]["sha256"] == sha256_of(path.with_suffix(".npz"))
     except (ValueError, KeyError, TypeError):
         return False
+
+
+def load_estimates():
+    """Images per second from the 26 September profiles (results/profile), for step-time estimates.
+
+    Model rates were measured with 4 threads, one session at a time; for 8 threads each is scaled by
+    that model's measured 8/4-thread ratio (scripts/29). Damage and normalising rates come from the
+    MobileNetV3-Large profile. Returns None if a profile file is missing (then no estimates are logged).
+    """
+    folder = Path("results/profile")
+    try:
+        rates = {}
+        profiles = list(folder.glob("*_pipeline_profile_all10.json"))
+        for f in profiles + [folder / "convnext_tiny_pipeline_profile_int8.json"]:
+            r = json.loads(f.read_text(encoding="utf-8"))
+            for precision, v in r["metrics"]["inference"].items():
+                rates[(r["model"], precision)] = v["images_per_second_median_pass"]
+        if THREADS != 4:
+            for f in folder.glob("*_thread_check.json"):
+                r = json.loads(f.read_text(encoding="utf-8"))
+                for precision, v in r["metrics"].items():
+                    m = v["images_per_second_median"]
+                    if (r["model"], precision) in rates and str(THREADS) in m:
+                        rates[(r["model"], precision)] *= m[str(THREADS)] / m["4"]
+        steps = json.loads((folder / "mobilenet_v3_large_pipeline_profile_all10.json").read_text(
+            encoding="utf-8"))["metrics"]["steps"]
+    except (OSError, KeyError, ValueError):
+        return None
+    damage = {k: v["images_per_second"] for k, v in steps.items() if "(" in k}
+    return rates, damage, steps["normalise"]["images_per_second"]
+
+
+def step_estimate(jobs, cond, n_images):
+    if estimates is None:
+        return None
+    rates, damage, normalise = estimates
+    damage_rate = None
+    if cond["corruption"] != "clean":
+        suite = {"brokkr": "Brokkr", "imagenet-c": "ImageNet-C"}[cond["suite"]]
+        damage_rate = damage.get(f"{cond['corruption']} ({suite}) s{cond['severity']}")
+        if damage_rate is None:
+            return None
+    return estimated_step_seconds(jobs, n_images, rates, damage_rate, normalise)
 
 
 def check_disk(step: str, needed_bytes: int = 0):
@@ -197,15 +244,17 @@ group_keys = list(dict.fromkeys(key for key, _ in passes))
 keep_awake(True)
 log(f"breadth sweep at {git('rev-parse', '--short', 'HEAD')} (uncommitted changes: "
     f"{'yes' if git('status', '--porcelain') else 'no'}); split {args.split}; limit {args.limit}; "
-    f"{THREADS} threads; {sum(len(v) for v in plan.values())} model-precisions in {len(passes)} passes: "
+    f"{THREADS} threads, spinning {args.spinning}; {sum(len(v) for v in plan.values())} model-precisions "
+    f"in {len(passes)} passes: "
     + " | ".join(", ".join(models) for _, models in passes))
 
 files = parquet_files(DATASET)
 splits = make_splits(count_images(files))
 runtime = {"name": "onnxruntime", "version": ort.__version__, "execution_provider": "CPUExecutionProvider",
-           "threads": THREADS}
-sessions = {(m, p): make_session(Path("models") / f"{m}_{p}.onnx", THREADS)
+           "threads": THREADS, "spinning": args.spinning}
+sessions = {(m, p): make_session(Path("models") / f"{m}_{p}.onnx", THREADS, spinning=args.spinning == "on")
             for m, ps in plan.items() for p in ps}
+estimates = load_estimates()
 excluded = {}  # model -> reason (FP32 sanity check failed)
 
 jobs = [(args.split, CONDITIONS)]
@@ -304,8 +353,14 @@ for split, conditions in jobs:
                       "sha256": build_record(model, precision)["file"]["sha256"]}],
                 )
                 save_measurement(record, path)
+            took = time.time() - t0
+            estimate = step_estimate(todo, cond, len(positions))
+            vs = f"estimate {estimate / 60:.1f} min, {took / estimate:.1f}x" if estimate else "no estimate"
             log(f"done: {split} {label}, group {group}, {len(todo)} model-precisions, "
-                f"{(time.time() - t0) / 60:.1f} min")
+                f"{took / 60:.1f} min ({vs})")
+            warning = slow_warning(took, estimate)
+            if warning:
+                log(warning)
             if split == "test" and cond["corruption"] == "clean":
                 for model in models:
                     sanity_check(model)

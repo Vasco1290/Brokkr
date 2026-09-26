@@ -37,12 +37,20 @@ def pin_to_cpus(cpu_ids: list) -> None:
         raise NotImplementedError(f"CPU pinning not supported on {platform.system()}")
 
 
-def make_session(onnx_path, num_threads: int) -> ort.InferenceSession:
-    """Open an ONNX Runtime session that uses exactly `num_threads` CPU threads."""
+def make_session(onnx_path, num_threads: int, spinning: bool = True) -> ort.InferenceSession:
+    """Open an ONNX Runtime session that uses exactly `num_threads` CPU threads.
+
+    spinning: ONNX Runtime's default (True) keeps its threads busy-waiting for a while after each run,
+    which is fastest for one session alone. With several sessions taking turns (the 4.1 sweep), idle
+    sessions' spinning threads compete with the working one; False lets them sleep instead. It changes
+    how threads wait, not the arithmetic (checked bit-identical for the sweep: scripts/30).
+    """
     options = ort.SessionOptions()
     options.intra_op_num_threads = num_threads  # threads used inside one operation (e.g. a convolution)
     options.inter_op_num_threads = 1  # run operations one after another, not in parallel
     options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+    if not spinning:
+        options.add_session_config_entry("session.intra_op.allow_spinning", "0")
     return ort.InferenceSession(str(onnx_path), options, providers=["CPUExecutionProvider"])
 
 
