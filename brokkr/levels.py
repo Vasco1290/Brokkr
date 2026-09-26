@@ -39,3 +39,33 @@ def distinct_levels(values: np.ndarray) -> np.ndarray:
     offsets = (np.arange(n) * 256)[:, None]
     counts = np.bincount((flat + offsets).ravel(), minlength=n * 256).reshape(n, 256)
     return (counts > 0).sum(axis=1)
+
+
+SATURATION = {np.dtype(np.uint8): (0, 255), np.dtype(np.int8): (-128, 127)}
+
+
+def fake_quantize(x: np.ndarray, scale, zero_point) -> np.ndarray:
+    """What ONNX Runtime's QuantizeLinear followed by DequantizeLinear returns for x.
+
+    The ONNX definition, step by step, in float32: divide by the scale, round halves to even, add the
+    zero-point, clip ("saturate") to the 8-bit range, then subtract the zero-point and multiply by the
+    scale. The clip matters: Percentile calibration cuts off the rarest large values, and the error of
+    that cut is part of INT8's error (tested against ONNX Runtime itself).
+    """
+    zero_point = np.asarray(zero_point)
+    low, high = SATURATION[zero_point.dtype]
+    scale = np.float32(scale)
+    zp = np.float32(zero_point)
+    q = np.clip(np.rint(np.asarray(x, dtype=np.float32) / scale) + zp, low, high)
+    return ((q - zp) * scale).astype(np.float32)
+
+
+def sqnr_db_per_image(reference: np.ndarray, approximation: np.ndarray) -> np.ndarray:
+    """Signal-to-noise ratio in dB for each image: 20·log10(‖x‖ / ‖x − x̂‖), ONNX Runtime's formula
+    (onnxruntime.quantization.qdq_loss_debug), computed per image instead of pooled over images."""
+    n = reference.shape[0]
+    x = reference.reshape(n, -1).astype(np.float64)
+    diff = x - approximation.reshape(n, -1).astype(np.float64)
+    eps = np.finfo(float).eps
+    signal = np.maximum(np.linalg.norm(x, axis=1), eps)
+    return 20 * np.log10(signal / np.maximum(np.linalg.norm(diff, axis=1), eps))
