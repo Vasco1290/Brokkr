@@ -375,3 +375,122 @@ From the saved per-tensor means (`results/levels/*_levels.json`, field `raw`):
 - Percentile INT8 uses about twice as many levels as default INT8 on clean images too (127.93 vs
   67.07), so (b) shows that Percentile spends more levels in general, not specifically on damaged
   images.
+
+## M2: where does INT8's extra error under darkness and fog arise?
+
+Added 26 September 2026, before any 4.1 result exists.
+
+Written before any 4.1 result exists; **M2 runs after the 4.1 sweep**. M1 (MobileNetV3-Large) is
+accepted as recorded and is not re-run with another summary. M2 asks a follow-up question on models
+M1 never used.
+
+**Question.** For darkness (Brokkr) s5 and fog (Brokkr) s3, in which layers does INT8 add more
+rounding error than it does on clean images?
+
+**Design, fixed now.**
+- **Models (8):** MobileNetV2, EfficientNet-B0, ShuffleNetV2 x1.0, MNASNet 1.0, RegNetY-400MF,
+  ResNet-18, ResNet-50, ConvNeXt-Tiny. Not MobileNetV3-Large (used by M1) and not MobileNetV3-Small
+  (its INT8 build failed).
+- **Precisions:** Percentile 99.99 INT8 (the 4.1 builds) and default INT8 (MinMax, Stage 1's recipe:
+  the 512 `int8_calibration` images; ConvNeXt-Tiny with the same recorded `skip_symbolic_shape`
+  switch). The MinMax builds were made on 26 September 2026, before this section was committed:
+  rebuilt the same way, MobileNetV3-Large's MinMax model has exactly the file bytes of its Stage 1
+  default INT8, so the recipe is Stage 1's. Seven passed every check; **EfficientNet-B0's MinMax build
+  failed** (top-1 agreement with FP32 on 256 tuning images 17.6%, below the 20% line), so it is
+  reported and left out of the default-INT8 verdicts. So the default-INT8 verdicts count **7 models**
+  and the Percentile verdicts **8 models**.
+- **Images:** 128 tuning images, positions 500–627 of the tuning split in split order (images 501–628;
+  none used by M1). Tuning only, never test images. They are processed in batches of 8 and every
+  number is computed per image before any summary, so memory is bounded by one batch whatever the
+  model. Measured on 26 September 2026 on the heaviest model (ConvNeXt-Tiny FP32, all 217 tensors
+  exposed, 8 images): peak memory 2.87 GB, well within this laptop's 15.7 GB.
+- **Conditions:** clean; darkness (Brokkr) s5; fog (Brokkr) s3; each model's own preprocessing;
+  damage seed = the image's dataset position.
+- **Tensors:** each activation `QuantizeLinear` in the INT8 model, in graph order, matched by name to
+  the same tensor in the FP32 model after ONNX Runtime's preparation step. Tensor #0 is the input
+  image. Tensors that cannot be matched are counted and listed, and left out.
+
+**Main measure: local rounding error.** For one image and one tensor: take the FP32 model's values
+there, quantize them with that tensor's INT8 scale and zero-point (from the INT8 model file): divide,
+round halves to even, add the zero-point, **clip to the 8-bit range**, then turn them back into numbers
+(`brokkr.levels.fake_quantize`). The clip matters: Percentile's error from cutting off rare large
+values is part of the measure. A test shows this equals ONNX Runtime's own QuantizeLinear followed by
+DequantizeLinear exactly, on made-up values beyond the range and on every quantized tensor of
+MobileNetV3-Large's Percentile INT8, some of which are clipped (`tests/test_levels.py`). Then,
+and compare with the unrounded values as a signal-to-noise ratio,
+SQNR = 20·log10(‖x‖ / ‖x − x̂‖) in dB (ONNX Runtime's formula). This is the error INT8 adds *at that
+tensor alone*, given perfect inputs; unlike the cumulative measure below, it contains no error
+carried forward from earlier layers, so it can show where extra error arises.
+- **Per image first:** SQNR is computed for each image separately; summaries are over images.
+- **Extra error at a tensor:** E(t) = the mean over images of [SQNR_clean(t) − SQNR_damaged(t)] for
+  the same image, in dB (positive = the damage makes INT8 round that tensor worse).
+- **Early layers:** the first 10% of a model's matched tensors after the input (tensors #1 to
+  #ceil(N/10), where N is the number of matched tensors after #0). **Rest:** every tensor after the
+  early block. The input tensor (#0) is reported separately and belongs to neither.
+- **Summaries per model, precision and condition:** E_early = the median of E(t) over the early
+  block; E_rest = the median over the rest. 95% intervals by resampling the 128 images (1,000
+  resamples, seed 0) and recomputing E(t), E_early and E_rest from the per-image SQNRs.
+- **Reported, not judged:** E_early with 5% and 20% cut-offs instead of 10%; the cumulative SQNR of
+  `scripts/26_int8_layer_divergence.py` (INT8 model vs FP32 model at each tensor, error carried
+  forward included), also per image.
+
+**Input images before quantization (M2b).** For each image and each colour channel: V_pre = the
+number of distinct values in that channel of the normalised input (what the input quantizer
+receives), V_q = the number of distinct 8-bit levels in that channel after the input quantizer.
+Per image, R = the average over the three channels of V_q / min(V_pre, 256).
+
+**M2a. The extra rounding error arises early.** Four verdicts: {Percentile, default} x {darkness s5,
+fog s3}. Judged on the local measure only.
+- **Supports**, for that precision and condition, if in **at least 6 of the models** (6 of 8 for
+  Percentile, 6 of 7 for default):
+  E_early ≥ 3.0 dB with its interval above 0, and E_early > E_rest with the interval of
+  (E_early − E_rest) above 0.
+- **Rejects** if in **more than half of the models** (5 of 8 for Percentile, 4 of 7 for default)
+  E_early ≤ E_rest (the point estimate), or E_early's
+  interval includes 0: the extra error is not concentrated early.
+- **Inconclusive** otherwise. Models whose E(t) never reaches 1.0 dB at any tensor are listed as "no
+  extra error"; they count against "supports".
+- *Confidence:* medium for default INT8 under darkness; low for Percentile (it may have removed most
+  of the early squeeze) and for fog.
+
+**M2b. At the input, the loss is the image, not INT8.** Percentile INT8 judged; default reported, not
+judged. For darkness s5 and fog s3 separately:
+- **Supports** if in **at least 6 of the 8 models** the 95% interval of the mean of
+  R(damaged) − R(clean) (paired over images) lies inside −0.05 to +0.05.
+- **Rejects** if in **at least 5 of the 8 models** that interval lies entirely below −0.05 (INT8's
+  input quantizer itself drops many of the values a damaged image still has).
+- **Inconclusive** otherwise. *Confidence:* medium.
+
+- **Why 3.0 dB:** 3 dB means the rounding error's power relative to the signal doubles.
+- **Why 10% for "early":** in MobileNetV3-Small the collapse was inside the first block, under 10%
+  of its tensors; one cut-off is fixed for every model so that no boundary is chosen per model. The
+  5% and 20% cut-offs are reported to show how much the answer depends on it, without judging them.
+- **Why these counts:** "supports" needs at least three quarters of the models (6 of 8; 6 of 7,
+  rounded up), as in H18's 8 of 12; "rejects" needs more than half (5 of 8; 4 of 7). The two cannot
+  both hold.
+- **What M2 cannot show:** that extra early rounding error *causes* the accuracy loss. Even
+  "supports" will be written as "consistent with".
+- **Check before judging:** the script's cumulative SQNR, pooled over images as ONNX Runtime pools
+  them, must reproduce `scripts/26_int8_layer_divergence.py`'s saved values for MobileNetV3-Small
+  (32 images) to 0.01 dB. If it does not, M2 stops and a dated note decides what to do.
+- **Records:** schema-2 diagnostic records per model and precision (script, split, images, model,
+  commit), and the verdicts in `results/final/`; the MinMax builds are build records checked by
+  `scripts/22_check_results.py`.
+
+## Exploratory note (26 September 2026): squeeze-and-excitation and weak INT8 builds
+
+**Not a prediction and not judged.** A possible later test, recorded now because it was noticed
+before any 4.1 result exists.
+
+All three models with weak or failed INT8 builds contain squeeze-and-excitation blocks:
+MobileNetV3-Small (Percentile: failed, 2.7% agreement with FP32 on 256 tuning images; a diagnostic
+MinMax build, not kept, also collapsed at 1.2%), EfficientNet-B0 (MinMax: failed, 17.6%) and
+MobileNetV3-Large (MinMax: 63.7% on 256 tuning images in the 26 September rebuild check). RegNetY-400MF
+also contains squeeze-and-excitation blocks and passed both builds (MinMax 92.2%, Percentile 94.5%).
+
+Checked from the model code (`torchvision.ops.misc.SqueezeExcitation` modules): MobileNetV3-Large 8,
+MobileNetV3-Small 9, EfficientNet-B0 16, RegNetY-400MF 16; the other six models none. Also noticed:
+the two Percentile builds below the 90% warning line (MobileNetV3-Large 86.3%, EfficientNet-B0 83.2%)
+are squeeze-and-excitation models too, and every build of a model without such blocks agreed with FP32
+on at least 92.2% of the 256 tuning images. Four such models are too few to separate this from
+other differences between the models.
