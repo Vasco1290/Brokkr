@@ -314,3 +314,28 @@ added as dated notes before those tasks measure anything.
   little use for choosing edge models.
 - ResNet-18 or ResNet-50 showing a large extra gap under contrast: plain-convolution models are
   usually reported to quantize well on clean images.
+
+## Note added 26 September 2026, before the mechanism test (task 4.0) is run: how M1 is computed
+
+Implementation details only; the design, thresholds and verdict rules above are unchanged.
+- **Tensors:** in each model file, the outputs of the `QuantizeLinear` nodes whose input is not a stored
+  constant (so weights are excluded). Both files must have the same 142 tensor names, else the test
+  stops.
+- **Levels:** for one image and one tensor, the number of distinct 8-bit values among all of that
+  tensor's elements for that image (all channels and positions).
+- **Per image:** the median over the 142 tensors, as written above. **Comparisons (a) and (b)** use
+  the mean over the 500 images of these per-image values, with `brokkr.accuracy.paired_bootstrap_diff`
+  (new minus old; 1,000 resamples, seed 0): (a) damaged minus clean, default INT8; (b) Percentile
+  minus default, on the same damaged images.
+- **"At least 20% of the clean images' value":** (a)'s difference is at most −0.20 times the mean over
+  the 500 clean images of default INT8's per-image value.
+- **Reading the levels:** each of the 142 outputs is added as an extra model output. The check before
+  anything is counted: on all 500 clean images, the modified model's top answer equals the
+  unmodified model's for every image (and the largest score difference is reported).
+- **Pictures:** MobileNetV3-Large's own preprocessing (232 / 224 / bilinear); damage by
+  `brokkr.sweep.damaged_batch` (seed = the image's dataset position).
+- **Reported, not judged:** Percentile INT8's own damaged-minus-clean difference, and the mean levels
+  of every tensor.
+- **Records:** six schema-2 `levels` records (2 models x 3 conditions; tuning split, 500 images), each
+  with the mean per-image value and its 95% bootstrap interval; the verdicts in
+  `results/final/mobilenet_v3_large_m1_verdict.json`. Script: `scripts/27_mechanism_levels.py`.
