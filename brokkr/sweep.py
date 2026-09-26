@@ -17,9 +17,11 @@ and precision in that group.
   Stage 3's damaged pictures are reproduced exactly (tested).
 """
 
+import contextlib
 import hashlib
 import inspect
 import json
+import shutil
 from importlib import metadata
 from pathlib import Path
 
@@ -27,6 +29,7 @@ import numpy as np
 
 from brokkr import accuracy
 from brokkr.datasets import read_parquet_images
+from brokkr.results import written_atomically
 from brokkr.shift.corruptions import corrupt as brokkr_corrupt
 
 CROP_BYTES = 224 * 224 * 3  # one cached picture, uint8
@@ -77,26 +80,52 @@ def build_caches(dataset: str, split: str, positions: np.ndarray, files: list, p
         raise ValueError("positions must be sorted and unique")
     keys = [cache_key(dataset, split, positions, files, prep) for prep in preps]
     paths = [cache_paths(cache_dir, key) for key in keys]
+    # The key file is written last, and every file is written under a temporary name first, so a cache
+    # counts as present only if all three files were completed.
     todo = [i for i, p in enumerate(paths) if not all(f.exists() for f in p.values())]
     if todo:
         Path(cache_dir).mkdir(parents=True, exist_ok=True)
-        temp = {i: paths[i]["crops"].with_suffix(".tmp.npy") for i in todo}
-        crops = {i: np.lib.format.open_memmap(temp[i], mode="w+", dtype=np.uint8,
-                                              shape=(len(positions), 224, 224, 3)) for i in todo}
-        labels = np.empty(len(positions), dtype=np.int64)
-        for n, (image_bytes, label) in enumerate(read_parquet_images(files, positions)):
-            image = accuracy.open_image(image_bytes).convert("RGB")  # decoded once for every group
-            labels[n] = label
+        temp = {i: paths[i]["crops"].with_name(paths[i]["crops"].name + ".tmp") for i in todo}
+        crops = {}
+        try:
             for i in todo:
-                p = keys[i]["preprocessing"]
-                crops[i][n] = accuracy.resize_and_crop(image, p["resize"], p["crop"], p["interpolation"])
-        for i in todo:
-            crops[i].flush()
-            del crops[i]
-            temp[i].rename(paths[i]["crops"])  # only a complete cache gets its real name
-            np.save(paths[i]["labels"], labels)
-            paths[i]["key"].write_text(json.dumps(keys[i], indent=2))
+                crops[i] = np.lib.format.open_memmap(temp[i], mode="w+", dtype=np.uint8,
+                                                     shape=(len(positions), 224, 224, 3))
+            labels = np.empty(len(positions), dtype=np.int64)
+            for n, (image_bytes, label) in enumerate(read_parquet_images(files, positions)):
+                image = accuracy.open_image(image_bytes).convert("RGB")  # decoded once for every group
+                labels[n] = label
+                for i in todo:
+                    p = keys[i]["preprocessing"]
+                    crops[i][n] = accuracy.resize_and_crop(image, p["resize"], p["crop"], p["interpolation"])
+            for i in todo:
+                crops[i].flush()
+                del crops[i]
+                temp[i].replace(paths[i]["crops"])
+                with written_atomically(paths[i]["labels"]) as tmp, tmp.open("wb") as f:
+                    np.save(f, labels)
+                with written_atomically(paths[i]["key"]) as tmp:
+                    tmp.write_text(json.dumps(keys[i], indent=2), encoding="utf-8")
+        finally:
+            crops.clear()  # release the memory maps so unfinished .tmp files can be removed
+            for i in todo:
+                with contextlib.suppress(OSError):  # a leftover .tmp file is harmless: it is never read
+                    temp[i].unlink(missing_ok=True)
     return paths
+
+
+def missing_cache_bytes(dataset: str, split: str, positions, files: list, preps: list, cache_dir) -> int:
+    """Disk space the caches not yet built will take (for the free-space check before building)."""
+    keys = [cache_key(dataset, split, positions, files, prep) for prep in preps]
+    missing = [k for k in keys if not all(f.exists() for f in cache_paths(cache_dir, k).values())]
+    return len(missing) * len(positions) * (CROP_BYTES + 8)
+
+
+MIN_FREE_GB = 8.0
+
+
+def free_gb(folder) -> float:
+    return shutil.disk_usage(folder).free / 1e9
 
 
 def load_cache(paths: dict, expected_key: dict) -> tuple:

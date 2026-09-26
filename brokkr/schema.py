@@ -32,6 +32,8 @@ import json
 import math
 from pathlib import Path
 
+from brokkr.results import written_atomically
+
 SCHEMA_VERSION = 2
 KINDS = ("accuracy", "calibration", "conformal", "selective", "speed", "levels", "diagnostic")
 SOURCES = ("brokkr", "community-submitted")
@@ -235,7 +237,8 @@ def save_measurement(record: dict, path) -> Path:
         raise ValueError("result record fails the schema check: " + "; ".join(problems))
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(record, indent=2))
+    with written_atomically(path) as tmp:
+        tmp.write_text(json.dumps(record, indent=2), encoding="utf-8")
     return path
 
 

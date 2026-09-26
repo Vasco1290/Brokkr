@@ -18,6 +18,8 @@ checksum in the record, so a missing, swapped, or edited array file is detected 
 
 import hashlib
 import json
+import os
+from contextlib import contextmanager
 from pathlib import Path
 
 import numpy as np
@@ -39,6 +41,26 @@ def make_record(kind: str, model: str, precision: str, measurement: dict, machin
         **measurement,
         "machine": machine,
     }
+
+
+@contextmanager
+def written_atomically(path):
+    """Write to <path>.tmp, then rename it to <path> only if the writing finished.
+
+    A crash (or power cut) mid-write leaves at most a .tmp file, never a half-written file under the
+    real name, so resume logic that looks for the real name never mistakes a broken file for a done one.
+
+        with written_atomically(out) as tmp:
+            tmp.write_text(...)
+    """
+    path = Path(path)
+    tmp = path.with_name(path.name + ".tmp")
+    try:
+        yield tmp
+        os.replace(tmp, path)  # atomic on one disk; replaces an old file (a plain rename can't, on Windows)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
 
 
 def save_record(record: dict, path) -> Path:

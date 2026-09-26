@@ -23,6 +23,11 @@ Rules (docs/hypotheses_stage4.md, committed before this runs):
 - Resumable: a (model, precision, condition) whose record and arrays exist with a matching checksum is
   skipped. Test-split reruns only for technical failure, logged with the reason.
 - Keeps Windows awake while running (SetThreadExecutionState).
+- Safe to interrupt: every file is written under a .tmp name and renamed only when complete; a step
+  counts as done only if its record and score file exist and the checksum matches.
+- Disk space: before building caches (counting the space they will take) and before every step, the
+  free space must stay at or above --min-free-gb (default 8). If not, the run stops cleanly (exit code
+  3); free some space and rerun the same command.
 """
 
 import argparse
@@ -40,7 +45,7 @@ from brokkr.benchmark import make_session
 from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
 from brokkr.export import MODELS, preprocessing
 from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import sha256_of
+from brokkr.results import sha256_of, written_atomically
 from brokkr.schema import (
     check_build_record,
     condition,
@@ -49,7 +54,16 @@ from brokkr.schema import (
     metric,
     save_measurement,
 )
-from brokkr.sweep import build_caches, cache_key, damaged_batch, load_cache, normalised
+from brokkr.sweep import (
+    MIN_FREE_GB,
+    build_caches,
+    cache_key,
+    damaged_batch,
+    free_gb,
+    load_cache,
+    missing_cache_bytes,
+    normalised,
+)
 
 DATASET, BATCH, TOLERANCE = "imagenet-1k-val", 32, 0.010
 # 8 threads: on 26 September 2026 every model's FP32 and Percentile INT8 scores were bit-identical with
@@ -73,6 +87,8 @@ parser.add_argument("--split", choices=["test", "tuning"], default="test",
 parser.add_argument("--models", nargs="+", default=list(MODELS))
 parser.add_argument("--limit", type=int, default=None, help="first N images only (dry runs)")
 parser.add_argument("--out", default="results/breadth")
+parser.add_argument("--min-free-gb", type=float, default=MIN_FREE_GB,
+                    help="stop cleanly if free disk space would fall below this")
 args = parser.parse_args()
 out_dir = Path(args.out)
 out_dir.mkdir(parents=True, exist_ok=True)
@@ -108,10 +124,26 @@ def output_path(model, precision, split, cond) -> Path:
 
 
 def complete(path: Path) -> bool:
+    """Done = the record and its score file exist under their real names and the checksum matches."""
     if not (path.exists() and path.with_suffix(".npz").exists()):
         return False
-    record = json.loads(path.read_text(encoding="utf-8"))
-    return record["arrays"]["sha256"] == sha256_of(path.with_suffix(".npz"))
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+        return record["arrays"]["sha256"] == sha256_of(path.with_suffix(".npz"))
+    except (ValueError, KeyError, TypeError):
+        return False
+
+
+def check_disk(step: str, needed_bytes: int = 0):
+    """Stop cleanly if free space (after `needed_bytes` more) would fall below --min-free-gb."""
+    free = free_gb(out_dir)
+    if free - needed_bytes / 1e9 < args.min_free_gb:
+        log(f"STOP (disk): {free:.1f} GB free before {step}"
+            + (f", which needs {needed_bytes / 1e9:.1f} GB" if needed_bytes else "")
+            + f"; the minimum is {args.min_free_gb:.1f} GB. Free some space and rerun the same command: "
+            "finished steps are kept.")
+        keep_awake(False)
+        sys.exit(3)
 
 
 def sanity_check(model: str):
@@ -182,6 +214,8 @@ if args.split == "test":
 for split, conditions in jobs:
     positions = splits[split][:args.limit] if args.limit else splits[split]
     preps = {key: {"resize": key[0], "crop": key[1], "interpolation": key[2]} for key in group_keys}
+    check_disk(f"building the {split} caches",
+               missing_cache_bytes(DATASET, split, positions, files, list(preps.values()), "data/cache"))
     built = build_caches(DATASET, split, positions, files, list(preps.values()), "data/cache")
     cache = {key: paths for key, paths in zip(group_keys, built, strict=True)}
     loaded = {key: load_cache(cache[key], cache_key(DATASET, split, positions, files, preps[key]))
@@ -235,6 +269,7 @@ for split, conditions in jobs:
             if not todo:
                 log(f"skip (complete): {split} {label}, group {group}")
                 continue
+            check_disk(f"{split} {label}, group {group}")
             t0 = time.time()
             logits = {job: [] for job in todo}
             for start in range(0, len(positions), BATCH):
@@ -247,8 +282,8 @@ for split, conditions in jobs:
             for (model, precision), parts in logits.items():
                 scores = np.concatenate(parts).astype(np.float32)
                 path = output_path(model, precision, split, cond)
-                np.savez_compressed(path.with_suffix(".npz"), logits=scores, labels=labels,
-                                    positions=np.asarray(positions))
+                with written_atomically(path.with_suffix(".npz")) as tmp, tmp.open("wb") as f:
+                    np.savez_compressed(f, logits=scores, labels=labels, positions=np.asarray(positions))
                 acc = accuracy_from_logits(scores, labels)["metrics"]
                 spec = MODELS[model]
                 record = make_measurement(
