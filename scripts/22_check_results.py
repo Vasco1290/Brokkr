@@ -33,7 +33,7 @@ print(f"Measurements: {len(measurements)} ({dict(versions)})")
 for kind, n in sorted(per_kind.items()):
     print(f"  {kind:<12} {n}")
 print(f"Not measurements (listed, not converted): {len(skipped)}")
-for kind, n in sorted(Counter(kind for _, kind in skipped).items()):
+for kind, n in sorted(Counter(str(kind) for _, kind in skipped).items()):
     print(f"  {kind:<18} {n}")
 
 for path, problems in failures:
