@@ -17,6 +17,8 @@ jobs:
           python-version: "3.10"
       # CPU-only PyTorch: much smaller download than the default GPU build.
       - run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-      - run: pip install -e ".[dev]"
+      - run: pip install -e ".[dev,imagenet-c]"
+      # ImageNet-C code: --no-deps, so it does not pull in the GUI build of OpenCV.
+      - run: pip install --no-deps imagecorruptions==1.1.2
       - run: ruff check .   # style and common-mistake checks
       - run: pytest -v

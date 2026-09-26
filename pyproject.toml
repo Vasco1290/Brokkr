@@ -43,6 +43,8 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 110
+# Copied third-party code keeps its original style (see brokkr/third_party/*/CHANGES.md).
+extend-exclude = ["brokkr/third_party"]
 
 [tool.ruff.lint]
 # E/W: style errors and warnings, F: real mistakes (unused or undefined names),
