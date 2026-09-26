@@ -93,7 +93,8 @@ class ImageBatches(CalibrationDataReader):
 
 
 def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
-            group_batches: int | None = None, unrounded_output_ops: list | None = None) -> Path:
+            group_batches: int | None = None, unrounded_output_ops: list | None = None,
+            skip_symbolic_shape: bool = False) -> Path:
     """Static INT8 quantization, using `calibration_batches` (arrays of shape (N, 3, H, W)).
 
     method: a key of INT8_METHODS.
@@ -104,11 +105,14 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
         first group sets the bin width, so the group size is recorded with the model.
     unrounded_output_ops: operation types whose OUTPUT stays in float (their weights stay int8),
         e.g. ["Gemm"] for the final layer (task 3.4; onnxruntime's OpTypesToExcludeOutputQuantization).
+    skip_symbolic_shape: skip the symbolic shape inference in onnxruntime's preparation step
+        (quant_pre_process). Off by default; used only where that step crashes (ConvNeXt-Tiny, task 4.1),
+        after checking it leaves MobileNetV3-Large's INT8 model unchanged. Recorded with the model.
     """
     out_path = Path(out_path)
     prepared = out_path.with_name(out_path.stem + "_prep.onnx")
     # Recommended first step: shape inference and graph clean-up so more operations get quantized.
-    quant_pre_process(str(fp32_path), str(prepared))
+    quant_pre_process(str(fp32_path), str(prepared), skip_symbolic_shape=skip_symbolic_shape)
     extra_options = dict(INT8_METHODS[method]["extra_options"])
     if group_batches:
         extra_options["CalibStridedMinMax"] = group_batches

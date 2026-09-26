@@ -74,6 +74,8 @@ def peak_memory_gb() -> float:
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", required=True, choices=list(MODELS))
 parser.add_argument("--rebuild-check", action="store_true")
+parser.add_argument("--skip-symbolic-shape", action="store_true",
+                    help="skip shape inference in onnxruntime's preparation step (recorded)")
 args = parser.parse_args()
 prep = preprocessing(args.model)
 fp32_path = Path("models") / f"{args.model}_fp32.onnx"
@@ -114,13 +116,17 @@ reference = outputs(fp32_path, check).argmax(1)
 with tempfile.TemporaryDirectory() as tmp:
     target = Path(tmp) / int8_path.name if int8_path.exists() else int8_path
     t0 = time.perf_counter()
-    to_int8(fp32_path, target, calibration, method=METHOD, group_batches=GROUP_BATCHES)
+    to_int8(fp32_path, target, calibration, method=METHOD, group_batches=GROUP_BATCHES,
+            skip_symbolic_shape=args.skip_symbolic_shape)
     build_seconds = round(time.perf_counter() - t0, 1)
     peak_gb = round(peak_memory_gb(), 2)
     scores = outputs(target, check)
     weights = weight_quantization(target)
     same_as_existing = (bool(np.array_equal(scores, outputs(int8_path, check)))
                         if target != int8_path else None)
+    same_bytes = None
+    if target != int8_path:
+        same_bytes = file_info(target)["sha256"] == file_info(int8_path)["sha256"]
     info = file_info(target)
 
 agreement = float(np.mean(scores.argmax(1) == reference))
@@ -133,6 +139,8 @@ checks = {
 if same_as_existing is not None:
     checks["rebuild gives exactly the existing model's outputs"] = same_as_existing
 
+if same_bytes is not None:
+    print(f"rebuild has the same file bytes as the existing model: {same_bytes}")
 print(f"{args.model}: export {export_seconds if export_seconds is not None else 'existing'} s, "
       f"INT8 build {build_seconds} s, peak memory {peak_gb} GB, {info['size_bytes'] / 1e6:.1f} MB, "
       f"agreement with FP32 {agreement:.1%} (256 tuning images)")
@@ -143,14 +151,15 @@ for description, ok in checks.items():
 
 build = {"int8_build_seconds": build_seconds, "export_seconds": export_seconds,
          "peak_memory_gb": peak_gb, "checks": checks, "top1_agreement_with_fp32": agreement,
-         "weights": weights}
+         "weights": weights, "skip_symbolic_shape": args.skip_symbolic_shape,
+         "rebuild_same_file_bytes": same_bytes}
 if target == int8_path:
     record = {
         "model": args.model, "precision": f"int8_{METHOD}", "derived_from": str(fp32_path),
         "licence": MODELS[args.model]["licence"],
         "settings": {**INT8_SETTINGS, "calibration_method": METHOD,
                      "calibration_method_detail": INT8_METHODS[METHOD]["description"],
-                     "preprocessing": prep,
+                     "preprocessing": prep, "skip_symbolic_shape": args.skip_symbolic_shape,
                      "calibration": {"dataset": DATASET, "dataset_licence": DATASETS[DATASET]["licence"],
                                      "split": "int8_calibration", "n_images": len(splits["int8_calibration"]),
                                      "group_images": GROUP_BATCHES * BATCH,
@@ -163,7 +172,8 @@ if target == int8_path:
     }
     int8_path.with_suffix(".json").write_text(json.dumps(record, indent=2))
 else:
-    out = Path("results/profile") / f"{args.model}_int8_{METHOD}_rebuild_check.json"
+    suffix = "_skip_symbolic_shape" if args.skip_symbolic_shape else ""
+    out = Path("results/profile") / f"{args.model}_int8_{METHOD}_rebuild_check{suffix}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     record = {"model": args.model, "build": build, "machine": machine_fingerprint()}
     out.write_text(json.dumps(record, indent=2))
