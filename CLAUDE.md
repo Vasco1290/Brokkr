@@ -61,6 +61,9 @@ else is built on its measurements.
   explanations are labelled "likely".
 * Report absolute weakness (FP32 also fails) separately from compression-caused weakness (INT8 minus
   FP32 on the same images).
+* Every number in a report (test counts, timings, accuracies, file counts) must come from a command
+  run in the current session. If a number wasn't just measured, say so or don't state it. (Added
+  26 September 2026, after a Stage 4 report stated "210 tests" that no command had produced.)
 
 ## Architecture principles
 
