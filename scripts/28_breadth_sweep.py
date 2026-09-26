@@ -10,8 +10,10 @@ Writes: <out>/<model>_<precision>_imagenet-1k-val_<split>_<suite>_<corruption>_s
 Rules (docs/hypotheses_stage4.md, committed before this runs):
 - A model's INT8 is run only if its build record is "usable" (brokkr.schema.check_build_record);
   MobileNetV3-Small's INT8 failed, so it runs in FP32 only.
-- Models sharing preprocessing share one keyed cache of clean pictures, and each damaged batch is made
-  once for all of them (brokkr.sweep). Damage seed = the image's dataset position.
+- Order: smallest measured run time first, ResNet-50 and ConvNeXt-Tiny last. Neighbouring models with
+  the same preprocessing form one pass and share each damaged batch; every group has one keyed cache
+  of clean pictures (brokkr.sweep). Damage seed = the image's dataset position. 8 threads (checked
+  bit-identical to 4 threads for every model, scripts/29_thread_check.py).
 - Before the first condition: a sample of cached pictures must equal freshly made ones, and (full
   test run only) MobileNetV3-Large's clean and darkness (Brokkr) s5 scores must equal Stage 3's saved
   scores on the first 64 test images. A mismatch stops the run.
@@ -28,7 +30,6 @@ import json
 import subprocess
 import sys
 import time
-from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -50,7 +51,13 @@ from brokkr.schema import (
 )
 from brokkr.sweep import build_caches, cache_key, damaged_batch, load_cache, normalised
 
-DATASET, BATCH, THREADS, TOLERANCE = "imagenet-1k-val", 32, 4, 0.010
+DATASET, BATCH, TOLERANCE = "imagenet-1k-val", 32, 0.010
+# 8 threads: on 26 September 2026 every model's FP32 and Percentile INT8 scores were bit-identical with
+# 4 and 8 threads on 64 tuning images, and 8 was faster for all (scripts/29_thread_check.py).
+THREADS = 8
+# Smallest measured 4.1 run time first (results/profile/*_all10.json, 26 September 2026).
+MODEL_ORDER = ["mobilenet_v3_small", "shufflenet_v2_x1_0", "mnasnet1_0", "mobilenet_v2", "mobilenet_v3_large",
+               "regnet_y_400mf", "efficientnet_b0", "resnet18", "resnet50", "convnext_tiny"]
 CONDITIONS = ([condition()]
               + [condition("fog", "brokkr", 3), condition("darkness", "brokkr", 5),
                  condition("defocus_blur", "brokkr", 3), condition("noise", "brokkr", 3)]
@@ -143,15 +150,23 @@ for model in args.models:
             print(f"not run: {model} {precision} (build {why})")
     if precisions:
         plan[model] = precisions
-groups = defaultdict(list)
-for model in plan:
+# 2. Order: smallest measured 4.1 run time first, ResNet-50 and ConvNeXt-Tiny last. Neighbouring models
+# with the same preprocessing form one pass, so each damaged batch is made once per pass.
+passes = []
+for model in [m for m in MODEL_ORDER if m in plan] + [m for m in plan if m not in MODEL_ORDER]:
     p = preprocessing(model)
-    groups[(p["resize"], p["crop"], p["interpolation"])].append(model)
+    key = (p["resize"], p["crop"], p["interpolation"])
+    if passes and passes[-1][0] == key:
+        passes[-1][1].append(model)
+    else:
+        passes.append((key, [model]))
+group_keys = list(dict.fromkeys(key for key, _ in passes))
 
 keep_awake(True)
 log(f"breadth sweep at {git('rev-parse', '--short', 'HEAD')} (uncommitted changes: "
     f"{'yes' if git('status', '--porcelain') else 'no'}); split {args.split}; limit {args.limit}; "
-    f"{sum(len(v) for v in plan.values())} model-precisions in {len(groups)} preprocessing groups")
+    f"{THREADS} threads; {sum(len(v) for v in plan.values())} model-precisions in {len(passes)} passes: "
+    + " | ".join(", ".join(models) for _, models in passes))
 
 files = parquet_files(DATASET)
 splits = make_splits(count_images(files))
@@ -166,38 +181,48 @@ if args.split == "test":
     jobs.append(("conformal_calibration", [condition()]))
 for split, conditions in jobs:
     positions = splits[split][:args.limit] if args.limit else splits[split]
-    preps = [{"resize": r, "crop": c, "interpolation": i} for r, c, i in groups]
-    cache_paths = build_caches(DATASET, split, positions, files, preps, "data/cache")
-    for (group, models), prep, paths in zip(groups.items(), preps, cache_paths, strict=True):
-        crops, labels = load_cache(paths, cache_key(DATASET, split, positions, files, prep))
+    preps = {key: {"resize": key[0], "crop": key[1], "interpolation": key[2]} for key in group_keys}
+    built = build_caches(DATASET, split, positions, files, list(preps.values()), "data/cache")
+    cache = {key: paths for key, paths in zip(group_keys, built, strict=True)}
+    loaded = {key: load_cache(cache[key], cache_key(DATASET, split, positions, files, preps[key]))
+              for key in group_keys}
 
-        # 2. Self-check: cached pictures equal freshly made ones (20 evenly spaced images).
-        sample = np.linspace(0, len(positions) - 1, 20).astype(int)
-        fresh = {int(positions[i]): None for i in sample}
-        for n, (image_bytes, _) in enumerate(read_parquet_images(files, positions[sample])):
-            fresh[int(positions[sample[n]])] = resize_and_crop(open_image(image_bytes), *group)
-        if not all(np.array_equal(crops[i], fresh[int(positions[i])]) for i in sample):
-            log(f"STOP: cached pictures differ from fresh ones ({split}, group {group})")
+    # Pre-flight 1: cached pictures equal freshly made ones (20 evenly spaced images, every group;
+    # the 20 photos are read from the dataset once).
+    sample = np.linspace(0, len(positions) - 1, 20).astype(int)
+    photos = [open_image(b) for b, _ in read_parquet_images(files, positions[sample])]
+    for key in group_keys:
+        crops = loaded[key][0]
+        if not all(np.array_equal(crops[i], resize_and_crop(photo, *key)) for i, photo in zip(sample, photos,
+                                                                                            strict=True)):
+            log(f"STOP: cached pictures differ from fresh ones ({split}, group {key})")
             sys.exit(1)
+    log(f"check passed: cached pictures equal fresh ones ({split}, 20 images, {len(group_keys)} groups)")
 
-        # 3. Self-check (full test run only): Stage 3's scores are reproduced exactly.
-        if split == "test" and args.limit is None and STAGE3_CHECK["model"] in models:
-            n = STAGE3_CHECK["images"]
-            for cond in STAGE3_CHECK["conditions"]:
-                batch = normalised(damaged_batch(crops, positions, list(range(n)), cond["suite"],
-                                                 cond["corruption"], cond["severity"]))
-                for precision in STAGE3_CHECK["precisions"]:
-                    name = (f"{STAGE3_CHECK['model']}_{precision}_{DATASET}_test_"
-                            f"{cond['corruption']}_s{cond['severity']}.npz")
-                    stage3 = np.load(Path("results/sweep") / name)["logits"][:n]
-                    ours = np.concatenate([sessions[(STAGE3_CHECK["model"], precision)].run(
-                        None, {"images": batch[i:i + BATCH]})[0] for i in range(0, n, BATCH)])
-                    if not np.array_equal(ours, stage3):
-                        log(f"STOP: {precision} {condition_label(cond)} differs from Stage 3 "
-                            f"(largest difference {np.abs(ours - stage3).max():.3g})")
-                        sys.exit(1)
-            log(f"check passed: MobileNetV3-Large reproduces Stage 3's scores exactly on {n} test images "
-                "(clean and darkness (Brokkr) s5, FP32 and Percentile INT8)")
+    # Pre-flight 2 (full test run only): Stage 3's scores are reproduced exactly, before any condition.
+    if split == "test" and args.limit is None and STAGE3_CHECK["model"] in plan:
+        p = preprocessing(STAGE3_CHECK["model"])
+        crops = loaded[(p["resize"], p["crop"], p["interpolation"])][0]
+        n = STAGE3_CHECK["images"]
+        for cond in STAGE3_CHECK["conditions"]:
+            batch = normalised(damaged_batch(crops, positions, list(range(n)), cond["suite"],
+                                             cond["corruption"], cond["severity"]))
+            for precision in STAGE3_CHECK["precisions"]:
+                name = (f"{STAGE3_CHECK['model']}_{precision}_{DATASET}_test_"
+                        f"{cond['corruption']}_s{cond['severity']}.npz")
+                stage3 = np.load(Path("results/sweep") / name)["logits"][:n]
+                ours = np.concatenate([sessions[(STAGE3_CHECK["model"], precision)].run(
+                    None, {"images": batch[i:i + BATCH]})[0] for i in range(0, n, BATCH)])
+                if not np.array_equal(ours, stage3):
+                    log(f"STOP: {precision} {condition_label(cond)} differs from Stage 3 "
+                        f"(largest difference {np.abs(ours - stage3).max():.3g})")
+                    sys.exit(1)
+        log(f"check passed: MobileNetV3-Large reproduces Stage 3's scores exactly on {n} test images "
+            f"(clean and darkness (Brokkr) s5, FP32 and Percentile INT8, {THREADS} threads)")
+
+    for group, models in passes:
+        crops, labels = loaded[group]
+        prep, paths = preps[group], cache[group]
 
         # 4. Every condition: damage each batch once, run every model and precision of the group.
         for cond in conditions:
