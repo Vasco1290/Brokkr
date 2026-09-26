@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from brokkr.schema import (
+    check_build_record,
     check_record,
     condition,
     condition_label,
@@ -17,6 +18,7 @@ from brokkr.schema import (
     load_measurements,
     make_measurement,
     metric,
+    non_default_settings,
     save_measurement,
 )
 
@@ -100,6 +102,18 @@ def test_the_os_must_be_recorded():
     record = accuracy_record()
     record["device"]["fingerprint"] = {k: v for k, v in FINGERPRINT.items() if k != "os"}
     assert any("must record the OS" in p for p in check_record(record))
+
+
+def test_a_diagnostic_needs_its_script_split_and_count():
+    record = make_measurement("diagnostic", MODEL, "int8", RUNTIME, "laptop", FINGERPRINT,
+                              {**DATA, "split": "tuning"}, condition(),
+                              {"median_sqnr_db": metric(3.0)}, {"script": "scripts/26_x.py"})
+    assert check_record(record) == []
+    record["settings"] = {}
+    assert any("settings.script" in p for p in check_record(record))
+    record["settings"] = {"script": "scripts/26_x.py"}
+    record["data"] = {**DATA, "n_images": 0}
+    assert any("number of images" in p for p in check_record(record))
 
 
 def test_save_refuses_a_failing_record(tmp_path):
@@ -189,3 +203,57 @@ def test_every_real_stage1_to_3_measurement_passes():
     measurements, _ = load_measurements("results", models, REAL_DATASETS)
     assert measurements
     assert [p for p, r in measurements if check_record(r)] == []
+
+
+# ---- model build records ----
+
+def build_record(**changes):
+    record = {"model": "tiny", "precision": "int8_percentile99.99", "licence": "Apache-2.0 (test)",
+              "settings": {"calibration_method": "percentile99.99", "skip_symbolic_shape": False,
+                           "calibration": {"split": "int8_calibration", "group_images": 128}},
+              "build": {"checks": {"agreement >= 20%": True}},
+              "machine": {"git": {"commit": COMMIT, "dirty": False}}}
+    record.update(changes)
+    return record
+
+
+def test_a_clean_passing_build_is_usable():
+    assert check_build_record(build_record(), {"skip_symbolic_shape"}) == ("usable", [])
+
+
+def test_a_failed_sanity_check_is_reported_not_hidden():
+    status, problems = check_build_record(build_record(build={"checks": {"agreement >= 20%": False}}), set())
+    assert status == "failed" and problems == []
+
+
+def test_older_records_are_judged_by_their_own_check():
+    export = {**build_record(), "pytorch_vs_onnx": {"max_abs_diff": 1e-6, "top1_agreement": 1.0}}
+    del export["build"]
+    assert check_build_record(export, set())[0] == "usable"
+    stage3 = {**build_record(), "sanity_check": {"top1_agreement_with_fp32": 0.1}}
+    del stage3["build"]
+    assert check_build_record(stage3, set())[0] == "failed"
+    unchecked = build_record()
+    del unchecked["build"]
+    assert check_build_record(unchecked, set())[0] == "no sanity check"
+
+
+def test_a_dirty_build_or_missing_licence_is_a_problem():
+    dirty = build_record(machine={"git": {"commit": COMMIT, "dirty": True}})
+    assert any("clean commit" in p for p in check_build_record(dirty, set())[1])
+    assert any("licence" in p for p in check_build_record(build_record(licence=""), set())[1])
+
+
+def test_an_option_the_code_had_must_be_stated():
+    record = build_record()
+    del record["settings"]["skip_symbolic_shape"]
+    assert check_build_record(record, set())[1] == []                       # built before the option
+    assert any("does not state it" in p for p in check_build_record(record, {"skip_symbolic_shape"})[1])
+
+
+def test_non_default_settings_are_shown():
+    assert non_default_settings(build_record()) == {}
+    record = build_record()
+    record["settings"]["skip_symbolic_shape"] = True
+    record["settings"]["calibration"]["group_images"] = 64
+    assert non_default_settings(record) == {"skip_symbolic_shape": True, "calibration group_images": 64}

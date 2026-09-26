@@ -2,7 +2,7 @@
 
 Usage:  python scripts/26_int8_layer_divergence.py --model mobilenet_v3_small [--images 32]
 Needs:  models/<model>_fp32.onnx and models/<model>_int8_percentile99.99.onnx
-Writes: results/checks/<model>_int8_layer_divergence.json
+Writes: results/checks/<model>_int8_layer_divergence.json (schema 2, kind "diagnostic": never a result)
 
 Uses ONNX Runtime's own debugging tool (onnxruntime.quantization.qdq_loss_debug). Both models are
 changed to also output every quantized tensor; both run on the same tuning images (the model's own
@@ -22,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 import onnx
+import onnxruntime as ort
 from onnxruntime.quantization import quant_pre_process
 from onnxruntime.quantization.qdq_loss_debug import (
     collect_activations,
@@ -31,13 +32,14 @@ from onnxruntime.quantization.qdq_loss_debug import (
 )
 
 from brokkr.accuracy import open_image, preprocess
-from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import preprocessing
+from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr.export import MODELS, file_info, preprocessing
 from brokkr.fingerprint import machine_fingerprint
 from brokkr.quantize import CALIBRATION_BATCH, ImageBatches
-from brokkr.results import make_record, save_record
+from brokkr.schema import condition, make_measurement, metric, save_measurement
 
 LOW_DB = 10.0
+THREADS = 4  # the same thread count as every other Brokkr run
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", required=True)
@@ -59,8 +61,10 @@ with tempfile.TemporaryDirectory() as tmp:
     float_aug, int8_aug = Path(tmp) / "float_aug.onnx", Path(tmp) / "int8_aug.onnx"
     modify_model_output_intermediate_tensors(prepared, float_aug)
     modify_model_output_intermediate_tensors(int8_path, int8_aug)
-    float_acts = collect_activations(str(float_aug), ImageBatches(batches))
-    int8_acts = collect_activations(str(int8_aug), ImageBatches(batches))
+    options = ort.SessionOptions()
+    options.intra_op_num_threads = THREADS
+    float_acts = collect_activations(str(float_aug), ImageBatches(batches), options, ["CPUExecutionProvider"])
+    int8_acts = collect_activations(str(int8_aug), ImageBatches(batches), options, ["CPUExecutionProvider"])
 
 errors = compute_activation_error(create_activation_matching(int8_acts, float_acts))
 
@@ -76,7 +80,7 @@ drops = [(rows[i - 1]["sqnr_db"] - rows[i]["sqnr_db"], i) for i in range(1, len(
 biggest_drop, at = max(drops)
 print(f"{args.model}: {len(rows)} quantized tensors compared on {args.images} tuning images")
 print(f"  first tensor, input side: {rows[0]['tensor']} {rows[0]['sqnr_db']} dB; "
-      f"final scores: {rows[-1]['tensor']} {rows[-1]['sqnr_db']} dB")
+      f"last compared tensor: {rows[-1]['tensor']} {rows[-1]['sqnr_db']} dB")
 if first_low:
     print(f"  first below {LOW_DB:.0f} dB: #{rows.index(first_low)} {first_low['tensor']} "
           f"({first_low['sqnr_db']} dB)")
@@ -85,11 +89,29 @@ else:
 print(f"  largest single drop: {biggest_drop:.1f} dB, from #{at - 1} {rows[at - 1]['tensor']} "
       f"({rows[at - 1]['sqnr_db']} dB) to #{at} {rows[at]['tensor']} ({rows[at]['sqnr_db']} dB)")
 
-record = make_record("check", args.model, "int8_percentile99.99", {
-    "settings": {"split": "tuning", "n_images": args.images, "preprocessing": prep,
-                 "tool": "onnxruntime.quantization.qdq_loss_debug (SQNR, dB)", "low_db": LOW_DB,
-                 "note": "Diagnostic of where INT8 drifts from FP32. Not a result; sets nothing."},
-    "metrics": {"tensors_in_graph_order": rows, "first_below_low_db": first_low,
-                "largest_drop_db": {"drop": round(biggest_drop, 2), "from": rows[at - 1], "to": rows[at]}},
-}, machine_fingerprint())
-print(f"Saved {save_record(record, Path('results/checks') / f'{args.model}_int8_layer_divergence.json')}")
+machine = machine_fingerprint()
+spec = MODELS[args.model]
+record = make_measurement(
+    "diagnostic",
+    {"name": args.model, "weights": str(spec["weights"]), "licence": spec["licence"]},
+    "int8_percentile99.99",
+    {"name": "onnxruntime", "version": ort.__version__, "execution_provider": "CPUExecutionProvider",
+     "threads": THREADS},
+    "laptop", machine,
+    {"dataset": "imagenet-1k-val", "split": "tuning", "n_images": int(len(positions)),
+     "licence": DATASETS["imagenet-1k-val"]["licence"]},
+    condition(),
+    {"tensors_compared": metric(len(rows)),
+     "median_sqnr_db": metric(float(np.median([r["sqnr_db"] for r in rows]))),
+     "first_below_low_db_index": metric(rows.index(first_low) if first_low else -1),
+     "largest_drop_db": metric(round(biggest_drop, 2))},
+    {"script": "scripts/26_int8_layer_divergence.py", "preprocessing": prep,
+     "tool": "onnxruntime.quantization.qdq_loss_debug (SQNR, dB)", "low_db": LOW_DB,
+     "note": "Diagnostic of where INT8 drifts from FP32. Not a result; sets nothing."},
+    derived_from=[{"file": str(path), "sha256": file_info(path)["sha256"]}
+                  for path in (fp32_path, int8_path)],
+)
+record["raw"] = {"tensors_in_graph_order": rows, "first_below_low_db": first_low,
+                 "largest_drop": {"from": rows[at - 1], "to": rows[at]}}
+out = Path("results/checks") / f"{args.model}_int8_layer_divergence.json"
+print(f"Saved {save_measurement(record, out)}")

@@ -6,7 +6,7 @@ required field, so a record that can't be traced fails the check.
 
     {
       "schema_version": 2,
-      "kind": "accuracy",                # or calibration, conformal, selective, speed, levels
+      "kind": "accuracy",                # or calibration, conformal, selective, speed, levels, diagnostic
       "source": "brokkr",                # or "community-submitted" (hard rule 7)
       "model": {"name": ..., "weights": ..., "licence": ...},
       "precision": "int8_percentile99.99",
@@ -33,7 +33,7 @@ import math
 from pathlib import Path
 
 SCHEMA_VERSION = 2
-KINDS = ("accuracy", "calibration", "conformal", "selective", "speed", "levels")
+KINDS = ("accuracy", "calibration", "conformal", "selective", "speed", "levels", "diagnostic")
 SOURCES = ("brokkr", "community-submitted")
 SUITES = {"brokkr": "Brokkr", "imagenet-c": "ImageNet-C"}
 DEVICE_LABELS = ("laptop", "raspberry-pi-5", "cloud-arm")
@@ -48,6 +48,9 @@ REQUIRED_METRICS = {
     "selective": {"e_aurc": True},
     "speed": {"p50_ms": False, "p95_ms": False, "p99_ms": False},
     "levels": {},
+    # A diagnostic explains a result (e.g. where an INT8 model drifts from FP32); it is never a result.
+    # Its tables go in the optional "raw" field; "settings" must name the script that made it.
+    "diagnostic": {},
 }
 MIN_WARMUP_RUNS, MIN_TIMED_RUNS = 20, 100
 
@@ -145,6 +148,8 @@ def check_record(r: dict) -> list:
         problems += _check_data(r["data"]) + _check_condition(r["condition"])
 
     problems += _check_metrics(r["kind"], r["metrics"])
+    if r["kind"] == "diagnostic" and not (isinstance(r["settings"], dict) and r["settings"].get("script")):
+        problems.append("a diagnostic record must name the script that made it (settings.script)")
     if r["kind"] == "speed":
         s = r["settings"]
         if not (s.get("warmup_runs", 0) >= MIN_WARMUP_RUNS and s.get("timed_runs", 0) >= MIN_TIMED_RUNS):
@@ -232,6 +237,73 @@ def save_measurement(record: dict, path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(record, indent=2))
     return path
+
+
+# ---- Model build records (models/*.json) ----
+
+# Build options that change how a model is made, with their default. A record made by code that had an
+# option must state it explicitly, so a non-default build can never hide (see check_build_record).
+BUILD_OPTIONS = {"skip_symbolic_shape": False}
+EXPORT_MAX_ABS_DIFF = 1e-4       # scripts/01_export_model.py
+MIN_AGREEMENT_WITH_FP32 = 0.20   # below this an FP16/INT8 build is broken (brokkr.quantize.check_int8_build)
+
+
+def build_sanity(r: dict) -> bool | None:
+    """Did the build's own sanity check pass? None if the record holds no sanity check."""
+    if "pytorch_vs_onnx" in r:
+        check = r["pytorch_vs_onnx"]
+        return check["max_abs_diff"] < EXPORT_MAX_ABS_DIFF and check["top1_agreement"] == 1.0
+    if "build" in r:
+        return all(r["build"]["checks"].values())
+    check = r.get("sanity_check")
+    if not check:
+        return None
+    if "checks" in check:
+        return all(check["checks"].values())
+    return check["top1_agreement_with_fp32"] >= MIN_AGREEMENT_WITH_FP32
+
+
+def non_default_settings(r: dict) -> dict:
+    """The build settings in this record that differ from Brokkr's defaults (shown by the checker)."""
+    s = r.get("settings") or {}
+    found = {k: s[k] for k, default in BUILD_OPTIONS.items() if k in s and s[k] != default}
+    if s.get("unrounded_output_ops"):
+        found["unrounded_output_ops"] = s["unrounded_output_ops"]
+    calibration = s.get("calibration") or {}
+    if calibration.get("group_images") not in (None, 128):
+        found["calibration group_images"] = calibration["group_images"]
+    if calibration.get("split") not in (None, "int8_calibration"):
+        found["calibration images"] = f"{calibration['split']}, seed {calibration.get('seed')}"
+    if calibration.get("held_out_corruption"):
+        found["damaged calibration, held out"] = calibration["held_out_corruption"]
+    if calibration.get("purpose"):
+        found["purpose"] = calibration["purpose"]
+    return found
+
+
+def check_build_record(r: dict, options_that_existed: set) -> tuple:
+    """(status, problems) for one model build record.
+
+    status: "usable" (its sanity check passed), "failed" (it failed), or "no sanity check".
+    problems: why the record itself is not acceptable (not clean, no licence, an option not stated).
+    options_that_existed: the BUILD_OPTIONS the building code already had, so the record must state them.
+    """
+    problems = []
+    git = (r.get("machine") or {}).get("git") or {}
+    if not _is_hex(git.get("commit"), 40):
+        problems.append("no git commit recorded")
+    if git.get("dirty") is not False:
+        problems.append("not built from a clean commit (dirty flag is not false)")
+    if not r.get("licence"):
+        problems.append("no licence recorded (hard rule 8)")
+    if (r.get("settings") or {}).get("calibration_method"):  # a quantized build
+        for option in options_that_existed:
+            if option not in r["settings"]:
+                problems.append(f"built by code that had the option {option!r}, "
+                                "but the record does not state it")
+    passed = build_sanity(r)
+    status = "no sanity check" if passed is None else ("usable" if passed else "failed")
+    return status, problems
 
 
 # ---- Reading Stage 1-3 (schema version 1) records ----

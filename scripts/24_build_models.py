@@ -37,6 +37,7 @@ from brokkr.fingerprint import machine_fingerprint
 from brokkr.quantize import CALIBRATION_BATCH as BATCH
 from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
 from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, to_int8, weight_quantization
+from brokkr.results import make_record, save_record
 
 DATASET = "imagenet-1k-val"
 METHOD = "percentile99.99"
@@ -174,9 +175,14 @@ if target == int8_path:
 else:
     suffix = "_skip_symbolic_shape" if args.skip_symbolic_shape else ""
     out = Path("results/profile") / f"{args.model}_int8_{METHOD}_rebuild_check{suffix}.json"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    record = {"model": args.model, "build": build, "machine": machine_fingerprint()}
-    out.write_text(json.dumps(record, indent=2))
+    record = make_record("check", args.model, f"int8_{METHOD}", {
+        "settings": {"split": "tuning", "n_images": len(reference), "compared_with": str(int8_path),
+                     "skip_symbolic_shape": args.skip_symbolic_shape, "preprocessing": prep,
+                     "note": "Rebuild check: a rebuild into a temporary file, timed and compared with "
+                             "the existing model. Not a result."},
+        "metrics": {"build": build},
+    }, machine_fingerprint())
+    save_record(record, out)
 passed = all(checks.values())
 print("PASS" if passed else "FAIL")
 sys.exit(0 if passed else 1)
