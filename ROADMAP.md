@@ -294,6 +294,11 @@ step is a timing probe on one model.
 - **Built on laptop results.** Laptop speed for the 4.1 models (FP32 and Percentile INT8; pinned,
   fixed threads, >= 20 warm-up, >= 100 timed runs, p50/p95/p99) is measured here and always labelled
   "laptop latency". Pi rows show "not measured" until 4.4 exists.
+- **Laptop latency needs its own fixed method, decided before 4.5** (note added 26 September 2026):
+  plugged in, a fixed power mode, a cool-down before each measurement, repeated runs reported as the
+  median and spread, and the whole setup recorded. Reason: the i5-1235U mixes fast and slow cores and
+  slows down when hot. Two back-to-back pipeline profiles on 26 September differed by 25–45% on most
+  steps, so a single run is not a valid latency number.
 - **Constraint filtering:** only options with a measurement for that device and condition. Anything
   unmeasured is reported as "not measured", never estimated.
 - **Pareto frontier:** options that no other option beats on all three of accuracy under the
