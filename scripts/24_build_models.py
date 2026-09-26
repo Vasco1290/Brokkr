@@ -1,6 +1,6 @@
-"""Build one task 4.1 model: FP32 ONNX export and Percentile 99.99 INT8, timed (task 4.1 tooling).
+"""Build one Stage 4 model: FP32 ONNX export and an INT8 version, timed (task 4.1 and M2 tooling).
 
-Usage:  python scripts/24_build_models.py --model resnet50 [--rebuild-check]
+Usage:  python scripts/24_build_models.py --model resnet50 [--method minmax] [--rebuild-check]
 Needs:  the model's torchvision weights (hash-checked) and data/imagenet-1k/
 Writes: models/<model>_fp32.onnx (+ .json, by scripts/01_export_model.py) and
         models/<model>_int8_percentile99.99.onnx (+ .json with build time and peak memory)
@@ -40,7 +40,9 @@ from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, to_int8, weight_quantiz
 from brokkr.results import make_record, save_record
 
 DATASET = "imagenet-1k-val"
-METHOD = "percentile99.99"
+# Percentile 99.99 is the 4.1 model ("int8_percentile99.99"). MinMax is the default INT8 of Stage 1,
+# built for M2 with the same images and named "int8", as MobileNetV3-Large's default INT8 is.
+PRECISION_NAMES = {"percentile99.99": "int8_percentile99.99", "minmax": "int8"}
 FAIL_AGREEMENT, WARN_AGREEMENT = 0.20, 0.90
 
 
@@ -74,13 +76,15 @@ def peak_memory_gb() -> float:
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", required=True, choices=list(MODELS))
+parser.add_argument("--method", choices=list(PRECISION_NAMES), default="percentile99.99")
 parser.add_argument("--rebuild-check", action="store_true")
 parser.add_argument("--skip-symbolic-shape", action="store_true",
                     help="skip shape inference in onnxruntime's preparation step (recorded)")
 args = parser.parse_args()
 prep = preprocessing(args.model)
 fp32_path = Path("models") / f"{args.model}_fp32.onnx"
-int8_path = Path("models") / f"{args.model}_int8_{METHOD}.onnx"
+METHOD, PRECISION = args.method, PRECISION_NAMES[args.method]
+int8_path = Path("models") / f"{args.model}_{PRECISION}.onnx"
 
 if int8_path.exists() and not args.rebuild_check:
     sys.exit(f"{int8_path} already exists; use --rebuild-check to time a rebuild without replacing it")
@@ -156,7 +160,7 @@ build = {"int8_build_seconds": build_seconds, "export_seconds": export_seconds,
          "rebuild_same_file_bytes": same_bytes}
 if target == int8_path:
     record = {
-        "model": args.model, "precision": f"int8_{METHOD}", "derived_from": str(fp32_path),
+        "model": args.model, "precision": PRECISION, "derived_from": str(fp32_path),
         "licence": MODELS[args.model]["licence"],
         "settings": {**INT8_SETTINGS, "calibration_method": METHOD,
                      "calibration_method_detail": INT8_METHODS[METHOD]["description"],
@@ -174,8 +178,8 @@ if target == int8_path:
     int8_path.with_suffix(".json").write_text(json.dumps(record, indent=2))
 else:
     suffix = "_skip_symbolic_shape" if args.skip_symbolic_shape else ""
-    out = Path("results/profile") / f"{args.model}_int8_{METHOD}_rebuild_check{suffix}.json"
-    record = make_record("check", args.model, f"int8_{METHOD}", {
+    out = Path("results/profile") / f"{args.model}_{PRECISION}_rebuild_check{suffix}.json"
+    record = make_record("check", args.model, PRECISION, {
         "settings": {"split": "tuning", "n_images": len(reference), "compared_with": str(int8_path),
                      "skip_symbolic_shape": args.skip_symbolic_shape, "preprocessing": prep,
                      "note": "Rebuild check: a rebuild into a temporary file, timed and compared with "
