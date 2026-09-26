@@ -84,10 +84,13 @@ if int8_path.exists() and not args.rebuild_check:
 
 # 1. FP32 export (with its own PyTorch-vs-ONNX check), unless it already exists.
 export_seconds = None
-if not fp32_path.exists():
+if not (fp32_path.exists() and fp32_path.with_suffix(".json").exists()):  # a half-made export is redone
     t0 = time.perf_counter()
     subprocess.run([sys.executable, "scripts/01_export_model.py", args.model], check=True)
     export_seconds = round(time.perf_counter() - t0, 1)
+export_check = json.loads(fp32_path.with_suffix(".json").read_text())["pytorch_vs_onnx"]
+if not (export_check["max_abs_diff"] < 1e-4 and export_check["top1_agreement"] == 1.0):
+    sys.exit(f"FAIL: {fp32_path} did not pass its PyTorch-vs-ONNX check: {export_check}")
 
 
 def load_batches(files, positions):
