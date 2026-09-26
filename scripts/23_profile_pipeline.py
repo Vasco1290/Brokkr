@@ -39,6 +39,7 @@ parser.add_argument("--model", required=True)
 parser.add_argument("--onnx", action="append", required=True, help="label=path, repeatable")
 parser.add_argument("--resize", type=int, default=232)
 parser.add_argument("--interpolation", choices=["bilinear", "bicubic"], default="bilinear")
+parser.add_argument("--out-suffix", default="", help="added to the output file name")
 parser.add_argument("--skip-corruptions", action="store_true", help="time only loading and inference")
 args = parser.parse_args()
 steps = {}
@@ -82,14 +83,11 @@ if not args.skip_corruptions:
 
     for name, severity in BROKKR:
         timed(f"{name} (Brokkr) s{severity}", N_IMAGES, run_brokkr, name, severity)
-    from imagecorruptions import corrupt as imagenet_c_corrupt
+    from brokkr.imagenet_c import damage as imagenet_c_damage  # vendored official code, seeded per image
 
     def run_imagenet_c(name, severity):
-        out = []
-        for c, p in zip(crops, positions, strict=True):
-            np.random.seed(int(p))  # imagecorruptions draws from NumPy's global generator
-            out.append(imagenet_c_corrupt(c, corruption_name=name, severity=severity))
-        return out
+        return [imagenet_c_damage(c, name, severity, seed=int(p))
+                for c, p in zip(crops, positions, strict=True)]
 
     for name, severity in IMAGENET_C:
         try:
@@ -131,5 +129,5 @@ record = make_record("profile", args.model, "several", {
                  "note": "Planning measurement for task 4.1 compute. Not a result; no accuracy computed."},
     "metrics": {"steps": steps, "inference": inference, "not_timed": not_timed},
 }, machine_fingerprint())
-out = save_record(record, Path("results/profile") / f"{args.model}_pipeline_profile.json")
+out = save_record(record, Path("results/profile") / f"{args.model}_pipeline_profile{args.out_suffix}.json")
 print(f"Saved {out}")
