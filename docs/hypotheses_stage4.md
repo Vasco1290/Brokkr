@@ -339,3 +339,39 @@ Implementation details only; the design, thresholds and verdict rules above are 
 - **Records:** six schema-2 `levels` records (2 models x 3 conditions; tuning split, 500 images), each
   with the mean per-image value and its 95% bootstrap interval; the verdicts in
   `results/final/mobilenet_v3_large_m1_verdict.json`. Script: `scripts/27_mechanism_levels.py`.
+
+## M1 outcome (added 26 September 2026, after the mechanism test)
+
+Run once, at commit `4c0944f` with no uncommitted changes (`scripts/27_mechanism_levels.py`); no
+reruns. The check before counting passed for both models: same top answer as the unmodified model on
+all 500 clean tuning images, largest score difference 0.
+
+Mean over the 500 tuning images of each image's median levels used (95% interval):
+
+| Model | Clean | Darkness (Brokkr) s5 | Fog (Brokkr) s3 |
+|---|---|---|---|
+| Default INT8 (MinMax) | 67.07 (66.84 to 67.31) | 59.33 (59.13 to 59.53) | 61.27 (61.01 to 61.53) |
+| Percentile 99.99 INT8 | 127.93 (127.60 to 128.28) | 114.98 (114.64 to 115.35) | 121.75 (121.28 to 122.24) |
+
+- **Darkness (Brokkr) s5: INCONCLUSIVE.** (a) damaged minus clean, default INT8: −7.74 levels (−7.95
+  to −7.57), which is −11.5% of the clean value; "supports" needed −13.41 or lower (−20%). (b)
+  Percentile minus default on the dark images: +55.66 (+55.36 to +55.95), as required.
+- **Fog (Brokkr) s3: INCONCLUSIVE.** (a) −5.80 (−6.00 to −5.60), −8.7% of the clean value; needed
+  −13.41 or lower. (b) +60.48 (+60.11 to +60.87), as required.
+- By the rule: damaged images do use fewer levels (so M1 is not rejected), but by less than the 20%
+  fixed in advance, so the test neither supports nor rejects the explanation.
+- Reported, not judged: Percentile INT8's own damaged minus clean: darkness −12.95 (−13.24 to
+  −12.62), fog −6.18 (−6.55 to −5.79).
+
+### Exploratory, after the verdict (not part of M1; changes no verdict)
+
+From the saved per-tensor means (`results/levels/*_levels.json`, field `raw`):
+- The reduction is concentrated at the start of the network. The quantized input image uses on
+  average 241.0 levels when clean and 64.2 at darkness s5 (149.5 at fog s3), in both models. Across
+  all 142 tensors the median relative change is much smaller (default INT8: −5.5% at darkness, −4.3%
+  at fog). A likely reason the pre-registered summary (a median over all 142 tensors) found less than
+  20%: it weighs the few early tensors where the squeeze is large the same as the many later ones
+  where it is small. This is an observation after the verdict, not a tested claim.
+- Percentile INT8 uses about twice as many levels as default INT8 on clean images too (127.93 vs
+  67.07), so (b) shows that Percentile spends more levels in general, not specifically on damaged
+  images.
