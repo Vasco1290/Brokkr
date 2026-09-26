@@ -153,3 +153,9 @@ def test_slow_warning_only_above_the_limit():
     assert sweep.slow_warning(150.0, 100.0) is None                    # exactly 1.5x: no warning
     assert "1.6x" in sweep.slow_warning(160.0, 100.0)
     assert sweep.slow_warning(500.0, None) is None                     # no estimate, no warning
+
+
+def test_durations_are_readable_for_short_and_long_steps():
+    assert sweep.duration(3.4) == "3 s" and sweep.duration(119) == "119 s"
+    assert sweep.duration(150) == "2.5 min" and sweep.duration(840) == "14.0 min"
+    assert "against 3 s" in sweep.slow_warning(10.0, 3.0)

@@ -159,6 +159,11 @@ def normalised(pictures: np.ndarray) -> np.ndarray:
 SLOW_LIMIT = 1.5  # a step taking more than 1.5 times its estimate gets a warning in the log
 
 
+def duration(seconds: float) -> str:
+    """'45 s' under two minutes, else '12.3 min' (short dry-run steps would otherwise all show 0.0 min)."""
+    return f"{seconds:.0f} s" if seconds < 120 else f"{seconds / 60:.1f} min"
+
+
 def estimated_step_seconds(jobs: list, n_images: int, rates: dict, damage_rate: float | None,
                            normalise_rate: float) -> float | None:
     """Expected seconds for one sweep step: damage and normalise n_images once, then run every job.
@@ -181,4 +186,4 @@ def slow_warning(actual_seconds: float, estimate_seconds: float | None,
     if ratio <= limit:
         return None
     return (f"WARNING: this step took {ratio:.1f}x its estimate (limit {limit}x): "
-            f"{actual_seconds / 60:.1f} min against {estimate_seconds / 60:.1f} min")
+            f"{duration(actual_seconds)} against {duration(estimate_seconds)}")

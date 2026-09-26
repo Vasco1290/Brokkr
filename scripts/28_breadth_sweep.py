@@ -59,6 +59,7 @@ from brokkr.sweep import (
     build_caches,
     cache_key,
     damaged_batch,
+    duration,
     estimated_step_seconds,
     free_gb,
     load_cache,
@@ -89,8 +90,10 @@ parser.add_argument("--split", choices=["test", "tuning"], default="test",
 parser.add_argument("--models", nargs="+", default=list(MODELS))
 parser.add_argument("--limit", type=int, default=None, help="first N images only (dry runs)")
 parser.add_argument("--out", default="results/breadth")
-parser.add_argument("--spinning", choices=["on", "off"], default="on",
-                    help="ONNX Runtime threads busy-wait between runs (on, its default) or sleep (off)")
+# Spinning off (threads sleep between runs): on 26 September 2026 every score was bit-identical with
+# spinning on and off, and off was 2.46x faster in the sweep's pattern (scripts/30_spinning_check.py).
+parser.add_argument("--spinning", choices=["on", "off"], default="off",
+                    help="ONNX Runtime threads busy-wait between runs (on) or sleep (off, the default)")
 parser.add_argument("--min-free-gb", type=float, default=MIN_FREE_GB,
                     help="stop cleanly if free disk space would fall below this")
 args = parser.parse_args()
@@ -355,9 +358,9 @@ for split, conditions in jobs:
                 save_measurement(record, path)
             took = time.time() - t0
             estimate = step_estimate(todo, cond, len(positions))
-            vs = f"estimate {estimate / 60:.1f} min, {took / estimate:.1f}x" if estimate else "no estimate"
+            vs = f"estimate {duration(estimate)}, {took / estimate:.1f}x" if estimate else "no estimate"
             log(f"done: {split} {label}, group {group}, {len(todo)} model-precisions, "
-                f"{took / 60:.1f} min ({vs})")
+                f"{duration(took)} ({vs})")
             warning = slow_warning(took, estimate)
             if warning:
                 log(warning)
