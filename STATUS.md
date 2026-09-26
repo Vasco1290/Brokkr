@@ -1,9 +1,9 @@
 # Brokkr status
 
-Snapshot as of **26 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
-(merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). Stage 4
-work happens on branch `stage-4`, created from `main` at `be01206`; so far it holds only the revised
-Stage 4 plan (`ROADMAP.md`).
+Snapshot as of **27 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+(merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4
+is in progress** on branch `stage-4` (created from `main` at `be01206`): task 4.0 done, the task 4.1
+breadth sweep has run; its analysis has not started.
 
 ## 0. Start here (a new session needs nothing else)
 
@@ -13,8 +13,9 @@ Stage 4 plan (`ROADMAP.md`).
   `results/final/mobilenet_v3_large_stage3_verdicts.json` (3.7) and `..._verdicts_with_h17.json` (3.9).
 - **Brokkr Technical Report 1** (`docs/writeup.md`, task 3.8) is approved and committed. Its "Related
   work" section is a placeholder marked "To be written by H"; do not draft it.
-- **Stage 4 is planned, not started.** The revised plan (tasks 4.0–4.5) is in `ROADMAP.md`. Next
-  step: task 4.0 (result schema, `docs/hypotheses_stage4.md`, mechanism test).
+- **Stage 4 is in progress** (plan: `ROADMAP.md`; predictions and outcomes: `docs/hypotheses_stage4.md`).
+  Task 4.0 is done; the task 4.1 sweep finished on 27 September 2026 (see "Stage 4 progress" below).
+  Next: the reliability script, then judging H18–H22, then M2.
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -78,14 +79,60 @@ conditions (damage type x severity) in which it is not harmful by the proposed h
 measured on a named split and machine; untested conditions are shown as "not tested". The exact
 wording, and how intervals are handled, are fixed in `docs/hypotheses_stage4.md` before task 4.3 runs.
 
-### Stage 4 plan (revised 26 September 2026, not started)
-Full plan in `ROADMAP.md`. In short: 4.0 unified result schema, Stage 4 hypotheses file, and a test of
-the quantization-levels explanation for darkness; 4.1 breadth study (8–10 torchvision models, FP32 vs
-Percentile INT8, Brokkr's own and ImageNet-C corruptions, labelled separately); 4.2 full Stage 3
-pipeline on EfficientNet-B0 and ResNet-18; 4.3 `brokkr shrink` / `brokkr test` and a label for any
-ONNX classifier; 4.4 Raspberry Pi 5 over SSH; 4.5 `brokkr recommend` (laptop results; Pi rows "not
-measured" until 4.4). Order: 4.0 -> 4.1 -> 4.3 -> 4.5, 4.2 alongside; 4.4 when the Pi 5 arrives (a
-few weeks away). Object detection, runtime monitoring and adaptation moved to "Later".
+### Stage 4 progress (27 September 2026)
+Plan: `ROADMAP.md` (order 4.0 -> 4.1 -> 4.3 -> 4.5, 4.2 alongside; 4.4 when the Pi 5 arrives).
+Predictions (M1, H18–H22, M2, 4.2 rules) and outcomes: `docs/hypotheses_stage4.md`, committed before
+measuring.
+
+**Task 4.0 (done).** Result format schema 2 (`brokkr/schema.py`) and a checker for results and model
+build records (`scripts/22_check_results.py`). Mechanism test M1 (`scripts/27_mechanism_levels.py`, 500
+tuning images): **INCONCLUSIVE** for darkness and fog by the pre-set rule; accepted as recorded, never
+re-run with another summary (outcome and exploratory notes in the hypotheses file).
+
+**Task 4.1 models.** 10 torchvision models; weights hash-checked; licences in `brokkr/export.py`.
+Percentile 99.99 INT8 usable for 9; **MobileNetV3-Small INT8 failed** (2.7% agreement with FP32 on 256
+tuning images; FP32 only). ConvNeXt-Tiny's INT8 was built with `skip_symbolic_shape` (recorded; checked
+to leave MobileNetV3-Large's model unchanged). Default MinMax INT8 was built for M2 for 8 models;
+**EfficientNet-B0's MinMax failed** (17.6%).
+
+**Task 4.1 sweep (finished).** `scripts/28_breadth_sweep.py`: 13 test conditions (Brokkr's own and
+ImageNet-C, labelled separately) plus clean `conformal_calibration`; 8 threads; 6 passes, smallest
+models first.
+- Commits: `5be2cb5` (first 30 records, thread spinning on); stopped by hand after 15:03:24 on 26
+  September because steps ran about 3x slower than estimated (idle sessions' threads spinning);
+  spinning switched off after checks (`4e4c4e5`, `fc965cd`: 2.46x faster, every score bit-identical;
+  a full tuning dry run gave 247 of 247 score files bit-identical); resumed at `fc965cd` for every
+  later record. The stop, reason and both commits are in `results/breadth/run_log.txt`.
+- Both pre-flight checks passed at both starts: cached pictures equal fresh ones; MobileNetV3-Large
+  reproduces Stage 3's scores exactly on 64 test images.
+- Finished 2026-09-27 04:22:41, exit code 0, no model excluded. **266 of 266 records** (247 test, 19
+  conformal_calibration), no leftover `.tmp` files. 9 slow-step warnings (1.5–1.8x the estimate; none
+  at 2x); no disk stop.
+- FP32 sanity check (clean test top-1 within 1.0 point of torchvision's published top-1), all PASS:
+
+```
+sanity check PASS (mobilenet_v3_small): FP32 clean top-1 0.6761, torchvision 0.6767, tolerance 0.01
+sanity check PASS (shufflenet_v2_x1_0): FP32 clean top-1 0.6984, torchvision 0.6936, tolerance 0.01
+sanity check PASS (mnasnet1_0): FP32 clean top-1 0.7386, torchvision 0.7346, tolerance 0.01
+sanity check PASS (mobilenet_v2): FP32 clean top-1 0.7269, torchvision 0.7215, tolerance 0.01
+sanity check PASS (mobilenet_v3_large): FP32 clean top-1 0.7558, torchvision 0.7527, tolerance 0.01
+sanity check PASS (regnet_y_400mf): FP32 clean top-1 0.7611, torchvision 0.7580, tolerance 0.01
+sanity check PASS (efficientnet_b0): FP32 clean top-1 0.7798, torchvision 0.7769, tolerance 0.01
+sanity check PASS (resnet18): FP32 clean top-1 0.6987, torchvision 0.6976, tolerance 0.01
+sanity check PASS (resnet50): FP32 clean top-1 0.8118, torchvision 0.8086, tolerance 0.01
+sanity check PASS (convnext_tiny): FP32 clean top-1 0.8279, torchvision 0.8252, tolerance 0.01
+```
+
+- Checker after the sweep: `PASS: 909 of 909 result records pass the schema check; 42 of 42 build
+  records acceptable; 0 results use an unusable build`. Free disk after: 16.4 GB.
+- No accuracy or reliability result beyond these sanity checks has been computed or looked at yet.
+
+**Next, in order.** (1) Reliability from the saved logits (ECE, conformal coverage with set size,
+E-AURC): script not yet written. (2) Judge H18–H22 by the committed rules: script not yet written.
+(3) M2 (design committed at `54c476d`): first step reproduces `scripts/26`'s MobileNetV3-Small values
+to 0.01 dB; default-INT8 verdicts count 7 models. (4) Diagnostic-only MobileNetV3-Small rebuild with
+the first squeeze-and-excitation multiply unquantized (tuning only; official result stays "INT8
+failed"). Handoff details: `results/handoff_4.1.md` (gitignored).
 
 ### Suggestions parked for later (not decided)
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
