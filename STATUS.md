@@ -319,6 +319,10 @@ images, so it is only used for the FP32 correctness check.
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
    accuracy script needs PyTorch installed. Move the model list to its own file (planned in task 4.3).
 5. ~~ImageNetV2 not downloaded yet.~~ Done in task 3.9 (licence recorded as the sources state it).
+6. **Stage 3 scripts 12, 14 and 15 need `scripts/08_corruption_sweep.py --split tuning` run first.**
+   The old unkeyed caches in `data/cache/` were deleted on 26 September 2026 to free disk space (with
+   `data/old_results_3.1_dirty/`); those scripts read the old tuning cache and stop with "not found"
+   until it is rebuilt.
 
 ---
 
