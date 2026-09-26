@@ -22,6 +22,7 @@ from brokkr.schema import (
 
 COMMIT = "a" * 40
 FINGERPRINT = {"cpu_model": "test CPU", "board_model": None, "architecture": "AMD64",
+               "os": "Windows", "os_release": "11",
                "packages": {"onnxruntime": "1.23.2"}, "git": {"commit": COMMIT, "dirty": False}}
 MODEL = {"name": "tiny", "weights": "TINY_V1", "licence": "Apache-2.0 (test)"}
 RUNTIME = {"name": "onnxruntime", "version": "1.23.2", "execution_provider": "CPUExecutionProvider",
@@ -93,6 +94,12 @@ def test_device_label_must_match_the_fingerprint():
     assert any("names a board" in p for p in check_record(record))
     record["device"] = {"label": "cloud-arm", "fingerprint": FINGERPRINT}   # x86, so not cloud ARM
     assert any("not an ARM machine" in p for p in check_record(record))
+
+
+def test_the_os_must_be_recorded():
+    record = accuracy_record()
+    record["device"]["fingerprint"] = {k: v for k, v in FINGERPRINT.items() if k != "os"}
+    assert any("must record the OS" in p for p in check_record(record))
 
 
 def test_save_refuses_a_failing_record(tmp_path):

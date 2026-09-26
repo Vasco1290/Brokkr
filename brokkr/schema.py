@@ -166,6 +166,8 @@ def _check_device(device) -> list:
     board = fp.get("board_model") or ""
     if label not in DEVICE_LABELS:
         return [f"device label must be one of {DEVICE_LABELS}"]
+    if not (fp.get("os") and fp.get("os_release")):
+        return ["the fingerprint must record the OS (os and os_release)"]
     # A label must match the machine it claims (hard rule 2: cloud ARM is never called a Pi).
     if label == "raspberry-pi-5" and not board.startswith("Raspberry Pi 5"):
         return ["labelled raspberry-pi-5, but the fingerprint's board is not a Raspberry Pi 5"]
