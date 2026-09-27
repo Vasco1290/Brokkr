@@ -65,6 +65,14 @@ else is built on its measurements.
   run in the current session. If a number wasn't just measured, say so or don't state it. (Added
   26 September 2026, after a Stage 4 report stated "210 tests" that no command had produced.)
 
+## Research freeze (from 27 September 2026, until website v0 ships)
+
+* No new research questions, diagnostics or hypotheses until website v0 ships. If a result raises a
+  new question, add it to the "Parked questions" list in STATUS.md and move on.
+* H23 and task 4.2 may still run, overnight only, and only as pre-registered (in
+  `docs/hypotheses_stage4.md`) before they start.
+* Daytime priority is the product: 4.3 (`brokkr shrink` / `test` / label), then website v0, then 4.5.
+
 ## Architecture principles
 
 * "Where a model runs" is a pluggable target (laptop now, Raspberry Pi 5 over SSH later, community devices

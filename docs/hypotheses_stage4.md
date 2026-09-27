@@ -866,3 +866,45 @@ Implementation details only; the design, the pass rule and H's confirmations abo
   numbers are not reported and not used. (`scripts/37_se1.py` changed at `cb7555a`.)
 - **Confirmed by H:** SE1 is also NOT JUDGED if the control's SE-all build or any baseline build fails
   its build check (the addition in the implementation note above).
+
+## SE1 outcome (added 27 September 2026, after the run)
+
+Run once at commit `126af6a` with no uncommitted changes (`scripts/37_se1.py`); no reruns. Tuning
+split, positions 64–4,999 (4,936 images). Verdict: `results/final/se1_verdict.json`; records and scores:
+`results/se1/` (64 diagnostic records). Builds made at `aa81196`; MobileNetV3-Small's SE-all and
+SE-output builds failed their agreement check (3.1% and 2.7% on 256 tuning images), like its baseline.
+
+**SE1: FAIL.** Both judged models have a baseline loss, so SE1 is judged; neither recovers half of it.
+
+Darkness (Brokkr) s5, points, paired 95% intervals (change = variant extra gap minus baseline extra
+gap; positive = loses less):
+
+| Model | Role | Baseline extra gap | SE-all change (share) | SE-output change (share) |
+|---|---|---|---|---|
+| EfficientNet-B0 | judged | −37.82 (−39.45 to −36.14) | +0.08 (−0.71 to +0.83) (0%) | +0.14 (−0.71 to +0.93) (0%) |
+| MobileNetV3-Large | judged | −11.79 (−13.05 to −10.47) | +0.59 (−0.14 to +1.32) (5%) | +0.47 (−0.30 to +1.13) (4%) |
+| RegNetY-400MF | control | −0.97 (−1.74 to −0.18) | +0.10 (−0.47 to +0.67) | +0.55 (+0.02 to +1.07) |
+| MobileNetV3-Small | reported | +6.54 (+5.31 to +7.70) | +0.10 (−0.12 to +0.32) | +0.12 (−0.10 to +0.34) |
+
+- Parts: EfficientNet-B0 recovers at least 50% with the interval above zero: does not hold.
+  MobileNetV3-Large: does not hold. Control changes by less than 2.0 points: holds.
+- Reported, not judged, SE-all change (share): contrast (ImageNet-C) s3: EfficientNet-B0 +0.26 (−0.53
+  to +0.99) (1%), MobileNetV3-Large +0.26 (−0.41 to +1.03) (2%), RegNetY-400MF −0.02; fog (Brokkr) s3:
+  EfficientNet-B0 +0.49 (−0.32 to +1.32) (5%), MobileNetV3-Large +0.75 (+0.16 to +1.44) (17%),
+  RegNetY-400MF +0.12. Baseline extra gaps, contrast s3: −36.35, −13.86, −1.60; fog s3: −8.95, −4.48,
+  −0.28.
+- Clean top-1 on these images (FP32 / baseline / SE-all / SE-output): EfficientNet-B0 76.28 / 71.15 /
+  71.15 / 71.31; MobileNetV3-Large 73.76 / 72.00 / 71.62 / 71.39; RegNetY-400MF 74.70 / 74.19 / 74.17 /
+  73.74; MobileNetV3-Small 66.55 / 3.38 / 3.28 / 3.30.
+- File sizes (baseline / SE-all / SE-output, MB): EfficientNet-B0 6.50 / 8.20 / 7.30;
+  MobileNetV3-Large 5.92 / 10.36 / 8.12; RegNetY-400MF 5.21 / 7.11 / 6.12; MobileNetV3-Small 2.83 / 4.15
+  / 3.48.
+
+### Exploratory, after the verdict (not part of SE1; changes no verdict)
+
+- Keeping the squeeze-and-excitation blocks in float changed the darkness extra gap by less than one
+  point in every model, so quantizing these blocks is likely not what the collapse depends on in
+  EfficientNet-B0 and MobileNetV3-Large. Where it does come from remains open (parked, research
+  freeze).
+- MobileNetV3-Small's positive "extra gap" is a floor effect: its INT8 builds are near chance (about
+  3% clean), so damage cannot make them much worse; its builds stay failed with the blocks in float.

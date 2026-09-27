@@ -3,7 +3,8 @@
 Snapshot as of **27 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4
 is in progress** on branch `stage-4` (created from `main` at `be01206`): task 4.0 done; task 4.1's
-sweep, reliability numbers and H18–H22 verdicts are done (its summary tables script is not); M2 done.
+sweep, reliability numbers and H18–H22 verdicts are done (its summary tables script is not); M2 and
+SE1 done. **Research freeze** until website v0 ships (see "Research freeze" below).
 
 ## 0. Start here (a new session needs nothing else)
 
@@ -15,7 +16,8 @@ sweep, reliability numbers and H18–H22 verdicts are done (its summary tables s
   work" section is a placeholder marked "To be written by H"; do not draft it.
 - **Stage 4 is in progress** (plan: `ROADMAP.md`; predictions and outcomes: `docs/hypotheses_stage4.md`).
   Task 4.0 is done; task 4.1's sweep, reliability and H18–H22 verdicts are done (27 September 2026;
-  see "Stage 4 progress" below). M2 is judged. Next: exploratory analysis of the M2 arrays.
+  see "Stage 4 progress" below). M2 and SE1 are judged. **Research freeze:** next is the product
+  (4.3 label proposal first); see "Research freeze" below.
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -158,11 +160,33 @@ Tuning images 500–627. **M2a Percentile: REJECTS** (darkness and fog: 6 of 8 r
 (`results/checks/m2_top_tensors_*.json`). Plain-language summary of Stage 4: `docs/stage4_story.md`
 (updated after each result).
 
-**Next, in order.** (1) SE1, the squeeze-and-excitation diagnostic (design, pass rule and H's
-confirmations in `docs/hypotheses_stage4.md`; tuning split only): code, dry run, then the run.
-(2) The 4.1 summary tables script. (The separate MobileNetV3-Small first-multiply rebuild was dropped;
-SE1 covers it.)
+**SE1 (27 September 2026).** `scripts/37_se1.py` at `126af6a`, tuning positions 64–4,999 (4,936
+images; the first 64 were seen in the dry run and left out). **FAIL:** keeping the
+squeeze-and-excitation blocks in float recovered 0% of EfficientNet-B0's darkness s5 extra gap
+(−37.82 points; change +0.08, interval −0.71 to +0.83) and 5% of MobileNetV3-Large's (−11.79; +0.59,
+−0.14 to +1.32); control RegNetY-400MF +0.10 (holds). Numbers: `docs/hypotheses_stage4.md`, "SE1
+outcome".
+
+### Research freeze (from 27 September 2026, until website v0 ships; also in `CLAUDE.md`)
+- No new research questions, diagnostics or hypotheses until website v0 ships. If a result raises a
+  new question, add it to "Parked questions" below and move on.
+- H23 and task 4.2 may still run, overnight only, and only as pre-registered (in
+  `docs/hypotheses_stage4.md`) before they start. (H23 is not yet written down anywhere.)
+- Daytime priority is the product: 4.3 (`brokkr shrink` / `test` / label), then website v0, then 4.5.
+
+**Next, in order.** (1) 4.3: the label's contents and format, proposed to H before anything is built,
+generated only from checked result files; then `brokkr shrink` / `test` / label. (2) Website v0.
+(3) 4.5 (`brokkr recommend`). Still owed from 4.1: the summary tables script.
 Handoff details: `results/handoff_4.1.md` (gitignored).
+
+### Parked questions (research freeze: written down, not pursued)
+- Where does the darkness and low-contrast collapse of EfficientNet-B0 and MobileNetV3-Large come
+  from? Not from extra early rounding error (M2a Percentile: REJECTS) and likely not from quantizing
+  the squeeze-and-excitation blocks (SE1: FAIL).
+- Why does MobileNetV3-Small's INT8 build fail (about 3% agreement with FP32), even with its
+  squeeze-and-excitation blocks in float?
+- Why is the largest per-tensor extra rounding error in RegNetY-400MF inside squeeze-and-excitation
+  blocks (up to +12.10 dB) while its accuracy barely suffers?
 
 ### Suggestions parked for later (not decided)
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
@@ -342,6 +366,8 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `33_calibration_preprocessing_check.py` | Diagnostic: `results/checks/*_calibration_preprocessing.json` |
 | `34_h19_without_two.py` | Exploratory: `results/checks/breadth_4.1_h19_without_two_*.json` |
 | `35_m2_rounding_error.py` | M2: `results/m2/`, `results/final/m2_verdicts.json` (`--dry-run --out` for a tool check) |
+| `36_m2_top_tensors.py` | Exploratory: `results/checks/m2_top_tensors_*.json` |
+| `37_se1.py` | SE1: `results/se1/`, `results/final/se1_verdict.json` (`--dry-run --out` for a tool check) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
 Tests: `tests/` (233 tests on 27 September 2026, run with `pytest`; style check `ruff check .`). One test uses the real
