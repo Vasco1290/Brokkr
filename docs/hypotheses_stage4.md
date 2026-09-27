@@ -721,3 +721,84 @@ E_early, in dB, with its 95% interval (10% block):
   or foggy images have fewer of them to clip.
 - The largest single-tensor E(t) values (up to +12.10 dB, RegNetY-400MF, Percentile, darkness s5) are
   not in the early block; where they sit is not yet described.
+
+## Squeeze-and-excitation diagnostic (SE1): design and pass rule, added 27 September 2026
+
+Written after M2 and its exploratory analysis (`scripts/36_m2_top_tensors.py`), before anything below
+is built or measured. A diagnostic: it changes no earlier result, and the official 4.1 builds and
+records stay as they are. Pass rule set by H; the reading of its details marked "(proposed)" is to be
+confirmed by H before the run.
+
+**Question.** Does keeping the squeeze-and-excitation blocks in float remove most of INT8's extra gap
+under darkness? Squeeze-and-excitation blocks (`torchvision.ops.misc.SqueezeExcitation`) are the small
+side branches that rescale each channel. In 4.1 the two models with large extra gaps, EfficientNet-B0
+(darkness (Brokkr) s5 −38.94 points, contrast (ImageNet-C) s3 −37.87) and MobileNetV3-Large (−11.60,
+−13.23), both have them; so does MobileNetV3-Small, whose INT8 build failed.
+
+**Models.**
+- Judged: EfficientNet-B0 and MobileNetV3-Large.
+- Control, judged: RegNetY-400MF. It has squeeze-and-excitation blocks and the largest
+  squeeze-and-excitation E(t) in M2's exploratory analysis, but small 4.1 extra gaps (−0.89 darkness
+  s5, −1.03 contrast s3).
+- Reported, not judged: MobileNetV3-Small (third fragile model; its Percentile INT8 failed its build
+  check, 2.7% agreement with FP32 on 256 tuning images).
+
+**Builds.** For each of the four models, two new INT8 variants, made exactly like its 4.1 Percentile
+99.99 build (the same 512 `int8_calibration` images in groups of 128, per-channel int8 weights,
+per-tensor uint8 activations, the same recorded `skip_symbolic_shape` setting) except:
+- **SE-all:** every node inside a squeeze-and-excitation module stays in float (not quantized);
+- **SE-output:** only the squeeze-and-excitation output path stays in float: the second 1×1
+  convolution (`fc2`), the scale activation (`scale_activation`) and the multiply that rescales the
+  block's input.
+- Nodes are chosen from the FP32 export's own module records (`pkg.torch.onnx.class_hierarchy` and
+  `name_scopes`, as in `scripts/36`), never from tensor names, and matched to the prepared model by
+  output tensor name. The number of nodes kept in float, and the file size, are recorded per build.
+- Every variant gets the usual INT8 build checks (loads, finite scores, per-channel weights,
+  agreement with FP32 on 256 tuning images). A variant below the 20% agreement line is reported as
+  "failed the build check" and still measured (for MobileNetV3-Small that agreement is itself the
+  question). The comparison baselines are the existing Percentile builds (the Stage 3 file for
+  MobileNetV3-Large, the 4.1 files for the others); MobileNetV3-Small's failed build is measured too,
+  as its baseline.
+
+**Images and conditions.** Tuning split only, all 5,000 images, in split order; never the test
+split. Each model's own preprocessing; damage seed = the image's dataset position (as in 4.1).
+Conditions: clean; darkness (Brokkr) s5 (judged); contrast (ImageNet-C) s3 and fog (Brokkr) s3
+(reported the same way, not judged). Precisions per model: FP32, the baseline Percentile INT8,
+SE-all, SE-output.
+
+**Measures.** Per model, build and damaged condition, on the same images:
+- extra gap = (INT8 − FP32 top-1 under the condition) − (INT8 − FP32 top-1 on clean images), as in 4.1;
+- change = extra gap of the variant minus extra gap of the baseline build (new minus old; positive =
+  the variant loses less to the damage), with a paired bootstrap 95% interval (1,000 resamples of
+  the 5,000 images, seed 0). Per image this is (variant damaged − variant clean) − (baseline damaged −
+  baseline clean), so FP32 cancels;
+- recovered share = change / (−baseline extra gap).
+- Also reported: clean top-1 of every build, agreement with FP32, file size, and near-floor flags
+  (FP32 below 10%).
+
+**SE1 pass rule (judged on SE-all, darkness (Brokkr) s5).** PASS only if all three hold:
+1. EfficientNet-B0: recovered share ≥ 50%, and the change's paired interval is above zero;
+2. MobileNetV3-Large: the same;
+3. RegNetY-400MF: the change is smaller than 2.0 points in size, |change| < 2.0 points.
+Otherwise FAIL.
+- (proposed) "At least 50%" and "less than 2 points" are compared on the point estimates, in whole
+  images (no rounding can move a value across a line); the interval condition is on the change in
+  points, not on the share.
+- (proposed) If a judged model's baseline extra gap on these tuning images is not below zero, its
+  share is undefined and that model's part fails.
+- (proposed) If a judged model's SE-all build fails a build check, or a run fails technically,
+  SE1 is NOT JUDGED and a dated note decides.
+- SE-output, contrast s3, fog s3 and MobileNetV3-Small are reported with the same numbers, not judged.
+- *Confidence (proposed): low.* The 4.1 extra gaps come from the test split; on tuning images they
+  are measured afresh, and M2 found the largest EfficientNet-B0 E(t) under darkness outside the
+  squeeze-and-excitation blocks.
+- Even a PASS shows only that the squeeze-and-excitation path is involved ("consistent with"), not
+  that it causes the collapse.
+
+**What stays planned.** The diagnostic-only MobileNetV3-Small rebuild with only its first
+squeeze-and-excitation multiply in float is not part of SE1 and is still to be decided.
+
+**Code (to be written; details decided later go in a dated note before the run).** A build option
+for nodes kept in float (stated in every later build record, like `skip_symbolic_shape`), node
+selection from the exporter's module records, a build script, and an evaluation-and-judging script
+that prints the verdict with the numbers that decided it. Tried first on a dry run outside `results/`.
