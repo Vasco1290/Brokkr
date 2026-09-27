@@ -2,8 +2,8 @@
 
 Snapshot as of **27 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4
-is in progress** on branch `stage-4` (created from `main` at `be01206`): task 4.0 done, the task 4.1
-breadth sweep has run; its analysis has not started.
+is in progress** on branch `stage-4` (created from `main` at `be01206`): task 4.0 done; task 4.1's
+sweep, reliability numbers and H18–H22 verdicts are done (its summary tables script is not).
 
 ## 0. Start here (a new session needs nothing else)
 
@@ -14,8 +14,9 @@ breadth sweep has run; its analysis has not started.
 - **Brokkr Technical Report 1** (`docs/writeup.md`, task 3.8) is approved and committed. Its "Related
   work" section is a placeholder marked "To be written by H"; do not draft it.
 - **Stage 4 is in progress** (plan: `ROADMAP.md`; predictions and outcomes: `docs/hypotheses_stage4.md`).
-  Task 4.0 is done; the task 4.1 sweep finished on 27 September 2026 (see "Stage 4 progress" below).
-  Next: the reliability script, then judging H18–H22, then M2.
+  Task 4.0 is done; task 4.1's sweep, reliability and H18–H22 verdicts are done (27 September 2026;
+  see "Stage 4 progress" below). Next: a preprocessing diagnostic of the INT8 calibration images,
+  then M2.
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -125,11 +126,22 @@ sanity check PASS (convnext_tiny): FP32 clean top-1 0.8279, torchvision 0.8252, 
 
 - Checker after the sweep: `PASS: 909 of 909 result records pass the schema check; 42 of 42 build
   records acceptable; 0 results use an unusable build`. Free disk after: 16.4 GB.
-- No accuracy or reliability result beyond these sanity checks has been computed or looked at yet.
 
-**Next, in order.** (1) Reliability from the saved logits (ECE, conformal coverage with set size,
-E-AURC): script not yet written. (2) Judge H18–H22 by the committed rules: script not yet written.
-(3) M2 (design committed at `54c476d`): first step reproduces `scripts/26`'s MobileNetV3-Small values
+**Task 4.1 analysis (27 September 2026).** Scripts committed at `1bcc63b` with a dated note fixing
+how the rules are computed (near-floor cells, absolute pass counts, rank ties), tried first on the
+64-image tuning dry run, then run once on the test split; no reruns.
+- Reliability (`scripts/31_breadth_reliability.py`, reported, not judged): 741 records (ECE, conformal
+  coverage with set size, E-AURC) from 247 test results, all checks PASS; `results/breadth_reliability/`.
+  Checker afterwards: `PASS: 1650 of 1650 result records pass the schema check`.
+- Verdicts (`scripts/32_judge_breadth.py`, 9 models; `results/final/breadth_4.1_verdicts.json`):
+  **H18a FAIL** (3 of 12 conditions, 8 needed), **H18b PASS** (8, 8 needed; a weak test), **H19 PASS**
+  (9, 6 needed), **H20 FAIL** (2 models, 5 needed), **H21 FAIL** (2, 5 needed), **H22 FAIL** (4, 5
+  needed). Numbers and intervals: `docs/hypotheses_stage4.md`, "H18–H22 outcome".
+- The only large extra gaps (H20, H21) are MobileNetV3-Large (contrast s3 −13.23, darkness s5 −11.60
+  points) and EfficientNet-B0 (−37.87, −38.94). MobileNetV3-Large reproduces Stage 3 exactly.
+
+**Next, in order.** (1) Diagnostic: confirm each model's INT8 calibration images had the same
+preprocessing as its evaluation images. (2) M2 (design committed at `54c476d`): first step reproduces `scripts/26`'s MobileNetV3-Small values
 to 0.01 dB; default-INT8 verdicts count 7 models. (4) Diagnostic-only MobileNetV3-Small rebuild with
 the first squeeze-and-excitation multiply unquantized (tuning only; official result stays "INT8
 failed"). Handoff details: `results/handoff_4.1.md` (gitignored).
@@ -307,9 +319,11 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `19_alarm_all_conditions.py` | Exploratory, after the verdicts: alarm firing rate for every test condition |
 | `20_robust_conformal_clean.py` | After the verdicts: robust thresholds' coverage and set size on clean test images |
 | `21_imagenetv2_summary.py` | ImageNetV2 (3.9): top-1 and coverage with set size, FP32 and best INT8 |
+| `31_breadth_reliability.py` | 4.1: `results/breadth_reliability/*_{calibration,conformal,selective}.json` |
+| `32_judge_breadth.py` | 4.1: `results/final/breadth_4.1_verdicts.json` (H18–H22) and the absolute vs compression-caused table |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (137 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (225 tests on 27 September 2026, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3

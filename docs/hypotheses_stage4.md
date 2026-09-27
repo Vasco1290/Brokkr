@@ -536,3 +536,63 @@ The first four points were left open by the rules above and were decided by H (t
 - **Tool check before the real run:** both scripts were run on the 64-image tuning dry-run records
   (made at `4e4c4e5`); the conformal thresholds came from the real `conformal_calibration` records.
   These dry-run numbers test the code only and are never results.
+
+## H18–H22 outcome (added 27 September 2026, after judging)
+
+Run once on the 4.1 test-split results (10,000 images per record), at commit `1bcc63b` with no
+uncommitted changes (`scripts/32_judge_breadth.py`); no reruns. Verdicts:
+`results/final/breadth_4.1_verdicts.json`. All 10 FP32 sanity checks passed; 9 models judged
+(MobileNetV3-Small left out: INT8 build failed). Gaussian noise (ImageNet-C) s5 is not judged in
+H18–H19: only ConvNeXt-Tiny is above the floor there (fewer than 4 models).
+
+| | Verdict | Count |
+|---|---|---|
+| H18a | **FAIL** | 3 conditions hold, 8 needed (11 of 12 judged) |
+| H18b | **PASS** | 8 hold, 8 needed (11 of 12 judged) |
+| H19 | **PASS** | 9 hold, 6 needed (11 of 12 judged) |
+| H20 | **FAIL** | 2 models hold, 5 needed (9 of 9 judged) |
+| H21 | **FAIL** | 2 hold, 5 needed (9 of 9 judged) |
+| H22 | **FAIL** | 4 hold, 5 needed (8 of 9 judged) |
+
+- **H18a.** Holds for fog (Brokkr) s3 (rho +0.767, 95% interval +0.123 to +1.000), noise (Brokkr) s3
+  (+0.983, +0.739 to +1.000) and Gaussian noise (ImageNet-C) s3 (+0.929, +0.615 to +1.000; 8 models).
+  The other 8 judged conditions: rho +0.350 to +0.600, every interval includes zero.
+- **H18b.** The interval excludes zero (below zero) for noise (Brokkr) s3 (rho −0.883, −1.000 to
+  −0.459), fog (ImageNet-C) s5 (−0.733, −1.000 to −0.030) and Gaussian noise (ImageNet-C) s3 (−0.810,
+  −1.000 to −0.215; 8 models); it includes zero for the other 8 judged conditions. As stated above,
+  a PASS of this test means "no strong relation found", not "no relation".
+- **H19.** The interval includes zero for contrast (ImageNet-C) s3 (rho +0.644, −0.244 to +0.983) and
+  s5 (+0.543, −0.333 to +1.000; 6 models); above zero for the other 9 judged conditions (lowest lower
+  end: +0.115).
+- **H20** (contrast (ImageNet-C) s3, extra gap in points, paired 95% interval): holds for
+  MobileNetV3-Large −13.23 (−14.20 to −12.28) and EfficientNet-B0 −37.87 (−39.09 to −36.58). Not for
+  ConvNeXt-Tiny −4.19 (−4.77 to −3.55), MobileNetV2 −1.98 (−2.58 to −1.40), RegNetY-400MF −1.03
+  (−1.65 to −0.41), ResNet-50 −0.71 (−1.25 to −0.19), ResNet-18 −0.60 (−1.07 to −0.14), ShuffleNetV2
+  −0.42 (−1.02 to +0.19), MNASNet +0.98 (+0.35 to +1.63).
+- **H21** (darkness (Brokkr) s5): holds for MobileNetV3-Large −11.60 (−12.53 to −10.76) and
+  EfficientNet-B0 −38.94 (−40.13 to −37.78). Not for ShuffleNetV2 −1.75 (−2.32 to −1.15), ConvNeXt-Tiny
+  −1.21 (−1.71 to −0.67), MNASNet −1.05 (−1.67 to −0.41), MobileNetV2 −1.01 (−1.63 to −0.42),
+  RegNetY-400MF −0.89 (−1.47 to −0.33), ResNet-50 −0.40 (−0.90 to +0.15), ResNet-18 −0.24 (−0.72 to
+  +0.22).
+- **H22** (contrast s3 extra gap minus Gaussian noise s3 extra gap): holds for MobileNetV3-Large −12.55
+  (−13.64 to −11.54), MobileNetV2 −2.38 (−2.98 to −1.81), EfficientNet-B0 −40.16 (−41.33 to −39.01),
+  ResNet-18 −0.66 (−1.13 to −0.20). Not for RegNetY-400MF −0.64 (−1.33 to +0.03), ConvNeXt-Tiny −0.29
+  (−1.08 to +0.47), ResNet-50 +0.44 (−0.19 to +1.06), MNASNet +0.95 (+0.31 to +1.57). ShuffleNetV2
+  left out (near floor: FP32 5.44% at Gaussian noise (ImageNet-C) s3).
+- Check: MobileNetV3-Large reproduces Stage 3 (FP32 clean 75.58%, Percentile INT8 73.60%; darkness
+  (Brokkr) s5 73.73% and 60.15%).
+- Reliability (reported, not judged): `scripts/31_breadth_reliability.py` at `1bcc63b`, 741 records
+  (ECE, conformal coverage with set size, E-AURC) from 247 test results, all checks PASS; records in
+  `results/breadth_reliability/`.
+
+### Exploratory, after the verdicts (not part of H18–H22; changes no verdict)
+
+- H22 depends on the near-floor rule fixed in the note above: ShuffleNetV2's difference, −1.31
+  (−1.80 to −0.78), would have been a fifth holding model had only the contrast cell been checked.
+  The rule was fixed before any test-split result was computed, so the verdict stands.
+- The only large extra gaps in H20 and H21 are MobileNetV3-Large and EfficientNet-B0, both
+  squeeze-and-excitation models (see the exploratory note of 26 September); RegNetY-400MF also has
+  such blocks and its extra gaps are small (−1.03, −0.89). Consistent with "a few models collapse"
+  rather than "INT8 generally collapses", and not tested.
+- H18a: with 9 models, correlations of about +0.35 to +0.6 give intervals that include zero; likely
+  a small-sample limit, as the plan anticipated.
