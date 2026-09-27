@@ -671,3 +671,53 @@ unchanged. The first three points were left open by the M2 rules and were decide
 - **Unmatched tensor, as the rule above says (counted, listed, left out):** in every dry-run model
   the final output's quantizer input, `logits_QuantizeLinear_Input`, has no FP32 tensor of that name
   (the INT8 build renames the model output); `scripts/26` has no such row either.
+
+## M2 outcome (added 27 September 2026, after the run)
+
+Run once to completion at commit `ed4f920` with no uncommitted changes
+(`scripts/35_m2_rounding_error.py`); the earlier start at `b1397aa` crashed before measuring anything
+(note above). Tuning split, positions 500–627 (128 images). Verdicts: `results/final/m2_verdicts.json`;
+per-image numbers and schema-2 diagnostic records: `results/m2/`.
+- **Check before judging: PASS.** Pooled cumulative SQNR for MobileNetV3-Small on 32 tuning images: 126
+  tensors, largest difference from `scripts/26`'s saved values 0.0050 dB (tolerance 0.01).
+- Default INT8 usable for 7 of 8 models (EfficientNet-B0's MinMax build failed). Every model had one
+  unmatched tensor, `logits_QuantizeLinear_Input` (left out). ConvNeXt-Tiny's INT8 values (cumulative
+  measure only) were read with directly exposed outputs, the other models' with ONNX Runtime's tool.
+- (image, tensor) pairs with a zero signal or zero local error: 0.
+
+| Verdict | Result | Counts |
+|---|---|---|
+| M2a Percentile, darkness (Brokkr) s5 | **REJECTS** | supporting 0 (6 needed), rejecting 6 (5 needed), 8 models |
+| M2a Percentile, fog (Brokkr) s3 | **REJECTS** | supporting 0, rejecting 6 (5 needed), 8 models |
+| M2a default, darkness (Brokkr) s5 | **INCONCLUSIVE** | supporting 0, rejecting 0 (4 needed), 7 models |
+| M2a default, fog (Brokkr) s3 | **INCONCLUSIVE** | supporting 0, rejecting 1 (4 needed), 7 models |
+| M2b Percentile, darkness (Brokkr) s5 | **SUPPORTS** | supporting 8 (6 needed), rejecting 0, 8 models |
+| M2b Percentile, fog (Brokkr) s3 | **SUPPORTS** | supporting 8, rejecting 0, 8 models |
+
+E_early, in dB, with its 95% interval (10% block):
+- **Percentile, darkness s5:** MobileNetV2 +1.40 (+1.34 to +1.47), EfficientNet-B0 −0.34 (−0.51 to
+  −0.29), ShuffleNetV2 −1.85 (−2.26 to −1.12), MNASNet −1.26 (−1.94 to −0.70), RegNetY-400MF +0.41
+  (−0.07 to +0.72), ResNet-18 −2.17 (−3.15 to −1.43), ResNet-50 −0.09 (−0.41 to −0.04), ConvNeXt-Tiny
+  +1.54 (+1.29 to +1.70). Rejecting: all but MobileNetV2 and ConvNeXt-Tiny.
+- **Percentile, fog s3:** MobileNetV2 +0.79 (+0.75 to +0.83), EfficientNet-B0 −0.40 (−0.59 to −0.22),
+  ShuffleNetV2 −1.29 (−1.80 to −0.84), MNASNet −2.31 (−2.92 to −1.62), RegNetY-400MF −0.58 (−1.00 to
+  −0.19), ResNet-18 −2.37 (−3.36 to −1.64), ResNet-50 −0.20 (−0.54 to +0.10), ConvNeXt-Tiny +0.53 (+0.38
+  to +0.65). Rejecting: all but MobileNetV2 and ConvNeXt-Tiny.
+- **Default, darkness s5:** MobileNetV2 +1.43 (+1.38 to +1.49), ShuffleNetV2 +1.06 (+0.94 to +1.20),
+  MNASNet +2.20 (+2.05 to +2.35), RegNetY-400MF +1.68 (+1.60 to +1.81), ResNet-18 +1.75 (+1.56 to +1.95),
+  ResNet-50 +0.64 (+0.56 to +0.72), ConvNeXt-Tiny +2.01 (+1.91 to +2.08). None reaches 3.0 dB.
+- **Default, fog s3:** MobileNetV2 +0.80, ShuffleNetV2 +1.43, MNASNet +1.49, RegNetY-400MF +0.69,
+  ResNet-18 +1.39, ResNet-50 +0.32, ConvNeXt-Tiny +0.96 (every interval above zero). ResNet-50 rejects:
+  E_early − E_rest −0.11 (−0.15 to −0.06).
+- **M2b, Percentile:** mean R(damaged) − R(clean), darkness s5: +0.0047 to +0.0055 for all 8 models,
+  every interval inside ±0.05; fog s3: −0.0002 to +0.0003, every interval inside ±0.05.
+- Per-model E_rest, E_early − E_rest, the 5% and 20% blocks, M2b for default INT8 and the cumulative
+  SQNR are in `results/final/m2_console.txt` and the records (reported, not judged).
+
+### Exploratory, after the verdicts (not part of M2; changes no verdict)
+
+- Under Percentile INT8, E_early is negative for most models (damage makes the early tensors' local
+  rounding error smaller). A likely reason, not tested: Percentile clips rare large values, and dark
+  or foggy images have fewer of them to clip.
+- The largest single-tensor E(t) values (up to +12.10 dB, RegNetY-400MF, Percentile, darkness s5) are
+  not in the early block; where they sit is not yet described.

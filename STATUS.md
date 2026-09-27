@@ -3,7 +3,7 @@
 Snapshot as of **27 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4
 is in progress** on branch `stage-4` (created from `main` at `be01206`): task 4.0 done; task 4.1's
-sweep, reliability numbers and H18–H22 verdicts are done (its summary tables script is not).
+sweep, reliability numbers and H18–H22 verdicts are done (its summary tables script is not); M2 done.
 
 ## 0. Start here (a new session needs nothing else)
 
@@ -15,8 +15,7 @@ sweep, reliability numbers and H18–H22 verdicts are done (its summary tables s
   work" section is a placeholder marked "To be written by H"; do not draft it.
 - **Stage 4 is in progress** (plan: `ROADMAP.md`; predictions and outcomes: `docs/hypotheses_stage4.md`).
   Task 4.0 is done; task 4.1's sweep, reliability and H18–H22 verdicts are done (27 September 2026;
-  see "Stage 4 progress" below). Next: a preprocessing diagnostic of the INT8 calibration images,
-  then M2.
+  see "Stage 4 progress" below). M2 is judged. Next: exploratory analysis of the M2 arrays.
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -140,11 +139,26 @@ how the rules are computed (near-floor cells, absolute pass counts, rank ties), 
 - The only large extra gaps (H20, H21) are MobileNetV3-Large (contrast s3 −13.23, darkness s5 −11.60
   points) and EfficientNet-B0 (−37.87, −38.94). MobileNetV3-Large reproduces Stage 3 exactly.
 
-**Next, in order.** (1) Diagnostic: confirm each model's INT8 calibration images had the same
-preprocessing as its evaluation images. (2) M2 (design committed at `54c476d`): first step reproduces `scripts/26`'s MobileNetV3-Small values
-to 0.01 dB; default-INT8 verdicts count 7 models. (4) Diagnostic-only MobileNetV3-Small rebuild with
-the first squeeze-and-excitation multiply unquantized (tuning only; official result stays "INT8
-failed"). Handoff details: `results/handoff_4.1.md` (gitignored).
+**After the verdicts (27 September 2026).**
+- Calibration vs evaluation preprocessing (`scripts/33_calibration_preprocessing_check.py`): identical
+  for every model and INT8 build (bit-identical arrays on the 512 calibration images); no technical
+  failure.
+- New rule (dated note): any correlation from now on needs at least 6 models.
+- Exploratory H19 without MobileNetV3-Large and EfficientNet-B0 (`scripts/34_h19_without_two.py`):
+  1 condition with the interval above zero (9 with all models).
+
+**M2 (27 September 2026).** `scripts/35_m2_rounding_error.py` at `ed4f920` (the start at `b1397aa`
+crashed before measuring; logged). Check against `scripts/26`: PASS (largest difference 0.0050 dB).
+Tuning images 500–627. **M2a Percentile: REJECTS** (darkness and fog: 6 of 8 reject, 5 needed);
+**M2a default: INCONCLUSIVE** (darkness and fog; every E_early positive but below 3.0 dB);
+**M2b Percentile: SUPPORTS** (darkness and fog, 8 of 8). Numbers: `docs/hypotheses_stage4.md`,
+"M2 outcome".
+
+**Next, in order.** (1) Exploratory: where the largest per-tensor extra rounding errors E(t) sit
+(from the saved M2 arrays). (2) A squeeze-and-excitation diagnostic (to be proposed, then agreed).
+(3) Diagnostic-only MobileNetV3-Small rebuild with the first squeeze-and-excitation multiply
+unquantized (tuning only; official result stays "INT8 failed"). (4) The 4.1 summary tables script.
+Handoff details: `results/handoff_4.1.md` (gitignored).
 
 ### Suggestions parked for later (not decided)
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
@@ -321,9 +335,12 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `21_imagenetv2_summary.py` | ImageNetV2 (3.9): top-1 and coverage with set size, FP32 and best INT8 |
 | `31_breadth_reliability.py` | 4.1: `results/breadth_reliability/*_{calibration,conformal,selective}.json` |
 | `32_judge_breadth.py` | 4.1: `results/final/breadth_4.1_verdicts.json` (H18–H22) and the absolute vs compression-caused table |
+| `33_calibration_preprocessing_check.py` | Diagnostic: `results/checks/*_calibration_preprocessing.json` |
+| `34_h19_without_two.py` | Exploratory: `results/checks/breadth_4.1_h19_without_two_*.json` |
+| `35_m2_rounding_error.py` | M2: `results/m2/`, `results/final/m2_verdicts.json` (`--dry-run --out` for a tool check) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (225 tests on 27 September 2026, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (233 tests on 27 September 2026, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
