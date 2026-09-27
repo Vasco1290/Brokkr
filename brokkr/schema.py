@@ -260,7 +260,7 @@ def load_measurement(path) -> tuple:
 
 # Build options that change how a model is made, with their default. A record made by code that had an
 # option must state it explicitly, so a non-default build can never hide (see check_build_record).
-BUILD_OPTIONS = {"skip_symbolic_shape": False}
+BUILD_OPTIONS = {"skip_symbolic_shape": False, "kept_float": None}  # kept_float: SE1 (brokkr.se_float)
 EXPORT_MAX_ABS_DIFF = 1e-4       # scripts/01_export_model.py
 MIN_AGREEMENT_WITH_FP32 = 0.20   # below this an FP16/INT8 build is broken (brokkr.quantize.check_int8_build)
 

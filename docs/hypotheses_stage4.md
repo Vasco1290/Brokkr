@@ -822,3 +822,36 @@ measured.
 - **Dropped:** the separate MobileNetV3-Small rebuild with only its first squeeze-and-excitation
   multiply in float; SE-all and SE-output cover it.
 - **Not done for now:** M2's layer measurement for MobileNetV3-Large.
+
+## Note added 27 September 2026, before the SE1 builds: how SE1 is computed
+
+Implementation details only; the design, the pass rule and H's confirmations above are unchanged.
+- **Choosing the nodes** (`brokkr/se_float.py`, tested): from the module records the exporter wrote on
+  each node of the FP32 file. SE-all: every node whose module classes include
+  `torchvision.ops.misc.SqueezeExcitation`. SE-output: inside such a module, the nodes of its `fc2` and
+  `scale_activation` submodules, and the multiply in the module's own forward. Counts read from the
+  four FP32 files (squeeze-and-excitation modules; nodes SE-all / SE-output): EfficientNet-B0 16;
+  112 / 48. MobileNetV3-Large 8; 48 / 24. RegNetY-400MF 16; 96 / 48. MobileNetV3-Small 9; 54 / 27.
+- **Keeping them in float** (`brokkr.quantize.to_int8(keep_float_outputs=...)`, tested): the chosen
+  nodes' output tensor names are looked up in the prepared model (after `quant_pre_process`) and those
+  nodes are passed to ONNX Runtime as `nodes_to_exclude`. The build stops if any name is missing or its
+  node is unnamed. In a check before the build code was written, every chosen output of all four
+  models was found on a named node of the prepared model.
+- **Builds** (`scripts/24_build_models.py --keep-float se-all|se-output`): saved as
+  `models/<model>_int8_percentile99.99_seall.onnx` / `_seoutput.onnx`. Their records state
+  `kept_float` (selection, node count, block count); every later build record states it (null for
+  none), and `scripts/22_check_results.py` requires that. One extra build check: no tensor inside the
+  kept path (a chosen output whose consumers in the export are all chosen nodes) is the input of a
+  QuantizeLinear in the built model.
+- **"A build fails a build check"** means its record is not "usable" by
+  `brokkr.schema.check_build_record`. Added here: SE1 is also NOT JUDGED if the control's SE-all build
+  or any judged model's baseline build fails its check (the rules above name only the judged models'
+  SE-all builds).
+- **Measuring** (`scripts/37_se1.py`): the 5,000 tuning images in split order, batches of 32, 8
+  threads, thread spinning off; top-1 ties go to the lower class number. Records are schema-2
+  "diagnostic" records in `results/se1/` (with the scores), since SE1 is a diagnostic and some builds
+  (MobileNetV3-Small) may have failed their check; the verdict goes to `results/final/se1_verdict.json`.
+  MobileNetV3-Large's baseline is its Stage 3 Percentile file.
+- **Rule code:** `brokkr/se1.py` (tested): baseline loss, change, recovered share, control, verdict.
+- **Dry run first:** the first 64 tuning images, all output outside `results/`; a tool check, never a
+  result.

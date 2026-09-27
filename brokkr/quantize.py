@@ -94,7 +94,8 @@ class ImageBatches(CalibrationDataReader):
 
 def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
             group_batches: int | None = None, unrounded_output_ops: list | None = None,
-            skip_symbolic_shape: bool = False) -> Path:
+            skip_symbolic_shape: bool = False, keep_float_outputs: list | None = None,
+            report: dict | None = None) -> Path:
     """Static INT8 quantization, using `calibration_batches` (arrays of shape (N, 3, H, W)).
 
     method: a key of INT8_METHODS.
@@ -108,6 +109,10 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
     skip_symbolic_shape: skip the symbolic shape inference in onnxruntime's preparation step
         (quant_pre_process). Off by default; used only where that step crashes (ConvNeXt-Tiny, task 4.1),
         after checking it leaves MobileNetV3-Large's INT8 model unchanged. Recorded with the model.
+    keep_float_outputs: output tensor names of nodes that stay in float (not quantized): the nodes of
+        the prepared model that produce them are passed to onnxruntime as nodes_to_exclude (SE1,
+        brokkr.se_float). Every name must be found, on a named node, or the build stops.
+    report: if given, filled with what was done ("nodes_kept_float": the excluded node names).
     """
     out_path = Path(out_path)
     prepared = out_path.with_name(out_path.stem + "_prep.onnx")
@@ -118,6 +123,19 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
         extra_options["CalibStridedMinMax"] = group_batches
     if unrounded_output_ops:
         extra_options["OpTypesToExcludeOutputQuantization"] = list(unrounded_output_ops)
+    nodes_to_exclude = []
+    if keep_float_outputs:
+        wanted = set(keep_float_outputs)
+        nodes = [n for n in onnx.load(str(prepared)).graph.node if wanted & set(n.output)]
+        found = {o for n in nodes for o in n.output} & wanted
+        names = [n.name for n in nodes]
+        if found != wanted or not all(names) or len(set(names)) != len(names):
+            prepared.unlink()
+            raise ValueError(f"keep_float_outputs: {len(wanted - found)} outputs not found in the prepared "
+                             "model, or their nodes are unnamed or share a name")
+        nodes_to_exclude = names
+    if report is not None:
+        report["nodes_kept_float"] = nodes_to_exclude
     quantize_static(
         str(prepared),
         str(out_path),
@@ -128,6 +146,7 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
         activation_type=QuantType.QUInt8,
         calibrate_method=INT8_METHODS[method]["calibrate_method"],
         extra_options=extra_options,
+        nodes_to_exclude=nodes_to_exclude or None,
     )
     prepared.unlink()
     return out_path

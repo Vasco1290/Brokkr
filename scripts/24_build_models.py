@@ -1,6 +1,7 @@
 """Build one Stage 4 model: FP32 ONNX export and an INT8 version, timed (task 4.1 and M2 tooling).
 
 Usage:  python scripts/24_build_models.py --model resnet50 [--method minmax] [--rebuild-check]
+        python scripts/24_build_models.py --model efficientnet_b0 --keep-float se-all     (SE1 variants)
 Needs:  the model's torchvision weights (hash-checked) and data/imagenet-1k/
 Writes: models/<model>_fp32.onnx (+ .json, by scripts/01_export_model.py) and
         models/<model>_int8_percentile99.99.onnx (+ .json with build time and peak memory)
@@ -11,6 +12,11 @@ Calibration images use the model's OWN preprocessing (brokkr.export.preprocessin
 
 Build checks (not results): loads; finite scores; weights all per-channel; top-1 agreement with FP32
 on 256 tuning images, FAIL below 20% (a broken conversion), WARNING below 90%.
+
+--keep-float se-all | se-output (SE1, docs/hypotheses_stage4.md): the Percentile build with the model's
+squeeze-and-excitation nodes (all of them, or only the output path) kept in float, chosen from the
+exporter's module records (brokkr.se_float). Saved as models/<model>_int8_percentile99.99_seall.onnx or
+_seoutput.onnx, with one more build check: no tensor inside the kept path is quantized.
 
 --rebuild-check: for a model whose INT8 file already exists (MobileNetV3-Large from Stage 3), build
 again into a temporary file, time it, and check the new build gives exactly the existing file's
@@ -28,7 +34,9 @@ import time
 from pathlib import Path
 
 import numpy as np
+import onnx
 
+from brokkr import se_float
 from brokkr.accuracy import open_image, preprocess
 from brokkr.benchmark import make_session
 from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
@@ -78,12 +86,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--model", required=True, choices=list(MODELS))
 parser.add_argument("--method", choices=list(PRECISION_NAMES), default="percentile99.99")
 parser.add_argument("--rebuild-check", action="store_true")
+parser.add_argument("--keep-float", choices=se_float.SELECTIONS, default=None,
+                    help="SE1: keep these squeeze-and-excitation nodes in float (Percentile builds only)")
 parser.add_argument("--skip-symbolic-shape", action="store_true",
                     help="skip shape inference in onnxruntime's preparation step (recorded)")
 args = parser.parse_args()
 prep = preprocessing(args.model)
 fp32_path = Path("models") / f"{args.model}_fp32.onnx"
 METHOD, PRECISION = args.method, PRECISION_NAMES[args.method]
+if args.keep_float and METHOD != "percentile99.99":
+    sys.exit("--keep-float is only for Percentile 99.99 builds (SE1)")
+if args.keep_float:
+    PRECISION += "_" + args.keep_float.replace("-", "")  # int8_percentile99.99_seall / _seoutput
 int8_path = Path("models") / f"{args.model}_{PRECISION}.onnx"
 
 if int8_path.exists() and not args.rebuild_check:
@@ -117,12 +131,32 @@ calibration = load_batches(files, splits["int8_calibration"])
 check = load_batches(files, splits["tuning"][:256])
 reference = outputs(fp32_path, check).argmax(1)
 
+# SE1: the squeeze-and-excitation nodes to keep in float, and the tensors that stay inside that path
+# (every consumer in the export is also kept), which must not be quantized in the built model.
+keep, inside, kept_float = None, [], None
+if args.keep_float:
+    export = onnx.load(str(fp32_path))
+    keep = se_float.selected_outputs(export, args.keep_float)
+    if not keep:
+        sys.exit(f"FAIL: {args.model} has no {args.keep_float} nodes")
+    consumers = {}
+    for node in export.graph.node:
+        for name in node.input:
+            consumers.setdefault(name, []).append(node)
+    inside = [t for t in keep if consumers.get(t)
+              and all(se_float.in_selection(n, args.keep_float) for n in consumers[t])]
+    kept_float = {"selection": args.keep_float, "nodes": len(keep),
+                  "squeeze_excitation_blocks": se_float.se_block_count(export)}
+report = {}
+
 # 2. INT8 build, timed.
 with tempfile.TemporaryDirectory() as tmp:
     target = Path(tmp) / int8_path.name if int8_path.exists() else int8_path
     t0 = time.perf_counter()
     to_int8(fp32_path, target, calibration, method=METHOD, group_batches=GROUP_BATCHES,
-            skip_symbolic_shape=args.skip_symbolic_shape)
+            skip_symbolic_shape=args.skip_symbolic_shape, keep_float_outputs=keep, report=report)
+    quantized_inputs = {n.input[0] for n in onnx.load(str(target)).graph.node
+                        if n.op_type == "QuantizeLinear"}
     build_seconds = round(time.perf_counter() - t0, 1)
     peak_gb = round(peak_memory_gb(), 2)
     scores = outputs(target, check)
@@ -143,6 +177,9 @@ checks = {
 }
 if same_as_existing is not None:
     checks["rebuild gives exactly the existing model's outputs"] = same_as_existing
+if args.keep_float:
+    inside_ok = not (set(inside) & quantized_inputs)
+    checks[f"no tensor inside the kept path is quantized ({len(inside)} checked)"] = inside_ok
 
 if same_bytes is not None:
     print(f"rebuild has the same file bytes as the existing model: {same_bytes}")
@@ -157,7 +194,7 @@ for description, ok in checks.items():
 build = {"int8_build_seconds": build_seconds, "export_seconds": export_seconds,
          "peak_memory_gb": peak_gb, "checks": checks, "top1_agreement_with_fp32": agreement,
          "weights": weights, "skip_symbolic_shape": args.skip_symbolic_shape,
-         "rebuild_same_file_bytes": same_bytes}
+         "rebuild_same_file_bytes": same_bytes, "nodes_kept_float": report.get("nodes_kept_float", [])}
 if target == int8_path:
     record = {
         "model": args.model, "precision": PRECISION, "derived_from": str(fp32_path),
@@ -165,6 +202,7 @@ if target == int8_path:
         "settings": {**INT8_SETTINGS, "calibration_method": METHOD,
                      "calibration_method_detail": INT8_METHODS[METHOD]["description"],
                      "preprocessing": prep, "skip_symbolic_shape": args.skip_symbolic_shape,
+                     "kept_float": kept_float,
                      "calibration": {"dataset": DATASET, "dataset_licence": DATASETS[DATASET]["licence"],
                                      "split": "int8_calibration", "n_images": len(splits["int8_calibration"]),
                                      "group_images": GROUP_BATCHES * BATCH,
