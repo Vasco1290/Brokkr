@@ -96,11 +96,11 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 **Done when:** one finding can be explained in two minutes, with the numbers behind it, and the
 write-up exists.
 
-## Stage 4 — Breadth, depth, labels and recommendations `[ ]`
+## Stage 4 — Breadth, depth, labels and recommendations `[~]`
 
 Stage 3 studied one model on one laptop. Stage 4 asks whether its findings hold across models, tests
 the likely explanation for INT8's darkness collapse, and turns results files into labels and
-recommendations. Plan revised 26 September 2026; nothing built yet.
+recommendations. Plan revised 26 September 2026; progress is in `STATUS.md`.
 
 **Rules for the whole stage** (Stage 3's rules carry over unchanged):
 - Differences are "new minus old" only, with paired bootstrap 95% intervals and the direction stated
@@ -125,7 +125,7 @@ overlaps 4.1's); 4.4 when the Pi 5 arrives (expected in a few weeks).
 **Naming:** Brokkr's own corruptions and ImageNet-C's are labelled separately everywhere (records,
 tables, labels), e.g. "fog (Brokkr)" and "fog (ImageNet-C)".
 
-### 4.0 Foundations: result schema, hypotheses, mechanism test `[ ]`
+### 4.0 Foundations: result schema, hypotheses, mechanism test `[x]`
 
 *Scope*
 - **Unified result schema:** one versioned JSON format for every Stage 4 result, checked by a
@@ -157,7 +157,7 @@ hypotheses file is committed; the mechanism test writes a results JSON and print
 *Compute (estimate):* schema and converter, negligible. Mechanism test: minutes (a small sample of
 tuning images, two models, three conditions).
 
-### 4.1 Breadth: does clean accuracy predict robustness after quantization? `[ ]`
+### 4.1 Breadth: does clean accuracy predict robustness after quantization? `[~]`
 
 *Scope*
 - **Models:** 8–10 torchvision ImageNet classifiers, MobileNetV3-Large included. Candidates, before
