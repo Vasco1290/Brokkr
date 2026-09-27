@@ -12,8 +12,9 @@ Design, pass rule and H's confirmations: docs/hypotheses_stage4.md, "Squeeze-and
 (SE1)" and the notes after it. Rule code: brokkr/se1.py.
 - Models: EfficientNet-B0 and MobileNetV3-Large (judged), RegNetY-400MF (control, judged),
   MobileNetV3-Small (reported). Builds: FP32, the baseline Percentile INT8, SE-all, SE-output.
-- Images: the whole tuning split (5,000), in split order; each model's own preprocessing; damage seed =
-  the image's dataset position. Conditions: clean; darkness (Brokkr) s5 (judged); contrast (ImageNet-C)
+- Images: the tuning split without its first 64 images (4,936), in split order; the first 64 were seen in
+  the dry run, so they are left out (dated note of 27 September 2026). Each model's own preprocessing;
+  damage seed = the image's dataset position. Conditions: clean; darkness (Brokkr) s5 (judged); contrast (ImageNet-C)
   s3 and fog (Brokkr) s3 (reported the same way).
 - Every build is measured whatever its build check said; the check's result is printed and recorded.
 - Resumable: a (model, build, condition) whose record and score file exist with a matching checksum is
@@ -68,7 +69,7 @@ VERDICT_PATH = OUT / "se1_verdict_DRY_RUN.json" if args.dry_run else Path("resul
 
 files = parquet_files(DATASET)
 tuning = make_splits(count_images(files))["tuning"]
-positions = tuning[:64] if args.dry_run else tuning
+positions = tuning[:64] if args.dry_run else tuning[64:]  # the dry run's 64 images are never in the run
 machine = machine_fingerprint()
 runtime = {"name": "onnxruntime", "version": ort.__version__, "execution_provider": "CPUExecutionProvider",
            "threads": THREADS, "spinning": "off"}
