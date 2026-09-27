@@ -14,8 +14,8 @@ Design, pass rule and H's confirmations: docs/hypotheses_stage4.md, "Squeeze-and
   MobileNetV3-Small (reported). Builds: FP32, the baseline Percentile INT8, SE-all, SE-output.
 - Images: the tuning split without its first 64 images (4,936), in split order; the first 64 were seen in
   the dry run, so they are left out (dated note of 27 September 2026). Each model's own preprocessing;
-  damage seed = the image's dataset position. Conditions: clean; darkness (Brokkr) s5 (judged); contrast (ImageNet-C)
-  s3 and fog (Brokkr) s3 (reported the same way).
+  damage seed = the image's dataset position. Conditions: clean; darkness (Brokkr) s5 (judged);
+  contrast (ImageNet-C) s3 and fog (Brokkr) s3 (reported the same way).
 - Every build is measured whatever its build check said; the check's result is printed and recorded.
 - Resumable: a (model, build, condition) whose record and score file exist with a matching checksum is
   skipped. 8 threads, thread spinning off (as in 4.1).

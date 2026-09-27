@@ -855,3 +855,14 @@ Implementation details only; the design, the pass rule and H's confirmations abo
 - **Rule code:** `brokkr/se1.py` (tested): baseline loss, change, recovered share, control, verdict.
 - **Dry run first:** the first 64 tuning images, all output outside `results/`; a tool check, never a
   result.
+
+## Note added 27 September 2026, before the SE1 run: images, and one confirmation
+
+- **Images changed to 4,936.** The SE1 dry run (`scripts/37_se1.py --dry-run`, at `aa81196`) used the
+  first 64 tuning images, which were also part of the planned 5,000, and its printed numbers were seen.
+  Nothing was tuned on them (the pass rule was fixed and committed before any build), but so that no
+  image whose SE1 numbers were already seen enters the run, H decided that SE1 runs on the tuning
+  split without its first 64 images: positions 64 to 4,999 in split order (4,936 images). The dry-run
+  numbers are not reported and not used. (`scripts/37_se1.py` changed at `cb7555a`.)
+- **Confirmed by H:** SE1 is also NOT JUDGED if the control's SE-all build or any baseline build fails
+  its build check (the addition in the implementation note above).
