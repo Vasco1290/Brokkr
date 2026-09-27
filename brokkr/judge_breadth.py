@@ -5,7 +5,9 @@ The rules are the ones committed before the 4.1 sweep, plus the dated note of 27
 - a near-floor cell (FP32 top-1 below 10% for one model at one condition) is left out by dropping that
   model from that condition's correlation (H18, H19), or from the model count (H20-H22); for H22 a
   model is left out if EITHER of its two conditions is near floor;
-- a correlation needs at least 4 models; with fewer, that condition is "not judged";
+- a correlation needs at least 4 models; with fewer, that condition is "not judged" (the minimum
+  H18-H19 were judged with; a later note, also 27 September, raised it to 6 for every correlation
+  computed after them: MIN_MODELS);
 - pass counts stay absolute (H18: 8 conditions, H19: 6, H20-H22: 5 models): anything left out or not
   judged can never count towards a PASS;
 - Spearman correlation uses average ranks for ties (standard); in the bootstrap over models, a
@@ -26,7 +28,9 @@ import numpy as np
 from brokkr.judge import N_RESAMPLES, SEED, ci_side, paired_ci
 
 NEAR_FLOOR = 0.10  # FP32 top-1 below this under a condition: the cell is left out
-MIN_MODELS = 4     # a correlation needs at least this many (distinct) models
+MIN_MODELS = 6           # any correlation from the 27 September note on needs at least this many models
+MIN_MODELS_H18_H19 = 4   # the minimum H18-H19 were judged with (fixed before they ran)
+MIN_DISTINCT = 4         # a bootstrap resample with fewer distinct models than this is redrawn
 LARGE_POINTS = 5   # "large" extra gap (H20, H21): at most -5.0 points
 
 
@@ -55,13 +59,13 @@ def spearman_ci(x, y) -> tuple:
     """95% interval of Spearman's correlation by resampling the models. Returns (interval, redrawn)."""
     x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     n = len(x)
-    if n < MIN_MODELS or spearman(x, y) is None:
+    if n < MIN_DISTINCT or spearman(x, y) is None:
         raise ValueError("needs at least 4 models and a defined correlation")
     rng = np.random.default_rng(SEED)
     values, redrawn = [], 0
     while len(values) < N_RESAMPLES:
         idx = rng.integers(0, n, n)
-        rho = spearman(x[idx], y[idx]) if len(np.unique(idx)) >= MIN_MODELS else None
+        rho = spearman(x[idx], y[idx]) if len(np.unique(idx)) >= MIN_DISTINCT else None
         if rho is None:
             redrawn += 1
             if redrawn > 100 * N_RESAMPLES:
@@ -71,14 +75,17 @@ def spearman_ci(x, y) -> tuple:
     return [float(v) for v in np.percentile(values, [2.5, 97.5])], redrawn
 
 
-def correlation(models: list, x: dict, y: dict, fp32_at_condition: dict) -> dict:
-    """Spearman of x against y across models (dicts by model), near-floor models left out."""
+def correlation(models: list, x: dict, y: dict, fp32_at_condition: dict,
+                min_models: int = MIN_MODELS) -> dict:
+    """Spearman of x against y across models (dicts by model), near-floor models left out.
+
+    Not judged if fewer than `min_models` remain."""
     kept = [m for m in models if not near_floor(fp32_at_condition[m])]
     found = {"models": kept, "left_out_near_floor": [m for m in models if m not in kept]}
     xs, ys = [x[m] for m in kept], [y[m] for m in kept]
-    rho = spearman(xs, ys) if len(kept) >= MIN_MODELS else None
+    rho = spearman(xs, ys) if len(kept) >= min_models else None
     if rho is None:
-        why = f"fewer than {MIN_MODELS} models" if len(kept) < MIN_MODELS else "a variable is constant"
+        why = f"fewer than {min_models} models" if len(kept) < min_models else "a variable is constant"
         return {**found, "judged": False, "why_not_judged": why, "rho": None, "ci95": None, "side": None}
     ci, redrawn = spearman_ci(xs, ys)
     return {**found, "judged": True, "rho": rho, "ci95": ci, "side": ci_side(ci), "redrawn": redrawn}
@@ -139,9 +146,9 @@ def h18_h19(models: list, conditions: list, top1: dict) -> dict:
         fp32 = {m: top1[(m, "fp32", c)] for m in models}
         int8 = {m: top1[(m, "int8", c)] for m in models}
         cond_gap = {m: int8[m] - fp32[m] for m in models}
-        a = correlation(models, clean_fp32, int8, fp32)
-        b = correlation(models, clean_fp32, cond_gap, fp32)
-        g = correlation(models, clean_gap, cond_gap, fp32)
+        a = correlation(models, clean_fp32, int8, fp32, MIN_MODELS_H18_H19)
+        b = correlation(models, clean_fp32, cond_gap, fp32, MIN_MODELS_H18_H19)
+        g = correlation(models, clean_gap, cond_gap, fp32, MIN_MODELS_H18_H19)
         h18a[c] = {**a, "holds": a["judged"] and a["side"] == "above zero"}
         h18b[c] = {**b, "holds": b["judged"] and b["side"] == "includes zero"}
         h19[c] = {**g, "holds": g["judged"] and g["side"] == "above zero"}

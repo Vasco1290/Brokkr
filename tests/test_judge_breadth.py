@@ -52,8 +52,20 @@ def test_correlation_leaves_out_near_floor_models_and_needs_four():
     assert r["rho"] == pytest.approx(1.0) and r["side"] == "above zero"
 
     fp32 = {m: (0.05 if i >= 3 else 0.5) for i, m in enumerate(MODELS)}  # only 3 models above the floor
-    r = jb.correlation(MODELS, x, y, fp32)
+    r = jb.correlation(MODELS, x, y, fp32, jb.MIN_MODELS_H18_H19)
     assert not r["judged"] and r["why_not_judged"] == "fewer than 4 models"
+
+
+def test_from_the_27_september_note_a_correlation_needs_six_models():
+    x = {m: i for i, m in enumerate(MODELS)}
+    y = {m: 10 * i for i, m in enumerate(MODELS)}
+    five = {m: (0.05 if i >= 5 else 0.5) for i, m in enumerate(MODELS)}  # 5 models above the floor
+    assert not jb.correlation(MODELS, x, y, five)["judged"]               # default: at least 6
+    assert jb.correlation(MODELS, x, y, five, jb.MIN_MODELS_H18_H19)["judged"]  # as H18-H19 were judged
+    six = {m: (0.05 if i >= 6 else 0.5) for i, m in enumerate(MODELS)}
+    mixed = dict(zip(MODELS, [3, 1, 4, 2, 6, 5, 9, 8, 7], strict=True))  # related, but not perfectly
+    r = jb.correlation(MODELS, x, mixed, six)
+    assert r["judged"] and r["ci95"][0] < r["ci95"][1]  # six models: a real interval, redraw rule still 4
 
 
 def paired(n: int, fp32_clean: int, int8_clean: int, fp32_cond: int, int8_cond: int) -> list:
