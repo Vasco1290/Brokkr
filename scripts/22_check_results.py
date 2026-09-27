@@ -26,7 +26,7 @@ from brokkr.export import MODELS
 from brokkr.schema import check_build_record, check_record, load_measurements, non_default_settings
 
 # The commit that added each build option: code at or after it must state the option in its records.
-OPTION_INTRODUCED = {"skip_symbolic_shape": "e33195e"}
+OPTION_INTRODUCED = {"skip_symbolic_shape": "e33195e", "kept_float": "7c933be"}
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--folder", default="results")
