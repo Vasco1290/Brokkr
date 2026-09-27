@@ -1,6 +1,6 @@
 # Stage 4 so far, in plain words
 
-*Last updated 27 September 2026, after M2 and before the squeeze-and-excitation test (SE1). Every
+*Last updated 27 September 2026, after the squeeze-and-excitation test (SE1). Every
 number here was measured on one Windows laptop; details and exact rules are in
 [hypotheses_stage4.md](hypotheses_stage4.md).*
 
@@ -57,15 +57,21 @@ photo itself loses the detail, not the shrinking.
 the largest extra errors sit inside those blocks. Both collapsing models, and the model that broke
 completely, have such blocks. But so does RegNetY-400MF, which does not collapse.
 
+**6. Are those side branches the cause? (test SE1)** We shrank the two collapsing models again, this
+time keeping the side branches at full size, and tested them on 4,936 photos. We had said beforehand
+that at least half of the darkness collapse must go away. It did not: EfficientNet-B0 still lost 38
+points more in the dark than on clean photos (recovered: 0%), MobileNetV3-Large 12 points
+(recovered: 5%). The broken MobileNetV3-Small stayed broken. **Not confirmed.** So what causes the
+collapse is still unknown.
+
 ## What is still open
 
-- **The squeeze-and-excitation test (SE1), designed but not yet run:** shrink EfficientNet-B0 and
-  MobileNetV3-Large again but keep those side branches at full size, and see whether at least half
-  of the darkness collapse goes away. RegNetY-400MF is a check (a weak one: it barely collapses
-  anyway), and MobileNetV3-Small is measured alongside. It is only judged if the collapse also shows
-  up on the photos used for this test.
-- A summary table for the breadth study; turning results into "nutrition labels"; model
-  recommendations; and speed tests on a Raspberry Pi 5, which has not arrived yet.
+- **Why the two models collapse** is unknown: not from extra error in the first layers (M2), and
+  probably not from the side branches (SE1). This question is parked: Brokkr now pauses new research
+  until the first version of the website is out.
+- **Next is the product:** a "nutrition label" for each model, built only from checked result files;
+  then the first website; then model recommendations. Speed tests on a Raspberry Pi 5 wait for the
+  board to arrive.
 
 ## The main lesson so far
 
