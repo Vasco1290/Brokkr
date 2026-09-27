@@ -611,3 +611,43 @@ once, so every resample gives the same value).
 - This changes no existing verdict. H18a, H18b and H19 were judged with the minimum of 4 fixed before
   they ran; the smallest judged condition had 6 models (contrast (ImageNet-C) s5), and Gaussian noise
   (ImageNet-C) s5, not judged, had 1.
+
+## Note added 27 September 2026, before M2 runs: how M2 is computed
+
+Written before any M2 number is computed. The design, thresholds and counts in the M2 section above are
+unchanged. The first three points were left open by the M2 rules and were decided by H before running.
+- **M2a "rejects", per model:** a model counts towards "rejects" if E_early ≤ E_rest (point estimates)
+  OR its E_early interval is not above zero; "rejects" if that count reaches 5 of 8 (Percentile) or 4
+  of 7 (default).
+- **"E_early's interval includes 0" is read as "not above zero":** an interval entirely below zero
+  (damage makes early rounding error smaller) also counts towards "rejects".
+- **M2b boundaries:** "inside −0.05 to +0.05" includes the ends (lower ≥ −0.05 and upper ≤ +0.05);
+  "entirely below −0.05" is strict (upper < −0.05).
+- **Verdict order:** SUPPORTS if at least 6 models support; otherwise REJECTS if the reject count is
+  reached; otherwise INCONCLUSIVE (the section above shows the two cannot both hold).
+- **Reading the tensors:** both the FP32 model (after `quant_pre_process`, with the build's recorded
+  `skip_symbolic_shape`) and the INT8 model get ONNX Runtime's own augmentation
+  (`qdq_loss_debug.modify_model_output_intermediate_tensors`), as in `scripts/26`; 4 threads; batches
+  of 8 images. A tensor is matched if its name is saved by the FP32 model and its DequantizeLinear
+  output is saved by the INT8 model; each QuantizeLinear input is listed once, in graph order.
+- **Local measure:** `brokkr.m2.local_rounding` (FP32 values, `brokkr.levels.fake_quantize` with the
+  tensor's scale and zero-point from the INT8 file). **Cumulative measure** (reported only): FP32 values
+  vs the INT8 model's DequantizeLinear output. SQNR uses ONNX Runtime's guard (each norm at least the
+  machine epsilon).
+- **Check before judging:** the pooled cumulative SQNR (sums of squared norms over the 32 images, ONNX
+  Runtime's pooling) must be within 0.01 dB of `scripts/26`'s saved value at every one of its tensors
+  (those were saved rounded to 0.01 dB). If not, M2 stops.
+- **Zero signal or zero error:** if any (image, tensor) has a signal or local error whose norm is at
+  most the machine epsilon (so the guard, not the data, would set its SQNR), no verdict is computed and
+  a dated note decides.
+- **"No extra error":** the largest E(t) over all matched tensors, including the input (#0), is below
+  1.0 dB. (Such a model cannot meet E_early ≥ 3.0 dB, so this label cannot change a verdict.)
+- **Intervals:** 1,000 resamples of the 128 images, seed 0, a fresh generator for each (model,
+  precision, condition); the E_early, E_rest and E_early − E_rest intervals come from the same
+  resamples; percentile intervals (2.5%, 97.5%); "above zero" means the lower end is above zero.
+- **M2b's R** uses each precision's own input quantizer (tensor #0); per image, the mean over the three
+  channels of V_q / min(V_pre, 256).
+- **Default INT8 models:** those whose MinMax build record is "usable" (7; EfficientNet-B0's failed).
+- **Code and records:** `brokkr/m2.py` (tested in `tests/test_m2.py`) and
+  `scripts/35_m2_rounding_error.py`; per-image numbers in `results/m2/*.npz`, schema-2 diagnostic
+  records in `results/m2/`, verdicts in `results/final/m2_verdicts.json`.
