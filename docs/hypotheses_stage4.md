@@ -596,3 +596,18 @@ H18–H19: only ConvNeXt-Tiny is above the floor there (fewer than 4 models).
   rather than "INT8 generally collapses", and not tested.
 - H18a: with 9 models, correlations of about +0.35 to +0.6 give intervals that include zero; likely
   a small-sample limit, as the plan anticipated.
+
+## Note added 27 September 2026: at least 6 models in any correlation from now on
+
+Decided by H after the exploratory H19 check above, where a correlation with 4 models had an
+interval of zero width (with 4 models, the only resamples that are not redrawn contain every model
+once, so every resample gives the same value).
+- From now on, **any correlation across models needs at least 6 distinct models** after near-floor
+  models are left out; with fewer, that correlation is "not judged" (or, in a reported analysis,
+  "not computed").
+- The bootstrap redraw rule is unchanged: a resample with fewer than 4 distinct models (or an
+  undefined correlation) is redrawn. (With a redraw threshold of 6, a 6-model correlation would again
+  have an interval of zero width.)
+- This changes no existing verdict. H18a, H18b and H19 were judged with the minimum of 4 fixed before
+  they ran; the smallest judged condition had 6 models (contrast (ImageNet-C) s5), and Gaussian noise
+  (ImageNet-C) s5, not judged, had 1.
