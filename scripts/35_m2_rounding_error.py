@@ -1,6 +1,8 @@
 """M2: in which layers does INT8 add more rounding error under darkness and fog than on clean images?
 
 Usage:  python scripts/35_m2_rounding_error.py
+        python scripts/35_m2_rounding_error.py --dry-run --out <folder>   (a tool check, never a result:
+        3 models, 16 tuning images at positions 628-643, outside M2's images; everything goes to <folder>)
 Needs:  models/<model>_fp32.onnx, _int8_percentile99.99.onnx and _int8.onnx (MinMax) with build records,
         data/imagenet-1k/, results/checks/mobilenet_v3_small_int8_layer_divergence.json (scripts/26)
 Writes: results/m2/<model>_<precision>_m2.npz (per-image numbers) and one schema-2 diagnostic record per
@@ -24,6 +26,7 @@ and the dated M2 note of 27 September 2026 (written before this script ran). Mea
   epsilon guard would set its SQNR), the verdicts are not computed and a dated note must decide.
 """
 
+import argparse
 import json
 import sys
 import tempfile
@@ -61,7 +64,17 @@ CLEAN, DARK, FOG = condition(), condition("darkness", "brokkr", 5), condition("f
 DAMAGED = {"darkness": DARK, "fog": FOG}
 CHECK_MODEL = "mobilenet_v3_small"
 CHECK_RECORD = Path("results/checks/mobilenet_v3_small_int8_layer_divergence.json")
-OUT, DATASET = Path("results/m2"), "imagenet-1k-val"
+DATASET = "imagenet-1k-val"
+DRY_RUN_MODELS = ["resnet18", "efficientnet_b0", "convnext_tiny"]  # no MinMax; skip_symbolic_shape; plain
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--dry-run", action="store_true")
+parser.add_argument("--out", default="results/m2")
+args = parser.parse_args()
+if args.dry_run and args.out == "results/m2":
+    sys.exit("a dry run needs its own --out folder")
+OUT = Path(args.out)
+VERDICT_PATH = OUT / "m2_verdicts_DRY_RUN.json" if args.dry_run else Path("results/final/m2_verdicts.json")
 RUNTIME = {"name": "onnxruntime", "version": ort.__version__, "execution_provider": "CPUExecutionProvider",
            "threads": THREADS}
 
@@ -100,9 +113,27 @@ def augmented_session(path: Path, tmp: Path, name: str) -> tuple:
     return session, {o.name[:-len(SAVED)] for o in session.get_outputs() if o.name.endswith(SAVED)}
 
 
+def exposed_session(path: Path, tmp: Path, name: str, names: list) -> ort.InferenceSession:
+    """A session on a copy of the model that also outputs the given float tensors, added directly.
+
+    Only a fallback for INT8 models whose graph ONNX Runtime's augmentation tool makes invalid
+    (ConvNeXt-Tiny: it tries to save an int32 bias zero-point as a float tensor). It lets ONNX Runtime
+    fuse differently, so the cumulative measure (reported, never judged) can differ slightly from the
+    tool's; the judged local measure does not run the INT8 model (dated note of 27 September 2026)."""
+    model = onnx.load(str(path))
+    existing = {o.name for o in model.graph.output}
+    for n in names:
+        if n not in existing:
+            model.graph.output.append(onnx.helper.make_tensor_value_info(n, onnx.TensorProto.FLOAT, None))
+    out = tmp / f"{name}_exposed.onnx"
+    onnx.save(model, str(out))
+    return ort.InferenceSession(str(out), options, providers=["CPUExecutionProvider"])
+
+
 def run(session, names: list, images: np.ndarray) -> dict:
     """The requested saved tensors for a batch, each as (images, values)."""
-    values = session.run([n + SAVED for n in names], {"images": images})
+    saved = {o.name for o in session.get_outputs()}
+    values = session.run([n + SAVED if n + SAVED in saved else n for n in names], {"images": images})
     return {n: v.reshape(images.shape[0], -1) for n, v in zip(names, values, strict=True)}
 
 
@@ -125,16 +156,23 @@ def measure(model: str, precisions: list, positions: list, conditions: list) -> 
         for p in precisions:
             path = Path("models") / f"{model}_{p}.onnx"
             quantizers = m2.activation_quantizers(onnx.load(str(path)))
-            session, int8_names = augmented_session(path, tmp, p)
+            try:
+                session, int8_names = augmented_session(path, tmp, p)
+                exposure = "onnxruntime qdq_loss_debug tool (as scripts/26)"
+            except ort.capi.onnxruntime_pybind11_state.InvalidGraph as error:
+                int8_names = {q["dequantized"] for q in quantizers if q["dequantized"]}
+                session = exposed_session(path, tmp, p, sorted(int8_names))
+                exposure = f"direct outputs (the tool made the graph invalid: {str(error)[:120]})"
             matched = [q for q in quantizers if q["tensor"] in fp32_names and q["dequantized"] in int8_names]
             matched_names = {q["tensor"] for q in matched}
             if not matched or matched[0]["tensor"] != "images":
                 sys.exit(f"FAIL: {model} {p}: tensor #0 is not the input image")
-            plan[p] = {"session": session, "q": matched, "path": path,
+            plan[p] = {"session": session, "q": matched, "path": path, "exposure": exposure,
                        "unmatched": [q["tensor"] for q in quantizers if q["tensor"] not in matched_names]}
         needed = sorted({q["tensor"] for info in plan.values() for q in info["q"]})
         for p, info in plan.items():
             found[p] = {"tensors": [q["tensor"] for q in info["q"]], "unmatched": info["unmatched"],
+                        "int8_exposure": info["exposure"],
                         "model_sha256": file_info(info["path"])["sha256"], "conditions": {}}
         for cond in conditions:
             parts = {p: {"local": [], "cumulative": [], "R": []} for p in plan}
@@ -173,7 +211,7 @@ def outcome(part: dict) -> str:
 # ---- 1. The check before judging: reproduce scripts/26 for MobileNetV3-Small ----
 t0 = time.time()
 saved = json.loads(CHECK_RECORD.read_text(encoding="utf-8"))
-check_positions = list(tuning[:saved["data"]["n_images"]])
+check_positions = tuning[:saved["data"]["n_images"]]
 check = measure(CHECK_MODEL, [PRECISIONS["percentile"]], check_positions, [CLEAN])[PRECISIONS["percentile"]]
 cum = check["conditions"]["clean"]["cumulative"]
 ours = {t: m2.pooled_sqnr_db(cum[i, 0], cum[i, 1]) for i, t in enumerate(check["tensors"])}
@@ -200,12 +238,16 @@ if not check_ok:
     sys.exit("STOP: the check failed; M2 is not measured or judged (a dated note decides what to do)")
 
 # ---- 2. Measure the 8 models ----
-positions = list(tuning[500:628])
+positions = tuning[628:644] if args.dry_run else tuning[500:628]
+POSITION_RANGE = "628-643 (DRY RUN)" if args.dry_run else "500-627"
+if args.dry_run:
+    M2_MODELS = DRY_RUN_MODELS
 if not all(usable(m, PRECISIONS["percentile"]) for m in M2_MODELS):
     sys.exit("FAIL: a Percentile build of an M2 model is not usable")
 precisions_of = {m: [PRECISIONS["percentile"]] + ([PRECISIONS["default"]] if usable(m, "int8") else [])
                  for m in M2_MODELS}
-print(f"Default INT8 (MinMax) usable for {sum(len(v) == 2 for v in precisions_of.values())} of 8 models; "
+print(f"Default INT8 (MinMax) usable for {sum(len(v) == 2 for v in precisions_of.values())} of "
+      f"{len(M2_MODELS)} models; "
       f"not usable: {[m for m, v in precisions_of.items() if len(v) == 1]}")
 results, degenerate = {}, 0
 for model in M2_MODELS:
@@ -216,7 +258,8 @@ for model in M2_MODELS:
         for c in r["conditions"].values():
             s2, n2 = c["local"][:, 0], c["local"][:, 1]
             degenerate += int(((s2 <= m2.EPS ** 2) | (n2 <= m2.EPS ** 2)).sum())
-        counts.append(f"{p} {len(r['tensors'])} tensors ({len(r['unmatched'])} unmatched)")
+        counts.append(f"{p} {len(r['tensors'])} tensors ({len(r['unmatched'])} unmatched: {r['unmatched']}; "
+                      f"INT8 read by {r['int8_exposure'][:30]})")
     print(f"  measured {model}: {', '.join(counts)}  ({time.time() - t0:.0f} s)")
 print(f"(image, tensor) pairs with a zero signal or zero local error: {degenerate}")
 
@@ -251,9 +294,10 @@ for model, by_precision in results.items():
                        **{f"E_early_{k}_db": metric(v["E_early"], v["E_early_ci95"])
                           for k, v in extra.items()}}
             settings = {"script": "scripts/35_m2_rounding_error.py", "compared_with": "clean (same images)",
-                        "positions": "tuning split, positions 500-627", "batch": BATCH,
+                        "positions": f"tuning split, positions {POSITION_RANGE}", "batch": BATCH,
                         "early_fraction": m2.EARLY_FRACTION, "early_tensors": s["early_tensors"],
                         "rest_tensors": s["rest_tensors"], "unmatched_tensors": r["unmatched"],
+                        "int8_exposure_for_cumulative": r["int8_exposure"],
                         "bootstrap_resamples": m2.N_RESAMPLES, "seed": m2.SEED}
             record = make_measurement(
                 "diagnostic", model_field(model), p, RUNTIME, "laptop", machine, data_field(len(positions)),
@@ -273,7 +317,7 @@ verdicts = {}
 for short_name, p in PRECISIONS.items():
     models = [m for m in M2_MODELS if p in precisions_of[m]]
     expected = 8 if short_name == "percentile" else 7
-    if len(models) != expected:
+    if len(models) != expected and not args.dry_run:
         sys.exit(f"FAIL: {len(models)} models for {p}; the M2 section counts {expected}")
     for name in DAMAGED:
         parts = {m: m2.m2a_model(summary[(m, p, name)]["s"]) for m in models}
@@ -325,11 +369,11 @@ per_model = {key: {m: {"E_early": summary[(m, v["precision"], v["condition"])]["
                        "R_change_ci95": summary[(m, v["precision"], v["condition"])]["R"]["ci95"]}
                    for m in v["parts"]} for key, v in verdicts.items()}
 verdict_record = make_record("verdicts", "m2 (8 models)", "int8_percentile99.99 and int8", {
-    "settings": {"script": "scripts/35_m2_rounding_error.py", "split": "tuning", "positions": "500-627",
+    "settings": {"script": "scripts/35_m2_rounding_error.py", "split": "tuning", "positions": POSITION_RANGE,
                  "n_images": len(positions), "models": M2_MODELS,
                  "rules": "docs/hypotheses_stage4.md, M2 and the dated M2 note of 27 September 2026",
                  "check": {"pass": check_ok, "largest_difference_db": max(diffs)}},
     "metrics": {"verdicts": verdicts},
     "raw": {"per_model": per_model},
 }, machine)
-print(f"\nSaved {save_record(plain(verdict_record), Path('results/final/m2_verdicts.json'))}")
+print(f"\nSaved {save_record(plain(verdict_record), VERDICT_PATH)}")

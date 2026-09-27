@@ -651,3 +651,23 @@ unchanged. The first three points were left open by the M2 rules and were decide
 - **Code and records:** `brokkr/m2.py` (tested in `tests/test_m2.py`) and
   `scripts/35_m2_rounding_error.py`; per-image numbers in `results/m2/*.npz`, schema-2 diagnostic
   records in `results/m2/`, verdicts in `results/final/m2_verdicts.json`.
+
+## Note added 27 September 2026, before M2 is measured: a technical failure and how INT8 values are read
+
+- **First run (commit `b1397aa`) crashed before measuring anything:** the image positions were passed
+  as a Python list where the dataset reader needs an array. Technical failure; fixed, nothing was
+  computed.
+- **A dry run was then added and used** (`--dry-run`: 3 models, 16 tuning images at positions
+  628–643, outside M2's images; output outside `results/`; a tool check, never a result). It found
+  that ONNX Runtime's augmentation tool makes ConvNeXt-Tiny's INT8 graph invalid (it tries to save an
+  int32 bias zero-point as a float tensor).
+- **Change:** the INT8 model is read with ONNX Runtime's tool wherever that works (as in `scripts/26`,
+  the path the check validates: largest difference 0.0050 dB); only where the tool makes the graph
+  invalid are the DequantizeLinear outputs exposed directly, and the record says which was used.
+  Exposing only those outputs lets ONNX Runtime fuse operations differently: in the dry run, using it
+  for MobileNetV3-Small moved the pooled cumulative SQNR by up to 0.0758 dB, so it is a fallback
+  only. This affects only the cumulative measure (reported, never judged); the judged local measure
+  uses the FP32 values and the INT8 file's scales and zero-points and never runs the INT8 model.
+- **Unmatched tensor, as the rule above says (counted, listed, left out):** in every dry-run model
+  the final output's quantizer input, `logits_QuantizeLinear_Input`, has no FP32 tensor of that name
+  (the INT8 build renames the model output); `scripts/26` has no such row either.
