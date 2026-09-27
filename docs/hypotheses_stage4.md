@@ -494,3 +494,45 @@ the two Percentile builds below the 90% warning line (MobileNetV3-Large 86.3%, E
 are squeeze-and-excitation models too, and every build of a model without such blocks agreed with FP32
 on at least 92.2% of the 256 tuning images. Four such models are too few to separate this from
 other differences between the models.
+
+## Note added 27 September 2026, before H18–H22 are judged: how the 4.1 rules are computed
+
+Written after the 4.1 sweep finished and before any 4.1 test-split number beyond the FP32 sanity
+checks was computed. Implementation details only; the predictions and thresholds above are unchanged.
+The first four points were left open by the rules above and were decided by H (the owner) before any
+4.1 test-split result was computed.
+- **Near floor in a correlation (H18, H19):** a near-floor cell (FP32 top-1 below 10% for one model
+  at one condition) is left out by dropping that model from that condition's correlation; the other
+  models stay. If fewer than 4 models remain, that condition is "not judged".
+- **Pass counts stay absolute:** H18a and H18b need 8 conditions, H19 needs 6, H20–H22 need 5 models,
+  whatever is left out. A condition not judged, or a model left out, never counts towards a PASS.
+- **Rank ties:** Spearman correlation uses average ranks for tied values (standard; equal to scipy's
+  default). In the bootstrap over models, a resample with fewer than 4 distinct models, or where
+  either variable is constant (so the correlation is undefined), is redrawn; redraws do not count
+  towards the 1,000.
+- **H22 near floor:** a model is left out if FP32 is near floor at contrast (ImageNet-C) s3 OR at
+  Gaussian noise (ImageNet-C) s3.
+- **Conventions reused from Stage 3 (`brokkr.judge`):** top-1 breaks score ties towards the lower
+  class number, and must equal each record's saved top-1 exactly; paired intervals resample the same
+  image positions for every side (1,000 resamples, seed 0, a fresh generator for each interval);
+  intervals are percentile intervals (2.5% and 97.5%); an interval is "below zero" only if its upper
+  end is below zero and "above zero" only if its lower end is above zero, so an interval ending
+  exactly at zero "includes zero".
+- **"At most −5.0 points"** (H20, H21) is compared in whole images, extra-gap count × 100 ≤ −5 × n,
+  so floating-point rounding cannot move a value across the line.
+- **Correlation inputs:** each model's top-1 values (point estimates) on the test split; the
+  correlation interval resamples only the model list (1,000 resamples, seed 0, one fresh generator
+  per condition and prediction).
+- **Judged models:** FP32 sanity check passed (recomputed from the clean test record, same rule and
+  tolerance as the sweep) and a usable INT8 build (`brokkr.schema.check_build_record`), with all 13
+  conditions present at both precisions. Every record must hold the same images in the same order.
+- **Code:** `brokkr/judge_breadth.py` (tested in `tests/test_judge_breadth.py`) and
+  `scripts/32_judge_breadth.py`, which saves `results/final/breadth_4.1_verdicts.json` and prints,
+  after the verdicts, absolute weakness next to every compression-caused number (reported, not judged).
+- **Reliability** (reported, not judged): `scripts/31_breadth_reliability.py` computes ECE, conformal
+  coverage with average set size, and E-AURC for every test-split record with Stage 2–3's functions;
+  the conformal threshold comes from the same model and precision's clean `conformal_calibration`
+  images (5,000).
+- **Tool check before the real run:** both scripts were run on the 64-image tuning dry-run records
+  (made at `4e4c4e5`); the conformal thresholds came from the real `conformal_calibration` records.
+  These dry-run numbers test the code only and are never results.

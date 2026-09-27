@@ -32,7 +32,9 @@ import json
 import math
 from pathlib import Path
 
-from brokkr.results import written_atomically
+import numpy as np
+
+from brokkr.results import sha256_of, written_atomically
 
 SCHEMA_VERSION = 2
 KINDS = ("accuracy", "calibration", "conformal", "selective", "speed", "levels", "diagnostic")
@@ -240,6 +242,18 @@ def save_measurement(record: dict, path) -> Path:
     with written_atomically(path) as tmp:
         tmp.write_text(json.dumps(record, indent=2), encoding="utf-8")
     return path
+
+
+def load_measurement(path) -> tuple:
+    """A schema-2 record and its saved per-image arrays, after checking the arrays' checksum."""
+    path = Path(path)
+    record = json.loads(path.read_text(encoding="utf-8"))
+    info = record["arrays"]
+    npz_path = path.with_name(info["file"])
+    if sha256_of(npz_path) != info["sha256"]:
+        raise ValueError(f"{npz_path} does not match the checksum in {path}")
+    with np.load(npz_path) as data:
+        return record, {name: data[name] for name in data.files}
 
 
 # ---- Model build records (models/*.json) ----

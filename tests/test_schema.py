@@ -7,14 +7,17 @@ import copy
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
+from brokkr.results import sha256_of
 from brokkr.schema import (
     check_build_record,
     check_record,
     condition,
     condition_label,
     from_v1,
+    load_measurement,
     load_measurements,
     make_measurement,
     metric,
@@ -121,6 +124,17 @@ def test_save_refuses_a_failing_record(tmp_path):
         save_measurement(accuracy_record(source="someone"), tmp_path / "bad.json")
     assert not (tmp_path / "bad.json").exists()
     assert save_measurement(accuracy_record(), tmp_path / "good.json").exists()
+
+
+def test_load_measurement_checks_the_arrays(tmp_path):
+    np.savez_compressed(tmp_path / "scores.npz", logits=np.zeros((2, 3), np.float32))
+    record = accuracy_record(arrays={"file": "scores.npz", "sha256": sha256_of(tmp_path / "scores.npz")})
+    save_measurement(record, tmp_path / "r.json")
+    loaded, arrays = load_measurement(tmp_path / "r.json")
+    assert loaded == record and arrays["logits"].shape == (2, 3)
+    np.savez_compressed(tmp_path / "scores.npz", logits=np.ones((2, 3), np.float32))  # changed afterwards
+    with pytest.raises(ValueError, match="checksum"):
+        load_measurement(tmp_path / "r.json")
 
 
 # ---- schema 1 -> schema 2 ----
