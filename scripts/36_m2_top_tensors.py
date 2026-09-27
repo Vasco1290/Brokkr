@@ -98,7 +98,12 @@ for model in M2_MODELS:
             scopes, classes = module_info(meta_node) if meta_node is not None else ([], [])
             enclosing = reversed(list(zip(scopes, classes, strict=True)))
             block = next((s for s, c in enclosing if c in BLOCK_CLASSES), None)
-            module, module_class = (scopes[-1], classes[-1]) if scopes else ("(model input)", "")
+            if t == "images":
+                module, module_class = "(model input)", ""
+            elif not scopes:
+                module, module_class = "(no module recorded by the exporter)", ""
+            else:  # an empty path: the top-level model's own forward (e.g. the flatten before the classifier)
+                module, module_class = scopes[-1] or "(top-level model)", classes[-1]
             op = "input image" if t == "images" else (op_node.op_type if op_node is not None else "unknown")
             fp32_op = "input image" if t == "images" else (
                 fp32_nodes[t].op_type if t in fp32_nodes else "not in the FP32 export")
