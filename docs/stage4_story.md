@@ -60,13 +60,17 @@ completely, have such blocks. But so does RegNetY-400MF, which does not collapse
 ## What is still open
 
 - **The squeeze-and-excitation test (SE1), designed but not yet run:** shrink EfficientNet-B0 and
-  MobileNetV3-Large again but keep those side branches at full size, and see whether the darkness
-  collapse mostly goes away, with RegNetY-400MF as a check and MobileNetV3-Small alongside.
+  MobileNetV3-Large again but keep those side branches at full size, and see whether at least half
+  of the darkness collapse goes away. RegNetY-400MF is a check (a weak one: it barely collapses
+  anyway), and MobileNetV3-Small is measured alongside. It is only judged if the collapse also shows
+  up on the photos used for this test.
 - A summary table for the breadth study; turning results into "nutrition labels"; model
   recommendations; and speed tests on a Raspberry Pi 5, which has not arrived yet.
 
 ## The main lesson so far
 
 Shrinking usually costs little, even on damaged photos, but a few models collapse under darkness
-and low contrast, and clean-photo tests do not warn you which ones. So each model has to be tested
-under the conditions it will meet.
+and low contrast. A model's accuracy on clean photos does not predict which ones. How much a model
+loses when shrunk, measured on clean photos, does go together with how much it loses under damage,
+but mostly because of the two collapsing models: without them the link almost disappears. So it is
+not an established warning sign, and each model has to be tested under the conditions it will meet.

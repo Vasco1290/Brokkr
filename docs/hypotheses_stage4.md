@@ -802,3 +802,23 @@ squeeze-and-excitation multiply in float is not part of SE1 and is still to be d
 for nodes kept in float (stated in every later build record, like `skip_symbolic_shape`), node
 selection from the exporter's module records, a build script, and an evaluation-and-judging script
 that prints the verdict with the numbers that decided it. Tried first on a dry run outside `results/`.
+
+## Note added 27 September 2026: SE1 details confirmed and changed by H (before any SE1 build)
+
+This note replaces the points marked "(proposed)" in the SE1 section above; nothing has been built or
+measured.
+- **Confirmed:** "at least 50%" and "less than 2 points" are compared on the point estimates, in whole
+  images, and the interval condition is on the change in points, not on the share; if a judged
+  model's SE-all build fails a build check, or a run fails technically, SE1 is NOT JUDGED and a dated
+  note decides; confidence: low.
+- **Changed: a judged model must first have a baseline loss.** EfficientNet-B0 or MobileNetV3-Large
+  "has a baseline loss" if its existing Percentile build's darkness (Brokkr) s5 extra gap on these
+  tuning images is −2.0 points or lower (in whole images) with its paired 95% interval below zero.
+  If either judged model has no baseline loss, **SE1 is NOT JUDGED**: there is nothing to recover. (This
+  replaces "its share is undefined and that model's part fails".)
+- **Added to the limits:** RegNetY-400MF's 4.1 extra gaps are about 1 point (−0.89 darkness s5, −1.03
+  contrast s3), so its "change under 2 points" control is close to automatic and carries little
+  evidence.
+- **Dropped:** the separate MobileNetV3-Small rebuild with only its first squeeze-and-excitation
+  multiply in float; SE-all and SE-output cover it.
+- **Not done for now:** M2's layer measurement for MobileNetV3-Large.

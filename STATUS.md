@@ -154,10 +154,14 @@ Tuning images 500–627. **M2a Percentile: REJECTS** (darkness and fog: 6 of 8 r
 **M2b Percentile: SUPPORTS** (darkness and fog, 8 of 8). Numbers: `docs/hypotheses_stage4.md`,
 "M2 outcome".
 
-**Next, in order.** (1) Exploratory: where the largest per-tensor extra rounding errors E(t) sit
-(from the saved M2 arrays). (2) A squeeze-and-excitation diagnostic (to be proposed, then agreed).
-(3) Diagnostic-only MobileNetV3-Small rebuild with the first squeeze-and-excitation multiply
-unquantized (tuning only; official result stays "INT8 failed"). (4) The 4.1 summary tables script.
+**Exploratory (done):** where the largest M2 extra rounding errors sit, `scripts/36_m2_top_tensors.py`
+(`results/checks/m2_top_tensors_*.json`). Plain-language summary of Stage 4: `docs/stage4_story.md`
+(updated after each result).
+
+**Next, in order.** (1) SE1, the squeeze-and-excitation diagnostic (design, pass rule and H's
+confirmations in `docs/hypotheses_stage4.md`; tuning split only): code, dry run, then the run.
+(2) The 4.1 summary tables script. (The separate MobileNetV3-Small first-multiply rebuild was dropped;
+SE1 covers it.)
 Handoff details: `results/handoff_4.1.md` (gitignored).
 
 ### Suggestions parked for later (not decided)
