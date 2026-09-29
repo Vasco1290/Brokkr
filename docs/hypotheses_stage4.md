@@ -908,3 +908,68 @@ gap; positive = loses less):
   freeze).
 - MobileNetV3-Small's positive "extra gap" is a floor effect: its INT8 builds are near chance (about
   3% clean), so damage cannot make them much worse; its builds stay failed with the blocks in float.
+
+## Note added 29 September 2026, before any label is generated: the reliability envelope (P1)
+
+The envelope's three states were fixed by H; details marked "(proposed)" await H's confirmation.
+Nothing has been generated.
+- **Harm thresholds** (the proposed definition of the 3.9 note, used unchanged): a condition is harmful
+  for a build if its clean-tuned 90% conformal coverage falls below 80%, or its top-1 is more than 10
+  points below the same build's clean top-1.
+- **The two intervals, per build and tested condition:** coverage with its 95% bootstrap interval (the
+  4.1 conformal record: threshold from the same build's clean `conformal_calibration` images, 1,000
+  resamples, seed 0); and the drop = top-1 under the condition minus the same build's clean top-1,
+  with a paired 95% interval over the same test images (1,000 resamples, seed 0).
+- **States:**
+  - **not harmful:** the whole coverage interval is at or above 80% (lower end ≥ 80%) and the whole
+    drop interval is at or above −10.0 points (lower end ≥ −10.0);
+  - **harmful:** the whole coverage interval is below 80% (upper end < 80%), or the whole drop interval
+    is below −10.0 points (upper end < −10.0);
+  - **borderline:** neither: an interval straddles a threshold and no threshold is wholly failed;
+  - **not tested:** any condition without a checked record for that build.
+- (proposed) **Ends:** "at or above" includes the threshold (so ≥ is "not harmful" and a lower end of
+  exactly 80.0% or −10.0 points still clears); "below" is strict.
+- (proposed) **Which build:** the states are computed for the shrunk build and for FP32 beside it; the
+  summary block at the top describes the shrunk build.
+- (proposed) **Which conditions:** the 12 damaged 4.1 conditions, each named with its suite; clean is
+  shown as the reference row and is not part of the envelope. Rows where FP32 is near floor (below
+  10%) are flagged; their state is computed the same way.
+- (proposed) **No correction for 12 conditions tested at once:** the label says the intervals are per
+  condition.
+- **Wording on the label:** "not harmful in our tests", "harmful", "borderline", "not tested"; never
+  "safe", "robust" or "guaranteed". The summary block has one short line per state, listing its
+  conditions.
+- **Inputs:** only records that pass `scripts/22_check_results.py`: the 4.1 test-split accuracy
+  records (with their scores) and the 4.1 conformal records.
+
+## Note added 29 September 2026, before any latency is measured: the laptop latency method (P1)
+
+Proposed by Claude, to be confirmed by H before any timing. Built on `brokkr.benchmark` (Stage 1's
+tested code).
+- **What is timed:** one image at a time (batch 1, 3×224×224, random input with seed 0: speed does
+  not depend on the picture), ONNX Runtime CPU execution provider, for FP32 and the Percentile INT8
+  build of each of the 9 models.
+- **Machine checks, at the start and end of every model (the run stops if one fails):** plugged in;
+  Windows power mode "best performance"; battery saver off; and, before starting, a 10-second idle
+  check of total CPU use, which must be below 10% (other programs closed). All of it is recorded.
+- **Cores and threads:** pinned to the performance cores this laptop's fingerprint lists (logical CPUs
+  0–3), because unpinned Windows moves the work between fast and slow cores (Stage 1). Two thread
+  counts, 1 and 4, as in Stage 1; the label's main line shows 4 threads, the details show both.
+  Thread spinning left at ONNX Runtime's default, since one session runs at a time.
+- **Runs:** 10 sessions per build. In each session, a model's FP32 and INT8 builds are timed back to
+  back, in alternating order (FP32 first in odd sessions, INT8 first in even ones), so slow drift
+  affects both alike. Each timing: 20 warm-up runs (not counted), then 300 timed runs (the rules ask
+  for at least 100; 300 puts 3 runs above p99).
+- **Cool-down:** 60 seconds of rest before each model's first session, and 30 seconds between
+  sessions.
+- **Reported, per build and thread count:** p50, p95 and p99 in milliseconds, each the median across
+  the 10 sessions; the spread = the interquartile range of the 10 session p50s as a percentage of
+  their median, and the fastest and slowest session p50. A spread above 10% is flagged "unstable"
+  (Stage 1's rule), shown on the label, and not hidden.
+- **Recorded with every result:** the machine fingerprint (CPU, OS, core types, power state), the
+  pinned CPUs, thread count, spinning, ONNX Runtime version, sessions, warm-up and timed runs,
+  cool-down, the idle check's reading, and the power state at start and end.
+- **On the label:** "Laptop latency (Intel Core i5-1235U, Windows 11, batch 1, 4 threads on
+  performance cores)" with p50 / p95 / p99 and the spread; "Raspberry Pi 5: not measured". Laptop
+  latency is never presented as the speed of an edge device.
+- Stage 1's speed records are not reused (different sessions and settings).
