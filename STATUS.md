@@ -170,8 +170,8 @@ outcome".
 ### Research freeze (from 27 September 2026, until website v0 ships; also in `CLAUDE.md`)
 - No new research questions, diagnostics or hypotheses until website v0 ships. If a result raises a
   new question, add it to "Parked questions" below and move on.
-- H23 and task 4.2 may still run, overnight only, and only as pre-registered (in
-  `docs/hypotheses_stage4.md`) before they start. (H23 is not yet written down anywhere.)
+- Task 4.2 may still run, overnight only, and only as pre-registered (in `docs/hypotheses_stage4.md`)
+  before it starts. H23 is parked (29 September 2026): not run during the freeze.
 - Daytime priority is the product: 4.3 (`brokkr shrink` / `test` / label), then website v0, then 4.5.
 
 **Next, in order.** (1) 4.3: the label's contents and format, proposed to H before anything is built,
@@ -187,6 +187,7 @@ Handoff details: `results/handoff_4.1.md` (gitignored).
   squeeze-and-excitation blocks in float?
 - Why is the largest per-tensor extra rounding error in RegNetY-400MF inside squeeze-and-excitation
   blocks (up to +12.10 dB) while its accuracy barely suffers?
+- H23 (parked 29 September 2026; never written down or pre-registered): not run during the freeze.
 
 ### Suggestions parked for later (not decided)
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each

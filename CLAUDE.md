@@ -69,8 +69,8 @@ else is built on its measurements.
 
 * No new research questions, diagnostics or hypotheses until website v0 ships. If a result raises a
   new question, add it to the "Parked questions" list in STATUS.md and move on.
-* H23 and task 4.2 may still run, overnight only, and only as pre-registered (in
-  `docs/hypotheses_stage4.md`) before they start.
+* Task 4.2 may still run, overnight only, and only as pre-registered (in `docs/hypotheses_stage4.md`)
+  before it starts. H23 is parked (in STATUS.md) and is not run during the freeze.
 * Daytime priority is the product: 4.3 (`brokkr shrink` / `test` / label), then website v0, then 4.5.
 
 ## Architecture principles
