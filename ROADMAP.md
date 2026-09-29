@@ -234,6 +234,8 @@ Overnight runs.
 
 ### 4.3 `brokkr shrink` / `brokkr test` and the label, for any ONNX model `[ ]`
 
+*29 September 2026: now P1 of the Product plan below.*
+
 *Scope*
 - **Input:** an FP32 ONNX ImageNet-1k classifier (1,000 outputs) and a small config: preprocessing
   (resize, crop, mean, std) and its licence. The commands refuse to run without a licence (rule 8).
@@ -288,6 +290,8 @@ step is a timing probe on one model.
 
 ### 4.5 `brokkr recommend` `[ ]`
 
+*29 September 2026: comes after P1–P6 (Product plan below); its laptop latency moved to P1.*
+
 *Scope*
 - `brokkr recommend --task classification --device ... --min-fps ... --max-size ... --condition ...`,
   reading only results JSON.
@@ -328,6 +332,87 @@ results files.
 - Runtime monitoring
 - Adaptation
 
+## Product plan (P1–P6), added 29 September 2026
+
+From 29 September 2026 the work follows this order, under the research freeze (`CLAUDE.md`). It
+replaces the order of Stage 4's 4.3–4.5 and brings the start of Stage 6's website forward: task 4.3
+becomes P1, and 4.5's laptop latency moves into P1. Task 4.2 may still run overnight if pre-registered.
+Every step keeps the project's rules: numbers only from checked result files, licences recorded, no
+overclaiming, and a check that prints pass / fail.
+
+### P1 Labels `[ ]`
+- `brokkr test`: one command that runs the 4.1 condition set on a model and writes schema-2 records,
+  and the label generator. Labels for the 9 models whose INT8 build passed in 4.1, made from their 4.1
+  records; `brokkr test` is shown to reproduce those records on one of them.
+- One label per shrunk build, with FP32 beside it; a summary block at the top (conditions where it is
+  not harmful / harmful / borderline / not tested); the reliability envelope with three states (dated
+  note in `docs/hypotheses_stage4.md`); E-AURC in a details section. `label.json` is the only source;
+  Markdown (usable as a Hugging Face model card) and HTML are generated from it.
+- Laptop latency for FP32 and INT8 of the 9 models, by the method fixed in a dated note before
+  measuring; the Raspberry Pi row says "not measured".
+- The model list moves out of `export.py`, so testing and labelling run without PyTorch.
+
+*Done when:* `brokkr test` on one 4.1 model reproduces its 4.1 records (the same scores); each of the 9
+models has a `label.json`, Markdown and HTML label generated only from records that pass
+`scripts/22_check_results.py`; a check script prints PASS only if every number in every `label.json`
+equals its source record and every number in the Markdown and HTML appears in its `label.json`; the
+Markdown's model-card metadata parses; laptop latency records exist for all 18 builds.
+
+### P2 Website v0 and going public `[ ]`
+- A static site (GitHub Pages) generated only from `label.json` files: a list of models and one page
+  per label. Nothing on it is computed separately.
+- The "before making the repository public" checklist (Stage 1 above), plus a licence and
+  commercial-use check of every model and dataset (each dataset tagged "research only" or "commercial
+  use allowed") and a re-read of README, ROADMAP, docs and site for overclaiming. Then H makes the
+  repository public.
+
+*Done when:* the site builds from label files alone and a test fails if any number on it is not in a
+`label.json`; every checklist item is ticked with its date; the repository is public and the site is
+live.
+
+### P3 The user's own images `[ ]`
+- `brokkr test --images <folder>`. With labels (ImageNet-1k class numbers, the models' own classes):
+  the full results, as for ImageNet. Without labels: INT8-vs-FP32 top-1 agreement under each damage
+  condition, with intervals (agreement needs no labels).
+- The user states the images' name and licence (no licence, no run: hard rule 8); results are marked
+  "user images" and never mixed with Brokkr's ImageNet results.
+
+*Done when:* the same small folder, run with and without its labels file, gives two labels that say
+which mode, how many images, and the stated licence; tests cover both modes on made-up images (used
+in tests only).
+
+### P4 Fast mode and a menu of conditions `[ ]`
+- `--fast`: fewer images (the count fixed in the code and printed on the label), the same pipeline;
+  the label marks the result "fast mode" and shows the wider intervals.
+- `--conditions`: choose damage types and severities from a catalogue; anything not chosen is "not
+  tested" on the label.
+
+*Done when:* a fast-mode label and a full label of the same model differ only in image count,
+intervals and the "fast mode" mark (checked by a script), and unchosen conditions show "not tested".
+
+### P5 `brokkr shrink --auto` `[ ]`
+- Tries the recipes Brokkr has measured: Percentile 99.99, calibration with damaged images (as 3.3),
+  unrounded last layer (as 3.4); tests each; recommends the smallest build that is "not harmful" in
+  every condition the user chose, or says plainly that none is.
+- The choice is made on the tuning split, never the test split; the chosen build's label reports its
+  test-split numbers.
+
+*Done when:* on one model it prints every recipe's size and envelope states and the one chosen (or
+"none"); tests cover the "none" case.
+
+### P6 `pip install brokkr` and a quick start `[ ]`
+- An installable package (testing and labelling without PyTorch; PyTorch only for exporting
+  torchvision models) and a one-page quick start.
+
+*Done when:* in a fresh virtual environment, installing the built package and following the quick
+start ends with a label, checked by a script. Publishing to PyPI only with H's go-ahead.
+
+### Then
+- 4.5 `brokkr recommend` (above), reading labels.
+- 4.4 Raspberry Pi 5 (above), when it arrives.
+- A GitHub Action that runs `brokkr test` on a model file in a repository and attaches its label.
+  *Done when:* an example workflow runs it on a small model and uploads the label.
+
 ## Stage 5 — Energy and heat on real devices `[ ]`
 
 The Raspberry Pi 5 SSH target moved to task 4.4.
@@ -338,6 +423,8 @@ The Raspberry Pi 5 SSH target moved to task 4.4.
 **Done when:** energy and sustained-run results for the Pi come from the same testing code as 4.4.
 
 ## Stage 6 — Website + installer `[ ]`
+
+*29 September 2026: website v0 is brought forward as P2 of the Product plan above.*
 
 - Static catalog site (GitHub Pages) built from JSON: problem-based search, model pages with labels
 - Install script: detect device, pick model, install a camera runner that can say "not sure"
