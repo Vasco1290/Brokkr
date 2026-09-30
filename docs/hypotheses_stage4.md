@@ -1114,3 +1114,44 @@ Fixed by H before `brokkr test` exists or runs.
   images: `results/breadth/run_log.txt`), but only step 1 decides.
 - **How it is checked:** a script prints step 1's result, which rule applies, PASS / FAIL for each of
   the 28 records, and PASS only if all 28 pass.
+
+## Note added 30 September 2026: H's decisions on the flagged points (before any P1 code)
+
+These decide the points flagged in the two "Revised 30 September 2026" sections and the reproduction
+note above; where they differ, this note replaces them. Nothing has been built or measured.
+
+**Envelope and label**
+1. **Near floor:** the envelope is judged normally for every row, near floor or not. Only the
+   shrinking-cost column says "not informative" when FP32 top-1 under that condition is below 10%
+   (then the shrinking cost can be at most 10 points and says little about shrinking). This replaces
+   the proposed "not informative" state for whole rows.
+2. **Split:** labels use the **test** split: the same harm definition as `621cc43`, applied to the test
+   split. The conformal thresholds come from the `conformal_calibration` split, which shares no image
+   with the test split. Checked on 30 September: by the split definition (`brokkr.datasets.make_splits`:
+   10,000 test and 5,000 calibration images, 0 shared), and on the image positions saved in the score
+   files of all 19 builds of 4.1 (0 builds with shared or unexpected positions).
+3. **"Large shrinking cost"** is the name of the label's flag (whole interval of the shrinking cost
+   below −5.0 points), so it cannot be confused with H20 and H21's −5.0 on the extra gap. The label never
+   calls it an "extra gap".
+
+**Latency**
+4. **VNNI:** read with py-cpuinfo 9.0.0 (MIT: licence field on PyPI and the LICENSE file in its wheel,
+   checked 30 September; installed into `.venv` on 30 September, `py_cpuinfo-9.0.0-py3-none-any.whl`).
+   Read on 30 September: py-cpuinfo reports AVX512_VNNI as not available on this CPU (NumPy's feature
+   list agrees), and has no check at all for AVX-VNNI (its source reads AVX512_VNNI from CPUID leaf 7
+   but never the sub-leaf that holds AVX-VNNI). So records and the label say "AVX512-VNNI: no;
+   AVX-VNNI: unknown (not reported by py-cpuinfo)". No custom CPUID helper for v0.
+5. **Threads on the label:** "2 physical cores × 2 hardware threads". The timing plan is unchanged.
+6. **MobileNetV3-Small's FP32 is added to the latency plan:** 19 builds (FP32 of all 10 models, INT8 of
+   the 9 whose build passed).
+7. **Other Brokkr jobs are detected with psutil** (BSD-3-Clause: licence field on PyPI, checked 30
+   September; not yet installed), because the same check must work on Linux (Raspberry Pi 5), not
+   through PowerShell.
+
+**Methods page (for the website)**
+- It states: the 80% coverage threshold was set after the Stage 2 results were known (`237effa`), and
+  the −10.0-point threshold after the Stage 3 results (`621cc43`); both were set before any 4.1 result
+  existed. It gives their data-independent reasons (from the envelope revision above): below 80% the
+  sets miss at least twice the 10% they are built to miss; a fall of ten points means at least one
+  image in ten that was right on clean images is now wrong. And: "With 12 conditions, an occasional
+  result may cross a line by chance."
