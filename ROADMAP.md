@@ -350,8 +350,9 @@ overclaiming, and a check that prints pass / fail.
   not harmful / harmful / borderline / not tested); the reliability envelope with three states (dated
   note in `docs/hypotheses_stage4.md`); E-AURC in a details section. `label.json` is the only source;
   Markdown (usable as a Hugging Face model card) and HTML are generated from it.
-- Laptop latency for FP32 and INT8 of the 9 models, by the method fixed in a dated note before
-  measuring; the Raspberry Pi row says "not measured".
+- Laptop latency for 19 builds (FP32 of all 10 models, INT8 of the 9 whose build passed; revised 30
+  September 2026), by the method fixed in dated notes before measuring; the Raspberry Pi row says "not
+  measured".
 - The model list moves out of `export.py`, so testing and labelling run without PyTorch.
 
 *Done when:* `brokkr test` on MobileNetV3-Large passes the reproduction rule (dated note, 30 September
@@ -359,9 +360,7 @@ overclaiming, and a check that prints pass / fail.
 that pass `scripts/22_check_results.py` (MobileNetV3-Small's INT8 row: "INT8 build failed", with the
 reason from its build record); a check script prints PASS only if every number in every `label.json`
 equals its source record and every number in the Markdown and HTML appears in its `label.json`; the
-Markdown's model-card metadata parses; laptop latency records exist for the 18 builds of the latency
-note (FP32 and INT8 of the 9 models; MobileNetV3-Small's label says "not measured" unless H adds its
-FP32).
+Markdown's model-card metadata parses; laptop latency records exist for all 19 builds.
 
 ### P2 Website v0 and going public `[ ]`
 - A static site (GitHub Pages) generated only from `label.json` files: a list of models and one page
