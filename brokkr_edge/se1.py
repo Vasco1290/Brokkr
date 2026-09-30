@@ -3,7 +3,7 @@ confirmations of 27 September 2026), from per-image correctness (0/1 arrays over
 
 Words:
 - extra gap of a build under a condition: (build - FP32 top-1 under the condition) - (build - FP32
-  top-1 on clean images), paired over the same images (brokkr.judge_breadth.extra_gap);
+  top-1 on clean images), paired over the same images (brokkr_edge.judge_breadth.extra_gap);
 - change of a variant: its extra gap minus the baseline build's (new minus old; positive = the variant
   loses less to the damage). Per image: (variant damaged - variant clean) - (baseline damaged -
   baseline clean), so FP32 cancels. Paired 95% interval: 1,000 resamples, seed 0;
@@ -11,8 +11,8 @@ Words:
 Every threshold is compared in whole images, so no rounding can move a value across a line.
 """
 
-from brokkr.judge import ci_side, paired_ci
-from brokkr.judge_breadth import extra_gap
+from brokkr_edge.judge import ci_side, paired_ci
+from brokkr_edge.judge_breadth import extra_gap
 
 BASELINE_LOSS_POINTS = 2   # a baseline loss: extra gap -2.0 points or lower, interval below zero
 RECOVERED_SHARE = 0.5      # judged models: recover at least half

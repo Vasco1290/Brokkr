@@ -16,12 +16,12 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import open_image, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import make_record, save_record
+from brokkr_edge.accuracy import open_image, preprocess
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import make_record, save_record
 
 BATCH, PASSES, WARMUP_BATCHES = 32, 3, 2
 

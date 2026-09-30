@@ -7,7 +7,7 @@ Writes: results/samples/imagenet_c_check.png
 Rows: 5 tuning images (never test images). Columns: clean; the ImageNet-C conditions planned for 4.1
 (fog, contrast, defocus blur, Gaussian noise at severities 3 and 5); then Brokkr's own four 4.1
 conditions for comparison. Each column is labelled with its suite, e.g. "fog (ImageNet-C) s3".
-Same seeds as the sweeps (brokkr.sweep.damaged_batch).
+Same seeds as the sweeps (brokkr_edge.sweep.damaged_batch).
 """
 
 from pathlib import Path
@@ -15,10 +15,10 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-from brokkr.accuracy import open_image, resize_and_crop
-from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.schema import condition, condition_label
-from brokkr.sweep import damaged_batch
+from brokkr_edge.accuracy import open_image, resize_and_crop
+from brokkr_edge.datasets import count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.schema import condition, condition_label
+from brokkr_edge.sweep import damaged_batch
 
 TILE, LABEL_H = 160, 30
 CONDITIONS = ([condition()]

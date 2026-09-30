@@ -15,9 +15,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from brokkr.accuracy import open_image, resize_and_crop
-from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.shift import CORRUPTIONS, corrupt
+from brokkr_edge.accuracy import open_image, resize_and_crop
+from brokkr_edge.datasets import count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.shift import CORRUPTIONS, corrupt
 
 TILE, LABEL_W, HEADER_H = 224, 130, 28
 out_dir = Path("results/samples")

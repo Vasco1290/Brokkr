@@ -1,11 +1,11 @@
-"""The SE1 pass rule (brokkr.se1) on made-up per-image results whose right answer is known.
+"""The SE1 pass rule (brokkr_edge.se1) on made-up per-image results whose right answer is known.
 
 The numbers here are invented for the tests; they are never results.
 """
 
 import numpy as np
 
-from brokkr import se1
+from brokkr_edge import se1
 
 N = 1000
 

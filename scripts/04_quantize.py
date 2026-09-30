@@ -4,7 +4,7 @@ Usage:  python scripts/04_quantize.py [--model NAME]
 Needs:  models/<model>_fp32.onnx and data/imagenet-1k/
 Writes: models/<model>_fp16.onnx, models/<model>_int8.onnx, and a .json record for each
 
-INT8 calibration uses the "int8_calibration" split (512 images) from brokkr.datasets.make_splits,
+INT8 calibration uses the "int8_calibration" split (512 images) from brokkr_edge.datasets.make_splits,
 which never overlaps the "test" split. Those images DO fall inside the full 50,000 set, which a
 --split all accuracy run must disclose.
 
@@ -20,12 +20,12 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import open_image, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import INT8_SETTINGS, to_fp16, to_int8
+from brokkr_edge.accuracy import open_image, preprocess
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import INT8_SETTINGS, to_fp16, to_int8
 
 DATASET = "imagenet-1k-val"
 WARN_AGREEMENT = 0.90

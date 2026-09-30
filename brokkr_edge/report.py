@@ -11,9 +11,9 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr import charts
-from brokkr.accuracy import paired_bootstrap_diff
-from brokkr.fingerprint import git_info
+from brokkr_edge import charts
+from brokkr_edge.accuracy import paired_bootstrap_diff
+from brokkr_edge.fingerprint import git_info
 
 PRECISION_ORDER = {"fp32": 0, "fp16": 1, "int8": 2}
 UNSTABLE_IQR_PCT = 10  # middle half of sessions disagreeing by more than this is flagged

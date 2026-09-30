@@ -9,8 +9,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from brokkr import judge
-from brokkr.results import save_arrays
+from brokkr_edge import judge
+from brokkr_edge.results import save_arrays
 
 N, CLASSES = 2_000, 10
 rng = np.random.default_rng(0)
@@ -149,7 +149,7 @@ def test_verdicts_can_be_saved_as_json():
 
 def test_judging_script_end_to_end_on_a_fake_results_folder(tmp_path):
     """Run scripts/18_judge_stage3.py on small fake files laid out like the real final run."""
-    from brokkr.shift import CORRUPTIONS
+    from brokkr_edge.shift import CORRUPTIONS
 
     m, best, n = "fake", "int8_x", 1_000
     labels = np.random.default_rng(0).integers(0, CLASSES, n)

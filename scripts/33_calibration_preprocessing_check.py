@@ -8,13 +8,13 @@ Writes: results/checks/<model>_calibration_preprocessing.json (schema 2, kind "d
 
 For every model and each INT8 build it has (Percentile 99.99 for 4.1; MinMax "int8" for M2):
 1. Settings: the preprocessing the build record states, the one every evaluation record states, and
-   torchvision's (brokkr.export.preprocessing) must be the same.
+   torchvision's (brokkr_edge.export.preprocessing) must be the same.
 2. Code: the evaluation functions (accuracy.open_image, resize_and_crop, normalize; export.preprocessing;
    sweep.build_caches, normalised) must have the same source at both sweep commits as today.
 3. Behaviour: the 512 int8_calibration images preprocessed by the calibration code AS IT WAS AT THE
-   BUILD COMMIT (brokkr/accuracy.py and brokkr/export.py read from git, called the way that commit's
+   BUILD COMMIT (brokkr_edge/accuracy.py and brokkr_edge/export.py read from git, called the way that commit's
    build script called them) must be bit-identical to today's evaluation path (resize_and_crop with the
-   model's settings, then brokkr.sweep.normalised).
+   model's settings, then brokkr_edge.sweep.normalised).
 Prints PASS only if every check holds for every model.
 """
 
@@ -28,16 +28,16 @@ from pathlib import Path
 import numpy as np
 import PIL
 
-from brokkr import accuracy, sweep
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.schema import condition, make_measurement, metric, save_measurement
+from brokkr_edge import accuracy, sweep
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.schema import condition, make_measurement, metric, save_measurement
 
 SWEEP_COMMITS = ("5be2cb5", "fc965cd")  # the two commits the 4.1 test-split records come from
-EVALUATION_FUNCTIONS = {"brokkr/accuracy.py": ("open_image", "resize_and_crop", "normalize"),
-                        "brokkr/export.py": ("preprocessing",),
-                        "brokkr/sweep.py": ("build_caches", "normalised")}
+EVALUATION_FUNCTIONS = {"brokkr_edge/accuracy.py": ("open_image", "resize_and_crop", "normalize"),
+                        "brokkr_edge/export.py": ("preprocessing",),
+                        "brokkr_edge/sweep.py": ("build_caches", "normalised")}
 RUNTIME = {"name": "numpy and pillow (no model is run)", "version": f"numpy {np.__version__}, pillow "
            f"{PIL.__version__}", "execution_provider": "none", "threads": 1}
 
@@ -102,9 +102,9 @@ for model in MODELS:
         build = json.loads(path.read_text(encoding="utf-8"))
         commit = build["machine"]["git"]["commit"][:7]
         stated = (build.get("settings") or {}).get("preprocessing")
-        old = module_at(commit, "brokkr/accuracy.py")
+        old = module_at(commit, "brokkr_edge/accuracy.py")
         if stated is not None:  # 4.1 builds: scripts/24 calls preprocess(image, resize, crop, interpolation)
-            old_prep = module_at(commit, "brokkr/export.py").preprocessing(model)
+            old_prep = module_at(commit, "brokkr_edge/export.py").preprocessing(model)
             calibrated = np.stack([old.preprocess(old.open_image(b), old_prep["resize"], old_prep["crop"],
                                                   old_prep["interpolation"]) for b in raw])
             how = f"scripts/24 at {commit}: preprocess(image, {old_prep})"

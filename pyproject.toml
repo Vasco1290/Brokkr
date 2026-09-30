@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "brokkr"
+name = "brokkr-edge"
 version = "0.0.1"
 description = "Shrink vision models for edge hardware, stress-test them, and make them say when they're unsure."
 readme = "README.md"
@@ -37,15 +37,15 @@ data = ["huggingface_hub>=1.32"]  # only needed to download datasets
 imagenet-c = ["scipy==1.15.3", "scikit-image==0.25.2", "opencv-python-headless==4.14.0.94"]
 
 [tool.setuptools.packages.find]
-include = ["brokkr*"]
+include = ["brokkr_edge*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 110
-# Copied third-party code keeps its original style (see brokkr/third_party/*/CHANGES.md).
-extend-exclude = ["brokkr/third_party"]
+# Copied third-party code keeps its original style (see brokkr_edge/third_party/*/CHANGES.md).
+extend-exclude = ["brokkr_edge/third_party"]
 
 [tool.ruff.lint]
 # E/W: style errors and warnings, F: real mistakes (unused or undefined names),

@@ -22,7 +22,7 @@ from onnxruntime.quantization import (
     quantize_static,
 )
 
-from brokkr.benchmark import make_session
+from brokkr_edge.benchmark import make_session
 
 # Settings are kept in one place so they can be saved alongside the results.
 INT8_SETTINGS = {
@@ -111,7 +111,7 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
         after checking it leaves MobileNetV3-Large's INT8 model unchanged. Recorded with the model.
     keep_float_outputs: output tensor names of nodes that stay in float (not quantized): the nodes of
         the prepared model that produce them are passed to onnxruntime as nodes_to_exclude (SE1,
-        brokkr.se_float). Every name must be found, on a named node, or the build stops.
+        brokkr_edge.se_float). Every name must be found, on a named node, or the build stops.
     report: if given, filled with what was done ("nodes_kept_float": the excluded node names).
     """
     out_path = Path(out_path)

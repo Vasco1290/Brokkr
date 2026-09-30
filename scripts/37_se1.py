@@ -9,7 +9,7 @@ Writes: results/se1/<model>_<precision>_tuning_<suite>_<corruption>_s<severity>.
         "diagnostic") + .npz (logits, labels, positions); verdict in results/final/se1_verdict.json
 
 Design, pass rule and H's confirmations: docs/hypotheses_stage4.md, "Squeeze-and-excitation diagnostic
-(SE1)" and the notes after it. Rule code: brokkr/se1.py.
+(SE1)" and the notes after it. Rule code: brokkr_edge/se1.py.
 - Models: EfficientNet-B0 and MobileNetV3-Large (judged), RegNetY-400MF (control, judged),
   MobileNetV3-Small (reported). Builds: FP32, the baseline Percentile INT8, SE-all, SE-output.
 - Images: the tuning split without its first 64 images (4,936), in split order; the first 64 were seen in
@@ -30,16 +30,16 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 
-from brokkr import se1
-from brokkr.accuracy import accuracy_from_logits, open_image, resize_and_crop
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.judge import plain, top1_correct
-from brokkr.judge_breadth import near_floor
-from brokkr.results import make_record, save_record, sha256_of, written_atomically
-from brokkr.schema import (
+from brokkr_edge import se1
+from brokkr_edge.accuracy import accuracy_from_logits, open_image, resize_and_crop
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.judge import plain, top1_correct
+from brokkr_edge.judge_breadth import near_floor
+from brokkr_edge.results import make_record, save_record, sha256_of, written_atomically
+from brokkr_edge.schema import (
     check_build_record,
     condition,
     condition_label,
@@ -48,7 +48,7 @@ from brokkr.schema import (
     metric,
     save_measurement,
 )
-from brokkr.sweep import damaged_batch, normalised
+from brokkr_edge.sweep import damaged_batch, normalised
 
 JUDGED, CONTROL, REPORTED = ["efficientnet_b0", "mobilenet_v3_large"], "regnet_y_400mf", "mobilenet_v3_small"
 SE1_MODELS = [*JUDGED, CONTROL, REPORTED]

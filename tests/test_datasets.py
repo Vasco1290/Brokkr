@@ -1,4 +1,4 @@
-"""Checks for brokkr.datasets, using tiny fake Parquet files (no real dataset needed)."""
+"""Checks for brokkr_edge.datasets, using tiny fake Parquet files (no real dataset needed)."""
 
 import io
 
@@ -7,8 +7,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from PIL import Image
 
-from brokkr.accuracy import open_image
-from brokkr.datasets import choose_subset, count_images, read_parquet_images
+from brokkr_edge.accuracy import open_image
+from brokkr_edge.datasets import choose_subset, count_images, read_parquet_images
 
 
 def fake_parquet(path, labels):
@@ -46,7 +46,7 @@ def test_subset_none_means_everything():
 
 
 def test_splits_have_the_right_sizes_and_never_overlap():
-    from brokkr.datasets import SPLIT_SIZES, make_splits
+    from brokkr_edge.datasets import SPLIT_SIZES, make_splits
     splits = make_splits(50_000)
     assert {name: len(pos) for name, pos in splits.items()} == SPLIT_SIZES
     names = list(splits)
@@ -58,7 +58,7 @@ def test_splits_have_the_right_sizes_and_never_overlap():
 def test_splits_keep_stage1_images():
     # Stage 1 used choose_subset(seed 0) for test and choose_calibration(seed 1) for INT8.
     # The central splits must be exactly those images, or Stage 1 results would no longer match.
-    from brokkr.datasets import choose_calibration, make_splits
+    from brokkr_edge.datasets import choose_calibration, make_splits
     splits = make_splits(50_000)
     stage1_test = choose_subset(50_000, 10_000, seed=0)
     stage1_int8 = choose_calibration(50_000, 512, exclude=stage1_test, seed=1)
@@ -67,7 +67,7 @@ def test_splits_keep_stage1_images():
 
 
 def test_splits_are_reproducible():
-    from brokkr.datasets import make_splits
+    from brokkr_edge.datasets import make_splits
     a, b = make_splits(50_000), make_splits(50_000)
     assert all(np.array_equal(a[k], b[k]) for k in a)
 
@@ -75,7 +75,7 @@ def test_splits_are_reproducible():
 def test_too_few_images_for_all_splits_is_refused():
     import pytest
 
-    from brokkr.datasets import make_splits
+    from brokkr_edge.datasets import make_splits
     with pytest.raises(ValueError):
         make_splits(12_000)
 
@@ -93,7 +93,7 @@ def test_real_splits_are_validation_images_and_never_overlap():
     import pyarrow.parquet as pq
     import pytest
 
-    from brokkr.datasets import DATASETS, make_splits, parquet_files
+    from brokkr_edge.datasets import DATASETS, make_splits, parquet_files
 
     try:
         files = parquet_files("imagenet-1k-val")
@@ -128,7 +128,7 @@ def test_real_splits_are_validation_images_and_never_overlap():
 
 
 def test_unassigned_images_are_in_no_split():
-    from brokkr.datasets import SPLIT_SIZES, make_splits, unassigned
+    from brokkr_edge.datasets import SPLIT_SIZES, make_splits, unassigned
 
     free = unassigned(50_000)
     assert len(free) == 50_000 - sum(SPLIT_SIZES.values()) == 29_488
@@ -137,7 +137,7 @@ def test_unassigned_images_are_in_no_split():
 
 
 def test_folder_images_take_the_label_from_the_folder_name(tmp_path, monkeypatch):
-    from brokkr import datasets
+    from brokkr_edge import datasets
 
     monkeypatch.setitem(datasets.DATASETS, "fake-v2", {"folder": "v2", "licence": "test"})
     for label in (10, 2, 0):  # folder names sort as numbers, not text: 0, 2, 10
@@ -154,6 +154,6 @@ def test_folder_images_take_the_label_from_the_folder_name(tmp_path, monkeypatch
 
 
 def test_every_dataset_has_a_licence():
-    from brokkr.datasets import DATASETS
+    from brokkr_edge.datasets import DATASETS
 
     assert all(spec.get("licence") for spec in DATASETS.values())  # hard rule 8

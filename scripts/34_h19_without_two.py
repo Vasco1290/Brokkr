@@ -7,7 +7,7 @@ Writes: results/checks/breadth_4.1_h19_without_two_<condition>.json (schema 2, k
 
 Question (asked after the verdicts, 27 September 2026): does H19's relation (a model's clean INT8 loss
 ranks its INT8 loss under damage) depend on the two models with the largest INT8 losses? Same code as the
-verdict (brokkr.judge_breadth.correlation: near-floor models left out, 1,000 resamples of the model list,
+verdict (brokkr_edge.judge_breadth.correlation: near-floor models left out, 1,000 resamples of the model list,
 seed 0), with the rule of the later 27 September note: at least 6 models, else "not computed". The top-1
 values are read from the saved verdict file, so no score file is reopened.
 """
@@ -18,12 +18,12 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr import judge_breadth as jb
-from brokkr.datasets import DATASETS
-from brokkr.export import MODELS
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import sha256_of
-from brokkr.schema import condition, condition_label, make_measurement, metric, save_measurement
+from brokkr_edge import judge_breadth as jb
+from brokkr_edge.datasets import DATASETS
+from brokkr_edge.export import MODELS
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import sha256_of
+from brokkr_edge.schema import condition, condition_label, make_measurement, metric, save_measurement
 
 VERDICTS = Path("results/final/breadth_4.1_verdicts.json")
 WITHOUT = ("mobilenet_v3_large", "efficientnet_b0")
@@ -72,7 +72,7 @@ for label, cond in conditions.items():
     record = make_measurement(
         "diagnostic",
         {"name": f"{len(models)} of the 9 judged 4.1 models (without {' and '.join(WITHOUT)})",
-         "weights": "torchvision defaults (brokkr.export.MODELS)",
+         "weights": "torchvision defaults (brokkr_edge.export.MODELS)",
          "licence": {m: MODELS[m]["licence"] for m in models}},
         "fp32 and int8_percentile99.99", RUNTIME, "laptop", machine,
         {"dataset": "imagenet-1k-val", "split": v["settings"]["split"], "n_images": v["settings"]["n_images"],

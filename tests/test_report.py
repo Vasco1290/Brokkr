@@ -1,13 +1,13 @@
-"""Checks for brokkr.report and the paired accuracy difference."""
+"""Checks for brokkr_edge.report and the paired accuracy difference."""
 
 import json
 
 import numpy as np
 import pytest
 
-from brokkr.accuracy import paired_bootstrap_diff
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.report import accuracy_rows, build_site, render_html
+from brokkr_edge.accuracy import paired_bootstrap_diff
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.report import accuracy_rows, build_site, render_html
 
 
 def accuracy_record(precision, predictions, labels, source="brokkr"):

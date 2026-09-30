@@ -26,15 +26,15 @@ from pathlib import Path
 import numpy as np
 import onnx
 
-from brokkr.accuracy import accuracy_from_logits, normalize, open_image, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH as BATCH
-from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
-from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, check_int8_build, to_int8, weight_quantization
-from brokkr.results import load_arrays
+from brokkr_edge.accuracy import accuracy_from_logits, normalize, open_image, preprocess
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH as BATCH
+from brokkr_edge.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
+from brokkr_edge.quantize import INT8_METHODS, INT8_SETTINGS, check_int8_build, to_int8, weight_quantization
+from brokkr_edge.results import load_arrays
 
 DATASET = "imagenet-1k-val"
 UNROUNDED_OPS = ["Gemm"]

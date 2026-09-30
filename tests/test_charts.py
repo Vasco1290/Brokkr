@@ -1,9 +1,9 @@
-"""Checks for brokkr.charts and the robustness section of the results page."""
+"""Checks for brokkr_edge.charts and the robustness section of the results page."""
 
 import xml.etree.ElementTree as ET
 
-from brokkr.charts import legend, panel
-from brokkr.report import robustness_html
+from brokkr_edge.charts import legend, panel
+from brokkr_edge.report import robustness_html
 
 SVG = "{http://www.w3.org/2000/svg}"
 

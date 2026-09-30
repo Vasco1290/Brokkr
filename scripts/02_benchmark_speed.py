@@ -20,9 +20,9 @@ import sys
 import time
 from pathlib import Path
 
-from brokkr.benchmark import benchmark_latency, combine_sessions, pin_to_cpus
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import make_record, save_record
+from brokkr_edge.benchmark import benchmark_latency, combine_sessions, pin_to_cpus
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import make_record, save_record
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")

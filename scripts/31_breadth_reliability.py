@@ -9,11 +9,11 @@ Writes: <out>/<source name>_calibration.json, _conformal.json, _selective.json (
         default out: results/breadth_reliability)
 
 The metrics are Stage 3's, computed by the same tested functions as scripts/07_reliability.py:
-- calibration: ECE (15 equal-width bins) with a bootstrap 95% interval (brokkr.shift.reliability);
+- calibration: ECE (15 equal-width bins) with a bootstrap 95% interval (brokkr_edge.shift.reliability);
 - conformal: the 90% threshold from the SAME model and precision's clean conformal_calibration images
   (5,000 in the full run), then coverage AND average set size on the evaluated images, each with a
-  bootstrap 95% interval (brokkr.shift.conformal); coverage is never reported without set size;
-- selective prediction: AURC and E-AURC with bootstrap 95% intervals (brokkr.shift.selective).
+  bootstrap 95% interval (brokkr_edge.shift.conformal); coverage is never reported without set size;
+- selective prediction: AURC and E-AURC with bootstrap 95% intervals (brokkr_edge.shift.selective).
 Bootstrap: 1,000 resamples, seed 0. Nothing here is judged; H18-H22 use top-1 only (scripts/32).
 
 Checks (PASS / FAIL at the end): each record's score file matches its checksum; ECE and its interval
@@ -30,11 +30,11 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.schema import condition_label, load_measurement, make_measurement, metric, save_measurement
-from brokkr.shift.conformal import conformal_threshold, evaluate_sets
-from brokkr.shift.reliability import calibration, confidence_and_correct, softmax
-from brokkr.shift.selective import selective_prediction
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.schema import condition_label, load_measurement, make_measurement, metric, save_measurement
+from brokkr_edge.shift.conformal import conformal_threshold, evaluate_sets
+from brokkr_edge.shift.reliability import calibration, confidence_and_correct, softmax
+from brokkr_edge.shift.selective import selective_prediction
 
 TARGET_COVERAGE, RESAMPLES, SEED = 0.90, 1000, 0
 
@@ -101,7 +101,7 @@ for path in sources:
           "accuracy": metric(cal["accuracy"]), "overconfidence": metric(cal["overconfidence"])},
          {"n_bins": cal["n_bins"]}, {"bins": cal["bins"]})
     # ECE is biased upwards, so near zero its interval can sit entirely above it
-    # (brokkr/shift/reliability.py): the check is that everything lies in [0, 1].
+    # (brokkr_edge/shift/reliability.py): the check is that everything lies in [0, 1].
     ok = 0 <= cal["ece"] <= 1 and 0 <= cal["ece_ci95"][0] <= cal["ece_ci95"][1] <= 1
     ok &= abs(cal["accuracy"] - acc["metrics"]["top1"]["value"]) < 1e-9
 

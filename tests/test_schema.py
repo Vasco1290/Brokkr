@@ -1,4 +1,4 @@
-"""Checks for brokkr.schema: the unified result format, its checker, and the schema-1 converter.
+"""Checks for brokkr_edge.schema: the unified result format, its checker, and the schema-1 converter.
 
 The numbers in these records are made up for the tests; they are never results.
 """
@@ -10,8 +10,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from brokkr.results import sha256_of
-from brokkr.schema import (
+from brokkr_edge.results import sha256_of
+from brokkr_edge.schema import (
     check_build_record,
     check_record,
     condition,
@@ -211,8 +211,8 @@ def test_converting_does_not_change_the_input():
 
 @pytest.mark.skipif(not Path("results/accuracy").exists(), reason="Stage 1-3 results not on this machine")
 def test_every_real_stage1_to_3_measurement_passes():
-    from brokkr.datasets import DATASETS as REAL_DATASETS
-    from brokkr.export import MODELS as REAL_MODELS
+    from brokkr_edge.datasets import DATASETS as REAL_DATASETS
+    from brokkr_edge.export import MODELS as REAL_MODELS
     models = {n: {"weights": str(s["weights"]), "licence": s["licence"]} for n, s in REAL_MODELS.items()}
     measurements, _ = load_measurements("results", models, REAL_DATASETS)
     assert measurements

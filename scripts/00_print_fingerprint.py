@@ -2,6 +2,6 @@
 
 import json
 
-from brokkr.fingerprint import machine_fingerprint
+from brokkr_edge.fingerprint import machine_fingerprint
 
 print(json.dumps(machine_fingerprint(), indent=2))

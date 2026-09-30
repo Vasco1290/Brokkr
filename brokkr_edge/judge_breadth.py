@@ -18,14 +18,14 @@ Words (from the hypotheses file):
 - compression-caused gap at a condition: INT8 top-1 minus FP32 top-1, same model, same images;
 - extra gap: that gap minus the same model's clean gap (negative = INT8 hurts more under the damage).
 
-Intervals: "paired" = the same resampled images for every side (brokkr.judge.paired_ci: 1,000
+Intervals: "paired" = the same resampled images for every side (brokkr_edge.judge.paired_ci: 1,000
 resamples, seed 0); correlations resample the model list (1,000 resamples, seed 0). Percentile
 intervals (2.5% and 97.5%), as everywhere in Brokkr.
 """
 
 import numpy as np
 
-from brokkr.judge import N_RESAMPLES, SEED, ci_side, paired_ci
+from brokkr_edge.judge import N_RESAMPLES, SEED, ci_side, paired_ci
 
 NEAR_FLOOR = 0.10  # FP32 top-1 below this under a condition: the cell is left out
 MIN_MODELS = 6           # any correlation from the 27 September note on needs at least this many models

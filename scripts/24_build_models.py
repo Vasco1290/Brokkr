@@ -8,14 +8,14 @@ Writes: models/<model>_fp32.onnx (+ .json, by scripts/01_export_model.py) and
 
 INT8 is Stage 3's chosen method applied as it is (docs/hypotheses_stage4.md): Percentile 99.99, the 512
 int8_calibration images fed in groups of 128, per-channel int8 weights, per-tensor uint8 activations.
-Calibration images use the model's OWN preprocessing (brokkr.export.preprocessing).
+Calibration images use the model's OWN preprocessing (brokkr_edge.export.preprocessing).
 
 Build checks (not results): loads; finite scores; weights all per-channel; top-1 agreement with FP32
 on 256 tuning images, FAIL below 20% (a broken conversion), WARNING below 90%.
 
 --keep-float se-all | se-output (SE1, docs/hypotheses_stage4.md): the Percentile build with the model's
 squeeze-and-excitation nodes (all of them, or only the output path) kept in float, chosen from the
-exporter's module records (brokkr.se_float). Saved as models/<model>_int8_percentile99.99_seall.onnx or
+exporter's module records (brokkr_edge.se_float). Saved as models/<model>_int8_percentile99.99_seall.onnx or
 _seoutput.onnx, with one more build check: no tensor inside the kept path is quantized.
 
 --rebuild-check: for a model whose INT8 file already exists (MobileNetV3-Large from Stage 3), build
@@ -36,16 +36,16 @@ from pathlib import Path
 import numpy as np
 import onnx
 
-from brokkr import se_float
-from brokkr.accuracy import open_image, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH as BATCH
-from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
-from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, to_int8, weight_quantization
-from brokkr.results import make_record, save_record
+from brokkr_edge import se_float
+from brokkr_edge.accuracy import open_image, preprocess
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH as BATCH
+from brokkr_edge.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
+from brokkr_edge.quantize import INT8_METHODS, INT8_SETTINGS, to_int8, weight_quantization
+from brokkr_edge.results import make_record, save_record
 
 DATASET = "imagenet-1k-val"
 # Percentile 99.99 is the 4.1 model ("int8_percentile99.99"). MinMax is the default INT8 of Stage 1,

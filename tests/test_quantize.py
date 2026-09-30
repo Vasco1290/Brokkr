@@ -1,4 +1,4 @@
-"""Checks for brokkr.quantize, using a tiny convolutional model (fast, no dataset needed)."""
+"""Checks for brokkr_edge.quantize, using a tiny convolutional model (fast, no dataset needed)."""
 
 import numpy as np
 import onnx
@@ -6,9 +6,9 @@ import onnxruntime as ort
 import pytest
 import torch
 
-from brokkr.datasets import choose_calibration, choose_subset
-from brokkr.export import export_onnx
-from brokkr.quantize import (
+from brokkr_edge.datasets import choose_calibration, choose_subset
+from brokkr_edge.export import export_onnx
+from brokkr_edge.quantize import (
     INT8_METHODS,
     ImageBatches,
     damaged_calibration_plan,

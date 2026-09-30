@@ -1,4 +1,4 @@
-"""The H18-H22 judging rules (brokkr.judge_breadth) on made-up inputs whose right answer is known.
+"""The H18-H22 judging rules (brokkr_edge.judge_breadth) on made-up inputs whose right answer is known.
 
 The numbers here are invented for the tests; they are never results.
 """
@@ -6,7 +6,7 @@ The numbers here are invented for the tests; they are never results.
 import numpy as np
 import pytest
 
-from brokkr import judge_breadth as jb
+from brokkr_edge import judge_breadth as jb
 
 MODELS = [f"m{i}" for i in range(9)]
 

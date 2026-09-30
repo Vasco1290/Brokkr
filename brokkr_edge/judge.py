@@ -18,10 +18,10 @@ checked "excludes zero" in either direction. It changed no verdict; docs/stage3_
 
 import numpy as np
 
-from brokkr.shift.alarm import consecutive_window_means, fires
-from brokkr.shift.conformal import evaluate_sets, prediction_sets
-from brokkr.shift.reliability import confidence_and_correct, ece, softmax
-from brokkr.shift.selective import aurc, optimal_aurc
+from brokkr_edge.shift.alarm import consecutive_window_means, fires
+from brokkr_edge.shift.conformal import evaluate_sets, prediction_sets
+from brokkr_edge.shift.reliability import confidence_and_correct, ece, softmax
+from brokkr_edge.shift.selective import aurc, optimal_aurc
 
 N_RESAMPLES, SEED = 1000, 0
 

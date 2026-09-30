@@ -8,8 +8,8 @@ import json
 import sys
 from pathlib import Path
 
-from brokkr.export import MODELS, compare_with_pytorch, export_onnx, file_info, load_model
-from brokkr.fingerprint import machine_fingerprint
+from brokkr_edge.export import MODELS, compare_with_pytorch, export_onnx, file_info, load_model
+from brokkr_edge.fingerprint import machine_fingerprint
 
 MAX_ABS_DIFF = 1e-4  # PyTorch and ONNX Runtime outputs must agree to within this
 

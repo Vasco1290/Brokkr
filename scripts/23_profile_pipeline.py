@@ -22,12 +22,12 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from brokkr.accuracy import normalize
-from brokkr.benchmark import make_session, summarise
-from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import make_record, save_record
-from brokkr.shift.corruptions import corrupt as brokkr_corrupt
+from brokkr_edge.accuracy import normalize
+from brokkr_edge.benchmark import make_session, summarise
+from brokkr_edge.datasets import count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import make_record, save_record
+from brokkr_edge.shift.corruptions import corrupt as brokkr_corrupt
 
 DATASET = "imagenet-1k-val"
 N_IMAGES, BATCH, THREADS, WARMUP_BATCHES, PASSES = 1000, 32, 4, 20, 4
@@ -56,7 +56,7 @@ def timed(label: str, n: int, fn, *fn_args):
 
 
 def resize_and_crop(image: Image.Image, size: int, method, crop: int = 224) -> np.ndarray:
-    """Same as brokkr.accuracy.resize_and_crop, with the interpolation as a parameter (profile only)."""
+    """Same as brokkr_edge.accuracy.resize_and_crop, with the interpolation as a parameter (profile only)."""
     w, h = image.size
     new_w, new_h = (size, int(size * h / w)) if w <= h else (int(size * w / h), size)
     image = image.resize((new_w, new_h), method)
@@ -83,7 +83,7 @@ if not args.skip_corruptions:
 
     for name, severity in BROKKR:
         timed(f"{name} (Brokkr) s{severity}", N_IMAGES, run_brokkr, name, severity)
-    from brokkr.imagenet_c import damage as imagenet_c_damage  # vendored official code, seeded per image
+    from brokkr_edge.imagenet_c import damage as imagenet_c_damage  # vendored official code, seeded per image
 
     def run_imagenet_c(name, severity):
         return [imagenet_c_damage(c, name, severity, seed=int(p))

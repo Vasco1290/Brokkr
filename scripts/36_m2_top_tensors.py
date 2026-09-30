@@ -33,11 +33,11 @@ from pathlib import Path
 import numpy as np
 import onnx
 
-from brokkr.export import MODELS
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.m2 import EARLY_FRACTION, N_RESAMPLES, SEED
-from brokkr.results import sha256_of
-from brokkr.schema import load_measurement, make_measurement, metric, save_measurement
+from brokkr_edge.export import MODELS
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.m2 import EARLY_FRACTION, N_RESAMPLES, SEED
+from brokkr_edge.results import sha256_of
+from brokkr_edge.schema import load_measurement, make_measurement, metric, save_measurement
 
 M2_MODELS = ["mobilenet_v2", "efficientnet_b0", "shufflenet_v2_x1_0", "mnasnet1_0", "regnet_y_400mf",
              "resnet18", "resnet50", "convnext_tiny"]

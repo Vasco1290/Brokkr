@@ -1,4 +1,4 @@
-"""Checks for brokkr.levels (the counts are on small made-up arrays, not results)."""
+"""Checks for brokkr_edge.levels (the counts are on small made-up arrays, not results)."""
 
 from pathlib import Path
 
@@ -7,7 +7,7 @@ import onnx
 import pytest
 from onnx import TensorProto, helper
 
-from brokkr.levels import (
+from brokkr_edge.levels import (
     SATURATION,
     activation_quantize_outputs,
     distinct_levels,

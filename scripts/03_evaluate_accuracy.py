@@ -3,7 +3,7 @@
 Usage:  python scripts/03_evaluate_accuracy.py [--model NAME] [--precision fp32]
                                                 [--split test|conformal_calibration|tuning|all]
                                                 [--dataset imagenet-1k-val|imagenetv2-matched-frequency]
-        test:                  the fixed 10,000-image test split (brokkr.datasets.make_splits)
+        test:                  the fixed 10,000-image test split (brokkr_edge.datasets.make_splits)
         conformal_calibration: 5,000 images for tuning conformal prediction sets
         tuning:                5,000 images held back for Stage 3
         all:                   all 50,000 images (includes the INT8 calibration images; FP32 check only)
@@ -27,8 +27,8 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import evaluate
-from brokkr.datasets import (
+from brokkr_edge.accuracy import evaluate
+from brokkr_edge.datasets import (
     DATASETS,
     count_images,
     folder_images,
@@ -37,9 +37,9 @@ from brokkr.datasets import (
     read_folder_images,
     read_parquet_images,
 )
-from brokkr.export import MODELS
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import make_record, save_arrays, save_record
+from brokkr_edge.export import MODELS
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import make_record, save_arrays, save_record
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", default="mobilenet_v3_large")

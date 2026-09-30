@@ -7,11 +7,11 @@ Needs:  schema-2 accuracy records with saved scores from scripts/28_breadth_swee
 Writes: results/final/breadth_4.1_verdicts.json (or --out): every verdict and the numbers behind it
 
 Rules: the H18-H22 rules committed before the sweep and the dated note of 27 September 2026, both in
-docs/hypotheses_stage4.md; the judging code is brokkr/judge_breadth.py.
+docs/hypotheses_stage4.md; the judging code is brokkr_edge/judge_breadth.py.
 - Judged models: FP32 sanity check passed (clean test-split top-1 within 1.0 point of torchvision's
   published top-1; on other splits it cannot be judged and is reported as such) and a usable INT8
-  build (brokkr.schema.check_build_record). Every other model is listed with the reason.
-- Top-1 counts ties towards the lower class number, as everywhere (brokkr.judge.top1_correct), and
+  build (brokkr_edge.schema.check_build_record). Every other model is listed with the reason.
+- Top-1 counts ties towards the lower class number, as everywhere (brokkr_edge.judge.top1_correct), and
   must equal each record's saved top-1 exactly.
 - Every record of every model must hold the same images in the same order (checked), so the
   intervals are paired.
@@ -24,12 +24,12 @@ import json
 import sys
 from pathlib import Path
 
-from brokkr import judge_breadth as jb
-from brokkr.export import MODELS
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.judge import plain, top1_correct
-from brokkr.results import make_record, save_record
-from brokkr.schema import check_build_record, condition, condition_label, load_measurement
+from brokkr_edge import judge_breadth as jb
+from brokkr_edge.export import MODELS
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.judge import plain, top1_correct
+from brokkr_edge.results import make_record, save_record
+from brokkr_edge.schema import check_build_record, condition, condition_label, load_measurement
 
 INT8, TOLERANCE = "int8_percentile99.99", 0.010  # sanity-check tolerance, as in scripts/28_breadth_sweep.py
 CLEAN = condition()

@@ -27,10 +27,10 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr import accuracy
-from brokkr.datasets import read_parquet_images
-from brokkr.results import written_atomically
-from brokkr.shift.corruptions import corrupt as brokkr_corrupt
+from brokkr_edge import accuracy
+from brokkr_edge.datasets import read_parquet_images
+from brokkr_edge.results import written_atomically
+from brokkr_edge.shift.corruptions import corrupt as brokkr_corrupt
 
 CROP_BYTES = 224 * 224 * 3  # one cached picture, uint8
 
@@ -144,7 +144,7 @@ def damaged_batch(crops, positions, indices, suite: str | None, corruption: str,
     if suite == "brokkr":
         fn = brokkr_corrupt
     elif suite == "imagenet-c":
-        from brokkr.imagenet_c import damage as fn  # optional packages, imported only when used
+        from brokkr_edge.imagenet_c import damage as fn  # optional packages, imported only when used
     else:
         raise ValueError(f"unknown suite {suite!r}")
     return np.stack([fn(np.asarray(crops[i]), corruption, severity, seed=seed_for(positions[i]))

@@ -8,7 +8,7 @@ Every result file has the same outer shape, so the website and reports can read 
       "source": "brokkr",              # or "community-submitted" (hard rule 7)
       "model": ..., "precision": ...,
       "settings": {...}, "metrics": {...}, "raw": {...},
-      "machine": {...}                 # from brokkr.fingerprint
+      "machine": {...}                 # from brokkr_edge.fingerprint
     }
 
 Large arrays (e.g. every class score for every image) don't belong in JSON. save_arrays writes

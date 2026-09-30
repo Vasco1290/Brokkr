@@ -16,10 +16,10 @@ import argparse
 import json
 from pathlib import Path
 
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift.conformal import evaluate_sets
-from brokkr.shift.reliability import softmax
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_arrays, make_record, save_record
+from brokkr_edge.shift.conformal import evaluate_sets
+from brokkr_edge.shift.reliability import softmax
 
 V2 = "imagenetv2-matched-frequency"
 

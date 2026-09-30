@@ -2,14 +2,15 @@
 
 Usage:  python scripts/22_check_results.py [--folder results] [--models models]
 Reads:  every .json under the results folder. Stage 1-3 files (schema version 1) are converted in
-        memory by brokkr.schema.from_v1; nothing on disk is changed. And every models/*.json build record.
+        memory by brokkr_edge.schema.from_v1; nothing on disk is changed. And every models/*.json build
+        record.
 Prints:
   1. Result records (schema 2): count per kind, with diagnostics counted apart (they explain results
      but are never results), and the files that are not measurements (choices, checks, verdicts,
      profiles), listed but not converted.
   2. Build records: each model file's status ("usable": its own sanity check passed; "failed"; "no
      sanity check"), any non-default setting, and problems: not from a clean commit, no licence, or
-     built by code that had an option (brokkr.schema.BUILD_OPTIONS) without stating it.
+     built by code that had an option (brokkr_edge.schema.BUILD_OPTIONS) without stating it.
   3. PASS only if every result record passes the schema check, every build record is acceptable, and
      no result record uses a model whose build failed or has no sanity check.
 """
@@ -21,9 +22,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from brokkr.datasets import DATASETS
-from brokkr.export import MODELS
-from brokkr.schema import check_build_record, check_record, load_measurements, non_default_settings
+from brokkr_edge.datasets import DATASETS
+from brokkr_edge.export import MODELS
+from brokkr_edge.schema import check_build_record, check_record, load_measurements, non_default_settings
 
 # The commit that added each build option: code at or after it must state the option in its records.
 OPTION_INTRODUCED = {"skip_symbolic_shape": "e33195e", "kept_float": "7c933be"}

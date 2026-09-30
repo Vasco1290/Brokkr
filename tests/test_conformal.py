@@ -1,10 +1,10 @@
-"""Checks for brokkr.shift.conformal, on simulated data where the maths guarantees the answer."""
+"""Checks for brokkr_edge.shift.conformal, on simulated data where the maths guarantees the answer."""
 
 import numpy as np
 import pytest
 
-from brokkr.shift.conformal import conformal_threshold, evaluate_sets, prediction_sets
-from brokkr.shift.reliability import softmax
+from brokkr_edge.shift.conformal import conformal_threshold, evaluate_sets, prediction_sets
+from brokkr_edge.shift.reliability import softmax
 
 
 def simulated_model(n: int, n_classes: int, rng: np.random.Generator) -> tuple:

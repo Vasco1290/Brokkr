@@ -8,7 +8,7 @@ Writes: results/choices/<model>_temperatures.json
 
 Rules fixed before fitting (docs/hypotheses_stage3.md, dated notes): T minimises the negative
 log-likelihood of the true class on the clean tuning images; golden-section search over T = 0.1 to
-10 (brokkr.shift.reliability.fit_temperature). If any T lands within 1% of either end of that
+10 (brokkr_edge.shift.reliability.fit_temperature). If any T lands within 1% of either end of that
 range, the run stops and reports it instead of saving anything.
 
 Checks: NLL at T is not above NLL at T = 1, and no image's top answer changes.
@@ -23,10 +23,10 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift import CORRUPTIONS
-from brokkr.shift.reliability import confidence_and_correct, ece, fit_temperature, nll
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_arrays, make_record, save_record
+from brokkr_edge.shift import CORRUPTIONS
+from brokkr_edge.shift.reliability import confidence_and_correct, ece, fit_temperature, nll
 
 DATASET = "imagenet-1k-val"
 LOW, HIGH = 0.1, 10.0

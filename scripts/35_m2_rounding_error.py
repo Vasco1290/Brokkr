@@ -10,11 +10,11 @@ Writes: results/m2/<model>_<precision>_m2.npz (per-image numbers) and one schema
         results/final/m2_verdicts.json
 
 Design and verdict rules: docs/hypotheses_stage4.md, "M2" (committed at 54c476d, before any 4.1 result)
-and the dated M2 note of 27 September 2026 (written before this script ran). Measures: brokkr/m2.py.
+and the dated M2 note of 27 September 2026 (written before this script ran). Measures: brokkr_edge/m2.py.
 - Models: the 8 of the M2 section. Precisions: Percentile 99.99 INT8 (8 models) and default INT8
   (MinMax; only builds whose record says "usable": 7 models, EfficientNet-B0's failed).
 - Images: tuning positions 500-627 (128 images, split order), each model's own preprocessing; clean,
-  darkness (Brokkr) s5, fog (Brokkr) s3; damage seed = dataset position (brokkr.sweep.damaged_batch).
+  darkness (Brokkr) s5, fog (Brokkr) s3; damage seed = dataset position (brokkr_edge.sweep.damaged_batch).
 - Tensors: each activation QuantizeLinear of the INT8 model, in graph order, matched by name to the FP32
   model after ONNX Runtime's preparation step (quant_pre_process, with the build's recorded settings).
   Values are read with ONNX Runtime's own tool (qdq_loss_debug.modify_model_output_intermediate_tensors),
@@ -39,14 +39,14 @@ import onnxruntime as ort
 from onnxruntime.quantization import quant_pre_process
 from onnxruntime.quantization.qdq_loss_debug import modify_model_output_intermediate_tensors
 
-from brokkr import m2
-from brokkr.accuracy import open_image, resize_and_crop
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.judge import plain
-from brokkr.results import make_record, save_record, sha256_of, written_atomically
-from brokkr.schema import (
+from brokkr_edge import m2
+from brokkr_edge.accuracy import open_image, resize_and_crop
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.judge import plain
+from brokkr_edge.results import make_record, save_record, sha256_of, written_atomically
+from brokkr_edge.schema import (
     check_build_record,
     condition,
     condition_label,
@@ -54,7 +54,7 @@ from brokkr.schema import (
     metric,
     save_measurement,
 )
-from brokkr.sweep import damaged_batch, normalised
+from brokkr_edge.sweep import damaged_batch, normalised
 
 THREADS, BATCH, SAVED = 4, 8, "_ReshapedSavedOutput"
 M2_MODELS = ["mobilenet_v2", "efficientnet_b0", "shufflenet_v2_x1_0", "mnasnet1_0", "regnet_y_400mf",

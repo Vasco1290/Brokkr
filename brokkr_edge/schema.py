@@ -11,7 +11,7 @@ required field, so a record that can't be traced fails the check.
       "model": {"name": ..., "weights": ..., "licence": ...},
       "precision": "int8_percentile99.99",
       "runtime": {"name": "onnxruntime", "version": ..., "execution_provider": ..., "threads": 4},
-      "device": {"label": "laptop", "fingerprint": {...}},       # fingerprint from brokkr.fingerprint
+      "device": {"label": "laptop", "fingerprint": {...}},       # fingerprint from brokkr_edge.fingerprint
       "code": {"commit": ..., "dirty": false},
       "data": {"dataset": ..., "split": "test", "n_images": ..., "licence": ...},   # null for speed
       "condition": {"corruption": "fog", "suite": "imagenet-c", "severity": 3},    # null for speed
@@ -34,7 +34,7 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.results import sha256_of, written_atomically
+from brokkr_edge.results import sha256_of, written_atomically
 
 SCHEMA_VERSION = 2
 KINDS = ("accuracy", "calibration", "conformal", "selective", "speed", "levels", "diagnostic")
@@ -260,9 +260,10 @@ def load_measurement(path) -> tuple:
 
 # Build options that change how a model is made, with their default. A record made by code that had an
 # option must state it explicitly, so a non-default build can never hide (see check_build_record).
-BUILD_OPTIONS = {"skip_symbolic_shape": False, "kept_float": None}  # kept_float: SE1 (brokkr.se_float)
+BUILD_OPTIONS = {"skip_symbolic_shape": False, "kept_float": None}  # kept_float: SE1 (brokkr_edge.se_float)
 EXPORT_MAX_ABS_DIFF = 1e-4       # scripts/01_export_model.py
-MIN_AGREEMENT_WITH_FP32 = 0.20   # below this an FP16/INT8 build is broken (brokkr.quantize.check_int8_build)
+# Below this an FP16/INT8 build is broken (brokkr_edge.quantize.check_int8_build).
+MIN_AGREEMENT_WITH_FP32 = 0.20
 
 
 def build_sanity(r: dict) -> bool | None:
@@ -335,7 +336,7 @@ def from_v1(r: dict, file: str, models: dict, datasets: dict, v1_by_file: dict,
             device_label: str = "laptop") -> dict | None:
     """Convert one schema-1 measurement record to schema 2, or None if it isn't a measurement.
 
-    models / datasets: name -> {"weights"?, "licence"} (from brokkr.export and brokkr.datasets).
+    models / datasets: name -> {"weights"?, "licence"} (from brokkr_edge.export and brokkr_edge.datasets).
     v1_by_file: every schema-1 record by file name, used to find the model run that a reliability
     record was computed from (its runtime is that run's runtime).
     """
@@ -352,7 +353,7 @@ def from_v1(r: dict, file: str, models: dict, datasets: dict, v1_by_file: dict,
     runtime = {
         "name": "onnxruntime",
         "version": rs.get("onnxruntime_version") or run["machine"]["packages"]["onnxruntime"],
-        # Every Stage 1-3 session was made by brokkr.benchmark.make_session, which uses the CPU provider.
+        # Every Stage 1-3 session was made by brokkr_edge.benchmark.make_session, which uses the CPU provider.
         "execution_provider": rs.get("execution_provider", "CPUExecutionProvider"),
         "threads": rs["num_threads"],
     }

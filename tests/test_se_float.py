@@ -1,10 +1,10 @@
-"""brokkr.se_float on a hand-made graph whose nodes carry the exporter's module records."""
+"""brokkr_edge.se_float on a hand-made graph whose nodes carry the exporter's module records."""
 
 import onnx
 import pytest
 from onnx import helper
 
-from brokkr import se_float
+from brokkr_edge import se_float
 
 SE = "torchvision.ops.misc.SqueezeExcitation"
 TOP = ["", "features", "features.1", "features.1.block.1"]

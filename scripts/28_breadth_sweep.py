@@ -8,11 +8,11 @@ Writes: <out>/<model>_<precision>_imagenet-1k-val_<split>_<suite>_<corruption>_s
         (schema-2 accuracy record) + .npz (logits, labels, positions), and <out>/run_log.txt
 
 Rules (docs/hypotheses_stage4.md, committed before this runs):
-- A model's INT8 is run only if its build record is "usable" (brokkr.schema.check_build_record);
+- A model's INT8 is run only if its build record is "usable" (brokkr_edge.schema.check_build_record);
   MobileNetV3-Small's INT8 failed, so it runs in FP32 only.
 - Order: smallest measured run time first, ResNet-50 and ConvNeXt-Tiny last. Neighbouring models with
   the same preprocessing form one pass and share each damaged batch; every group has one keyed cache
-  of clean pictures (brokkr.sweep). Damage seed = the image's dataset position. 8 threads (checked
+  of clean pictures (brokkr_edge.sweep). Damage seed = the image's dataset position. 8 threads (checked
   bit-identical to 4 threads for every model, scripts/29_thread_check.py).
 - Before the first condition: a sample of cached pictures must equal freshly made ones, and (full
   test run only) MobileNetV3-Large's clean and darkness (Brokkr) s5 scores must equal Stage 3's saved
@@ -40,13 +40,13 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 
-from brokkr.accuracy import accuracy_from_logits, open_image, resize_and_crop
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import sha256_of, written_atomically
-from brokkr.schema import (
+from brokkr_edge.accuracy import accuracy_from_logits, open_image, resize_and_crop
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import sha256_of, written_atomically
+from brokkr_edge.schema import (
     check_build_record,
     condition,
     condition_label,
@@ -54,7 +54,7 @@ from brokkr.schema import (
     metric,
     save_measurement,
 )
-from brokkr.sweep import (
+from brokkr_edge.sweep import (
     MIN_FREE_GB,
     build_caches,
     cache_key,

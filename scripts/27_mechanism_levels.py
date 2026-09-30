@@ -23,15 +23,15 @@ import numpy as np
 import onnx
 import onnxruntime as ort
 
-from brokkr.accuracy import bootstrap_ci, open_image, paired_bootstrap_diff, resize_and_crop
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.levels import activation_quantize_outputs, distinct_levels, expose
-from brokkr.results import make_record, save_record
-from brokkr.schema import condition, condition_label, make_measurement, metric, save_measurement
-from brokkr.sweep import damaged_batch, normalised
+from brokkr_edge.accuracy import bootstrap_ci, open_image, paired_bootstrap_diff, resize_and_crop
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.levels import activation_quantize_outputs, distinct_levels, expose
+from brokkr_edge.results import make_record, save_record
+from brokkr_edge.schema import condition, condition_label, make_measurement, metric, save_measurement
+from brokkr_edge.sweep import damaged_batch, normalised
 
 MODEL, DATASET, N_IMAGES, BATCH, THREADS = "mobilenet_v3_large", "imagenet-1k-val", 500, 32, 4
 PRECISIONS = {"default": "int8", "percentile": "int8_percentile99.99"}

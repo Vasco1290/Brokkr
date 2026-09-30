@@ -10,7 +10,7 @@ import io
 import numpy as np
 from PIL import Image
 
-from brokkr.benchmark import make_session
+from brokkr_edge.benchmark import make_session
 
 # ImageNet colour statistics that torchvision's pretrained models expect.
 IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
@@ -24,7 +24,7 @@ def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224,
 
     Same steps as torchvision's transforms for the weights: shrink so the shorter side is
     `resize_size` pixels (232 for MobileNetV3-Large), cut out the central 224x224 square, scale to
-    0-1, normalise colours. Each model's own settings come from brokkr.export.preprocessing.
+    0-1, normalise colours. Each model's own settings come from brokkr_edge.export.preprocessing.
     """
     return normalize(resize_and_crop(image, resize_size, crop_size, interpolation))
 

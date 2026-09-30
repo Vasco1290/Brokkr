@@ -1,4 +1,4 @@
-"""Checks for brokkr.export.
+"""Checks for brokkr_edge.export.
 
 Uses random (untrained) weights so the test needs no download. Whether the export is
 correct does not depend on which weights are inside.
@@ -9,7 +9,7 @@ import onnxruntime as ort
 import pytest
 import torch
 
-from brokkr.export import compare_with_pytorch, export_onnx, file_info, load_model
+from brokkr_edge.export import compare_with_pytorch, export_onnx, file_info, load_model
 
 
 @pytest.fixture(scope="module")
@@ -45,8 +45,8 @@ def test_file_info(exported):
 
 
 def test_every_model_has_a_licence_and_standard_normalisation():
-    from brokkr.accuracy import IMAGENET_MEAN, IMAGENET_STD
-    from brokkr.export import MODELS
+    from brokkr_edge.accuracy import IMAGENET_MEAN, IMAGENET_STD
+    from brokkr_edge.export import MODELS
     for name, spec in MODELS.items():
         assert spec["licence"]["code"] and spec["licence"]["weights"], name
         t = spec["weights"].transforms()
@@ -55,7 +55,7 @@ def test_every_model_has_a_licence_and_standard_normalisation():
 
 
 def test_preprocessing_is_read_from_torchvision():
-    from brokkr.export import preprocessing
+    from brokkr_edge.export import preprocessing
     assert preprocessing("mobilenet_v3_large") == {"resize": 232, "crop": 224, "interpolation": "bilinear"}
     assert preprocessing("efficientnet_b0")["interpolation"] == "bicubic"
 
@@ -63,7 +63,7 @@ def test_preprocessing_is_read_from_torchvision():
 def test_default_preprocessing_is_unchanged_by_the_interpolation_option():
     from PIL import Image
 
-    from brokkr.accuracy import resize_and_crop
+    from brokkr_edge.accuracy import resize_and_crop
     image = Image.fromarray((np.random.default_rng(0).random((300, 260, 3)) * 255).astype(np.uint8))
     assert np.array_equal(resize_and_crop(image), resize_and_crop(image, 232, 224, "bilinear"))
     assert not np.array_equal(resize_and_crop(image), resize_and_crop(image, 232, 224, "bicubic"))

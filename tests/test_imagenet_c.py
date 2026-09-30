@@ -1,12 +1,12 @@
-"""Checks for the vendored ImageNet-C code and brokkr.imagenet_c (pictures are random test data)."""
+"""Checks for the vendored ImageNet-C code and brokkr_edge.imagenet_c (pictures are random test data)."""
 
 import numpy as np
 import pytest
 
 # Skipped where the optional ImageNet-C packages are not installed (e.g. the basic CI job).
 installed = pytest.importorskip("imagecorruptions")
-vendored_corrupt = pytest.importorskip("brokkr.third_party.imagecorruptions").corrupt
-imagenet_c = pytest.importorskip("brokkr.imagenet_c")
+vendored_corrupt = pytest.importorskip("brokkr_edge.third_party.imagecorruptions").corrupt
+imagenet_c = pytest.importorskip("brokkr_edge.imagenet_c")
 CORRUPTIONS, damage = imagenet_c.CORRUPTIONS, imagenet_c.damage
 
 

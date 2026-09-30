@@ -31,12 +31,12 @@ from onnxruntime.quantization.qdq_loss_debug import (
     modify_model_output_intermediate_tensors,
 )
 
-from brokkr.accuracy import open_image, preprocess
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info, preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH, ImageBatches
-from brokkr.schema import condition, make_measurement, metric, save_measurement
+from brokkr_edge.accuracy import open_image, preprocess
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info, preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH, ImageBatches
+from brokkr_edge.schema import condition, make_measurement, metric, save_measurement
 
 LOW_DB = 10.0
 THREADS = 4  # the same thread count as every other Brokkr run

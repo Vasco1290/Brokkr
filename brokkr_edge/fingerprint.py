@@ -13,7 +13,7 @@ import sys
 from importlib import metadata
 from pathlib import Path
 
-DEFAULT_PACKAGES = ("brokkr", "numpy", "torch", "torchvision", "onnx", "onnxruntime")
+DEFAULT_PACKAGES = ("brokkr-edge", "numpy", "torch", "torchvision", "onnx", "onnxruntime")
 
 
 def cpu_model() -> str:

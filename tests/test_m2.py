@@ -1,4 +1,4 @@
-"""M2's measures and verdict rules (brokkr.m2) on made-up inputs whose right answer is known.
+"""M2's measures and verdict rules (brokkr_edge.m2) on made-up inputs whose right answer is known.
 
 The numbers here are invented for the tests; they are never results.
 """
@@ -9,8 +9,8 @@ import pytest
 from onnx import TensorProto, helper, numpy_helper
 from onnxruntime.quantization.qdq_loss_debug import compute_signal_to_quantization_noice_ratio
 
-from brokkr import m2
-from brokkr.levels import sqnr_db_per_image
+from brokkr_edge import m2
+from brokkr_edge.levels import sqnr_db_per_image
 
 
 def tiny_qdq_model() -> onnx.ModelProto:

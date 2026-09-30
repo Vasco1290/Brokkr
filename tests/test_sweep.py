@@ -1,4 +1,4 @@
-"""Checks for brokkr.sweep: keyed clean-picture caches and repeatable damaged batches.
+"""Checks for brokkr_edge.sweep: keyed clean-picture caches and repeatable damaged batches.
 
 Uses tiny fake Parquet files and random pictures (test data, not results).
 """
@@ -13,9 +13,9 @@ import pyarrow.parquet as pq
 import pytest
 from PIL import Image
 
-from brokkr import sweep
-from brokkr.accuracy import resize_and_crop
-from brokkr.shift.corruptions import corrupt as brokkr_corrupt
+from brokkr_edge import sweep
+from brokkr_edge.accuracy import resize_and_crop
+from brokkr_edge.shift.corruptions import corrupt as brokkr_corrupt
 
 PREP_A = {"resize": 232, "crop": 224, "interpolation": "bilinear"}
 PREP_B = {"resize": 256, "crop": 224, "interpolation": "bicubic"}
@@ -128,8 +128,8 @@ def test_clean_batches_are_copies_and_never_change_the_cache():
 
 @pytest.mark.skipif(not Path("data/imagenet-1k/data").exists(), reason="ImageNet not on this machine")
 def test_real_imagenet_cache_sample_matches_fresh_crops(tmp_path):
-    from brokkr.accuracy import open_image
-    from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
+    from brokkr_edge.accuracy import open_image
+    from brokkr_edge.datasets import count_images, make_splits, parquet_files, read_parquet_images
     files = parquet_files("imagenet-1k-val")
     positions = make_splits(count_images(files))["tuning"][:8]
     paths = sweep.build_caches("imagenet-1k-val", "tuning", positions, files, [PREP_A, PREP_B], tmp_path)

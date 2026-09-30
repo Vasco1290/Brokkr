@@ -17,13 +17,13 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import open_image, resize_and_crop
-from brokkr.benchmark import make_session
-from brokkr.datasets import count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import preprocessing
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import make_record, save_record
-from brokkr.sweep import damaged_batch, normalised
+from brokkr_edge.accuracy import open_image, resize_and_crop
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import preprocessing
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import make_record, save_record
+from brokkr_edge.sweep import damaged_batch, normalised
 
 JOBS = [("mobilenet_v3_small", "fp32"), ("shufflenet_v2_x1_0", "fp32"),
         ("shufflenet_v2_x1_0", "int8_percentile99.99"), ("mnasnet1_0", "fp32"),

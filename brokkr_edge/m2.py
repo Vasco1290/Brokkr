@@ -1,7 +1,7 @@
 """M2 (docs/hypotheses_stage4.md): where does INT8's extra rounding error under darkness and fog arise?
 
 Local rounding error at one quantized tensor: take the FP32 model's values there, round them with that
-tensor's INT8 scale and zero-point (brokkr.levels.fake_quantize: divide, round halves to even, add the
+tensor's INT8 scale and zero-point (brokkr_edge.levels.fake_quantize: divide, round halves to even, add the
 zero-point, clip to 8 bits, turn back into numbers), and compare with the unrounded values as a
 signal-to-noise ratio, SQNR = 20·log10(‖x‖ / ‖x − x̂‖) in dB (ONNX Runtime's formula, with its guard:
 each norm at least the machine epsilon). It is the error INT8 adds at that tensor alone, given perfect
@@ -23,7 +23,7 @@ import numpy as np
 import onnx
 from onnx import numpy_helper
 
-from brokkr.levels import SATURATION, fake_quantize
+from brokkr_edge.levels import SATURATION, fake_quantize
 
 N_RESAMPLES, SEED = 1000, 0
 EPS = np.finfo(float).eps  # ONNX Runtime's guard in compute_signal_to_quantization_noice_ratio

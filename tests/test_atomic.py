@@ -1,12 +1,12 @@
-"""A crash mid-write must never leave a half-written file under the real name (brokkr.results)."""
+"""A crash mid-write must never leave a half-written file under the real name (brokkr_edge.results)."""
 
 import json
 
 import numpy as np
 import pytest
 
-from brokkr import sweep
-from brokkr.results import written_atomically
+from brokkr_edge import sweep
+from brokkr_edge.results import written_atomically
 
 
 def test_a_finished_write_gets_the_real_name(tmp_path):
