@@ -334,7 +334,8 @@ results files.
 
 ## Platform plan to 31 October 2026 (added 30 September 2026)
 
-Set by H on 30 September 2026. **It replaces the order and scope of the Product plan (P1–P6) above**,
+Set by H on 30 September 2026 (step 6 undated the same day: see step 6). **It replaces the order and
+scope of the Product plan (P1–P6) above**,
 which stays below for the record. Brokkr becomes a platform by 31 October 2026. Steps are built
 strictly in this order; each is finished (tested, documented, pushed) before the next starts. The
 project's rules are unchanged: numbers only from checked result files, licences recorded, no
@@ -392,7 +393,14 @@ fails it; in a fresh environment, installing from PyPI and running the quick sta
 *Done when:* two jobs submitted together run one after the other, the status page shows both, and
 each returns a schema-valid label.
 
-### 6. Raspberry Pi 5 latency and labels `[ ]`, done by 28 October (board expected about 20 October)
+### 6. Raspberry Pi 5 latency and labels `[ ]`, after the board arrives (no fixed date)
+
+*Changed 30 September 2026 by H: the board cannot be bought this month, so this step moves to after
+the board arrives, with no fixed date. The label schema's hardware field stays exactly as planned
+(`docs/label_schema.md`), so Pi results can be added later without changing it; until then every
+label's Raspberry Pi 5 row says "not measured". No microcontroller (e.g. ESP32) support in October.
+All other steps and dates are unchanged.*
+
 - The Pi 5 as a target over SSH (4.4), its fingerprint, and latency for the 19 builds by the latency
   method adapted in a dated note before measuring; labels regenerated with Pi rows. Results are
   labelled "Raspberry Pi 5" only when measured on one.
