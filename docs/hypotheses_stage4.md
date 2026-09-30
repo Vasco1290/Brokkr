@@ -1049,3 +1049,40 @@ tested code).
   performance cores)" with p50 / p95 / p99 and the spread; "Raspberry Pi 5: not measured". Laptop
   latency is never presented as the speed of an edge device.
 - Stage 1's speed records are not reused (different sessions and settings).
+
+### Revised 30 September 2026 (latency; before any latency is measured)
+
+Appended to the 29 September latency note; nothing above is changed.
+
+**Confirmed by H:** the stop conditions; pinning to logical CPUs 0–3; thread counts 1 and 4 (the main
+line shows 4); 10 sessions; 20 warm-up and 300 timed runs; the cool-downs; p50, p95 and p99 as medians
+across sessions; the spread and the "unstable" flag above 10%.
+
+**Added:**
+- **Recorded in every latency record and shown on the label:** ONNX Runtime version, execution
+  provider, intra-op and inter-op thread counts, graph optimisation level, CPU model, and whether VNNI
+  is available. `brokkr.benchmark.make_session` sets intra-op threads to the thread count, inter-op
+  threads to 1, sequential execution, and leaves graph optimisation at ONNX Runtime's default, which
+  for the installed version (1.23.2, read 30 September) is `ORT_ENABLE_ALL`; the record states the
+  level explicitly rather than relying on the default.
+- **VNNI (FLAGGED: method to be confirmed):** on Windows, Brokkr's fingerprint records both VNNI
+  flavours as unknown (no standard-library way to read them). Read on 30 September: NumPy 2.2.6's
+  CPU-feature list reports AVX512_VNNI as not available (and AVX-512F as not available), but has no
+  entry for the other flavour, AVX-VNNI. Proposed: read both from the CPU itself (CPUID leaf 7:
+  sub-leaf 0, ECX bit 11 = AVX512_VNNI; sub-leaf 1, EAX bit 4 = AVX-VNNI), with a small new helper or
+  the py-cpuinfo package (its licence checked and recorded first). Until then the record and label say
+  "VNNI: unknown (not yet readable on Windows by Brokkr)".
+- **Which physical cores logical CPUs 0–3 are** (read on 30 September from Windows'
+  `GetSystemCpuSetInformation`): logical CPUs 0 and 1 are the two hardware threads of one physical
+  performance core (core index 0), and 2 and 3 those of the other (core index 2); logical CPUs 4–11
+  are eight efficiency cores, one thread each. So "4 threads on the performance cores" means 2
+  physical cores with 2 hardware threads each; with 1 thread, Windows picks one of the four. The map
+  is read at run time and recorded in every latency record (never typed in), and the label says
+  "4 threads (2 performance cores, 2 threads each)".
+- **On the label:** "Timing is model only; excludes image loading and pre-processing. Random input
+  (seed 0)."
+- **The run refuses to start if task 4.2 or any other Brokkr job is running.** Before starting, and
+  before each model, it lists the running processes and stops if any other process runs a Python
+  script from this repository's `scripts/` folder or a `brokkr` command. (proposed method: Windows'
+  process list with command lines, through PowerShell's `Get-CimInstance Win32_Process`; `psutil` is
+  not installed.)
