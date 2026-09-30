@@ -2,6 +2,8 @@
 models/
 data/
 results/
+# Generated labels (for now; step 2 moves published labels into a tracked catalog folder)
+labels/
 *.onnx
 *.pt
 *.pth

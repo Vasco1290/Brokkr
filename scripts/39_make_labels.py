@@ -1,7 +1,7 @@
 """Make the P1 labels from the 4.1 records (no model is run).
 
 Usage:  python scripts/39_make_labels.py [--models mobilenet_v3_large mobilenet_v3_small]
-                                         [--out results/labels]
+                                         [--out labels]
 Needs:  the 4.1 test and conformal_calibration records with their scores (results/breadth), their
         reliability records (results/breadth_reliability), the build records (models/), and
         brokkr_edge/model_list.json
@@ -73,7 +73,7 @@ RELIABILITY = {
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--models", nargs="+", default=list(load_model_list()))
-parser.add_argument("--out", default="results/labels")
+parser.add_argument("--out", default="labels")
 args = parser.parse_args()
 git = git_info()
 used_files = {}  # path -> (sha256, what checked it)

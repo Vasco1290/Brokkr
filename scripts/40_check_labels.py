@@ -1,6 +1,6 @@
 """Check every label against its sources: PASS only if every number, state and render holds up.
 
-Usage:  python scripts/40_check_labels.py [--labels results/labels]
+Usage:  python scripts/40_check_labels.py [--labels labels]
 Needs:  <labels>/<model>/label.json, label.md, label.html (scripts/39_make_labels.py) and every file each
         label names in its "sources"
 
@@ -35,7 +35,7 @@ from brokkr_edge.results import sha256_of
 from brokkr_edge.schema import check_build_record
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--labels", default="results/labels")
+parser.add_argument("--labels", default="labels")
 args = parser.parse_args()
 
 
