@@ -1,0 +1,415 @@
+{
+  "generated_by": "scripts/38_write_model_list.py",
+  "models": {
+    "mobilenet_v3_large": {
+      "publisher": "torchvision",
+      "weights": "MobileNet_V3_Large_Weights.IMAGENET1K_V2",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 232,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.75274,
+        "top5": 0.92566,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "mobilenet_v3_small": {
+      "publisher": "torchvision",
+      "weights": "MobileNet_V3_Small_Weights.IMAGENET1K_V1",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 256,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.6766800000000001,
+        "top5": 0.87402,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "mobilenet_v2": {
+      "publisher": "torchvision",
+      "weights": "MobileNet_V2_Weights.IMAGENET1K_V2",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 232,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.72154,
+        "top5": 0.90822,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "efficientnet_b0": {
+      "publisher": "torchvision",
+      "weights": "EfficientNet_B0_Weights.IMAGENET1K_V1",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 256,
+          "crop": 224,
+          "interpolation": "bicubic",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.7769199999999999,
+        "top5": 0.9353199999999999,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "shufflenet_v2_x1_0": {
+      "publisher": "torchvision",
+      "weights": "ShuffleNet_V2_X1_0_Weights.IMAGENET1K_V1",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 256,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.6936199999999999,
+        "top5": 0.8831600000000001,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "mnasnet1_0": {
+      "publisher": "torchvision",
+      "weights": "MNASNet1_0_Weights.IMAGENET1K_V1",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 256,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.73456,
+        "top5": 0.9151,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "regnet_y_400mf": {
+      "publisher": "torchvision",
+      "weights": "RegNet_Y_400MF_Weights.IMAGENET1K_V2",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 232,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.75804,
+        "top5": 0.92742,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "resnet18": {
+      "publisher": "torchvision",
+      "weights": "ResNet18_Weights.IMAGENET1K_V1",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 256,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.69758,
+        "top5": 0.89078,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "resnet50": {
+      "publisher": "torchvision",
+      "weights": "ResNet50_Weights.IMAGENET1K_V2",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 232,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.8085800000000001,
+        "top5": 0.95434,
+        "source": "torchvision weights metadata"
+      }
+    },
+    "convnext_tiny": {
+      "publisher": "torchvision",
+      "weights": "ConvNeXt_Tiny_Weights.IMAGENET1K_V1",
+      "licence": {
+        "code": "BSD-3-Clause (torchvision)",
+        "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+      },
+      "task": "classification",
+      "modality": "image",
+      "input": {
+        "shape": [
+          3,
+          224,
+          224
+        ],
+        "preprocessing": {
+          "resize": 236,
+          "crop": 224,
+          "interpolation": "bilinear",
+          "mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "std": [
+            0.229,
+            0.224,
+            0.225
+          ]
+        }
+      },
+      "outputs": {
+        "n_classes": 1000,
+        "class_set": "imagenet-1k"
+      },
+      "published": {
+        "top1": 0.8251999999999999,
+        "top5": 0.96146,
+        "source": "torchvision weights metadata"
+      }
+    }
+  }
+}

@@ -39,6 +39,9 @@ imagenet-c = ["scipy==1.15.3", "scikit-image==0.25.2", "opencv-python-headless==
 [tool.setuptools.packages.find]
 include = ["brokkr_edge*"]
 
+[tool.setuptools.package-data]
+brokkr_edge = ["model_list.json"]  # read without PyTorch (brokkr_edge.model_list)
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
