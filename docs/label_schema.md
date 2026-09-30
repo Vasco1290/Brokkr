@@ -1,6 +1,7 @@
 # The Brokkr label format (`label.json`), schema version 1
 
-*Written 30 September 2026, before any label is generated. The decisions it relies on are in
+*Written 30 September 2026, before any label is generated; `checks`, `generated`'s last three
+fields and speed rows' `hardware_kind` added the same day, while building, before any label was made. The decisions it relies on are in
 `docs/hypotheses_stage4.md` (notes of 29–30 September 2026). A validator for this document is part
 of step 1 of the platform plan (`ROADMAP.md`).*
 
@@ -65,6 +66,7 @@ to the schema's list.
   "hardware": [...],
   "datasets": [...],
   "conditions": [...],
+  "checks": {...},
   "measurements": [...],
   "envelope": {...},
   "summary": {...},
@@ -84,8 +86,14 @@ to the schema's list.
 ```
 
 ### `generated`
-Which code made the label: `brokkr_version`, git `commit` and `dirty` flag (a dirty label is refused
-by the catalog), the UTC time, and the `schema_version` of the rules used (e.g. which envelope rule).
+Which code made the label (`by`: package and version), git `commit` and `dirty` flag (an official label
+must be clean), the UTC time, `ci_level` (the interval level, 0.95), `label_licence` (CC BY 4.0) and
+`envelope_rule` (the name of the rule used).
+
+### `checks`
+Checks the label depends on, each with its numbers and sources. Version 1 has `fp32_sanity`: the
+reference build's clean top-1 (`measured`), the publisher's figure (`published`, with where it comes
+from), the `tolerance`, and `pass`. A label whose check fails is not made.
 
 ### `model`
 ```
@@ -192,7 +200,9 @@ One entry per build, hardware and thread count:
  "p50_ms": ..., "p95_ms": ..., "p99_ms": ..., "spread_pct": ..., "unstable": true | false,
  "sources": [...]}
 ```
-A Raspberry Pi 5 row exists from the start with `"status": "not measured"` until one is measured.
+A Raspberry Pi 5 row exists from the start with `"status": "not measured"` until one is measured. Every
+row also names `hardware_kind`; a row for a device Brokkr has not measured yet has `"hardware_id": null`
+(no machine to name) and a `reason`.
 
 ### `details`
 What the main label leaves out: E-AURC, ECE, the conformal thresholds, top-5, the reference build's
