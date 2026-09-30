@@ -942,6 +942,82 @@ Nothing has been generated.
 - **Inputs:** only records that pass `scripts/22_check_results.py`: the 4.1 test-split accuracy
   records (with their scores) and the 4.1 conformal records.
 
+### Revised 30 September 2026 (envelope; before any label is generated)
+
+Appended to the 29 September envelope note; nothing above is changed. Where the two differ, this
+section replaces it. Decided by H on 30 September unless marked "(proposed)".
+
+**Confirmed from the note above:** interval ends count as "not harmful" ("below" is strict); the summary
+block describes the shrunk build; intervals are per condition, with no multiple-testing correction, and
+the methods page says: "With 12 conditions, an occasional result may cross a line by chance."; the
+label wording ("not harmful in our tests"; never "safe", "robust" or "guaranteed").
+
+**1. Two drops, by name.**
+- **Damage drop** = top-1 under the condition minus clean top-1, same build, same test images; paired
+  95% interval (resample the images once, compute both on each resample; 1,000 resamples, seed 0).
+- **Shrinking cost** = INT8 top-1 minus FP32 top-1, same condition, same images; paired 95% interval
+  in the same way.
+- **The envelope of every build, FP32 and INT8 alike, is judged on that build's own damage drop and
+  coverage** (the two thresholds of the 3.9 harm definition). Reason: the label answers "can I use
+  this build in this condition?", and a build that is poor because FP32 is poor is still poor.
+  - FP32 row: its envelope comes from FP32's damage drop and coverage; it has no shrinking cost (it is
+    the reference).
+  - INT8 row: its envelope comes from INT8's damage drop and coverage; beside it, as its own column,
+    the shrinking cost with its interval, flagged "large shrinking cost" when the whole interval is
+    below −5.0 points (upper end < −5.0).
+- Not the same quantity as H20 and H21: those judged the *extra* gap (shrinking cost under damage
+  minus shrinking cost on clean images); this flag uses the plain shrinking cost in that condition.
+- **FLAGGED, not resolved (conflict with committed text):** the 3.9 note (`621cc43`) defines harm
+  "measured on the tuning split before any alarm result is looked at"; the label, like the 29
+  September note and ROADMAP 4.3, applies the same two thresholds to the 4.1 **test**-split records.
+  Awaiting H's decision.
+
+**2. What coverage measures.** For one build and condition: the share of test images whose prediction
+set contains the true class. A prediction set is every class whose probability is at least 1 − q,
+where q is the conformal threshold (LAC method) computed from the same build's clean
+`conformal_calibration` images (5,000) for a **target coverage of 90%**. The 90% promise holds only for
+images like the calibration images (clean); under damage there is no promise, and the label shows the
+coverage measured. Coverage comes from prediction sets, so it is always shown with the average set
+size (and its interval) beside it. 95% bootstrap intervals: 1,000 resamples, seed 0.
+
+**3. New state "not informative"** (rule proposed; H to confirm).
+- (proposed) A condition is **near floor** when FP32 top-1 under that condition is below 10%. Both
+  rows of that condition (FP32 and INT8) then get the state "not informative" instead of being judged.
+- Reason: it is the near-floor rule fixed for 4.1 before any 4.1 result existed (`1682b01`, 26
+  September 09:30, before the sweep started at `5be2cb5`), so it was not chosen by looking at labels;
+  below 10%, FP32 gets fewer than one image in ten right, so no build of the model is usable there and
+  the shrinking cost cannot be large (at most 10 points), so it says little about shrinking.
+- **FLAGGED:** judged normally, such a row would likely come out "harmful" (the damage drop from a
+  usable clean score to below 10% is large), which is a true answer to "can I use this build here?".
+  "Not informative" fits the shrinking-cost column most exactly. Alternative for H: keep the envelope
+  state judged and mark only the shrinking cost "not informative".
+
+**4. New state "INT8 build failed".** When a model's INT8 build record fails its build check
+(`brokkr.schema.check_build_record`), the INT8 row shows "INT8 build failed" with the reason read from
+the build record (which check failed, and its value); no INT8 accuracy, coverage or shrinking cost is
+shown. The FP32 row is labelled as usual. MobileNetV3-Small gets such a label, so P1 produces 10
+labels (ROADMAP P1 updated).
+- **FLAGGED:** the latency method H confirmed covers FP32 and INT8 of the 9 models (18 builds);
+  MobileNetV3-Small's FP32 is not in it, so its label would show "Laptop latency: not measured" unless
+  H adds it.
+
+**5. Where the two thresholds come from** (git history, checked 30 September 2026).
+- **80% coverage:** first committed in `237effa` (25 September 2026, 10:15 +0530), the Stage 3
+  pre-registration, where it picked the "harmful" conditions from the Stage 2 baselines (FP32, test
+  split): it was chosen with the Stage 2 results known. It was carried into the 3.9 harm proposal
+  (`621cc43`).
+- **−10.0 points:** first committed in `621cc43` (26 September 2026, 02:57 +0530), the 3.9 note, after
+  Stage 3's final results (it names best INT8 in darkness as its motivation).
+- **Both were committed before any 4.1 result existed:** before the 4.1 hypotheses (`1682b01`, 26
+  September 09:30) and before the 4.1 sweep started (`5be2cb5`, 13:33; every 4.1 record is later). They
+  were not chosen by looking at 4.1 data.
+- **Reasons that do not depend on 4.1 data** (written 30 September):
+  - 80% coverage: the prediction sets are built to miss at most 10% of images; below 80% they miss at
+    least twice that, so the "I'm not sure" promise is clearly broken, not just slightly under target.
+  - −10.0 points: a fall of ten percentage points means that at least one image in ten that the build
+    got right on clean images is now wrong: a change a user would notice and should be told about, and
+    one far larger than the chance variation of a paired comparison on thousands of images.
+
 ## Note added 29 September 2026, before any latency is measured: the laptop latency method (P1)
 
 Proposed by Claude, to be confirmed by H before any timing. Built on `brokkr.benchmark` (Stage 1's
