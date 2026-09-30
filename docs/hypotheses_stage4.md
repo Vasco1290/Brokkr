@@ -1086,3 +1086,31 @@ across sessions; the spread and the "unstable" flag above 10%.
   script from this repository's `scripts/` folder or a `brokkr` command. (proposed method: Windows'
   process list with command lines, through PowerShell's `Get-CimInstance Win32_Process`; `psutil` is
   not installed.)
+
+## Note added 30 September 2026, before any P1 run: the reproduction rule for `brokkr test`
+
+Fixed by H before `brokkr test` exists or runs.
+- **Target: MobileNetV3-Large** (not ResNet-18), FP32 and its Percentile INT8: the 13 test conditions
+  and clean `conformal_calibration`, i.e. its 28 records in `results/breadth/`. Read on 30 September:
+  all 28 come from the clean commit `fc965cd`, with 8 threads, thread spinning off and batch 32, and
+  the two model files' SHA-256 equal those the records name. `brokkr test` runs these existing model
+  files; nothing is rebuilt.
+- **Step 1, is INT8 inference on this laptop repeatable?** Before anything is compared with 4.1, the
+  INT8 model runs twice on the same 64 tuning images (positions 0–63: tuning, never test), in two
+  separate sessions, with 4.1's settings (8 threads, spinning off, batch 32). Repeatable = the two sets
+  of scores are identical bit for bit (`np.array_equal` on the float32 scores). The result is printed
+  and recorded before step 2.
+- **Step 2, the pass rule, chosen by step 1:**
+  - **If repeatable:** PASS = in every one of the 28 (precision, condition) records, every image's top-1
+    prediction (ties to the lower class number, as everywhere) is identical to the one from the 4.1
+    record's saved scores. Reported, not judged: whether the scores are identical bit for bit, and the
+    largest score difference.
+  - **If not repeatable:** PASS = in every record, top-1 within 0.1 points of the 4.1 record's
+    (compared in whole images: at most 10 of the 10,000 test images, 5 of the 5,000 calibration images)
+    **and** identical build settings: the same model files (SHA-256 equal to the records'), and the same
+    preprocessing, damage seeds, batch size and thread count as the 4.1 records state.
+- **Which applies is decided by step 1, not assumed.** Recorded evidence points to "repeatable" (at
+  both starts of the 4.1 sweep, MobileNetV3-Large reproduced Stage 3's scores exactly on 64 test
+  images: `results/breadth/run_log.txt`), but only step 1 decides.
+- **How it is checked:** a script prints step 1's result, which rule applies, PASS / FAIL for each of
+  the 28 records, and PASS only if all 28 pass.
