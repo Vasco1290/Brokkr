@@ -9,7 +9,7 @@ import copy
 import numpy as np
 
 from brokkr_edge import label as lb
-from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
+from brokkr_edge.label_render import TERMS, _do_not_use, _title, to_html, to_markdown, unexplained_numbers
 from brokkr_edge.label_schema import build_id, check_label, condition_id, hardware_id, model_id, slug
 
 
@@ -27,6 +27,34 @@ def test_shrinking_cost_flag():
     assert lb.shrinking_cost_flag([-0.08, -0.06], 0.60) == "large shrinking cost"
     assert lb.shrinking_cost_flag([-0.08, -0.04], 0.60) is None  # interval reaches above -5 points
     assert lb.shrinking_cost_flag([-0.08, -0.06], 0.05) == "not informative"  # FP32 near floor wins
+
+
+def test_summary_groups_use_only_the_envelope_states():
+    g = lb.summary_group
+    assert g("not harmful", "harmful") == "fine"  # the summary is about the INT8 build
+    assert g("harmful", "harmful") == "too hard for this model"
+    assert g("harmful", "not harmful") == "hurt by shrinking"
+    assert g("harmful", "borderline") == "borderline"  # FP32 neither copes nor fails
+    assert g("borderline", "not harmful") == g("borderline", "harmful") == "borderline"
+    assert g("INT8 build failed", "harmful") == "INT8 build failed"
+
+
+def test_summary_lines_follow_the_groups_and_name_a_mixed_borderline():
+    def row(build, cond, state):
+        return {"build_id": build, "condition_id": cond, "state": state}
+
+    states = {"a": ("not harmful", "harmful"), "b": ("harmful", "harmful"), "c": ("harmful", "not harmful"),
+              "d": ("harmful", "borderline"), "e": ("borderline", "not harmful")}
+    rows = [row("int8", c, s8) for c, (s8, _) in states.items()] + [row("fp32", c, s) for c, (_, s) in
+                                                                      states.items()]
+    lines = lb.summary(rows, "int8", {c: c.upper() for c in states})["lines"]
+    assert [(x["group"], x["count"], x["conditions"]) for x in lines] == [
+        ("fine", 1, ["A"]),
+        ("too hard for this model", 1, ["B"]),
+        ("hurt by shrinking", 1, ["C"]),
+        ("borderline", 2, ["D (INT8 harmful, FP32 borderline)", "E"]),
+        ("not tested", None, ["every damage type and severity not listed above"]),
+    ]
 
 
 def test_paired_counts_whole_items():
@@ -214,6 +242,35 @@ def test_the_validator_catches_each_rule():
     assert broken(lambda x: x["builds"][1].update(status="failed"))  # failed build without failure/with rows
     assert broken(lambda x: x.update(schema_version=2))
     assert broken(lambda x: x["summary"]["lines"][0].update(count=5))  # summary disagrees with envelope
+
+
+def test_titles_use_display_names_and_fall_back_to_internal_names():
+    label = tiny_label()
+    assert _title(label) == "tiny · INT8"
+    label["model"]["display_name"] = "Tiny-Net"
+    label["builds"][1]["display_name"] = "INT8 (percentile calibration, 99.99%)"
+    assert _title(label) == "Tiny-Net · INT8 (percentile calibration, 99.99%)"
+    for text in (to_markdown(label), to_html(label)):
+        assert "Tiny-Net · INT8 (percentile calibration, 99.99%)" in text
+        assert unexplained_numbers(label, text) == []  # "99.99%" is a label string, not a loose number
+
+
+def test_a_failed_build_gets_one_plain_do_not_use_sentence():
+    build = {"status": "failed", "failure": {"check": "top-1 agreement with FP32 >= 20%", "value": 0.0273,
+                                             "limit": 0.2, "n_items": 256, "split": "tuning"}}
+    sentence = _do_not_use(build)
+    assert sentence.startswith("This recipe broke the model, so do not use this INT8 build")
+    assert "2.73%" in sentence and "256 tuning images" in sentence and "20%" in sentence
+    assert sentence.endswith(".") and ". " not in sentence  # one sentence: a single full stop, at the end
+    assert _do_not_use({"status": "usable", "failure": None}) is None
+
+
+def test_every_explanation_is_plain_text_without_numbers():
+    label = tiny_label()
+    assert unexplained_numbers(label, " ".join(TERMS.values())) == []
+    for text in (to_markdown(label), to_html(label)):
+        assert "What the words mean" in text
+    assert "<abbr title=" in to_html(label)
 
 
 def test_a_number_not_in_the_label_is_caught():

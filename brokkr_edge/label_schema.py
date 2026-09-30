@@ -16,6 +16,15 @@ BUILD_ROLES = ("reference", "labelled")
 BUILD_STATUSES = ("usable", "failed")
 STATES = ("not harmful", "harmful", "borderline", "not tested", "INT8 build failed")
 SHRINKING_COST_FLAGS = (None, "large shrinking cost", "not informative")
+# Summary groups (note of 30 September 2026 in docs/label_schema.md; the rule is brokkr_edge.label).
+SUMMARY_GROUPS = (
+    "fine",
+    "too hard for this model",
+    "hurt by shrinking",
+    "borderline",
+    "INT8 build failed",
+    "not tested",
+)
 SPEED_STATUSES = ("measured", "not measured")
 # Metric name -> unit. Derived comparisons (damage_drop, shrinking_cost) are measurements too.
 METRICS = {
@@ -204,11 +213,12 @@ def check_label(label: dict) -> list:
     labelled_rows = [
         r for r in label["envelope"].get("rows", []) if r.get("build_id") == labelled.get("build_id")
     ]
-    counted = {line["state"]: line["count"] for line in label["summary"].get("lines", [])}
-    for state in STATES:
-        n = sum(r.get("state") == state for r in labelled_rows)
-        if n and counted.get(state) != n:
-            problems.append(f"summary: the count for {state!r} does not match the envelope")
+    lines = label["summary"].get("lines", [])
+    unknown = [line.get("group") for line in lines if line.get("group") not in SUMMARY_GROUPS]
+    if unknown:
+        problems.append(f"summary: unknown groups {unknown}")
+    if sum(line.get("count") or 0 for line in lines) != len(labelled_rows):
+        problems.append("summary: its counts do not add up to the labelled build's envelope rows")
 
     for s in label["speed"]:
         if s.get("status") not in SPEED_STATUSES or s.get("build_id") not in builds:

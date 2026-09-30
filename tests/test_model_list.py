@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from brokkr_edge.model_list import load_model_list
+from brokkr_edge.model_list import load_model_list, load_precision_display_names
 
 
 def test_loads_without_pytorch():
@@ -20,6 +20,14 @@ def test_every_model_has_a_licence_and_preprocessing():
         assert entry["licence"]["code"] and entry["licence"]["weights"], name  # hard rule 8
         p = entry["input"]["preprocessing"]
         assert {"resize", "crop", "interpolation", "mean", "std"} <= set(p), name
+
+
+def test_every_model_and_the_labelled_precisions_have_a_display_name():
+    for name, entry in load_model_list().items():
+        assert entry["display_name"].strip() and entry["display_name"] != name, name
+    names = load_precision_display_names()
+    assert names["int8_percentile99.99"] == "INT8 (percentile calibration, 99.99%)"  # H, Checkpoint 1
+    assert names["fp32"]
 
 
 def test_matches_torchvision_metadata():

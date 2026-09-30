@@ -3,6 +3,7 @@
   "models": {
     "mobilenet_v3_large": {
       "publisher": "torchvision",
+      "display_name": "MobileNetV3-Large",
       "weights": "MobileNet_V3_Large_Weights.IMAGENET1K_V2",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -44,6 +45,7 @@
     },
     "mobilenet_v3_small": {
       "publisher": "torchvision",
+      "display_name": "MobileNetV3-Small",
       "weights": "MobileNet_V3_Small_Weights.IMAGENET1K_V1",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -85,6 +87,7 @@
     },
     "mobilenet_v2": {
       "publisher": "torchvision",
+      "display_name": "MobileNetV2",
       "weights": "MobileNet_V2_Weights.IMAGENET1K_V2",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -126,6 +129,7 @@
     },
     "efficientnet_b0": {
       "publisher": "torchvision",
+      "display_name": "EfficientNet-B0",
       "weights": "EfficientNet_B0_Weights.IMAGENET1K_V1",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -167,6 +171,7 @@
     },
     "shufflenet_v2_x1_0": {
       "publisher": "torchvision",
+      "display_name": "ShuffleNetV2 x1.0",
       "weights": "ShuffleNet_V2_X1_0_Weights.IMAGENET1K_V1",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -208,6 +213,7 @@
     },
     "mnasnet1_0": {
       "publisher": "torchvision",
+      "display_name": "MNASNet 1.0",
       "weights": "MNASNet1_0_Weights.IMAGENET1K_V1",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -249,6 +255,7 @@
     },
     "regnet_y_400mf": {
       "publisher": "torchvision",
+      "display_name": "RegNetY-400MF",
       "weights": "RegNet_Y_400MF_Weights.IMAGENET1K_V2",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -290,6 +297,7 @@
     },
     "resnet18": {
       "publisher": "torchvision",
+      "display_name": "ResNet-18",
       "weights": "ResNet18_Weights.IMAGENET1K_V1",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -331,6 +339,7 @@
     },
     "resnet50": {
       "publisher": "torchvision",
+      "display_name": "ResNet-50",
       "weights": "ResNet50_Weights.IMAGENET1K_V2",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -372,6 +381,7 @@
     },
     "convnext_tiny": {
       "publisher": "torchvision",
+      "display_name": "ConvNeXt-Tiny",
       "weights": "ConvNeXt_Tiny_Weights.IMAGENET1K_V1",
       "licence": {
         "code": "BSD-3-Clause (torchvision)",
@@ -411,5 +421,12 @@
         "source": "torchvision weights metadata"
       }
     }
+  },
+  "precision_display_names": {
+    "fp32": "FP32 (full precision)",
+    "int8_minmax": "INT8 (min-max calibration)",
+    "int8_percentile99.99": "INT8 (percentile calibration, 99.99%)",
+    "int8_percentile99.999": "INT8 (percentile calibration, 99.999%)",
+    "int8_entropy": "INT8 (entropy calibration)"
   }
 }

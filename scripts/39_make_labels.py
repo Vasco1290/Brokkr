@@ -36,7 +36,7 @@ from brokkr_edge.label_schema import (
     hardware_id,
     model_id,
 )
-from brokkr_edge.model_list import MODEL_LIST_FILE, load_model_list
+from brokkr_edge.model_list import MODEL_LIST_FILE, load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
 from brokkr_edge.schema import (
     MIN_AGREEMENT_WITH_FP32,
@@ -154,12 +154,19 @@ def make_label(model: str) -> dict:
                 "check": failed[0],
                 "value": build["sanity_check"]["top1_agreement_with_fp32"],
                 "limit": MIN_AGREEMENT_WITH_FP32,
-                "sources": [source(path, "sanity_check.top1_agreement_with_fp32")],
+                "n_items": build["sanity_check"]["n_images"],
+                "split": build["sanity_check"]["split"],
+                "sources": [
+                    source(path, "sanity_check.top1_agreement_with_fp32"),
+                    source(path, "sanity_check.n_images"),
+                    source(path, "sanity_check.split"),
+                ],
             }
         bid = make_build_id(mid, "fp32" if precision == "fp32" else "int8", build["file"]["sha256"])
         builds[role] = {
             "build_id": bid,
             "role": role,
+            "display_name": load_precision_display_names()[precision],
             "precision": "fp32" if precision == "fp32" else "int8",
             "recipe": recipe,
             "file": {"sha256": build["file"]["sha256"], "size_bytes": build["file"]["size_bytes"]},
@@ -431,6 +438,7 @@ def make_label(model: str) -> dict:
         "model": {
             "model_id": mid,
             "name": model,
+            "display_name": entry["display_name"],
             "publisher": entry["publisher"],
             "weights": entry["weights"],
             "task": entry["task"],
@@ -509,6 +517,6 @@ for model in args.models:
         print(f"     {line}")
     for line in label["summary"]["lines"]:
         count = "" if line["count"] is None else f" ({line['count']})"
-        print(f"     {line['state']}{count}: {', '.join(line['conditions'])}")
+        print(f"     {line['group']}{count}: {', '.join(line['conditions'])}")
 print("PASS" if all_ok else "FAIL")
 sys.exit(0 if all_ok else 1)

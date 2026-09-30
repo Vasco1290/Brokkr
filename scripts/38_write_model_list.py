@@ -5,15 +5,17 @@ Writes: brokkr_edge/model_list.json (package data: read by brokkr_edge.model_lis
 
 --check: do not write; exit 1 if the file differs from what torchvision's metadata gives now.
 Every value is read from torchvision (brokkr_edge.export.MODELS and each weights' metadata and
-transforms); the licence text is brokkr_edge.export's, recorded there on 26 September 2026.
+transforms); the licence text is brokkr_edge.export's, recorded there on 26 September 2026. The
+display names (shown on labels) are typed once, in brokkr_edge.export and brokkr_edge.quantize.
 """
 
 import argparse
 import json
 import sys
 
-from brokkr_edge.export import MODELS
+from brokkr_edge.export import FP32_DISPLAY_NAME, MODELS
 from brokkr_edge.model_list import MODEL_LIST_FILE
+from brokkr_edge.quantize import INT8_METHODS
 
 
 def model_list() -> dict:
@@ -24,6 +26,7 @@ def model_list() -> dict:
         metrics = weights.meta["_metrics"]["ImageNet-1K"]
         models[name] = {
             "publisher": "torchvision",
+            "display_name": spec["display_name"],
             "weights": str(weights),
             "licence": spec["licence"],
             "task": "classification",
@@ -36,7 +39,11 @@ def model_list() -> dict:
             "published": {"top1": metrics["acc@1"] / 100, "top5": metrics["acc@5"] / 100,
                           "source": "torchvision weights metadata"},
         }
-    return {"generated_by": "scripts/38_write_model_list.py", "models": models}
+    precisions = {"fp32": FP32_DISPLAY_NAME} | {
+        f"int8_{method}": spec["display_name"] for method, spec in INT8_METHODS.items()
+    }
+    return {"generated_by": "scripts/38_write_model_list.py", "models": models,
+            "precision_display_names": precisions}
 
 
 parser = argparse.ArgumentParser()

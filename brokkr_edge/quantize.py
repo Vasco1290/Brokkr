@@ -36,19 +36,23 @@ INT8_SETTINGS = {
 # Calibration methods compared in Stage 3 (task 3.2). The method only decides the ACTIVATION ranges,
 # from the values seen on the calibration images; weights always use their own exact min/max.
 # Bin counts are onnxruntime's defaults (quantize_static cannot change them); they are written down
-# here so the record says exactly what ran.
+# here so the record says exactly what ran. display_name is the name shown on labels.
 INT8_METHODS = {
     "minmax": {"calibrate_method": CalibrationMethod.MinMax, "extra_options": {},
+               "display_name": "INT8 (min-max calibration)",
                "description": "range = smallest to largest value seen"},
     "percentile99.99": {"calibrate_method": CalibrationMethod.Percentile,
                         "extra_options": {"CalibPercentile": 99.99},
+                        "display_name": "INT8 (percentile calibration, 99.99%)",
                         "description": "range = 99.99th percentile of absolute values (2048 bins), "
                                        "clipped to the smallest/largest value seen"},
     "percentile99.999": {"calibrate_method": CalibrationMethod.Percentile,
                          "extra_options": {"CalibPercentile": 99.999},
+                         "display_name": "INT8 (percentile calibration, 99.999%)",
                          "description": "range = 99.999th percentile of absolute values (2048 bins), "
                                         "clipped to the smallest/largest value seen"},
     "entropy": {"calibrate_method": CalibrationMethod.Entropy, "extra_options": {},
+                "display_name": "INT8 (entropy calibration)",
                 "description": "range that loses least information (KL divergence), "
                                "128-bin histogram, 128 quantized bins"},
 }

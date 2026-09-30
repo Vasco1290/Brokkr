@@ -8,7 +8,8 @@ For each label, independently of the code that made it:
 1. It follows docs/label_schema.md version 1 (brokkr_edge.label_schema.check_label).
 2. Every source file still has the SHA-256 the label records.
 3. Each build's file checksum and size equal a build record it names, and its status equals that
-   record's own check (brokkr_edge.schema.check_build_record).
+   record's own check (brokkr_edge.schema.check_build_record); a failed build's failure (value, limit,
+   images, split) equals that record's sanity check. Display names equal brokkr_edge/model_list.json's.
 4. Every copied number (value and interval) equals the field it names in its source record.
 5. Every damage drop and shrinking cost is recomputed from the saved scores (paired bootstrap, 1,000
    resamples, seed 0) and must be identical.
@@ -30,9 +31,9 @@ from brokkr_edge.judge import top1_correct
 from brokkr_edge.label import envelope_state, paired, shrinking_cost_flag, summary
 from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
 from brokkr_edge.label_schema import check_label
-from brokkr_edge.model_list import load_model_list
+from brokkr_edge.model_list import load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
-from brokkr_edge.schema import check_build_record
+from brokkr_edge.schema import MIN_AGREEMENT_WITH_FP32, check_build_record
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--labels", default="labels")
@@ -72,6 +73,20 @@ def check(folder: Path) -> list:
             problems.append(f"build {b['build_id']}: no named build record has this file")
         elif check_build_record(match[0], set())[0] != b["status"]:
             problems.append(f"build {b['build_id']}: status differs from its build record's check")
+        elif b["failure"]:
+            f, sanity = b["failure"], match[0]["sanity_check"]
+            expected = (sanity["top1_agreement_with_fp32"], MIN_AGREEMENT_WITH_FP32, sanity["n_images"],
+                        sanity["split"])
+            if (f["value"], f["limit"], f["n_items"], f["split"]) != expected:
+                problems.append(f"build {b['build_id']}: failure differs from its build record")
+    entry = load_model_list()[label["model"]["name"]]
+    names = load_precision_display_names()
+    key = {b["build_id"]: "fp32" if b["precision"] == "fp32" else f"int8_{b['recipe']['method']}"
+           for b in label["builds"]}
+    if label["model"].get("display_name") != entry["display_name"] or any(
+        b.get("display_name") != names[key[b["build_id"]]] for b in label["builds"]
+    ):
+        problems.append("a display name differs from brokkr_edge/model_list.json")
 
     # 4 and 5. Every measurement.
     for m in label["measurements"]:

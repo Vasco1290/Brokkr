@@ -6,7 +6,9 @@ matches torchvision. brokkr_edge.export keeps the PyTorch side (building and exp
 
 Each entry: the torchvision weights name, the licence (hard rule 8), the preprocessing those weights
 expect (resize, crop, interpolation, mean, std), the number of classes, and torchvision's published
-ImageNet-1k top-1 and top-5 (used for the FP32 sanity check).
+ImageNet-1k top-1 and top-5 (used for the FP32 sanity check), and the name shown on labels. The file
+also holds each precision's display name, keyed as in build file names ("fp32",
+"int8_percentile99.99").
 """
 
 import json
@@ -18,3 +20,8 @@ MODEL_LIST_FILE = Path(__file__).with_name("model_list.json")
 def load_model_list() -> dict:
     """{model name: entry}, in the file's order."""
     return json.loads(MODEL_LIST_FILE.read_text(encoding="utf-8"))["models"]
+
+
+def load_precision_display_names() -> dict:
+    """{precision as in build file names: name shown on labels}."""
+    return json.loads(MODEL_LIST_FILE.read_text(encoding="utf-8"))["precision_display_names"]
