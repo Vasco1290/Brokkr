@@ -172,11 +172,16 @@ outcome".
   new question, add it to "Parked questions" below and move on.
 - Task 4.2 may still run, overnight only, and only as pre-registered (in `docs/hypotheses_stage4.md`)
   before it starts. H23 is parked (29 September 2026): not run during the freeze.
-- Daytime priority is the product: 4.3 (`brokkr shrink` / `test` / label), then website v0, then 4.5.
+- Work follows the Platform plan in `ROADMAP.md` (set by H, 30 September 2026): 1 labels (10 Oct),
+  2 catalog site and going public (17 Oct), 3 testing a user's model (28 Oct), 4 label submission,
+  PyPI and quick start (31 Oct), 5 hosted upload on Hugging Face Spaces (12 Nov), 7 EEG/EMG pack
+  (25 Nov); 6 Raspberry Pi 5 when the board arrives. (Replaces "4.3, website v0, 4.5".)
 
-**Next, in order.** (1) 4.3: the label's contents and format, proposed to H before anything is built,
-generated only from checked result files; then `brokkr shrink` / `test` / label. (2) Website v0.
-(3) 4.5 (`brokkr recommend`). Still owed from 4.1: the summary tables script.
+**Next.** Platform plan step 1 (labels): the label format is fixed in `docs/label_schema.md` and the
+dated notes of 29–30 September in `docs/hypotheses_stage4.md`; next is the label builder, up to
+Checkpoint 1 (the MobileNetV3-Large label and MobileNetV3-Small's "INT8 build failed" label, reviewed
+by H before the other 8). The package was renamed on 30 September 2026: imported as `brokkr_edge`,
+published as `brokkr-edge` (the PyPI name "brokkr" is taken); our command's name is still open.
 Handoff details: `results/handoff_4.1.md` (gitignored).
 
 ### Parked questions (research freeze: written down, not pursued)
@@ -316,7 +321,7 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 
 ## 3. Where everything lives
 
-### Code (`brokkr/`)
+### Code (`brokkr_edge/`, called `brokkr/` before 30 September 2026)
 | File | What it does |
 |---|---|
 | `fingerprint.py` | Records machine, OS, core types, power, versions, git commit |

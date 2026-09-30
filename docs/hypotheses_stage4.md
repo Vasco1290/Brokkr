@@ -1155,3 +1155,11 @@ note above; where they differ, this note replaces them. Nothing has been built o
   sets miss at least twice the 10% they are built to miss; a fall of ten points means at least one
   image in ten that was right on clean images is now wrong. And: "With 12 conditions, an occasional
   result may cross a line by chance."
+
+## Note added 30 September 2026: the package was renamed
+
+The import package `brokkr` was renamed `brokkr_edge` (published as `brokkr-edge`), because the PyPI
+name "brokkr" belongs to an unrelated project (commit `758c383`). Paths and module names in the notes
+above (`brokkr/...`, `brokkr.schema`, ...) are as they were when written; the same files now live under
+`brokkr_edge/`. Result records made earlier keep the names they were made with. The word "brokkr" as
+a value (a record's `source`, the name of Brokkr's own damage suite) is unchanged.
