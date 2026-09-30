@@ -51,6 +51,11 @@ STATE_MARK = {
 }
 
 
+def _first_upper(text: str) -> str:
+    """Capitalise only the first letter (str.capitalize would turn "INT8" into "Int8")."""
+    return text[:1].upper() + text[1:]
+
+
 def fmt(value, kind: str) -> str:
     return FORMATS[kind](value)
 
@@ -131,7 +136,7 @@ def _sections(label: dict) -> dict:
         )
     }
     out["summary"] = [
-        f"{STATE_MARK[line['state']].capitalize()}"
+        _first_upper(STATE_MARK[line["state"]])
         + (
             f" ({fmt(line['count'], 'int')} of {fmt(label['summary']['tested_conditions'], 'int')})"
             if line["count"] is not None
