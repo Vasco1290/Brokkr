@@ -332,7 +332,112 @@ results files.
 - Runtime monitoring
 - Adaptation
 
+## Platform plan to 31 October 2026 (added 30 September 2026)
+
+Set by H on 30 September 2026. **It replaces the order and scope of the Product plan (P1–P6) above**,
+which stays below for the record. Brokkr becomes a platform by 31 October 2026. Steps are built
+strictly in this order; each is finished (tested, documented, pushed) before the next starts. The
+project's rules are unchanged: numbers only from checked result files, licences recorded, no
+overclaiming, a pass / fail check for every step. Items of this ROADMAP that no step below covers are
+listed at the end, for H to decide.
+
+### 1. Labels (P1) `[ ]`, done by 10 October
+- `docs/label_schema.md` first: `label.json` is the platform's core data format (schema version,
+  stable IDs for model, build and hardware, a `source` field, no image-only assumptions: it must also
+  fit Raspberry Pi 5 results and EEG/EMG signals).
+- Then P1 as fixed in `docs/hypotheses_stage4.md` (notes of 29–30 September): 10 labels, the check
+  script, laptop latency for 19 builds, `brokkr test` reproducing MobileNetV3-Large's 4.1 records.
+- Checkpoint 1: the full MobileNetV3-Large label and MobileNetV3-Small's "INT8 build failed" label,
+  reviewed by H before the other 8 are built.
+
+*Done when:* the P1 "done when" line above holds, and every `label.json` passes a validator for
+`docs/label_schema.md` version 1.
+
+### 2. Static catalog site `[ ]`, done by 15 October
+- GitHub Pages, generated only from `label.json` files: browse, filter, compare, one page per label,
+  and a methods page (harm definition and threshold history as recorded in
+  `docs/hypotheses_stage4.md`, the "12 conditions" sentence). User-submitted labels are clearly marked
+  "unverified".
+- The repository's licence and README (licence proposed to H with reasons before adding).
+
+*Done when:* the site builds from label files alone, and a test fails if any number on it is not in
+a `label.json`; filter and compare work on the 10 labels; a user-submitted test label shows
+"unverified"; the site is live.
+
+### 3. `brokkr test` for a user's model `[ ]`, done by 20 October
+- A user's ONNX image classifier and a folder of their own labelled images -> INT8 build -> damage
+  tests -> `label.json`, run locally. Then PyTorch model input.
+- How the user's images are split (INT8 calibration, conformal calibration, test; no image in two
+  parts), the minimum image count and the required licence statement are fixed in a dated note before
+  coding.
+
+*Done when:* on a small made-up model and made-up images (tests only), and on one real torchvision
+model with a folder of images, the command produces a schema-valid `label.json` marked
+`source: user-submitted`; the same for PyTorch input.
+
+### 4. Label submission and PyPI `[ ]`, done by 22 October
+- A GitHub pull-request template for submitting a `label.json`, with an automatic check (schema
+  validation; the label is marked "user-submitted, unverified").
+- The package published to PyPI (the name "brokkr" is taken there by an unrelated project, so H
+  chooses the name first).
+
+*Done when:* a test pull request with a valid label passes the check and one with an invalid label
+fails it; in a fresh environment, installing from PyPI and running the quick start produces a label.
+
+### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 26 October
+- Free CPU Space: accepts the user's ONNX model and a folder of their labelled images, runs one job at
+  a time, with a queue and status page; returns the label, marked as a user-submitted run.
+- Upload limits, how long uploads are kept, and how they are deleted are stated on the page.
+
+*Done when:* two jobs submitted together run one after the other, the status page shows both, and
+each returns a schema-valid label.
+
+### 6. Raspberry Pi 5 latency and labels `[ ]`, done by 28 October (board expected about 20 October)
+- The Pi 5 as a target over SSH (4.4), its fingerprint, and latency for the 19 builds by the latency
+  method adapted in a dated note before measuring; labels regenerated with Pi rows. Results are
+  labelled "Raspberry Pi 5" only when measured on one.
+
+*Done when:* 19 Pi latency records exist and pass the checker, and the 10 labels show Pi rows.
+
+### 7. EEG/EMG pack, minimal `[ ]`, done by 31 October
+- One public dataset and one model (licences checked and recorded before use), three damage types
+  (electrode dropout, motion noise, power-line noise), an INT8 build, and a label in the same schema.
+
+*Done when:* the three damage types have tests; one EEG/EMG `label.json` passes the schema validator
+and appears in the catalog.
+
+### Conflicts with existing rules (flagged 30 September 2026, for H to decide)
+- Step 5 conflicts with `CLAUDE.md` ("No backend server until real users need one") and this
+  ROADMAP's "Later, only if real users need it: ... hosted uploads".
+- `CLAUDE.md`'s research freeze names the daytime priority as "4.3, then website v0, then 4.5"; this
+  plan drops 4.5 before 31 October.
+- A GitHub Pages site needs a public repository (or a paid GitHub plan), so step 2 needs the
+  "before making the repository public" checklist.
+- The PyPI name "brokkr" is taken (see step 4).
+
+### ROADMAP items not covered by steps 1–7 (for H to decide on each)
+- 4.1's summary tables script (still owed).
+- 4.2 (two more models, full pipeline; allowed overnight under the freeze).
+- 4.4's laptop-vs-Pi agreement check (does the same file give the same answers on ARM?).
+- 4.5 `brokkr recommend`.
+- P3's unlabelled mode (INT8-vs-FP32 agreement on a user's images without labels).
+- P4 fast mode and the menu of conditions and severities.
+- P5 `brokkr shrink --auto` (trying recipes and recommending one).
+- P6's one-page quick start (step 4 needs one to be checked, but it is not listed).
+- The GitHub Action.
+- The "before making the repository public" checklist (commercial-use check; overclaiming re-read;
+  making the repository public).
+- Stage 5 (energy and heat on the Pi with a USB power meter).
+- Stage 6's installer script and camera demo.
+- Stage 7's niche collections (e.g. factory defects, road scenes, farm pests).
+- Later: object detection, runtime monitoring, adaptation.
+- Technical Report 1's "Related work" section (to be written by H).
+- Stage 3 scripts 12, 14 and 15 need their tuning cache rebuilt (STATUS known gaps).
+- The parked research questions (STATUS).
+
 ## Product plan (P1–P6), added 29 September 2026
+
+*Replaced on 30 September 2026 by the Platform plan above (kept for the record).*
 
 From 29 September 2026 the work follows this order, under the research freeze (`CLAUDE.md`). It
 replaces the order of Stage 4's 4.3–4.5 and brings the start of Stage 6's website forward: task 4.3
