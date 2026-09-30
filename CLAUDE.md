@@ -74,7 +74,8 @@ else is built on its measurements.
   before it starts. H23 is parked (in STATUS.md) and is not run during the freeze.
 * Work follows the Platform plan in `ROADMAP.md` (set by H, 30 September 2026), strictly in this order:
   1 labels (by 10 Oct), 2 catalog site and going public (17 Oct), 3 testing a user's model (28 Oct),
-  4 label submission, PyPI and quick start (31 Oct), 5 hosted upload on Hugging Face Spaces (12 Nov),
+  4 label submission, PyPI and quick start (31 Oct), 4b unlabelled mode (November, before 5),
+  5 hosted upload on Hugging Face Spaces (12 Nov),
   7 EEG/EMG pack (25 Nov); 6 Raspberry Pi 5 when the board arrives. This replaces the earlier priority
   line (4.3, website v0, 4.5).
 

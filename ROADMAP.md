@@ -339,13 +339,14 @@ moved to "when the board arrives", the "before making the repository public" che
 update added to step 2, the quick-start page to step 4, the laptop-vs-Pi agreement check to step 6,
 and every other open ROADMAP item moved to "Later versions" below. **It replaces the order and scope
 of the Product plan (P1–P6) below**, which stays for the record. Steps are built strictly in this
-order (1, 2, 3, 4, 5, 7; step 6 whenever the board arrives); each is finished (tested, documented,
+order (1, 2, 3, 4, 4b, 5, 7; step 6 whenever the board arrives); each is finished (tested, documented,
 pushed) before the next starts. The project's rules are unchanged: numbers only from checked result
 files, licences recorded, no overclaiming, a pass / fail check for every step.
 
 Names (30 September 2026): the package is published as **`brokkr-edge`** and imported as
 **`brokkr_edge`** (the PyPI name "brokkr" belongs to an unrelated project). That project also
-installs a `brokkr` command, so our command's name is still to be decided by H.
+installs a `brokkr` command, so ours is **`brokkr-edge`** (e.g. `brokkr-edge test`; decided by H,
+30 September 2026, at Checkpoint 1).
 
 Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published labels**.
 
@@ -396,6 +397,19 @@ model with a folder of images, the command produces a schema-valid `label.json` 
 *Done when:* a test pull request with a valid label passes the check and one with an invalid label
 fails it; in a fresh environment, installing from PyPI and following the quick start produces a label.
 
+### 4b. Unlabelled mode for a user's images `[ ]`, in November, before step 5 (date not set)
+- Added by H on 30 September 2026 (Checkpoint 1), moved here from "Later versions"; estimated 6–10
+  hours. A user's ONNX image classifier and a folder of their own images **without** class labels ->
+  INT8 build -> how often INT8's top-1 answer agrees with FP32's, clean and under each damage type,
+  -> `label.json`. Without labels there is no accuracy or coverage, so the label says so.
+- What the label may and may not show without labels, and the minimum image count, are fixed in a
+  dated note before coding.
+
+*Done when (proposed by Claude, H to confirm):* on a small made-up model and made-up images
+(tests only), and on one real torchvision model with a folder of images, the command produces a
+schema-valid `label.json` marked `source: user-submitted` that shows agreement and says accuracy
+and coverage were not measured.
+
 ### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 12 November
 - Free CPU Space: accepts the user's ONNX model and a folder of their labelled images, runs one job at
   a time, with a queue and status page; returns the label, marked as a user-submitted run.
@@ -430,8 +444,6 @@ labels show Pi rows.
 - 4.1's summary tables script.
 - 4.2 (two more models, full pipeline; allowed overnight under the research freeze).
 - 4.5 `brokkr recommend`.
-- Unlabelled mode for a user's images (INT8-vs-FP32 agreement without labels): H asked for a cost
-  estimate before deciding whether it joins step 3.
 - Fast mode, and the menu of conditions and severities (P4).
 - `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe.
 - The GitHub Action.

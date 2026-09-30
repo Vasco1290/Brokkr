@@ -185,7 +185,8 @@ in its own dated note.
 ### `summary`
 The block at the top of every rendered label, for the labelled build: one short line per state, each
 listing its conditions ("Not harmful in our tests: ...", "Harmful: ...", "Borderline: ...",
-"Not tested: ..."). Generated from `envelope`, never written by hand.
+"Not tested: ..."). Generated from `envelope`, never written by hand. *(The groups were replaced
+on 30 September 2026: see the note at the end of this document.)*
 
 ### `speed`
 One entry per build, hardware and thread count:
@@ -224,3 +225,66 @@ Every file the label was made from, with its SHA-256, and for each the check it 
 | Markdown model card | `label.json` only | Hugging Face card metadata at the top; a test fails if any number in it is not in `label.json` |
 | HTML page | `label.json` only | the same test |
 | Catalog pages, filters, comparisons | the `label.json` files only | the same test; `user-submitted` shows "unverified" everywhere it appears |
+
+## Note added 30 September 2026, after H's Checkpoint 1 review, before the two labels are regenerated
+
+Decided by H (Checkpoint 1 decisions 1–6). Details marked "(proposed)" are Claude's and await H's
+confirmation at the next review. Nothing above is edited except a pointer in `summary`.
+
+**Version.** Schema version 1 is amended, not raised to 2. No label has been published: the two
+Checkpoint 1 labels were never released, are gitignored, and are regenerated under this note. No
+threshold, envelope state or envelope rule changes.
+
+**1. Display names** (decision 2). Two optional fields, both copied from `brokkr_edge/model_list.json`,
+which takes them from `brokkr_edge/export.py` (models) and `brokkr_edge/quantize.py` (INT8 recipes),
+where they are typed once:
+- `model.display_name`, e.g. "MobileNetV3-Large";
+- each build's `display_name`, e.g. "FP32 (full precision)", "INT8 (percentile calibration, 99.99%)".
+
+Every title (page heading, HTML page title, builds table) uses them. The internal names
+(`mobilenet_v3_large`, `percentile99.99`) stay in IDs and in `recipe`. A label without them renders
+with `model.name` and `precision`.
+
+**2. Summary groups** (decision 3). The summary still describes the labelled build and is still
+generated from `envelope`. Each tested condition goes into exactly one group, read from the labelled
+build's envelope state and the reference build's state in the same condition:
+
+| Labelled build (INT8) | Reference build (FP32) | Group |
+|---|---|---|
+| not harmful | any | fine |
+| harmful | harmful | too hard for this model |
+| harmful | not harmful | hurt by shrinking |
+| harmful | borderline | borderline (proposed) |
+| borderline | any | borderline |
+| INT8 build failed | any | INT8 build failed |
+
+Then "not tested", as before. `summary.lines` entries become `{"group", "count", "conditions"}`
+(`group` replaces `state`). The rendered group titles are "Fine (not harmful in our tests)", "Too hard
+for this model (FP32 also fails)", "Hurt by shrinking (FP32 copes, INT8 doesn't)" (H's wording), and
+"Borderline (too close to a line to call)", "INT8 build failed", "Not tested".
+- (proposed) **Harmful INT8 with borderline FP32 goes to "borderline".** FP32 neither clearly copes nor
+  clearly fails there, so neither of H's two groups fits, and putting the condition in either would
+  claim more than the intervals show. The rendered line names both states for such a condition.
+- (proposed) **"Fine" does not depend on FP32**: the summary answers "can I use this INT8 build here?".
+- The shrinking-cost column is unchanged, so a condition in "too hard for this model" can still carry
+  "large shrinking cost".
+- Written after the two Checkpoint 1 labels were seen. It groups existing states only; no threshold or
+  state is chosen here.
+
+**3. A failed labelled build** (decision 4). The rendered label opens with one plain sentence, made
+from the labelled build's `failure`: that this recipe broke the model and the INT8 build should not be
+used, with the check's value, its limit and the number of images it was measured on. `failure` gains
+`n_items` and `split` (both read from the build record, with their source).
+
+**4. Explanations** (decision 5). Every rendered label has a section "What the words mean", one plain
+line per technical term it uses; in HTML, table headings and summary group titles also carry the same
+line as a hover note. The lines are fixed text in `brokkr_edge/label_render.py`, not label data, and
+hold no number of their own (so the "every number is in `label.json`" check still covers them).
+
+**5. The full `label.json` stays the only source** (decision 6). Step 2's catalog makes a slim version
+from it; the slim version is generated, never edited, and is not a second source.
+
+**6. Command name** (decision 1). The command is `brokkr-edge` (the other PyPI project "brokkr"
+installs a `brokkr` command). A label made by the command says
+`"how_made": "brokkr-edge test <version>"`. Labels made from the 4.1 records keep
+`"scripts/39_make_labels.py, from the 4.1 records"`.
