@@ -342,8 +342,10 @@ overclaiming, and a check that prints pass / fail.
 
 ### P1 Labels `[ ]`
 - `brokkr test`: one command that runs the 4.1 condition set on a model and writes schema-2 records,
-  and the label generator. Labels for the 9 models whose INT8 build passed in 4.1, made from their 4.1
-  records; `brokkr test` is shown to reproduce those records on one of them.
+  and the label generator. Labels for all 10 models of 4.1, made from their 4.1 records: the 9 whose
+  INT8 build passed, and MobileNetV3-Small with the state "INT8 build failed" (revised 30 September
+  2026). `brokkr test` is shown to reproduce MobileNetV3-Large's 4.1 records by the reproduction rule
+  in `docs/hypotheses_stage4.md`.
 - One label per shrunk build, with FP32 beside it; a summary block at the top (conditions where it is
   not harmful / harmful / borderline / not tested); the reliability envelope with three states (dated
   note in `docs/hypotheses_stage4.md`); E-AURC in a details section. `label.json` is the only source;
@@ -352,11 +354,14 @@ overclaiming, and a check that prints pass / fail.
   measuring; the Raspberry Pi row says "not measured".
 - The model list moves out of `export.py`, so testing and labelling run without PyTorch.
 
-*Done when:* `brokkr test` on one 4.1 model reproduces its 4.1 records (the same scores); each of the 9
-models has a `label.json`, Markdown and HTML label generated only from records that pass
-`scripts/22_check_results.py`; a check script prints PASS only if every number in every `label.json`
+*Done when:* `brokkr test` on MobileNetV3-Large passes the reproduction rule (dated note, 30 September
+2026); each of the 10 models has a `label.json`, Markdown and HTML label generated only from records
+that pass `scripts/22_check_results.py` (MobileNetV3-Small's INT8 row: "INT8 build failed", with the
+reason from its build record); a check script prints PASS only if every number in every `label.json`
 equals its source record and every number in the Markdown and HTML appears in its `label.json`; the
-Markdown's model-card metadata parses; laptop latency records exist for all 18 builds.
+Markdown's model-card metadata parses; laptop latency records exist for the 18 builds of the latency
+note (FP32 and INT8 of the 9 models; MobileNetV3-Small's label says "not measured" unless H adds its
+FP32).
 
 ### P2 Website v0 and going public `[ ]`
 - A static site (GitHub Pages) generated only from `label.json` files: a list of models and one page
