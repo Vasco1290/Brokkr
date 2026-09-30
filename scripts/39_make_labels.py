@@ -79,14 +79,19 @@ git = git_info()
 used_files = {}  # path -> (sha256, what checked it)
 
 
+def repo_path(path: Path) -> str:
+    """The path from the repository folder, so a label never shows this machine's folders."""
+    return (path.relative_to(Path.cwd()) if path.is_absolute() else path).as_posix()
+
+
 def note(path: Path, check: str) -> str:
     sha = sha256_of(path)
-    used_files[path.as_posix()] = (sha, check)
+    used_files[repo_path(path)] = (sha, check)
     return sha
 
 
 def source(path: Path, field: str) -> dict:
-    return {"file": path.as_posix(), "sha256": used_files[path.as_posix()][0], "field": field}
+    return {"file": repo_path(path), "sha256": used_files[repo_path(path)][0], "field": field}
 
 
 def checked(path: Path) -> tuple:

@@ -487,7 +487,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid 
 text-align:left;vertical-align:top}th{background:var(--head)}.wrap{overflow-x:auto}
 abbr[title]{text-decoration:underline dotted;cursor:help}
 .s-not-harmful-in-our-tests{color:var(--good)}.s-harmful,.s-INT8-build-failed{color:var(--bad);font-weight:600}
-.s-borderline{color:var(--mid)}li{margin:2px 0}small{color:var(--muted)}
+.s-borderline{color:var(--mid)}li{margin:2px 0;overflow-wrap:anywhere}small{color:var(--muted)}
 dt{font-weight:600}dd{margin:0 0 6px 16px}
 """
 

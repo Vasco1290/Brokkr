@@ -57,6 +57,7 @@ REQUIRED_KEYS = (
     "sources",
 )
 ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_.:/@#-]*$")
+ABSOLUTE_PATH = re.compile(r"^([A-Za-z]:)?[/\\]")  # a path from this machine: "C:/...", "/home/..."
 
 
 def slug(text: str) -> str:
@@ -97,6 +98,10 @@ def _check_sources(sources, where: str) -> list:
         f"{where}: a source needs a file and a 64-character SHA-256"
         for s in sources
         if not (s.get("file") and len(str(s.get("sha256", ""))) == 64)
+    ] + [
+        f"{where}: source {s['file']!r} must be a path from the repository folder, not from this machine"
+        for s in sources
+        if ABSOLUTE_PATH.match(str(s.get("file", "")))
     ]
 
 
@@ -237,4 +242,6 @@ def check_label(label: dict) -> list:
             problems.append(f"speed row {s.get('build_id')}: 'not measured' needs a reason")
     if not label["sources"]:
         problems.append("the label lists no source files")
+    else:
+        problems += _check_sources(label["sources"], "sources")
     return problems

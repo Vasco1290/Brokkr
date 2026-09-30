@@ -242,6 +242,8 @@ def test_the_validator_catches_each_rule():
     assert broken(lambda x: x["builds"][1].update(status="failed"))  # failed build without failure/with rows
     assert broken(lambda x: x.update(schema_version=2))
     assert broken(lambda x: x["summary"]["lines"][0].update(count=5))  # summary disagrees with envelope
+    assert broken(lambda x: x["sources"][0].update(file="C:/Users/someone/Brokkr/x.json"))  # machine path
+    assert broken(lambda x: x["measurements"][0]["sources"][0].update(file="/home/someone/x.json"))
 
 
 def test_titles_use_display_names_and_fall_back_to_internal_names():
