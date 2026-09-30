@@ -288,3 +288,30 @@ from it; the slim version is generated, never edited, and is not a second source
 installs a `brokkr` command). A label made by the command says
 `"how_made": "brokkr-edge test <version>"`. Labels made from the 4.1 records keep
 `"scripts/39_make_labels.py, from the 4.1 records"`.
+
+## Note added 30 September 2026, after H's review of the regenerated Checkpoint 1 labels, before any code
+
+Decided by H (review notes 1–4). Where this differs from the note above, it replaces it. Schema
+version 1 stays, amended (confirmed by H); no threshold, envelope state or envelope rule changes.
+
+**1. Two-level summary** (replaces the four groups of the note above). The summary describes the shrunk
+build, so it groups first by the labelled build's own envelope state, then, for harmful conditions
+only, by the cause:
+- **not harmful in our tests**; **borderline**; **harmful**; **INT8 build failed**; **not tested**.
+- Cause of a harmful condition, from the reference (FP32) build's state in the same condition:
+  FP32 harmful → **too hard for this model** (FP32 also fails); FP32 not harmful → **hurt by
+  shrinking** (FP32 copes, INT8 doesn't); FP32 borderline → **cause unclear** (FP32 is borderline).
+- `summary.lines` entries: `{"state", "cause", "count", "conditions"}`, where `cause` is `null` except
+  on harmful lines, and `conditions` lists condition IDs (the renderer shows each condition's `label`).
+
+**2. A large shrinking cost is never hidden.** Every condition whose envelope row carries "large
+shrinking cost" is listed in `summary.large_shrinking_cost` (condition IDs, in row order), whatever
+its group, and the rendered summary names each one with its shrinking cost in points, e.g. under
+"Shrinking made it much worse". A test fails if a flagged condition is missing from the summary.
+
+**3. Which line a harmful row failed.** Each envelope row gains `failed`: the lines whose whole interval
+is below the line, a subset of `["damage drop", "coverage"]` in that order (empty unless the state is
+harmful). Rendered as "accuracy dropped" (damage drop), "uncertainty signal unreliable (coverage below
+<the coverage line>)" (coverage), or both; in the damage table's envelope cell and beside each harmful
+condition in the summary. The validator checks that harmful rows, and only they, have a non-empty
+`failed`; scripts/40 recomputes it.
