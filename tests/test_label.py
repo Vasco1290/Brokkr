@@ -9,7 +9,15 @@ import copy
 import numpy as np
 
 from brokkr_edge import label as lb
-from brokkr_edge.label_render import TERMS, _do_not_use, _title, to_html, to_markdown, unexplained_numbers
+from brokkr_edge.label_render import (
+    TERMS,
+    _do_not_use,
+    _envelope_cell,
+    _title,
+    to_html,
+    to_markdown,
+    unexplained_numbers,
+)
 from brokkr_edge.label_schema import build_id, check_label, condition_id, hardware_id, model_id, slug
 
 
@@ -29,32 +37,76 @@ def test_shrinking_cost_flag():
     assert lb.shrinking_cost_flag([-0.08, -0.06], 0.05) == "not informative"  # FP32 near floor wins
 
 
-def test_summary_groups_use_only_the_envelope_states():
-    g = lb.summary_group
-    assert g("not harmful", "harmful") == "fine"  # the summary is about the INT8 build
-    assert g("harmful", "harmful") == "too hard for this model"
-    assert g("harmful", "not harmful") == "hurt by shrinking"
-    assert g("harmful", "borderline") == "borderline"  # FP32 neither copes nor fails
-    assert g("borderline", "not harmful") == g("borderline", "harmful") == "borderline"
-    assert g("INT8 build failed", "harmful") == "INT8 build failed"
+def test_harm_cause_reads_fp32_state_only():
+    assert lb.harm_cause("harmful") == "too hard for this model"  # FP32 also fails
+    assert lb.harm_cause("not harmful") == "hurt by shrinking"  # FP32 copes, INT8 doesn't
+    assert lb.harm_cause("borderline") == "cause unclear"  # FP32 neither clearly copes nor fails
 
 
-def test_summary_lines_follow_the_groups_and_name_a_mixed_borderline():
-    def row(build, cond, state):
-        return {"build_id": build, "condition_id": cond, "state": state}
+def test_failed_lines_name_each_whole_interval_below_its_line():
+    ok_cov, ok_drop, low_cov, low_drop = [0.85, 0.9], [-0.05, 0.0], [0.70, 0.75], [-0.20, -0.15]
+    assert lb.failed_lines(ok_cov, ok_drop) == []
+    assert lb.failed_lines(ok_cov, low_drop) == ["damage drop"]
+    assert lb.failed_lines(low_cov, ok_drop) == ["coverage"]
+    assert lb.failed_lines(low_cov, low_drop) == ["damage drop", "coverage"]
+    assert lb.failed_lines([0.79, 0.85], [-0.12, -0.05]) == []  # straddling is borderline, not failed
 
-    states = {"a": ("not harmful", "harmful"), "b": ("harmful", "harmful"), "c": ("harmful", "not harmful"),
-              "d": ("harmful", "borderline"), "e": ("borderline", "not harmful")}
-    rows = [row("int8", c, s8) for c, (s8, _) in states.items()] + [row("fp32", c, s) for c, (_, s) in
-                                                                      states.items()]
-    lines = lb.summary(rows, "int8", {c: c.upper() for c in states})["lines"]
-    assert [(x["group"], x["count"], x["conditions"]) for x in lines] == [
-        ("fine", 1, ["A"]),
-        ("too hard for this model", 1, ["B"]),
-        ("hurt by shrinking", 1, ["C"]),
-        ("borderline", 2, ["D (INT8 harmful, FP32 borderline)", "E"]),
-        ("not tested", None, ["every damage type and severity not listed above"]),
+
+def rows_for(cases: dict) -> list:
+    """Envelope rows from {condition: (INT8 state, FP32 state, INT8 failed lines, INT8 flag)}."""
+    rows = []
+    for cond, (int8, fp32, failed, flag) in cases.items():
+        rows.append({"build_id": "int8", "condition_id": cond, "state": int8, "failed": failed,
+                     "shrinking_cost_flag": flag})
+        rows.append({"build_id": "fp32", "condition_id": cond, "state": fp32, "failed": [],
+                     "shrinking_cost_flag": None})
+    return rows
+
+
+CASES = {
+    "a": ("not harmful", "harmful", [], "large shrinking cost"),
+    "b": ("harmful", "harmful", ["damage drop"], "large shrinking cost"),
+    "c": ("harmful", "not harmful", ["coverage"], None),
+    "d": ("harmful", "borderline", ["damage drop", "coverage"], None),
+    "e": ("borderline", "not harmful", [], None),
+}
+
+
+def test_summary_groups_by_the_shrunk_build_first_then_by_cause():
+    lines = lb.summary(rows_for(CASES), "int8")["lines"]
+    assert [(x["state"], x["cause"], x["count"], x["conditions"]) for x in lines] == [
+        ("not harmful", None, 1, ["a"]),
+        ("borderline", None, 1, ["e"]),
+        ("harmful", "too hard for this model", 1, ["b"]),
+        ("harmful", "hurt by shrinking", 1, ["c"]),
+        ("harmful", "cause unclear", 1, ["d"]),  # INT8 harmful, FP32 borderline: under harmful
+        ("not tested", None, None, []),
     ]
+    assert lines[4]["by_failed"] == [{"failed": ["damage drop", "coverage"], "count": 1, "conditions": ["d"]}]
+
+
+def test_every_large_shrinking_cost_is_named_in_the_summary_whatever_its_group():
+    summary = lb.summary(rows_for(CASES), "int8")
+    flagged = [c for c, case in CASES.items() if case[3] == "large shrinking cost"]
+    assert summary["large_shrinking_cost"] == flagged == ["a", "b"]  # "not harmful" and "too hard" alike
+    label = tiny_label()  # its one condition is "not harmful": the flag must still reach the summary
+    label["envelope"]["rows"][1]["shrinking_cost_flag"] = "large shrinking cost"
+    label["summary"] = lb.summary(label["envelope"]["rows"], label["label_id"])
+    assert check_label(label) == []
+    for text in (to_markdown(label), to_html(label)):
+        line = next(x for x in text.split("\n") if "Shrinking made it much worse" in x and "points" in x)
+        assert "fog (suite) s3, -2.00 points" in line
+
+
+def test_a_harmful_cell_says_which_line_it_failed():
+    rule = lb.ENVELOPE_RULE
+    row = {"state": "harmful", "failed": ["damage drop", "coverage"]}
+    assert _envelope_cell(row, rule) == (
+        "harmful: accuracy dropped and uncertainty signal unreliable (coverage below 80%)"
+    )
+    one = {"state": "harmful", "failed": ["damage drop"]}
+    assert _envelope_cell(one, rule) == "harmful: accuracy dropped"
+    assert _envelope_cell({"state": "not harmful", "failed": []}, rule) == "not harmful in our tests"
 
 
 def test_paired_counts_whole_items():
@@ -119,6 +171,7 @@ def tiny_label() -> dict:
             "hardware_id": hw,
             "state": "not harmful",
             "why": [],
+            "failed": [],
             "shrinking_cost_flag": None,
         }
         for b in (ref, lab)
@@ -202,7 +255,7 @@ def tiny_label() -> dict:
         },
         "measurements": measurements,
         "envelope": {"rule": dict(lb.ENVELOPE_RULE), "rows": rows},
-        "summary": lb.summary(rows, lab, {"suite/fog/3": "fog (suite) s3"}),
+        "summary": lb.summary(rows, lab),
         "speed": [
             {
                 "build_id": b,
@@ -244,6 +297,9 @@ def test_the_validator_catches_each_rule():
     assert broken(lambda x: x["summary"]["lines"][0].update(count=5))  # summary disagrees with envelope
     assert broken(lambda x: x["sources"][0].update(file="C:/Users/someone/Brokkr/x.json"))  # machine path
     assert broken(lambda x: x["measurements"][0]["sources"][0].update(file="/home/someone/x.json"))
+    assert broken(lambda x: x["envelope"]["rows"][1].update(state="harmful"))  # harmful, no failed line
+    # a large shrinking cost left out of the summary
+    assert broken(lambda x: x["envelope"]["rows"][1].update(shrinking_cost_flag="large shrinking cost"))
 
 
 def test_titles_use_display_names_and_fall_back_to_internal_names():

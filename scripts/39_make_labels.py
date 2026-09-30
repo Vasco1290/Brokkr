@@ -26,7 +26,15 @@ from pathlib import Path
 from brokkr_edge import __version__
 from brokkr_edge.fingerprint import git_info
 from brokkr_edge.judge import top1_correct
-from brokkr_edge.label import CI_LEVEL, ENVELOPE_RULE, envelope_state, paired, shrinking_cost_flag, summary
+from brokkr_edge.label import (
+    CI_LEVEL,
+    ENVELOPE_RULE,
+    envelope_state,
+    failed_lines,
+    paired,
+    shrinking_cost_flag,
+    summary,
+)
 from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
 from brokkr_edge.label_schema import build_id as make_build_id
 from brokkr_edge.label_schema import (
@@ -267,7 +275,6 @@ def make_label(model: str) -> dict:
         }
         for c in CONDITIONS
     ]
-    labels = {c["condition_id"]: c["label"] for c in conditions}
 
     # Measurements.
     measurements = []
@@ -367,13 +374,14 @@ def make_label(model: str) -> dict:
                         "hardware_id": hw_id,
                         "state": "INT8 build failed",
                         "why": [f"build check failed: {f['check']}"],
+                        "failed": [],
                         "shrinking_cost_flag": None,
                     }
                 )
                 continue
-            state, why = envelope_state(
-                index[("coverage", bid, cid)]["ci95"], index[("damage_drop", bid, cid)]["ci95"]
-            )
+            coverage_ci = index[("coverage", bid, cid)]["ci95"]
+            drop_ci = index[("damage_drop", bid, cid)]["ci95"]
+            state, why = envelope_state(coverage_ci, drop_ci)
             flag = None
             if role == "labelled":
                 fp32_top1 = index[("top1", builds["reference"]["build_id"], cid)]["value"]
@@ -385,6 +393,7 @@ def make_label(model: str) -> dict:
                     "hardware_id": hw_id,
                     "state": state,
                     "why": why,
+                    "failed": failed_lines(coverage_ci, drop_ci),
                     "shrinking_cost_flag": flag,
                 }
             )
@@ -471,7 +480,7 @@ def make_label(model: str) -> dict:
         },
         "measurements": measurements,
         "envelope": {"rule": ENVELOPE_RULE, "rows": rows},
-        "summary": summary(rows, builds["labelled"]["build_id"], labels),
+        "summary": summary(rows, builds["labelled"]["build_id"]),
         "speed": speed,
         "details": {"conformal": details_conformal},
         "limits": [
@@ -522,6 +531,8 @@ for model in args.models:
         print(f"     {line}")
     for line in label["summary"]["lines"]:
         count = "" if line["count"] is None else f" ({line['count']})"
-        print(f"     {line['group']}{count}: {', '.join(line['conditions'])}")
+        cause = f", {line['cause']}" if line["cause"] else ""
+        print(f"     {line['state']}{cause}{count}: {', '.join(line['conditions'])}")
+    print(f"     large shrinking cost: {', '.join(label['summary']['large_shrinking_cost']) or 'none'}")
 print("PASS" if all_ok else "FAIL")
 sys.exit(0 if all_ok else 1)

@@ -55,15 +55,21 @@ STATE_MARK = {
     "not tested": "not tested",
     "INT8 build failed": "INT8 build failed",
 }
-# The summary groups (docs/label_schema.md, note of 30 September 2026) as a reader sees them.
-GROUP_TITLE = {
-    "fine": "Fine (not harmful in our tests)",
-    "too hard for this model": "Too hard for this model (FP32 also fails)",
-    "hurt by shrinking": "Hurt by shrinking (FP32 copes, INT8 doesn't)",
+# The summary (docs/label_schema.md, second note of 30 September 2026) as a reader sees it: lines by the
+# shrunk build's own state, harmful ones by cause.
+STATE_TITLE = {
+    "not harmful": "Not harmful in our tests",
     "borderline": "Borderline (too close to a line to call)",
+    "harmful": "Harmful",
     "INT8 build failed": "INT8 build failed",
     "not tested": "Not tested",
 }
+CAUSE_TITLE = {
+    "too hard for this model": "Too hard for this model (FP32 also fails)",
+    "hurt by shrinking": "Hurt by shrinking (FP32 copes, INT8 doesn't)",
+    "cause unclear": "Cause unclear (FP32 is borderline)",
+}
+LARGE_COST_TITLE = "Shrinking made it much worse (large shrinking cost)"
 
 # One plain line per technical term on the label. No numbers here (see the module docstring).
 TERMS = {
@@ -111,10 +117,17 @@ TERMS = {
     "Not tested": "this damage type or severity was not run.",
     "INT8 build failed": "the INT8 build did not pass its build check, so it was not tested.",
     "Top-1 agreement with FP32": "the share of images where INT8's first answer is the same as FP32's.",
-    "Fine": "INT8 is not harmful in our tests in these conditions.",
     "Too hard for this model": "FP32 fails here too: the model struggles even before shrinking. The "
     "shrinking-cost column shows whether shrinking made it worse.",
     "Hurt by shrinking": "FP32 copes here but INT8 does not: the shrinking caused the failure.",
+    "Cause unclear": "INT8 is harmful here, but FP32 is borderline, so it is not clear whether the model "
+    "or the shrinking is to blame.",
+    "Accuracy dropped": "the whole damage-drop interval is below its line: top-1 fell too far under this "
+    "damage.",
+    "Uncertainty signal unreliable": "the whole coverage interval is below its line: the prediction sets "
+    "miss the right answer too often, so the model's \"I'm not sure\" can no longer be trusted here.",
+    "Shrinking made it much worse": "every condition with a large shrinking cost, named whatever its "
+    "group, with its shrinking cost in points.",
     "Interval (in brackets)": "the range the true value most likely lies in, found by resampling the test "
     "images many times (bootstrap); its level is given under \"What was tested\".",
     "Paired": "both sides of a difference are computed on the same resampled images, so how hard each image "
@@ -153,13 +166,15 @@ HOVER = {
     "Latency": "p50, p95, p99",
     "Threads": "Threads",
     "not harmful in our tests": "Not harmful in our tests",
+    "not harmful": "Not harmful in our tests",
     "harmful": "Harmful",
     "borderline": "Borderline",
     "not tested": "Not tested",
     "INT8 build failed": "INT8 build failed",
-    "fine": "Fine",
     "too hard for this model": "Too hard for this model",
     "hurt by shrinking": "Hurt by shrinking",
+    "cause unclear": "Cause unclear",
+    "large shrinking cost": "Shrinking made it much worse",
 }
 
 
@@ -254,6 +269,58 @@ def _do_not_use(build: dict) -> str | None:
     )
 
 
+def _failed_text(failed: list, rule: dict) -> str:
+    """Which line a harmful row failed, in plain words (H's review note 3)."""
+    words = {
+        "damage drop": "accuracy dropped",
+        "coverage": f"uncertainty signal unreliable (coverage below {fmt(rule['coverage_min'], 'pct0')})",
+    }
+    return " and ".join(words[name] for name in failed)
+
+
+def _envelope_cell(row: dict | None, rule: dict) -> str:
+    if row is None:
+        return "—"
+    reason = _failed_text(row.get("failed", []), rule)
+    return STATE_MARK[row["state"]] + (f": {reason}" if reason else "")
+
+
+def _summary(label: dict, ix: dict) -> list:
+    """(indent, hover key, title, rest of the line) for each summary line."""
+    rule, summary = label["envelope"]["rule"], label["summary"]
+    of = f" of {fmt(summary['tested_conditions'], 'int')}"
+
+    def names(ids):
+        return ", ".join(ix["cond"][c] for c in ids)
+
+    out = []
+    for line in summary["lines"]:
+        state, cause = line["state"], line["cause"]
+        if state == "not tested":
+            continue
+        count = f" ({fmt(line['count'], 'int')}{of})"
+        if cause is None:
+            out.append((0, state, STATE_TITLE[state], f"{count}: {names(line['conditions'])}"))
+            continue
+        if not any(x[1] == "harmful" for x in out):
+            out.append((0, "harmful", STATE_TITLE["harmful"], ", by cause:"))
+        parts = [
+            f"{_failed_text(part['failed'], rule)} ({fmt(part['count'], 'int')}): {names(part['conditions'])}"
+            for part in line["by_failed"]
+        ]
+        out.append((1, cause, CAUSE_TITLE[cause], f"{count}: " + "; ".join(parts)))
+    labelled = label["label_id"]
+    costs = [
+        f"{ix['cond'][c]}, {fmt(ix['m'][('shrinking_cost', labelled, c)]['value'], 'pts')} points"
+        for c in summary["large_shrinking_cost"]
+    ]
+    if ix["builds"]["labelled"]["status"] == "usable":
+        out.append((0, "large shrinking cost", LARGE_COST_TITLE, ": " + ("; ".join(costs) or "none")))
+    not_tested = ": every damage type and severity not listed above"
+    out.append((0, "not tested", STATE_TITLE["not tested"], not_tested))
+    return out
+
+
 def _sections(label: dict) -> dict:
     """Plain rows of text for each part of the label, shared by Markdown and HTML."""
     ix = _by(label)
@@ -269,21 +336,7 @@ def _sections(label: dict) -> dict:
         ),
         "do_not_use": _do_not_use(lab),
     }
-    # (group, title, the rest of the line) for each summary line.
-    out["summary"] = [
-        (
-            line["group"],
-            GROUP_TITLE[line["group"]],
-            (
-                f" ({fmt(line['count'], 'int')} of {fmt(label['summary']['tested_conditions'], 'int')})"
-                if line["count"] is not None
-                else ""
-            )
-            + ": "
-            + ", ".join(line["conditions"]),
-        )
-        for line in label["summary"]["lines"]
-    ]
+    out["summary"] = _summary(label, ix)
     ds = {d["dataset_id"]: d for d in label["datasets"]}
     test = ds[label["measurements"][0]["dataset_id"]] if label["measurements"] else next(iter(ds.values()))
     hw = label["hardware"][0]
@@ -343,7 +396,7 @@ def _sections(label: dict) -> dict:
             c["label"],
             _value(ix["m"].get(("top1", ref["build_id"], cid)), "pct", ci=False),
             _value(ix["m"].get(("damage_drop", ref["build_id"], cid)), "pts"),
-            STATE_MARK[r_row["state"]] if r_row else "—",
+            _envelope_cell(r_row, rule),
         ]
         if failed:
             row += ["—", "—", "—", STATE_MARK["INT8 build failed"], "—"]
@@ -354,7 +407,7 @@ def _sections(label: dict) -> dict:
                 _value(ix["m"].get(("top1", lab["build_id"], cid)), "pct", ci=False),
                 _value(ix["m"].get(("damage_drop", lab["build_id"], cid)), "pts"),
                 _coverage(ix, lab["build_id"], cid),
-                STATE_MARK[l_row["state"]] if l_row else "—",
+                _envelope_cell(l_row, rule),
                 _value(cost, "pts") + (f" [{flag}]" if flag else ""),
             ]
         damage_rows.append(row)
@@ -445,7 +498,7 @@ def to_markdown(label: dict) -> str:
     parts += [
         f"**{s['badge']}**",
         "## Summary",
-        "\n".join(f"- **{title}**{rest}" for _, title, rest in s["summary"]),
+        "\n".join(f"{'  ' * indent}- **{title}**{rest}" for indent, _, title, rest in s["summary"]),
         TERMS_NOTE,
         "## What was tested",
         "\n".join(f"- {line}" for line in s["tested"]),
@@ -488,7 +541,7 @@ text-align:left;vertical-align:top}th{background:var(--head)}.wrap{overflow-x:au
 abbr[title]{text-decoration:underline dotted;cursor:help}
 .s-not-harmful-in-our-tests{color:var(--good)}.s-harmful,.s-INT8-build-failed{color:var(--bad);font-weight:600}
 .s-borderline{color:var(--mid)}li{margin:2px 0;overflow-wrap:anywhere}small{color:var(--muted)}
-dt{font-weight:600}dd{margin:0 0 6px 16px}
+dt{font-weight:600}dd{margin:0 0 6px 16px}li.sub{margin-left:24px}
 """
 
 
@@ -502,8 +555,11 @@ def _hover(text: str) -> str:
 
 def _html_table(head: list, rows: list) -> str:
     def cell(c):
-        cls = next((f' class="s-{v.replace(" ", "-")}"' for v in STATE_MARK.values() if str(c) == v), "")
-        return f"<td{cls}>{_hover(str(c)) if cls else html.escape(str(c))}</td>"
+        state, _, reason = str(c).partition(": ")  # an envelope cell: "harmful: accuracy dropped"
+        if state not in STATE_MARK.values():
+            return f"<td>{html.escape(str(c))}</td>"
+        reason = html.escape(f": {reason}") if reason else ""
+        return f'<td class="s-{state.replace(" ", "-")}">{_hover(state)}{reason}</td>'
 
     return (
         '<div class="wrap"><table><tr>'
@@ -523,9 +579,9 @@ def to_html(label: dict) -> str:
         return "<ul>" + "".join(f"<li>{html.escape(x)}</li>" for x in lines) + "</ul>"
 
     summary = "".join(
-        f'<li><strong><abbr title="{html.escape(TERMS[HOVER.get(group, "Not tested")])}">'
+        f'<li{" class=sub" if indent else ""}><strong><abbr title="{html.escape(TERMS[HOVER[key]])}">'
         f"{html.escape(title)}</abbr></strong>{html.escape(rest)}</li>"
-        for group, title, rest in s["summary"]
+        for indent, key, title, rest in s["summary"]
     )
     body = [f"<h1>{html.escape(_title(label))}</h1>"]
     if s["do_not_use"]:

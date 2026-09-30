@@ -13,8 +13,9 @@ For each label, independently of the code that made it:
 4. Every copied number (value and interval) equals the field it names in its source record.
 5. Every damage drop and shrinking cost is recomputed from the saved scores (paired bootstrap, 1,000
    resamples, seed 0) and must be identical.
-6. Every envelope state and shrinking-cost flag, and the summary, are recomputed from the measurements
-   with the committed rule (brokkr_edge.label) and must be identical; so must the FP32 sanity check.
+6. Every envelope state, failed line and shrinking-cost flag, and the summary, are recomputed from the
+   measurements with the committed rule (brokkr_edge.label) and must be identical; so must the FP32
+   sanity check.
 7. label.md and label.html equal a fresh render of label.json, every number a reader sees in them is a
    label.json number, and the Markdown's model-card metadata parses (huggingface_hub.ModelCard).
 """
@@ -28,7 +29,7 @@ import numpy as np
 from huggingface_hub import ModelCard
 
 from brokkr_edge.judge import top1_correct
-from brokkr_edge.label import envelope_state, paired, shrinking_cost_flag, summary
+from brokkr_edge.label import envelope_state, failed_lines, paired, shrinking_cost_flag, summary
 from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
 from brokkr_edge.label_schema import check_label
 from brokkr_edge.model_list import load_model_list, load_precision_display_names
@@ -110,22 +111,19 @@ def check(folder: Path) -> list:
         bid, cid = row["build_id"], row["condition_id"]
         build = next(b for b in label["builds"] if b["build_id"] == bid)
         if build["status"] == "failed":
-            expected = ("INT8 build failed", None)
+            expected = ("INT8 build failed", [], None)
         else:
-            state, _ = envelope_state(
-                ix[("coverage", bid, cid)]["ci95"], ix[("damage_drop", bid, cid)]["ci95"], rule
-            )
+            coverage_ci, drop_ci = ix[("coverage", bid, cid)]["ci95"], ix[("damage_drop", bid, cid)]["ci95"]
+            state, _ = envelope_state(coverage_ci, drop_ci, rule)
             flag = None
             if build["role"] == "labelled":
                 fp32 = ix[("top1", builds["reference"]["build_id"], cid)]["value"]
                 flag = shrinking_cost_flag(ix[("shrinking_cost", bid, cid)]["ci95"], fp32, rule)
-            expected = (state, flag)
-        if (row["state"], row["shrinking_cost_flag"]) != expected:
-            problems.append(
-                f"envelope {bid} {cid}: {row['state']}/{row['shrinking_cost_flag']}, rule gives {expected}"
-            )
-    labels = {c["condition_id"]: c["label"] for c in label["conditions"]}
-    if summary(label["envelope"]["rows"], label["label_id"], labels) != label["summary"]:
+            expected = (state, failed_lines(coverage_ci, drop_ci, rule), flag)
+        found = (row["state"], row["failed"], row["shrinking_cost_flag"])
+        if found != expected:
+            problems.append(f"envelope {bid} {cid}: {found}, rule gives {expected}")
+    if summary(label["envelope"]["rows"], label["label_id"]) != label["summary"]:
         problems.append("summary differs from the one the envelope gives")
     sanity = label["checks"]["fp32_sanity"]
     measured = ix[("top1", builds["reference"]["build_id"], "clean")]["value"]

@@ -16,15 +16,10 @@ BUILD_ROLES = ("reference", "labelled")
 BUILD_STATUSES = ("usable", "failed")
 STATES = ("not harmful", "harmful", "borderline", "not tested", "INT8 build failed")
 SHRINKING_COST_FLAGS = (None, "large shrinking cost", "not informative")
-# Summary groups (note of 30 September 2026 in docs/label_schema.md; the rule is brokkr_edge.label).
-SUMMARY_GROUPS = (
-    "fine",
-    "too hard for this model",
-    "hurt by shrinking",
-    "borderline",
-    "INT8 build failed",
-    "not tested",
-)
+# Summary: lines by the labelled build's own state, harmful ones also by cause (second note of 30
+# September 2026 in docs/label_schema.md; the rule is brokkr_edge.label).
+HARM_CAUSES = ("too hard for this model", "hurt by shrinking", "cause unclear")
+FAILED_LINES = ("damage drop", "coverage")  # the lines a harmful row can fail, in the order shown
 SPEED_STATUSES = ("measured", "not measured")
 # Metric name -> unit. Derived comparisons (damage_drop, shrinking_cost) are measurements too.
 METRICS = {
@@ -215,15 +210,41 @@ def check_label(label: dict) -> list:
             problems.append(
                 f"envelope row {row.get('condition_id')}: a failed build's rows say 'INT8 build failed'"
             )
+        failed = row.get("failed", [])
+        in_order = [x for x in FAILED_LINES if x in failed] == failed
+        if not in_order or bool(failed) != (row.get("state") == "harmful"):
+            problems.append(
+                f"envelope row {row.get('condition_id')}: a harmful row, and only a harmful row, names the "
+                f"lines it failed, from {FAILED_LINES}"
+            )
     labelled_rows = [
         r for r in label["envelope"].get("rows", []) if r.get("build_id") == labelled.get("build_id")
     ]
     lines = label["summary"].get("lines", [])
-    unknown = [line.get("group") for line in lines if line.get("group") not in SUMMARY_GROUPS]
-    if unknown:
-        problems.append(f"summary: unknown groups {unknown}")
-    if sum(line.get("count") or 0 for line in lines) != len(labelled_rows):
-        problems.append("summary: its counts do not add up to the labelled build's envelope rows")
+    own_state = {r.get("condition_id"): r.get("state") for r in labelled_rows}
+    listed = []
+    for line in lines:
+        state, cause, conds = line.get("state"), line.get("cause"), line.get("conditions", [])
+        if state not in STATES or (cause in HARM_CAUSES) != (state == "harmful"):
+            problems.append(f"summary: line {state!r} / {cause!r} is not a known group")
+        if line.get("count") is not None and line["count"] != len(conds):
+            problems.append(f"summary: the {state!r} line's count differs from its conditions")
+        if any(own_state.get(c) != state for c in conds):
+            problems.append(f"summary: the {state!r} line lists a condition in another state")
+        if state == "harmful":
+            parts = line.get("by_failed", [])
+            split = [c for part in parts for c in part.get("conditions", [])]
+            counts_ok = all(p.get("count") == len(p.get("conditions", [])) for p in parts)
+            if sorted(split) != sorted(conds) or not counts_ok:
+                problems.append(f"summary: the {cause!r} line's split by failed line does not match it")
+        listed += conds
+    if sorted(listed) != sorted(own_state):
+        problems.append("summary: every tested condition must be listed exactly once")
+    flagged = [
+        r["condition_id"] for r in labelled_rows if r.get("shrinking_cost_flag") == "large shrinking cost"
+    ]
+    if label["summary"].get("large_shrinking_cost") != flagged:
+        problems.append("summary: every condition with a large shrinking cost must be named, in row order")
 
     for s in label["speed"]:
         if s.get("status") not in SPEED_STATUSES or s.get("build_id") not in builds:

@@ -11,14 +11,15 @@ the checked records and pass the numbers in, so the same rules serve images, sig
   "harmful" if coverage's upper end < 80% or the drop's upper end < -10 points; otherwise "borderline".
 - Shrinking-cost flag: "not informative" if FP32 top-1 under the condition is below 10%; else "large
   shrinking cost" if the whole interval is below -5 points.
-- Summary group of a condition, from the labelled build's state and the reference build's state there
-  (docs/label_schema.md, note of 30 September 2026): see summary_group().
+- Failed lines of a harmful row: which whole interval is below its line ("damage drop", "coverage").
+- Summary (docs/label_schema.md, second note of 30 September 2026): the labelled build's conditions by
+  its own state, harmful ones by cause (see harm_cause()), and every large shrinking cost named.
 """
 
 import numpy as np
 
 from brokkr_edge.judge import N_RESAMPLES, SEED, paired_ci
-from brokkr_edge.label_schema import SUMMARY_GROUPS
+from brokkr_edge.label_schema import HARM_CAUSES
 
 ENVELOPE_RULE = {
     "name": "reliability envelope, version 1",
@@ -48,16 +49,24 @@ def paired(new_correct: np.ndarray, old_correct: np.ndarray) -> dict:
     }
 
 
+def failed_lines(coverage_ci: list, drop_ci: list, rule: dict = ENVELOPE_RULE) -> list:
+    """The lines whose whole interval is below them: a subset of ["damage drop", "coverage"]."""
+    failed = []
+    if drop_ci[1] < rule["damage_drop_min"]:
+        failed.append("damage drop")
+    if coverage_ci[1] < rule["coverage_min"]:
+        failed.append("coverage")
+    return failed
+
+
 def envelope_state(coverage_ci: list, drop_ci: list, rule: dict = ENVELOPE_RULE) -> tuple:
     """(state, reasons) for one build in one condition."""
     cov_min, drop_min = rule["coverage_min"], rule["damage_drop_min"]
-    fails = []
-    if coverage_ci[1] < cov_min:
-        fails.append("whole coverage interval below the coverage line")
-    if drop_ci[1] < drop_min:
-        fails.append("whole damage-drop interval below the damage-drop line")
-    if fails:
-        return "harmful", fails
+    failed = failed_lines(coverage_ci, drop_ci, rule)
+    if failed:
+        why = {"damage drop": "whole damage-drop interval below the damage-drop line",
+               "coverage": "whole coverage interval below the coverage line"}
+        return "harmful", [why[name] for name in failed]
     clears = coverage_ci[0] >= cov_min and drop_ci[0] >= drop_min
     if clears:
         return "not harmful", [
@@ -80,55 +89,49 @@ def shrinking_cost_flag(cost_ci: list, fp32_top1: float, rule: dict = ENVELOPE_R
     return None
 
 
-JUDGED_GROUPS = SUMMARY_GROUPS[:-1]  # every group except "not tested", in the order shown
+def harm_cause(reference_state: str) -> str:
+    """Why the labelled build is harmful in a condition, read from FP32's state there (no new threshold).
 
-
-def summary_group(labelled_state: str, reference_state: str) -> str:
-    """Which summary group a condition goes in. Only the envelope states are used; no new threshold.
-
-    fine: the labelled build is not harmful there (whatever FP32 does).
-    too hard for this model: both builds are harmful (FP32 also fails).
-    hurt by shrinking: the labelled build is harmful and FP32 is not harmful (FP32 copes, INT8 doesn't).
-    borderline: the labelled build is borderline, or it is harmful while FP32 is borderline.
+    too hard for this model: FP32 is harmful too (FP32 also fails).
+    hurt by shrinking: FP32 is not harmful (FP32 copes, INT8 doesn't).
+    cause unclear: FP32 is borderline, so it neither clearly copes nor clearly fails.
     """
-    if labelled_state in ("not harmful", "INT8 build failed"):
-        return "fine" if labelled_state == "not harmful" else labelled_state
-    if labelled_state == "harmful" and reference_state == "harmful":
-        return "too hard for this model"
-    if labelled_state == "harmful" and reference_state == "not harmful":
-        return "hurt by shrinking"
-    return "borderline"
-
-
-def summary(rows: list, labelled_build_id: str, condition_labels: dict) -> dict:
-    """One line per summary group for the labelled build, each with its count and conditions, in row
-    order. A harmful condition in "borderline" (because FP32 is borderline there) says so."""
-    state = {(r["build_id"], r["condition_id"]): r["state"] for r in rows}
-    reference = {r["condition_id"]: r["state"] for r in rows if r["build_id"] != labelled_build_id}
-    grouped = {group: [] for group in JUDGED_GROUPS}
-    for r in rows:
-        if r["build_id"] != labelled_build_id:
-            continue
-        cid = r["condition_id"]
-        group = summary_group(state[(labelled_build_id, cid)], reference[cid])
-        name = condition_labels[cid]
-        if group == "borderline" and r["state"] == "harmful":
-            name += f" (INT8 harmful, FP32 {reference[cid]})"
-        grouped[group].append(name)
-    lines = [
-        {"group": group, "count": len(conds), "conditions": conds}
-        for group, conds in grouped.items()
-        if conds
-    ]
-    lines.append(
-        {
-            "group": "not tested",
-            "count": None,
-            "conditions": ["every damage type and severity not listed above"],
-        }
+    return {"harmful": "too hard for this model", "not harmful": "hurt by shrinking"}.get(
+        reference_state, "cause unclear"
     )
+
+
+def summary(rows: list, labelled_build_id: str) -> dict:
+    """The labelled build's conditions grouped by its own state, then harmful ones by cause (row order
+    kept), and every condition flagged "large shrinking cost", whatever its group."""
+    reference = {r["condition_id"]: r["state"] for r in rows if r["build_id"] != labelled_build_id}
+    own = [r for r in rows if r["build_id"] == labelled_build_id]
+    order = [(state, None) for state in ("not harmful", "borderline")]
+    order += [("harmful", cause) for cause in HARM_CAUSES]
+    order += [("INT8 build failed", None)]
+    grouped = {key: [] for key in order}
+    for r in own:
+        cause = harm_cause(reference[r["condition_id"]]) if r["state"] == "harmful" else None
+        grouped[(r["state"], cause)].append(r)
+    lines = []
+    for (state, cause), group in grouped.items():
+        if not group:
+            continue
+        line = {"state": state, "cause": cause, "count": len(group),
+                "conditions": [r["condition_id"] for r in group]}
+        if state == "harmful":  # which line each condition failed: accuracy, coverage, or both
+            line["by_failed"] = [
+                {"failed": failed, "count": len(conds), "conditions": conds}
+                for failed in (["damage drop"], ["coverage"], ["damage drop", "coverage"])
+                if (conds := [r["condition_id"] for r in group if r["failed"] == failed])
+            ]
+        lines.append(line)
+    lines.append({"state": "not tested", "cause": None, "count": None, "conditions": []})
     return {
         "describes": labelled_build_id,
-        "tested_conditions": len([r for r in rows if r["build_id"] == labelled_build_id]),
+        "tested_conditions": len(own),
         "lines": lines,
+        "large_shrinking_cost": [
+            r["condition_id"] for r in own if r.get("shrinking_cost_flag") == "large shrinking cost"
+        ],
     }

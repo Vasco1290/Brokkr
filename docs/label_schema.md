@@ -315,3 +315,7 @@ harmful). Rendered as "accuracy dropped" (damage drop), "uncertainty signal unre
 <the coverage line>)" (coverage), or both; in the damage table's envelope cell and beside each harmful
 condition in the summary. The validator checks that harmful rows, and only they, have a non-empty
 `failed`; scripts/40 recomputes it.
+
+*Implementation detail, added before the labels are regenerated:* each harmful summary line also holds
+`by_failed`, a list of `{"failed", "count", "conditions"}` (accuracy only, coverage only, both, in that
+order, empty ones left out), so every count the rendered summary shows is a `label.json` number.
