@@ -21,6 +21,7 @@ dependencies = [
     "onnxconverter-common>=1.16",  # FP16 conversion (MIT)
     "pillow>=12.3",
     "pyarrow>=25.0",
+    "py-cpuinfo==9.0.0",  # CPU features for latency records (MIT; checked 30 Sep 2026)
 ]
 
 [project.optional-dependencies]

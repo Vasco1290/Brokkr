@@ -35,6 +35,7 @@ packaging==26.3
 pillow==12.3.0
 pluggy==1.6.0
 protobuf==7.36.2
+py-cpuinfo==9.0.0
 pyarrow==25.0.1
 Pygments==2.21.0
 pyreadline3==3.5.6
