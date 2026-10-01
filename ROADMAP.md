@@ -332,7 +332,12 @@ results files.
 - Runtime monitoring
 - Adaptation
 
-## Platform plan (added 30 September 2026, dates revised the same day)
+## Platform plan (added 30 September 2026, dates revised the same day and again on 1 October 2026)
+
+**Dates revised by H on 1 October 2026**, from the time measured so far (commit times in git: about
+34 to 43 working hours over 24–30 September) and Claude's estimates for the remaining steps, taking
+the slow end of each range. Old dates: step 1 10 October, 2 17 October, 3 28 October, 4 31 October,
+4b "in November", 5 12 November, 7 25 November.
 
 Set by H on 30 September 2026, then revised by H the same day: new dates, the Raspberry Pi 5 step
 moved to "when the board arrives", the "before making the repository public" checklist and a README
@@ -350,7 +355,7 @@ installs a `brokkr` command, so ours is **`brokkr-edge`** (e.g. `brokkr-edge tes
 
 Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published labels**.
 
-### 1. Labels (P1) `[ ]`, done by 10 October
+### 1. Labels (P1) `[ ]`, done by 5 October
 - `docs/label_schema.md` first (written: `label.json`, schema version 1). The label builder is made
   general enough for EEG/EMG signals (step 7), not image-only.
 - Then P1 as fixed in `docs/hypotheses_stage4.md` (notes of 29–30 September): 10 labels, the check
@@ -361,7 +366,7 @@ Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published
 *Done when:* the P1 "done when" line (Product plan, below) holds, and every `label.json` passes a
 validator for `docs/label_schema.md` version 1.
 
-### 2. Catalog site and going public `[ ]`, done by 17 October
+### 2. Catalog site and going public `[ ]`, done by 10 October
 - GitHub Pages, generated only from `label.json` files: browse, filter, compare, one page per label,
   and a methods page (harm definition and threshold history as recorded in
   `docs/hypotheses_stage4.md`, the "12 conditions" sentence). User-submitted labels are clearly marked
@@ -377,7 +382,7 @@ a `label.json`; filter and compare work on the 10 labels; a user-submitted test 
 "unverified"; every checklist item is ticked with its date; the README is current; the repository is
 public and the site is live.
 
-### 3. Testing a user's model `[ ]`, done by 28 October
+### 3. Testing a user's model `[ ]`, done by 16 October
 - A user's ONNX image classifier and a folder of their own labelled images -> INT8 build -> damage
   tests -> `label.json`, run locally. Then PyTorch model input.
 - How the user's images are split (INT8 calibration, conformal calibration, test; no image in two
@@ -388,7 +393,7 @@ public and the site is live.
 model with a folder of images, the command produces a schema-valid `label.json` marked
 `source: user-submitted`; the same for PyTorch input.
 
-### 4. Label submission, PyPI and quick start `[ ]`, done by 31 October
+### 4. Label submission, PyPI and quick start `[ ]`, done by 19 October
 - A GitHub pull-request template for submitting a `label.json`, with an automatic check (schema
   validation; the label is marked "user-submitted, unverified"). The template says submitters license
   their labels under CC BY 4.0.
@@ -397,7 +402,7 @@ model with a folder of images, the command produces a schema-valid `label.json` 
 *Done when:* a test pull request with a valid label passes the check and one with an invalid label
 fails it; in a fresh environment, installing from PyPI and following the quick start produces a label.
 
-### 4b. Unlabelled mode for a user's images `[ ]`, in November, before step 5 (date not set)
+### 4b. Unlabelled mode for a user's images `[ ]`, done by 23 October
 - Added by H on 30 September 2026 (Checkpoint 1), moved here from "Later versions"; estimated 6–10
   hours. A user's ONNX image classifier and a folder of their own images **without** class labels ->
   INT8 build -> how often INT8's top-1 answer agrees with FP32's, clean and under each damage type,
@@ -405,12 +410,12 @@ fails it; in a fresh environment, installing from PyPI and following the quick s
 - What the label may and may not show without labels, and the minimum image count, are fixed in a
   dated note before coding.
 
-*Done when (proposed by Claude, H to confirm):* on a small made-up model and made-up images
+*Done when (confirmed by H, 1 October 2026):* on a small made-up model and made-up images
 (tests only), and on one real torchvision model with a folder of images, the command produces a
 schema-valid `label.json` marked `source: user-submitted` that shows agreement and says accuracy
 and coverage were not measured.
 
-### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 12 November
+### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 29 October
 - Free CPU Space: accepts the user's ONNX model and a folder of their labelled images, runs one job at
   a time, with a queue and status page; returns the label, marked as a user-submitted run.
 - **The Space never publishes users' models or images, only the resulting labels.** Upload limits,
@@ -421,7 +426,7 @@ and coverage were not measured.
 *Done when:* two jobs submitted together run one after the other, the status page shows both, each
 returns a schema-valid label, and no uploaded model or image is reachable from outside after its job.
 
-### 7. EEG/EMG pack, minimal `[ ]`, done by 25 November
+### 7. EEG/EMG pack, minimal `[ ]`, done by 5 November
 - One public dataset and one model (licences checked and recorded before use), three damage types
   (electrode dropout, motion noise, power-line noise), an INT8 build, and a label in the same schema.
 

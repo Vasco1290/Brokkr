@@ -173,13 +173,13 @@ The platform plan, in order (details and "done when" lines in [ROADMAP.md](ROADM
 
 | Step | What | Planned |
 |---|---|---|
-| 1 | Labels for all ten models, the `brokkr-edge test` command, laptop latency | 10 October 2026 |
-| 2 | Catalog website and making this repository public | 17 October 2026 |
-| 3 | Testing your own ONNX or PyTorch model with your own labelled images | 28 October 2026 |
-| 4 | Label submission, PyPI package (`brokkr-edge`), quick start | 31 October 2026 |
-| 4b | Testing with images that have no labels | November 2026 |
-| 5 | Hosted upload on Hugging Face Spaces | 12 November 2026 |
-| 7 | EEG/EMG signals: one dataset, one model, three damage types | 25 November 2026 |
+| 1 | Labels for all ten models, the `brokkr-edge test` command, laptop latency | 5 October 2026 |
+| 2 | Catalog website and making this repository public | 10 October 2026 |
+| 3 | Testing your own ONNX or PyTorch model with your own labelled images | 16 October 2026 |
+| 4 | Label submission, PyPI package (`brokkr-edge`), quick start | 19 October 2026 |
+| 4b | Testing with images that have no labels | 23 October 2026 |
+| 5 | Hosted upload on Hugging Face Spaces | 29 October 2026 |
+| 7 | EEG/EMG signals: one dataset, one model, three damage types | 5 November 2026 |
 | 6 | Raspberry Pi 5 latency and labels | when the board arrives |
 
 ## Repository layout
