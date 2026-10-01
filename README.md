@@ -1,97 +1,132 @@
+<p align="center">
+  <img src="docs/assets/brokkr-banner.jpg" alt="Brokkr: a small anvil fused onto a computer chip" width="100%">
+</p>
+
 # Brokkr
-Shrink AI models for edge hardware, stress-test them in real-world conditions, and deploy them to know when they're unsure.
 
-**Status:** Stages 1–2 of 7 complete (core measurement; damaged images and reliability). Next: Stage 3,
-fixing what broke. See [ROADMAP.md](ROADMAP.md).
+**Small models you can actually trust on the edge.**
 
-## What works now
+Brokkr shrinks AI vision models so they fit on small devices, stress-tests them on damaged photos (fog,
+darkness, blur, noise, low contrast), and writes a **label** for each one: how big it is, how accurate
+it is, and whether it still knows when it is wrong once conditions get bad.
 
-One command reproduces every Stage 1 result: it exports a model to ONNX, makes FP16 and INT8 versions,
-measures their speed, size, and accuracy, and builds a results page from the saved JSON.
+The question behind it: when a model is shrunk from full precision (FP32) to small whole numbers
+(INT8), what happens to its accuracy **and** to its "I'm not sure" signal, on clean photos and on
+damaged ones?
 
-```bash
-python scripts/run_stage1.py          # add --full to also score FP32 on all 50,000 images
-```
+> **Status, 1 October 2026.** The study (Stages 1–3) and the ten-model breadth study (Stage 4) are
+> done. The label format is built and under review: two labels exist, eight more follow. There is
+> **no** published package, command-line tool or website yet, and nothing has been measured on a
+> Raspberry Pi. Every number below was measured on one Windows laptop (Intel Core i5-1235U, CPU only).
 
-Every result file records the machine, power state, CPU cores used, library versions, and the git
-commit it came from.
+## Contents
 
-## Stage 1 results
+- [What works today](#what-works-today)
+- [What a label says](#what-a-label-says)
+- [What we have found so far](#what-we-have-found-so-far)
+- [How we measure](#how-we-measure)
+- [Set up and run](#set-up-and-run)
+- [Roadmap](#roadmap)
+- [Repository layout](#repository-layout)
+- [Licence](#licence)
 
-Model: MobileNetV3-Large with torchvision's `IMAGENET1K_V2` weights (`brokkr/export.py`), run with
-ONNX Runtime 1.23.2 on a laptop (Intel Core i5-1235U, Windows 11, CPU only).
+## What works today
 
-**Size and accuracy** on a fixed 10,000-image subset of the ImageNet-1k validation split.
-Brackets are 95% bootstrap confidence intervals; "vs FP32" is the paired difference on the same images.
+| | State |
+|---|---|
+| Shrinking a model to FP16 and INT8 (four INT8 recipes) | works (`brokkr_edge/quantize.py`) |
+| Accuracy with 95% intervals, on clean and damaged images | works (`brokkr_edge/accuracy.py`, `brokkr_edge/shift/`) |
+| "I'm not sure": calibration, prediction sets with their size, confidence ranking | works (`brokkr_edge/shift/`) |
+| Ten models, thirteen conditions, every result checked against a schema | done (`scripts/28`, `scripts/22`) |
+| Labels: `label.json`, a Markdown model card and an HTML page, checked against their sources | two made, under review (`scripts/39`, `scripts/40`) |
+| Speed (latency) by a fixed method for 19 builds | **not measured yet** (rough Stage 1 timings only, see [STATUS.md](STATUS.md)) |
+| `brokkr-edge` command, PyPI package | **not built yet** |
+| Catalog website, testing your own model, hosted upload | **not built yet** (see [Roadmap](#roadmap)) |
+| Raspberry Pi 5 | **not measured**; waiting for the board |
 
-| Precision | File size | Top-1 accuracy | Top-1 vs FP32 | Top-5 |
-|---|---|---|---|---|
-| FP32 | 22.2 MB | 75.58% (74.70–76.48) | — | 92.70% |
-| FP16 | 11.3 MB | 75.63% (74.78–76.53) | +0.05 pts (−0.02 to +0.13) | 92.71% |
-| INT8 | 5.9 MB | 60.15% (59.14–61.11)\* | −15.43 pts (−16.30 to −14.59) | 83.37% |
+## What a label says
 
-\* INT8 outputs take only 237 distinct values, so on 262 of the 10,000 images two classes tie
-exactly for the top score. Ties go to the lower class number; any other tie-break would give a top-1
-between 59.62% and 61.01%.
+One label describes one shrunk build of one model, with the full-precision original beside it. This is
+the top of the label for **MobileNetV3-Large · INT8 (percentile calibration, 99.99%)**, measured on
+10,000 ImageNet-1k validation images (the format is still under review, and no label is published yet):
 
-Correctness check: on all 50,000 validation images our FP32 pipeline scores 75.26% (74.88–75.61);
-torchvision publishes 75.27% for these weights.
+| | FP32 (full precision) | INT8 (shrunk) |
+|---|---|---|
+| File size | 22.22 MB | 5.92 MB |
+| Top-1 accuracy, clean images | 75.58% (74.70 to 76.48) | 73.60% (72.75 to 74.52) |
+| Coverage of its prediction sets, clean images | 90.58%, set size 2.28 | 90.22%, set size 2.63 |
 
-**What this shows**
+Shrinking cost on clean images: −1.98 points (−2.47 to −1.47; INT8 minus FP32 on the same images, so
+negative means shrinking lost accuracy).
 
-- FP16 halves the file size with no measurable accuracy change.
-- INT8 made with ONNX Runtime's default static quantization (MinMax calibration, 512 images) is 3.75x
-  smaller but loses about 15 points of top-1 accuracy, and its rounded outputs cause exact ties.
-  Improving this is planned for Stage 3.
+Under the 12 kinds of damage tested, the label sorts each condition by what happened to the shrunk
+model, and why:
 
-**Speed on this laptop: rough, development machine only.** The i5-1235U mixes fast "performance" and
-slow "efficiency" cores. Unpinned, Windows moved the benchmark between them, so timings jumped between
-two speeds; the benchmark now pins to one core type and records it. Even pinned, repeated runs on this
-laptop disagreed by 10–20%, so only these conclusions held up (plugged in, "Best performance" mode,
-10 interleaved sessions per setting, median time per image):
+- **Not harmful in our tests** (1 of 12): fog (Brokkr) s3.
+- **Harmful, too hard for this model** (8 of 12): the full-precision model fails there too.
+- **Harmful, hurt by shrinking** (2 of 12): darkness (Brokkr) s5 and contrast (ImageNet-C) s3. The
+  full-precision model copes; the shrunk one does not.
+- **Harmful, cause unclear** (1 of 12): the full-precision model is borderline.
+- **Shrinking made it much worse** in 6 of the 12, named whatever their group: the largest is contrast
+  (ImageNet-C) s5, −37.20 points.
 
-- One thread on a performance core is about twice as fast as on an efficiency core
-  (FP32: 7.50 ms vs 13.74 ms).
-- FP16 gives no speed benefit on this CPU.
-- Default INT8 is not reliably faster. On 4 efficiency cores it was slower than FP32 (6.53 ms vs 5.42 ms,
-  both stable); on one performance core it looked faster (6.37 ms vs 7.50 ms), but that measurement was
-  unstable (sessions varied by 33%).
+"Harmful" means a whole 95% interval is below a line fixed before these results existed: coverage
+below 80%, or accuracy more than 10 points below the same build's clean accuracy. "Not harmful in our
+tests" is not a guarantee. A recipe that breaks a model is labelled as such: MobileNetV3-Small's INT8
+build matched the original's answer on only 2.73% of 256 check images, so its label opens with "do not
+use this INT8 build".
 
-Speed will be measured properly on a Raspberry Pi 5 in Stage 4 (task 4.4).
+The format is defined in [docs/label_schema.md](docs/label_schema.md). Every number in a label names
+the result file it came from, and `scripts/40_check_labels.py` recomputes each one.
 
-## Stage 2 results: damaged images and "knowing when it's wrong"
+## What we have found so far
 
-The same 10,000 test images, damaged by fog, defocus blur, motion blur, noise, and darkness at
-severities 1–5 (`brokkr/shift`, our own implementations in the style of ImageNet-C). Nine predictions
-were written down and committed before measuring; full outcomes are in
-[docs/hypotheses.md](docs/hypotheses.md): 6 confirmed, 3 rejected. The results page
-(`scripts/05_build_site.py`) has the charts and every number.
+**One model in depth (Stages 1–3, MobileNetV3-Large).** Full write-up:
+[Brokkr Technical Report 1](docs/writeup.md).
 
-- **FP16 behaves like FP32 everywhere:** the largest accuracy difference in any of 26 conditions was
-  0.25 points.
-- **Default INT8 falls apart faster than FP32 under every kind of damage.** At severity 3 it keeps
-  38–65% of FP32's accuracy, against 80% on clean images.
-- **Darkness hurts only INT8.** FP32 goes from 75.6% (clean) to 73.7% at severity 5; default INT8
-  from 60.2% to 20.5%.
-- **The 90% conformal promise holds on clean images** (FP32 90.6%, FP16 90.5%, INT8 89.8%) **but
-  breaks under blur and noise** (FP32 at severity 5: 20–37%), **while prediction sets barely grow**
-  (2.3 classes clean, 2.1–2.8 at severity 5). The model gives no warning that it is failing.
-- **Calibration numbers can mislead.** This model is under-confident on clean images (average
-  confidence 57.9% vs accuracy 75.6%); damage lowered accuracy toward its confidence, so ECE
-  *improved* while accuracy collapsed.
-- **Default INT8 is worse at knowing when it's wrong:** it needs sets of 8.3 classes (vs 2.3) to keep
-  the 90% promise on clean images, and its error when answering its most confident half is 16.2%
-  (vs 5.2% for FP32).
+| Build | File size | Top-1, clean | Top-1, darkness s5 |
+|---|---|---|---|
+| FP32 | 22.22 MB | 75.58% | 73.73% |
+| FP16 | 11.28 MB | 75.63% | 73.71% |
+| INT8, default recipe (min-max) | 5.92 MB | 60.15% | 20.48% |
+| INT8, percentile 99.99% recipe | 5.92 MB | 73.60% | 60.15% |
 
-To reproduce (about 2.5 hours on this laptop, plus calibration-split runs of `scripts/03`):
+- The default INT8 recipe broke this model; a different recipe, chosen without touching the test
+  images, recovered most of the clean accuracy at the same file size.
+- Darkness barely bothers the full-precision model but still costs the better INT8 build about 13.6
+  points.
+- The "I'm not sure" signal fails quietly under damage: the share of images whose prediction set holds
+  the right answer falls, but the sets do not grow to warn you. For the shrunk build under contrast
+  (ImageNet-C) s5, coverage is 12.63% with a set size of 0.99 (on clean images: 90.22% with 2.63).
+- Eight predictions were written down before measuring: 6 passed, 2 failed
+  ([docs/hypotheses_stage3.md](docs/hypotheses_stage3.md)).
 
-```bash
-python scripts/03_evaluate_accuracy.py --precision fp32 --split conformal_calibration   # and fp16, int8
-python scripts/08_corruption_sweep.py
-python scripts/07_reliability.py
-```
+**Ten models (Stage 4).** Plain-language summary: [docs/stage4_story.md](docs/stage4_story.md);
+predictions and outcomes: [docs/hypotheses_stage4.md](docs/hypotheses_stage4.md).
 
-## Development setup
+- Ten torchvision models, 13 conditions, 266 checked result records. All ten full-precision models
+  scored within one point of their published accuracy. Nine INT8 builds were usable; one
+  (MobileNetV3-Small) broke.
+- Of six predictions committed before measuring, 2 passed and 4 failed. The darkness collapse is not
+  common: only 2 of the 9 models lose much more to darkness when shrunk (we had predicted at least 5).
+- The tests of *why* it happens have not found the cause: each was inconclusive or rejected our
+  guess. The question is still open, and research is paused until the labels and the website ship.
+
+## How we measure
+
+- **No made-up numbers.** Every number comes from running the code, is saved as JSON first, and records
+  the machine, library versions and git commit it came from. Charts, labels and pages are generated
+  from that JSON.
+- **Predictions first.** Hypotheses and pass rules are committed before measuring; outcomes are
+  appended, never edited.
+- **No tuning on the test images.** Settings are chosen on separate tuning and calibration images.
+- **Intervals everywhere.** Accuracy and coverage carry 95% bootstrap intervals; differences are
+  paired on the same images. Coverage is never shown without its average set size.
+- **Named hardware.** Laptop results are called laptop results. Nothing here is a Raspberry Pi number.
+
+The full rules are in [CLAUDE.md](CLAUDE.md).
+
+## Set up and run
 
 ```bash
 python -m venv .venv
@@ -102,12 +137,10 @@ pytest
 ruff check .
 ```
 
-To recreate the exact package versions used for the results above, see `requirements-lock.txt`.
+To recreate the exact package versions used for the results, see `requirements-lock.txt`.
 
-## Test data
-
-Accuracy is measured on the ImageNet-1k validation set (50,000 images, about 6.7 GB). Its terms allow
-non-commercial research and educational use only, and each user must accept them:
+**Test data.** Accuracy is measured on the ImageNet-1k validation set (50,000 images, about 6.7 GB).
+Its terms allow non-commercial research and educational use only, and each user must accept them:
 
 1. Log in at huggingface.co and accept the terms at https://huggingface.co/datasets/ILSVRC/imagenet-1k
 2. Create a "Read" access token, then run `hf auth login` in a regular terminal and paste it
@@ -118,7 +151,50 @@ pip install -e ".[data]"
 hf download ILSVRC/imagenet-1k --repo-type dataset --include "data/validation-*" --local-dir data/imagenet-1k
 ```
 
+**Reproduce Stage 1** (export, FP16 and INT8 builds, speed, size, accuracy, results page):
+
+```bash
+python scripts/run_stage1.py          # add --full to also score FP32 on all 50,000 images
+```
+
+**Make and check labels** (needs the Stage 4 result files in `results/`, which are not in git):
+
+```bash
+python scripts/39_make_labels.py --models mobilenet_v3_large mobilenet_v3_small
+python scripts/40_check_labels.py     # prints PASS only if every number matches its source
+python scripts/22_check_results.py    # checks every result record
+```
+
+Reproduction steps for Stages 2–3 are in section 9 of the [technical report](docs/writeup.md).
+
+## Roadmap
+
+The platform plan, in order (details and "done when" lines in [ROADMAP.md](ROADMAP.md)):
+
+| Step | What | Planned |
+|---|---|---|
+| 1 | Labels for all ten models, the `brokkr-edge test` command, laptop latency | 10 October 2026 |
+| 2 | Catalog website and making this repository public | 17 October 2026 |
+| 3 | Testing your own ONNX or PyTorch model with your own labelled images | 28 October 2026 |
+| 4 | Label submission, PyPI package (`brokkr-edge`), quick start | 31 October 2026 |
+| 4b | Testing with images that have no labels | November 2026 |
+| 5 | Hosted upload on Hugging Face Spaces | 12 November 2026 |
+| 7 | EEG/EMG signals: one dataset, one model, three damage types | 25 November 2026 |
+| 6 | Raspberry Pi 5 latency and labels | when the board arrives |
+
+## Repository layout
+
+| Path | What is there |
+|---|---|
+| `brokkr_edge/` | the package: shrinking, damage, measurement, result schema, label rules and renderer |
+| `scripts/` | numbered scripts, in the order the work was done |
+| `tests/` | automatic checks (`pytest`) |
+| `docs/` | the technical report, hypotheses and outcomes, the label format |
+| `STATUS.md` | where everything stands, in detail |
+| `models/`, `data/`, `results/`, `labels/` | not in git: re-downloadable or regenerated |
+
 ## Licence
 
-Apache-2.0. Model weights and datasets keep their own terms (recorded with every result): the torchvision
-MobileNetV3 weights were trained on ImageNet-1k, whose terms allow non-commercial research use only.
+Code: Apache-2.0 ([LICENSE](LICENSE)). Published labels: CC BY 4.0. Model weights and datasets keep
+their own terms, recorded with every result and on every label: the torchvision weights used here
+were trained on ImageNet-1k, whose terms allow non-commercial research use only.
