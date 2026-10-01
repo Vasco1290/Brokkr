@@ -59,16 +59,25 @@ the top of the label for **MobileNetV3-Large · INT8 (percentile calibration, 99
 Shrinking cost on clean images: −1.98 points (−2.47 to −1.47; INT8 minus FP32 on the same images, so
 negative means shrinking lost accuracy).
 
-Under the 12 kinds of damage tested, the label sorts each condition by what happened to the shrunk
-model, and why:
+For the 12 kinds of damage tested, the label opens with three lines:
+
+- **Shrinking** made it much worse (a large shrinking cost) in 6 of 12 conditions, each named with its
+  cost; the largest is contrast (ImageNet-C) s5, −37.20 points.
+- **Harsh conditions:** the full-precision model is itself harmful in 8 of 12, even at full size.
+- **Uncertainty signal:** unreliable (coverage below 80%) in 10 of 12. The prediction sets were
+  calibrated on clean images and can be re-calibrated on your own images.
+
+Then it sorts each condition by what happened to the shrunk model, and why:
 
 - **Not harmful in our tests** (1 of 12): fog (Brokkr) s3.
 - **Harmful, too hard for this model** (8 of 12): the full-precision model fails there too.
 - **Harmful, hurt by shrinking** (2 of 12): darkness (Brokkr) s5 and contrast (ImageNet-C) s3. The
   full-precision model copes; the shrunk one does not.
 - **Harmful, cause unclear** (1 of 12): the full-precision model is borderline.
-- **Shrinking made it much worse** in 6 of the 12, named whatever their group: the largest is contrast
-  (ImageNet-C) s5, −37.20 points.
+
+Every harmful row says which line it failed (accuracy, coverage or both) and carries a suggested next
+step, such as "try another recipe or model". The suggestions are general; they were not tested for
+the model.
 
 "Harmful" means a whole 95% interval is below a line fixed before these results existed: coverage
 below 80%, or accuracy more than 10 points below the same build's clean accuracy. "Not harmful in our
