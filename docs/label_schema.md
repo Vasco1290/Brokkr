@@ -319,3 +319,40 @@ condition in the summary. The validator checks that harmful rows, and only they,
 *Implementation detail, added before the labels are regenerated:* each harmful summary line also holds
 `by_failed`, a list of `{"failed", "count", "conditions"}` (accuracy only, coverage only, both, in that
 order, empty ones left out), so every count the rendered summary shows is a `label.json` number.
+
+## Note added 1 October 2026: three lines at the top of the summary, and a suggested next step (before any code)
+
+Decided by H (review item 6, confirmed 1 October 2026). Details marked "(proposed)" are Claude's and
+await H's confirmation. Schema version 1 stays, amended; no threshold, state or rule changes.
+
+**1. Three lines open every label's summary, before the groups.** Each number is a `label.json`
+number.
+- **Shrinking:** the shrinking cost on clean images with its interval (the `shrinking_cost`
+  measurement for `clean`), then how many tested conditions carry "large shrinking cost", each named
+  with its shrinking cost in points. This line replaces the separate "Shrinking made it much worse"
+  line of the note above: every flagged condition is still named in the summary, whatever its group,
+  and the test that checks it stays.
+- **Harsh conditions:** how many tested conditions are harmful for the reference (FP32) build itself
+  ("even at full size"), each named (the name carries the damage type and severity).
+- **Uncertainty signal:** how many tested conditions fail the coverage line for the labelled build
+  (the whole coverage interval is below the coverage line, i.e. `failed` contains "coverage"), each
+  named, with the plain note that the prediction sets were calibrated on clean images and can be
+  re-calibrated on the user's own images.
+- In `label.json`: `summary.large_shrinking_cost`, `summary.reference_harmful` and
+  `summary.coverage_failed`, each `{"count", "conditions"}` (condition IDs, in row order);
+  `large_shrinking_cost` changes from a plain list to this shape. The validator checks all three
+  against the envelope rows; `scripts/40` recomputes them.
+- A label whose labelled build failed shows "not measured: INT8 build failed" on the Shrinking and
+  Uncertainty signal lines; the Harsh conditions line is shown as usual (it is about FP32).
+
+**2. A suggested next step on each harmful row** of the labelled build, in the damage table (a new
+last column) — fixed text in the renderer, chosen from the row's cause and failed lines, not label
+data:
+- hurt by shrinking → "try another recipe or model";
+- too hard for this model → "consider a stronger model";
+- coverage below the line (alone or with either cause) → also "re-calibrate on your own images";
+- (proposed) cause unclear (FP32 is borderline) → "try another recipe or a stronger model".
+
+Rows that are not harmful, and rows of a failed build, show no suggestion.
+- (proposed) The label says once, under the table and in `limits`, that these are general
+  suggestions and were not tested for this model, so a suggestion is never read as a result.

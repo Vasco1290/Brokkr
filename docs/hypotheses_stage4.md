@@ -1163,3 +1163,36 @@ name "brokkr" belongs to an unrelated project (commit `758c383`). Paths and modu
 above (`brokkr/...`, `brokkr.schema`, ...) are as they were when written; the same files now live under
 `brokkr_edge/`. Result records made earlier keep the names they were made with. The word "brokkr" as
 a value (a record's `source`, the name of Brokkr's own damage suite) is unchanged.
+
+## Note added 1 October 2026, before any latency is measured: a session interrupted by sleep or a pause is discarded
+
+Required by H (1 October 2026): the run must detect that the laptop slept or paused mid-run (any gap
+between timed runs far above normal) and discard that session instead of recording it. Appended to
+the latency notes of 29–30 September; nothing above is changed. The numbers marked "(proposed)" are
+Claude's and await H's confirmation before any timing; no latency has been measured.
+
+- **What is watched.** For every timing (20 warm-up runs, then 300 timed runs), the script records,
+  with a clock that keeps counting while the machine sleeps (`time.time`, the wall clock), the start
+  and end of each timed run. Two things are checked: the duration of each timed run, and the gap
+  between the end of one timed run and the start of the next.
+- **(proposed) The rule.** A timing is **interrupted** if any timed run, or any gap between two timed
+  runs, is longer than the larger of 1.0 second and 20 times that timing's own median run time. A
+  second sign is also recorded: the wall clock and the timer used for the latencies
+  (`time.perf_counter`) disagreeing by more than 1.0 second over the timing.
+- **What is discarded.** A session holds one model's FP32 and INT8 timings back to back; if either is
+  interrupted, the **whole session** (both builds, both thread counts timed in it) is discarded, so
+  FP32 and INT8 always come from the same sessions. Nothing from a discarded session enters p50, p95,
+  p99 or the spread.
+- **(proposed) What happens next.** The discarded session is repeated after the usual 30-second
+  cool-down, with the same FP32/INT8 order it had. At most 3 sessions may be discarded per model; a
+  fourth stops the run for that model with a clear FAIL, and no latency record is written for it.
+- **What is recorded.** Every latency record states the rule and its numbers, the count of discarded
+  sessions, and for each one the time, which build was being timed, and the longest run or gap seen. A
+  discard is logged, never hidden; the label shows the count when it is not zero.
+- **Why 1.0 second and 20 times (data-independent; written before any timing).** A sleep or a
+  suspended process lasts seconds or more, while one image through these models takes milliseconds to
+  a fraction of a second, so both bounds sit far above a normal run and far below any real sleep. An
+  ordinary slow run (the operating system briefly busy) stays below them and is kept: it is real
+  latency and belongs in p99.
+- **How it is checked.** A test feeds the detector made-up run times with one long gap, with one long
+  run, and with none, and checks that the first two are flagged and the third is not.
