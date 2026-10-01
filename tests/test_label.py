@@ -13,6 +13,7 @@ from brokkr_edge.label_render import (
     TERMS,
     _do_not_use,
     _envelope_cell,
+    _next_step,
     _title,
     to_html,
     to_markdown,
@@ -88,14 +89,41 @@ def test_summary_groups_by_the_shrunk_build_first_then_by_cause():
 def test_every_large_shrinking_cost_is_named_in_the_summary_whatever_its_group():
     summary = lb.summary(rows_for(CASES), "int8")
     flagged = [c for c, case in CASES.items() if case[3] == "large shrinking cost"]
-    assert summary["large_shrinking_cost"] == flagged == ["a", "b"]  # "not harmful" and "too hard" alike
+    # "not harmful" (a) and "too hard" (b) alike
+    assert summary["large_shrinking_cost"] == {"count": 2, "conditions": flagged} and flagged == ["a", "b"]
     label = tiny_label()  # its one condition is "not harmful": the flag must still reach the summary
     label["envelope"]["rows"][1]["shrinking_cost_flag"] = "large shrinking cost"
     label["summary"] = lb.summary(label["envelope"]["rows"], label["label_id"])
     assert check_label(label) == []
     for text in (to_markdown(label), to_html(label)):
-        line = next(x for x in text.split("\n") if "Shrinking made it much worse" in x and "points" in x)
-        assert "fog (suite) s3, -2.00 points" in line
+        assert "(large shrinking cost) in 1 of 1 tested conditions: fog (suite) s3 (-2.00 points)" in text
+
+
+def test_the_three_opening_counts_come_from_the_envelope_rows():
+    summary = lb.summary(rows_for(CASES), "int8")
+    assert summary["reference_harmful"] == {"count": 2, "conditions": ["a", "b"]}  # FP32 itself harmful
+    assert summary["coverage_failed"] == {"count": 2, "conditions": ["c", "d"]}  # INT8 fails coverage
+    label = tiny_label()  # nothing harmful, nothing flagged: the three lines still appear, with 0
+    for text in (to_markdown(label), to_html(label)):
+        assert "on clean images the shrinking cost is -1.00 points (-2.00 to +0.00)" in text
+        assert "even at full size, in 0 of 1 tested conditions." in text
+        assert "unreliable (coverage below 80%) in 0 of 1 tested conditions." in text
+        assert text.index("Shrinking") < text.index("Harsh conditions") < text.index("Uncertainty signal")
+        assert text.index("Uncertainty signal") < text.index("Not harmful in our tests")  # before the groups
+
+
+def test_a_harmful_row_gets_a_suggested_next_step_and_no_other_row_does():
+    both = {"state": "harmful", "failed": ["damage drop", "coverage"]}
+    accuracy = {"state": "harmful", "failed": ["damage drop"]}
+    assert _next_step(accuracy, "hurt by shrinking") == "try another recipe or model"
+    assert _next_step(both, "too hard for this model") == (
+        "consider a stronger model; re-calibrate on your own images"
+    )
+    assert _next_step(both, "cause unclear") == (
+        "try another recipe or a stronger model; re-calibrate on your own images"
+    )
+    assert _next_step({"state": "not harmful", "failed": []}, None) == "—"
+    assert _next_step({"state": "INT8 build failed", "failed": []}, None) == "—"
 
 
 def test_a_harmful_cell_says_which_line_it_failed():
@@ -164,6 +192,7 @@ def tiny_label() -> dict:
             ]
         measurements.append(m("damage_drop", b, "suite/fog/3", -0.01, [-0.03, 0.01]))
     measurements.append(m("shrinking_cost", lab, "suite/fog/3", -0.02, [-0.04, 0.0]))
+    measurements.append(m("shrinking_cost", lab, "clean", -0.01, [-0.02, 0.0]))
     rows = [
         {
             "build_id": b,
@@ -298,6 +327,7 @@ def test_the_validator_catches_each_rule():
     assert broken(lambda x: x["sources"][0].update(file="C:/Users/someone/Brokkr/x.json"))  # machine path
     assert broken(lambda x: x["measurements"][0]["sources"][0].update(file="/home/someone/x.json"))
     assert broken(lambda x: x["envelope"]["rows"][1].update(state="harmful"))  # harmful, no failed line
+    assert broken(lambda x: x["summary"]["coverage_failed"].update(count=3))  # an opening count is wrong
     # a large shrinking cost left out of the summary
     assert broken(lambda x: x["envelope"]["rows"][1].update(shrinking_cost_flag="large shrinking cost"))
 

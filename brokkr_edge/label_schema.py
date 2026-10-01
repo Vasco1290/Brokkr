@@ -240,11 +240,20 @@ def check_label(label: dict) -> list:
         listed += conds
     if sorted(listed) != sorted(own_state):
         problems.append("summary: every tested condition must be listed exactly once")
-    flagged = [
-        r["condition_id"] for r in labelled_rows if r.get("shrinking_cost_flag") == "large shrinking cost"
+    reference_rows = [
+        r for r in label["envelope"].get("rows", []) if r.get("build_id") != labelled.get("build_id")
     ]
-    if label["summary"].get("large_shrinking_cost") != flagged:
-        problems.append("summary: every condition with a large shrinking cost must be named, in row order")
+    expected = {  # the three counts that open the label, each in row order
+        "large_shrinking_cost": [
+            r for r in labelled_rows if r.get("shrinking_cost_flag") == "large shrinking cost"
+        ],
+        "reference_harmful": [r for r in reference_rows if r.get("state") == "harmful"],
+        "coverage_failed": [r for r in labelled_rows if "coverage" in r.get("failed", [])],
+    }
+    for name, expected_rows in expected.items():
+        conds = [r["condition_id"] for r in expected_rows]
+        if label["summary"].get(name) != {"count": len(conds), "conditions": conds}:
+            problems.append(f"summary: {name} must count and name exactly the envelope's conditions")
 
     for s in label["speed"]:
         if s.get("status") not in SPEED_STATUSES or s.get("build_id") not in builds:

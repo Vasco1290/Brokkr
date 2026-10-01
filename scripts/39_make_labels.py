@@ -497,6 +497,7 @@ def make_label(model: str) -> dict:
             "Coverage is for prediction sets tuned on clean calibration images; under damage there is no "
             "coverage promise, and the label shows what was measured.",
             "Accuracy was measured on the laptop; it has not been checked on other hardware.",
+            "The suggested next steps are general suggestions; they were not tested for this model.",
         ],
         "sources": [
             {"file": f, "sha256": sha, "check": check} for f, (sha, check) in sorted(used_files.items())
@@ -533,6 +534,8 @@ for model in args.models:
         count = "" if line["count"] is None else f" ({line['count']})"
         cause = f", {line['cause']}" if line["cause"] else ""
         print(f"     {line['state']}{cause}{count}: {', '.join(line['conditions'])}")
-    print(f"     large shrinking cost: {', '.join(label['summary']['large_shrinking_cost']) or 'none'}")
+    for name in ("large_shrinking_cost", "reference_harmful", "coverage_failed"):
+        part = label["summary"][name]
+        print(f"     {name} ({part['count']}): {', '.join(part['conditions']) or 'none'}")
 print("PASS" if all_ok else "FAIL")
 sys.exit(0 if all_ok else 1)

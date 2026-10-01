@@ -101,9 +101,14 @@ def harm_cause(reference_state: str) -> str:
     )
 
 
+def _counted(conditions: list) -> dict:
+    return {"count": len(conditions), "conditions": conditions}
+
+
 def summary(rows: list, labelled_build_id: str) -> dict:
     """The labelled build's conditions grouped by its own state, then harmful ones by cause (row order
-    kept), and every condition flagged "large shrinking cost", whatever its group."""
+    kept), and the three counts that open the label: conditions with a large shrinking cost (whatever
+    their group), conditions where FP32 itself is harmful, and conditions that fail the coverage line."""
     reference = {r["condition_id"]: r["state"] for r in rows if r["build_id"] != labelled_build_id}
     own = [r for r in rows if r["build_id"] == labelled_build_id]
     order = [(state, None) for state in ("not harmful", "borderline")]
@@ -131,7 +136,15 @@ def summary(rows: list, labelled_build_id: str) -> dict:
         "describes": labelled_build_id,
         "tested_conditions": len(own),
         "lines": lines,
-        "large_shrinking_cost": [
-            r["condition_id"] for r in own if r.get("shrinking_cost_flag") == "large shrinking cost"
-        ],
+        "large_shrinking_cost": _counted(
+            [r["condition_id"] for r in own if r.get("shrinking_cost_flag") == "large shrinking cost"]
+        ),
+        "reference_harmful": _counted(
+            [
+                r["condition_id"]
+                for r in rows
+                if r["build_id"] != labelled_build_id and r["state"] == "harmful"
+            ]
+        ),
+        "coverage_failed": _counted([r["condition_id"] for r in own if "coverage" in r["failed"]]),
     }

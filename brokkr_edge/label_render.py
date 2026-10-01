@@ -69,7 +69,18 @@ CAUSE_TITLE = {
     "hurt by shrinking": "Hurt by shrinking (FP32 copes, INT8 doesn't)",
     "cause unclear": "Cause unclear (FP32 is borderline)",
 }
-LARGE_COST_TITLE = "Shrinking made it much worse (large shrinking cost)"
+# A suggested next step for a harmful row, by its cause (note of 1 October 2026). General suggestions,
+# not results: the label says so under the damage table and in its limits.
+NEXT_STEP = {
+    "hurt by shrinking": "try another recipe or model",
+    "too hard for this model": "consider a stronger model",
+    "cause unclear": "try another recipe or a stronger model",
+}
+RECALIBRATE = "re-calibrate on your own images"
+DAMAGE_NOTE = (
+    "Damage drop and shrinking cost in points (positive = better). The suggested next steps are general "
+    "suggestions; they were not tested for this model."
+)
 
 # One plain line per technical term on the label. No numbers here (see the module docstring).
 TERMS = {
@@ -126,8 +137,13 @@ TERMS = {
     "damage.",
     "Uncertainty signal unreliable": "the whole coverage interval is below its line: the prediction sets "
     "miss the right answer too often, so the model's \"I'm not sure\" can no longer be trusted here.",
-    "Shrinking made it much worse": "every condition with a large shrinking cost, named whatever its "
-    "group, with its shrinking cost in points.",
+    "Harsh conditions": "conditions where the FP32 original is itself harmful: the damage is too much for "
+    "this model even at full size.",
+    "Uncertainty signal": "the model's way of saying \"I'm not sure\": its prediction sets. It can be "
+    "trusted only where coverage stays above its line.",
+    "Re-calibrate": "set the conformal threshold again, on images like the ones the model will really "
+    "see instead of clean ones.",
+    "Suggested next step": "a general suggestion for a harmful condition. It was not tested for this model.",
     "Interval (in brackets)": "the range the true value most likely lies in, found by resampling the test "
     "images many times (bootstrap); its level is given under \"What was tested\".",
     "Paired": "both sides of a difference are computed on the same resampled images, so how hard each image "
@@ -174,7 +190,10 @@ HOVER = {
     "too hard for this model": "Too hard for this model",
     "hurt by shrinking": "Hurt by shrinking",
     "cause unclear": "Cause unclear",
-    "large shrinking cost": "Shrinking made it much worse",
+    "shrinking": "Shrinking cost",
+    "harsh conditions": "Harsh conditions",
+    "uncertainty signal": "Uncertainty signal",
+    "Suggested next step": "Suggested next step",
 }
 
 
@@ -285,15 +304,61 @@ def _envelope_cell(row: dict | None, rule: dict) -> str:
     return STATE_MARK[row["state"]] + (f": {reason}" if reason else "")
 
 
+def _next_step(row: dict | None, cause: str | None) -> str:
+    """The suggested next step for a harmful row of the labelled build; nothing for any other row."""
+    if row is None or row["state"] != "harmful":
+        return "—"
+    steps = [NEXT_STEP[cause]] + ([RECALIBRATE] if "coverage" in row["failed"] else [])
+    return "; ".join(steps)
+
+
+def _top_lines(label: dict, ix: dict) -> list:
+    """The three lines that open the summary: shrinking, harsh conditions, uncertainty signal."""
+    rule, summary, labelled = label["envelope"]["rule"], label["summary"], label["label_id"]
+    of = f" of {fmt(summary['tested_conditions'], 'int')} tested conditions"
+
+    def counted(part, with_cost=False):
+        names = []
+        for c in part["conditions"]:
+            cost = ix["m"].get(("shrinking_cost", labelled, c)) if with_cost else None
+            names.append(ix["cond"][c] + (f" ({fmt(cost['value'], 'pts')} points)" if cost else ""))
+        return f"{fmt(part['count'], 'int')}{of}" + (": " + ", ".join(names) if names else "")
+
+    harsh = (
+        f": the FP32 original is itself harmful, even at full size, in "
+        f"{counted(summary['reference_harmful'])}."
+    )
+    if ix["builds"]["labelled"]["status"] != "usable":
+        shrinking = signal = ": not measured: INT8 build failed."
+    else:
+        clean = ix["m"][("shrinking_cost", labelled, "clean")]
+        shrinking = (
+            f": on clean images the shrinking cost is {fmt(clean['value'], 'pts')} points "
+            f"({fmt(clean['ci95'][0], 'pts')} to {fmt(clean['ci95'][1], 'pts')}). Shrinking made it much "
+            f"worse (large shrinking cost) in {counted(summary['large_shrinking_cost'], with_cost=True)}."
+        )
+        signal = (
+            f": unreliable (coverage below {fmt(rule['coverage_min'], 'pct0')}) in "
+            f"{counted(summary['coverage_failed'])}. The prediction sets were calibrated on clean images; "
+            f"they can be re-calibrated on your own images."
+        )
+    return [
+        (0, "shrinking", "Shrinking", shrinking),
+        (0, "harsh conditions", "Harsh conditions", harsh),
+        (0, "uncertainty signal", "Uncertainty signal", signal),
+    ]
+
+
 def _summary(label: dict, ix: dict) -> list:
-    """(indent, hover key, title, rest of the line) for each summary line."""
+    """(indent, hover key, title, rest of the line) for each summary line: the three opening lines, then
+    the conditions by the shrunk build's state and, for harmful ones, by cause."""
     rule, summary = label["envelope"]["rule"], label["summary"]
     of = f" of {fmt(summary['tested_conditions'], 'int')}"
 
     def names(ids):
         return ", ".join(ix["cond"][c] for c in ids)
 
-    out = []
+    out = _top_lines(label, ix)
     for line in summary["lines"]:
         state, cause = line["state"], line["cause"]
         if state == "not tested":
@@ -309,13 +374,6 @@ def _summary(label: dict, ix: dict) -> list:
             for part in line["by_failed"]
         ]
         out.append((1, cause, CAUSE_TITLE[cause], f"{count}: " + "; ".join(parts)))
-    labelled = label["label_id"]
-    costs = [
-        f"{ix['cond'][c]}, {fmt(ix['m'][('shrinking_cost', labelled, c)]['value'], 'pts')} points"
-        for c in summary["large_shrinking_cost"]
-    ]
-    if ix["builds"]["labelled"]["status"] == "usable":
-        out.append((0, "large shrinking cost", LARGE_COST_TITLE, ": " + ("; ".join(costs) or "none")))
     not_tested = ": every damage type and severity not listed above"
     out.append((0, "not tested", STATE_TITLE["not tested"], not_tested))
     return out
@@ -387,6 +445,7 @@ def _sections(label: dict) -> dict:
         )
     out["clean"] = clean_rows
     damage_rows = []
+    cause = {c: line["cause"] for line in label["summary"]["lines"] for c in line["conditions"]}
     for c in label["conditions"]:
         cid = c["condition_id"]
         if cid == "clean":
@@ -399,7 +458,7 @@ def _sections(label: dict) -> dict:
             _envelope_cell(r_row, rule),
         ]
         if failed:
-            row += ["—", "—", "—", STATE_MARK["INT8 build failed"], "—"]
+            row += ["—", "—", "—", STATE_MARK["INT8 build failed"], "—", "—"]
         else:
             cost = ix["m"].get(("shrinking_cost", lab["build_id"], cid))
             flag = l_row.get("shrinking_cost_flag") if l_row else None
@@ -409,6 +468,7 @@ def _sections(label: dict) -> dict:
                 _coverage(ix, lab["build_id"], cid),
                 _envelope_cell(l_row, rule),
                 _value(cost, "pts") + (f" [{flag}]" if flag else ""),
+                _next_step(l_row, cause.get(cid)),
             ]
         damage_rows.append(row)
     out["damage"] = damage_rows
@@ -463,6 +523,7 @@ DAMAGE_HEAD = [
     "INT8 coverage",
     "INT8 envelope",
     "Shrinking cost",
+    "Suggested next step",
 ]
 BUILDS_HEAD = ["Role", "Recipe", "File size", "Status"]
 CLEAN_HEAD = ["Build", "Top-1", "Coverage", "Shrinking cost"]
@@ -507,7 +568,7 @@ def to_markdown(label: dict) -> str:
         "## Clean images",
         _md_table(CLEAN_HEAD, s["clean"]),
         "## Under damage",
-        "Damage drop and shrinking cost in points (positive = better).",
+        DAMAGE_NOTE,
         _md_table(DAMAGE_HEAD, s["damage"]),
         "## Speed",
         _md_table(SPEED_HEAD, s["speed"]),
@@ -599,7 +660,7 @@ def to_html(label: dict) -> str:
         "<h2>Clean images</h2>",
         _html_table(CLEAN_HEAD, s["clean"]),
         "<h2>Under damage</h2>",
-        "<p><small>Damage drop and shrinking cost in points (positive = better).</small></p>",
+        f"<p><small>{html.escape(DAMAGE_NOTE)}</small></p>",
         _html_table(DAMAGE_HEAD, s["damage"]),
         "<h2>Speed</h2>",
         _html_table(SPEED_HEAD, s["speed"]),
