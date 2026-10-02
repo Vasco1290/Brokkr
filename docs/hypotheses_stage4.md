@@ -1228,3 +1228,32 @@ Implementation details of the reproduction rule above (30 September); the rule i
 - **What is written.** `results/reproduction/repeatability.json` before step 2 starts, and
   `results/reproduction/reproduction_check.json` with every record's result and the verdict.
   `scripts/43_check_reproduction.py` prints PASS only if all 28 pass.
+
+## Note added 3 October 2026, before any latency is measured: how the latency script carries out the method
+
+Implementation details of the latency notes above (29–30 September, 1–2 October); the method is
+unchanged. No latency has been measured: on 3 October the script was run once in its `--smoke` mode
+(one model, 2 sessions, 2-second cool-downs, written outside `results/`, every record marked
+`smoke_test`) to check that it works. That run is not a measurement and none of its timings is used.
+- **Script and rules:** `scripts/44_laptop_latency.py`; the rules live in `brokkr_edge/latency.py` and
+  are tested on made-up timings (`tests/test_latency.py`).
+- **Inside a session:** the model's builds are timed back to back at 1 thread, then again at 4 threads,
+  in the session's order (FP32 first in odd sessions, INT8 first in even ones). A fresh ONNX Runtime
+  session is opened for every timing. MobileNetV3-Small has FP32 only.
+- **Records:** one schema-2 `speed` record per build and thread count (38 files for the 19 builds),
+  `results/latency/<model>_<precision>_laptop_<threads>threads.json`, each with a `.npz` holding every
+  timed run of every kept session and their wall-clock start and end times.
+- **Machine checks:** all of them (with the 10-second idle reading) before each model; the power state
+  again after each model. A failed check stops the run (exit code 2) before anything is written for
+  that model. Finished models are skipped when the same command is run again.
+- **Other Brokkr jobs** are found with psutil 7.2.2 (BSD-3-Clause: the licence field and the LICENSE
+  file in its wheel, read 3 October 2026): any other process whose command line names a `.py` file
+  inside this repository's `scripts/` folder, `brokkr-edge`, or `-m brokkr_edge.cli`. The script's own
+  process, its parents and its children are not counted.
+- **Clocks:** each run's latency is read from `time.perf_counter_ns`; its start and end are also read
+  from `time.time` for the sleep/pause rule. The "second sign" of the 1 October note is recorded, not
+  judged: every record stores `clock_disagreement_s`, the largest difference, over its kept timings,
+  between the time a timing took by the wall clock and by the precise timer.
+- **Which physical core each pinned CPU is** is read at run time (`brokkr_edge.fingerprint.physical_cores`)
+  and stored in every record.
+- **Started by H only.** The real run is started by H, at the desk, overnight.

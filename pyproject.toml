@@ -22,6 +22,9 @@ dependencies = [
     "pillow>=12.3",
     "pyarrow>=25.0",
     "py-cpuinfo==9.0.0",  # CPU features for latency records (MIT; checked 30 Sep 2026)
+    # Idle CPU and other running Brokkr jobs, before a latency run (BSD-3-Clause: the licence field and
+    # the LICENSE file in the psutil 7.2.2 wheel, read 3 Oct 2026; it needs no other package).
+    "psutil>=7.2",
 ]
 
 [project.scripts]

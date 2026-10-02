@@ -221,6 +221,35 @@ def windows_efficiency_classes() -> dict:
     return classes
 
 
+def physical_cores() -> dict | None:
+    """{logical CPU number: index of the physical core it belongs to}, read from the OS. Two logical
+    CPUs with the same index are two hardware threads of one core. None if the OS can't tell us."""
+    try:
+        if platform.system() == "Windows":
+            import ctypes
+
+            kernel32 = ctypes.windll.kernel32
+            needed = ctypes.c_ulong(0)
+            kernel32.GetSystemCpuSetInformation(None, 0, ctypes.byref(needed), None, 0)
+            buffer = ctypes.create_string_buffer(needed.value)
+            if not kernel32.GetSystemCpuSetInformation(buffer, needed, ctypes.byref(needed), None, 0):
+                return None
+            cores, offset = {}, 0
+            while offset < needed.value:
+                # SYSTEM_CPU_SET_INFORMATION: entry size (4 bytes) at 0, logical processor index at
+                # byte 14, core index at byte 15 (see windows_efficiency_classes for the same layout).
+                size = int.from_bytes(buffer.raw[offset:offset + 4], "little")
+                cores[buffer.raw[offset + 14]] = buffer.raw[offset + 15]
+                offset += size
+            return dict(sorted(cores.items()))
+        if platform.system() == "Linux":
+            return {int(p.parent.parent.name[3:]): int(p.read_text())
+                    for p in sorted(Path("/sys/devices/system/cpu").glob("cpu[0-9]*/topology/core_id"))}
+    except (OSError, ValueError, AttributeError):
+        pass
+    return None
+
+
 def core_types() -> dict | None:
     """Which logical CPUs are fast "performance" cores and which are slower "efficiency" cores.
 
