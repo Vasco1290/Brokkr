@@ -1196,3 +1196,7 @@ Claude's and await H's confirmation before any timing; no latency has been measu
   latency and belongs in p99.
 - **How it is checked.** A test feeds the detector made-up run times with one long gap, with one long
   run, and with none, and checks that the first two are flagged and the third is not.
+
+*Confirmed by H on 2 October 2026:* the numbers marked "(proposed)" in the note above: a timing is
+interrupted if any timed run or gap is longer than the larger of 1.0 second and 20 times that timing's
+median run time; at most 3 discarded sessions per model, and a fourth is a FAIL for that model.

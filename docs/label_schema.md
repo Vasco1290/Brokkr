@@ -356,3 +356,17 @@ data:
 Rows that are not harmful, and rows of a failed build, show no suggestion.
 - (proposed) The label says once, under the table and in `limits`, that these are general
   suggestions and were not tested for this model, so a suggestion is never read as a result.
+
+*Confirmed by H on 2 October 2026:* both points marked "(proposed)" in the note above: "try another
+recipe or a stronger model" for cause-unclear rows, and the sentence saying the suggested next steps
+are general suggestions that were not tested for the model (under the table and in `limits`).
+
+## Note added 2 October 2026: the README's label example is generated from `label.json`
+
+Asked by H on 2 October 2026, so the README cannot drift from the labels. The block between the
+`label-example` markers in `README.md` is written by `scripts/41_readme_label_example.py` from two
+labels (`mobilenet_v3_large`, and `mobilenet_v3_small` for the "do not use" sentence) with
+`brokkr_edge.label_render.readme_example`, which, like the other renderers, reads only `label.json`
+and formats every number with `fmt()`. `scripts/40_check_labels.py` fails if the README's block
+differs from a fresh render, or if a number in it is not a `label.json` number; a test does the same
+whenever the labels are on the machine. Nobody edits the block by hand.
