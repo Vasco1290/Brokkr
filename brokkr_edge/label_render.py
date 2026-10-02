@@ -501,6 +501,11 @@ def _sections(label: dict) -> dict:
             f"for a {fmt(conf['target'], 'pct0')} target, threshold {fmt(conf['threshold'], 'thr')} from "
             f"{fmt(conf['calibration_items'], 'int')} clean calibration items."
         )
+    if lab["recipe"].get("skip_symbolic_shape"):
+        details.append(
+            "INT8 build setting not at its default: skip_symbolic_shape (ONNX Runtime's symbolic shape "
+            "inference was skipped in the preparation step; Brokkr does this only where that step crashes)."
+        )
     s = label["checks"]["fp32_sanity"]
     details.append(
         f"FP32 sanity check: clean top-1 {fmt(s['measured'], 'pct')} vs published "
@@ -688,6 +693,89 @@ def to_html(label: dict) -> str:
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         f"<title>{html.escape(_title(label))} · Brokkr label</title><style>{CSS}</style></head>"
         f"<body><main>{''.join(body)}</main></body></html>\n"
+    )
+
+
+# ---- the README's label example (written into README.md by scripts/41_readme_label_example.py) ----
+
+
+def readme_example(label: dict) -> str:
+    """A short Markdown version of the top of one label, for the README. Like the other renderers it
+    reads only the label and formats every number with fmt(), so the README cannot drift from it."""
+    ix = _by(label)
+    ref, lab = ix["builds"]["reference"], ix["builds"]["labelled"]
+    rule, summary = label["envelope"]["rule"], label["summary"]
+    test = {d["dataset_id"]: d for d in label["datasets"]}[label["measurements"][0]["dataset_id"]]
+    of = f" of {fmt(summary['tested_conditions'], 'int')}"
+
+    def clean(metric, build):
+        return ix["m"].get((metric, build["build_id"], "clean"))
+
+    def names(ids):
+        return ", ".join(ix["cond"][c] for c in ids)
+
+    cost = clean("shrinking_cost", lab)
+    flagged = summary["large_shrinking_cost"]
+    costs = {c: ix["m"][("shrinking_cost", lab["build_id"], c)]["value"] for c in flagged["conditions"]}
+    worst = min(costs, key=costs.get) if costs else None
+    lines = [
+        f"This is the top of the label for **{_title(label)}**, measured on {fmt(test['n_items'], 'int')} "
+        f"{test['name']} images (the {test['split']} split):",
+        "",
+        _md_table(
+            ["", _build_name(ref), _build_name(lab)],
+            [
+                ["File size"] + [fmt(b["file"]["size_bytes"], "mb") + " MB" for b in (ref, lab)],
+                ["Top-1 accuracy, clean images"] + [_value(clean("top1", b), "pct") for b in (ref, lab)],
+                ["Coverage of its prediction sets, clean images"]
+                + [_coverage(ix, b["build_id"], "clean") for b in (ref, lab)],
+            ],
+        ),
+        "",
+        f"Shrinking cost on clean images: {_value(cost, 'pts')} points (INT8 minus FP32 on the same images, "
+        f"so negative means shrinking lost accuracy).",
+        "",
+        f"For the {fmt(summary['tested_conditions'], 'int')} kinds of damage tested, the label opens with "
+        f"three lines:",
+        "",
+        f"- **Shrinking** made it much worse (a large shrinking cost) in {fmt(flagged['count'], 'int')}{of} "
+        f"conditions"
+        + (f"; the largest is {ix['cond'][worst]}, {fmt(costs[worst], 'pts')} points." if worst else "."),
+        f"- **Harsh conditions:** the FP32 original is itself harmful, even at full size, in "
+        f"{fmt(summary['reference_harmful']['count'], 'int')}{of}.",
+        f"- **Uncertainty signal:** unreliable (coverage below {fmt(rule['coverage_min'], 'pct0')}) in "
+        f"{fmt(summary['coverage_failed']['count'], 'int')}{of}. The prediction sets were calibrated on "
+        f"clean images and can be re-calibrated on your own images.",
+        "",
+        "Then it sorts each condition by what happened to the shrunk model, and why:",
+        "",
+    ]
+    for line in summary["lines"]:
+        if line["state"] == "not tested":
+            continue
+        cause = CAUSE_TITLE.get(line["cause"], "")
+        title = STATE_TITLE[line["state"]] + (f", {cause[0].lower()}{cause[1:]}" if cause else "")
+        few = f": {names(line['conditions'])}" if line["count"] <= 3 else ""  # long lists stay on the label
+        lines.append(f"- **{title}** ({fmt(line['count'], 'int')}{of}){few}")
+    lines += [
+        "",
+        f"\"Harmful\" means a whole {fmt(label['generated']['ci_level'], 'pct0')} interval is below a line "
+        f"fixed before these results existed: coverage below {fmt(rule['coverage_min'], 'pct0')}, or a "
+        f"damage drop (accuracy under the damage minus clean accuracy) below "
+        f"{fmt(rule['damage_drop_min'], 'pts0')} points. \"Not harmful in our tests\" is not a guarantee.",
+    ]
+    return "\n".join(lines)
+
+
+def readme_broken_example(label: dict) -> str:
+    """One README sentence about a label whose INT8 build failed its build check."""
+    lab = next(b for b in label["builds"] if b["role"] == "labelled")
+    f = lab["failure"]
+    name = label["model"].get("display_name") or label["model"]["name"]
+    return (
+        f"A recipe that breaks a model is labelled as such: {name}'s INT8 build matched FP32's first answer "
+        f"on only {fmt(f['value'], 'pct')} of {fmt(f['n_items'], 'int')} {f['split']} images (a usable build "
+        f"needs at least {fmt(f['limit'], 'pct0')}), so its label opens with \"do not use this INT8 build\"."
     )
 
 

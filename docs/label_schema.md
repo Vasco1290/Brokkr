@@ -370,3 +370,8 @@ labels (`mobilenet_v3_large`, and `mobilenet_v3_small` for the "do not use" sent
 and formats every number with `fmt()`. `scripts/40_check_labels.py` fails if the README's block
 differs from a fresh render, or if a number in it is not a `label.json` number; a test does the same
 whenever the labels are on the machine. Nobody edits the block by hand.
+
+*Added 2 October 2026, before the ten labels are generated:* a build's `recipe` also records
+`skip_symbolic_shape` (true for ConvNeXt-Tiny's INT8, false otherwise), copied from its build record
+and checked by `scripts/40`; when true, the label's Details say so. A non-default build setting is
+never left off a label.

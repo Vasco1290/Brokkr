@@ -15,6 +15,8 @@ from brokkr_edge.label_render import (
     _envelope_cell,
     _next_step,
     _title,
+    readme_broken_example,
+    readme_example,
     to_html,
     to_markdown,
     unexplained_numbers,
@@ -359,6 +361,18 @@ def test_every_explanation_is_plain_text_without_numbers():
     for text in (to_markdown(label), to_html(label)):
         assert "What the words mean" in text
     assert "<abbr title=" in to_html(label)
+
+
+def test_the_readme_example_shows_only_label_numbers():
+    label = tiny_label()
+    text = readme_example(label)
+    assert "tiny · INT8" in text and "(1 of 1): fog (suite) s3" in text
+    assert unexplained_numbers(label, text) == []
+    label["builds"][1].update(status="failed", failure={"check": "top-1 agreement with FP32 >= 20%",
+                                                        "value": 0.0273, "limit": 0.2, "n_items": 256,
+                                                        "split": "tuning"})
+    sentence = readme_broken_example(label)
+    assert "2.73% of 256 tuning images" in sentence and unexplained_numbers(label, sentence) == []
 
 
 def test_a_number_not_in_the_label_is_caught():

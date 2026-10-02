@@ -18,10 +18,13 @@ For each label, independently of the code that made it:
    sanity check.
 7. label.md and label.html equal a fresh render of label.json, every number a reader sees in them is a
    label.json number, and the Markdown's model-card metadata parses (huggingface_hub.ModelCard).
+Then, once: the README's label example equals a fresh render of its two labels
+(scripts/41_readme_label_example.py --check).
 """
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -74,6 +77,10 @@ def check(folder: Path) -> list:
             problems.append(f"build {b['build_id']}: no named build record has this file")
         elif check_build_record(match[0], set())[0] != b["status"]:
             problems.append(f"build {b['build_id']}: status differs from its build record's check")
+        elif b["recipe"].get("skip_symbolic_shape", False) != (match[0].get("settings") or {}).get(
+            "skip_symbolic_shape", False
+        ):
+            problems.append(f"build {b['build_id']}: skip_symbolic_shape differs from its build record")
         elif b["failure"]:
             f, sanity = b["failure"], match[0]["sanity_check"]
             expected = (sanity["top1_agreement_with_fp32"], MIN_AGREEMENT_WITH_FP32, sanity["n_images"],
@@ -164,5 +171,11 @@ for folder in folders:
     )
     for p in problems[:20]:
         print(f"     {p}")
+readme = subprocess.run(
+    [sys.executable, "scripts/41_readme_label_example.py", "--check", "--labels", args.labels],
+    capture_output=True, text=True,
+)
+print((readme.stdout + readme.stderr).strip())
+all_ok &= readme.returncode == 0
 print(f"\n{'PASS' if all_ok else 'FAIL'}: {len(folders)} labels in {args.labels}")
 sys.exit(0 if all_ok else 1)

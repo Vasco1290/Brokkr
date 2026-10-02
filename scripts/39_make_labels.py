@@ -156,6 +156,7 @@ def make_label(model: str) -> dict:
                     "group_items": s["calibration"].get("group_images"),
                 },
                 "kept_float": s.get("kept_float"),
+                "skip_symbolic_shape": s.get("skip_symbolic_shape", False),
             }
             if precision != "fp32"
             else {"method": "fp32 export (torch.onnx), not quantized"}

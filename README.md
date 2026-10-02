@@ -46,44 +46,41 @@ damaged ones?
 
 ## What a label says
 
-One label describes one shrunk build of one model, with the full-precision original beside it. This is
-the top of the label for **MobileNetV3-Large · INT8 (percentile calibration, 99.99%)**, measured on
-10,000 ImageNet-1k validation images (the format is still under review, and no label is published yet):
+One label describes one shrunk build of one model, with the full-precision original beside it. The
+format is still under review, and no label is published yet.
 
-| | FP32 (full precision) | INT8 (shrunk) |
+<!-- label-example:start (written by scripts/41_readme_label_example.py; do not edit by hand) -->
+This is the top of the label for **MobileNetV3-Large · INT8 (percentile calibration, 99.99%)**, measured on 10000 ImageNet-1k validation images (the test split):
+
+|  | FP32 (full precision) | INT8 (percentile calibration, 99.99%) |
 |---|---|---|
 | File size | 22.22 MB | 5.92 MB |
-| Top-1 accuracy, clean images | 75.58% (74.70 to 76.48) | 73.60% (72.75 to 74.52) |
-| Coverage of its prediction sets, clean images | 90.58%, set size 2.28 | 90.22%, set size 2.63 |
+| Top-1 accuracy, clean images | 75.58% (74.70% to 76.48%) | 73.60% (72.75% to 74.52%) |
+| Coverage of its prediction sets, clean images | 90.58% (90.01% to 91.16%), set size 2.28 | 90.22% (89.62% to 90.85%), set size 2.63 |
 
-Shrinking cost on clean images: −1.98 points (−2.47 to −1.47; INT8 minus FP32 on the same images, so
-negative means shrinking lost accuracy).
+Shrinking cost on clean images: -1.98 (-2.47 to -1.47) points (INT8 minus FP32 on the same images, so negative means shrinking lost accuracy).
 
 For the 12 kinds of damage tested, the label opens with three lines:
 
-- **Shrinking** made it much worse (a large shrinking cost) in 6 of 12 conditions, each named with its
-  cost; the largest is contrast (ImageNet-C) s5, −37.20 points.
-- **Harsh conditions:** the full-precision model is itself harmful in 8 of 12, even at full size.
-- **Uncertainty signal:** unreliable (coverage below 80%) in 10 of 12. The prediction sets were
-  calibrated on clean images and can be re-calibrated on your own images.
+- **Shrinking** made it much worse (a large shrinking cost) in 6 of 12 conditions; the largest is contrast (ImageNet-C) s5, -37.20 points.
+- **Harsh conditions:** the FP32 original is itself harmful, even at full size, in 8 of 12.
+- **Uncertainty signal:** unreliable (coverage below 80%) in 10 of 12. The prediction sets were calibrated on clean images and can be re-calibrated on your own images.
 
 Then it sorts each condition by what happened to the shrunk model, and why:
 
-- **Not harmful in our tests** (1 of 12): fog (Brokkr) s3.
-- **Harmful, too hard for this model** (8 of 12): the full-precision model fails there too.
-- **Harmful, hurt by shrinking** (2 of 12): darkness (Brokkr) s5 and contrast (ImageNet-C) s3. The
-  full-precision model copes; the shrunk one does not.
-- **Harmful, cause unclear** (1 of 12): the full-precision model is borderline.
+- **Not harmful in our tests** (1 of 12): fog (Brokkr) s3
+- **Harmful, too hard for this model (FP32 also fails)** (8 of 12)
+- **Harmful, hurt by shrinking (FP32 copes, INT8 doesn't)** (2 of 12): darkness (Brokkr) s5, contrast (ImageNet-C) s3
+- **Harmful, cause unclear (FP32 is borderline)** (1 of 12): fog (ImageNet-C) s3
 
-Every harmful row says which line it failed (accuracy, coverage or both) and carries a suggested next
-step, such as "try another recipe or model". The suggestions are general; they were not tested for
-the model.
+"Harmful" means a whole 95% interval is below a line fixed before these results existed: coverage below 80%, or a damage drop (accuracy under the damage minus clean accuracy) below -10 points. "Not harmful in our tests" is not a guarantee.
 
-"Harmful" means a whole 95% interval is below a line fixed before these results existed: coverage
-below 80%, or accuracy more than 10 points below the same build's clean accuracy. "Not harmful in our
-tests" is not a guarantee. A recipe that breaks a model is labelled as such: MobileNetV3-Small's INT8
-build matched the original's answer on only 2.73% of 256 check images, so its label opens with "do not
-use this INT8 build".
+A recipe that breaks a model is labelled as such: MobileNetV3-Small's INT8 build matched FP32's first answer on only 2.73% of 256 tuning images (a usable build needs at least 20%), so its label opens with "do not use this INT8 build".
+<!-- label-example:end -->
+
+Every harmful row of a label says which line it failed (accuracy, coverage or both) and carries a
+suggested next step, such as "try another recipe or model". The suggestions are general; they were not
+tested for the model.
 
 The format is defined in [docs/label_schema.md](docs/label_schema.md). Every number in a label names
 the result file it came from, and `scripts/40_check_labels.py` recomputes each one.

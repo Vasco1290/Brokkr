@@ -1,11 +1,16 @@
 """The README stays usable: every local file or image it points to exists, and old names are gone.
 
-It cannot check that the README's numbers are current (the result files are not in git); those are
-re-read from the result files whenever the README is updated.
+Its label example is generated from the labels (scripts/41_readme_label_example.py) and checked here
+whenever the labels are on the machine. Its other numbers come from result files that are not in git;
+those are re-read from the result files whenever the README is updated.
 """
 
 import re
+import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 README = Path("README.md").read_text(encoding="utf-8")
 # Markdown links and images "](target)", and HTML images 'src="target"'.
@@ -27,6 +32,14 @@ def test_every_contents_link_points_to_a_heading():
     }
     anchors = [t[1:] for t in TARGETS if t.startswith("#")]
     assert [a for a in anchors if a not in headings] == []
+
+
+@pytest.mark.skipif(not Path("labels/mobilenet_v3_large/label.json").exists(),
+                    reason="the labels are not on this machine (they are not in git)")
+def test_the_label_example_equals_a_fresh_render_of_the_labels():
+    result = subprocess.run([sys.executable, "scripts/41_readme_label_example.py", "--check"],
+                            capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_the_old_package_folder_name_is_gone():
