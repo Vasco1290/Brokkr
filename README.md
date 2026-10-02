@@ -14,8 +14,8 @@ The question behind it: when a model is shrunk from full precision (FP32) to sma
 (INT8), what happens to its accuracy **and** to its "I'm not sure" signal, on clean photos and on
 damaged ones?
 
-> **Status, 1 October 2026.** The study (Stages 1–3) and the ten-model breadth study (Stage 4) are
-> done. The label format is built and under review: two labels exist, eight more follow. There is
+> **Status, 2 October 2026.** The study (Stages 1–3) and the ten-model breadth study (Stage 4) are
+> done. Labels exist for all ten models and pass their checks, but none is published yet. There is
 > **no** published package, command-line tool or website yet, and nothing has been measured on a
 > Raspberry Pi. Every number below was measured on one Windows laptop (Intel Core i5-1235U, CPU only).
 
@@ -38,7 +38,7 @@ damaged ones?
 | Accuracy with 95% intervals, on clean and damaged images | works (`brokkr_edge/accuracy.py`, `brokkr_edge/shift/`) |
 | "I'm not sure": calibration, prediction sets with their size, confidence ranking | works (`brokkr_edge/shift/`) |
 | Ten models, thirteen conditions, every result checked against a schema | done (`scripts/28`, `scripts/22`) |
-| Labels: `label.json`, a Markdown model card and an HTML page, checked against their sources | two made, under review (`scripts/39`, `scripts/40`) |
+| Labels: `label.json`, a Markdown model card and an HTML page, checked against their sources | made for all ten models, not published yet (`scripts/39`, `scripts/40`) |
 | Speed (latency) by a fixed method for 19 builds | **not measured yet** (rough Stage 1 timings only, see [STATUS.md](STATUS.md)) |
 | `brokkr-edge` command, PyPI package | **not built yet** |
 | Catalog website, testing your own model, hosted upload | **not built yet** (see [Roadmap](#roadmap)) |
@@ -46,8 +46,8 @@ damaged ones?
 
 ## What a label says
 
-One label describes one shrunk build of one model, with the full-precision original beside it. The
-format is still under review, and no label is published yet.
+One label describes one shrunk build of one model, with the full-precision original beside it. No
+label is published yet: the catalog comes with the website (step 2 of the roadmap).
 
 <!-- label-example:start (written by scripts/41_readme_label_example.py; do not edit by hand) -->
 This is the top of the label for **MobileNetV3-Large · INT8 (percentile calibration, 99.99%)**, measured on 10000 ImageNet-1k validation images (the test split):
