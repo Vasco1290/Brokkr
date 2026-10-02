@@ -1200,3 +1200,31 @@ Claude's and await H's confirmation before any timing; no latency has been measu
 *Confirmed by H on 2 October 2026:* the numbers marked "(proposed)" in the note above: a timing is
 interrupted if any timed run or gap is longer than the larger of 1.0 second and 20 times that timing's
 median run time; at most 3 discarded sessions per model, and a fourth is a FAIL for that model.
+
+## Note added 3 October 2026, before `brokkr-edge test` exists or runs: how the reproduction is carried out
+
+Implementation details of the reproduction rule above (30 September); the rule itself is unchanged.
+- **The command.** `brokkr-edge test --model <name>` runs the 13 test conditions and clean
+  `conformal_calibration` for the model's FP32 build and, if its build record is usable, its Percentile
+  INT8 build, and writes schema-2 accuracy records with their scores. It needs no PyTorch (model facts
+  come from `brokkr_edge/model_list.json`). It uses the code the 4.1 sweep used to make the pictures
+  (`brokkr_edge.sweep`: the same caches, damage seed = dataset position) and 4.1's settings: 8 threads,
+  thread spinning off, batch 32. It writes to `results/test_runs/<model>` unless told otherwise, and
+  never into `results/breadth`. `--split tuning --limit N` is a dry run on the first N tuning images.
+- **Step 1 (repeatability).** The command is run twice, each time in its own process (so also in its
+  own ONNX Runtime session), with `--split tuning --limit 64` (tuning positions 0–63). The decision
+  uses the INT8 scores on clean images only, as the rule says: repeatable = identical bit for bit.
+  The same comparison for the other conditions and for FP32 is printed, not judged.
+- **Step 2.** One full run into `results/reproduction/mobilenet_v3_large`; each of its 28 records is
+  compared with the record of the same name in `results/breadth`.
+  - If repeatable: PASS = the same images in the same order and identical top-1 predictions (the
+    class with the highest score, ties to the lower class number). Printed, not judged: whether the
+    scores are identical bit for bit, and the largest score difference.
+  - If not repeatable: PASS = the number of correct top-1 answers differs by at most 10 (test) or 5
+    (calibration), and the two records state the same model file SHA-256, preprocessing, damage seed
+    rule, batch size and thread count.
+- **When it may run.** Only from a clean commit (the records state it) and only on mains power (H: "run
+  it when I'm plugged in"): the script stops if the laptop is on battery.
+- **What is written.** `results/reproduction/repeatability.json` before step 2 starts, and
+  `results/reproduction/reproduction_check.json` with every record's result and the verdict.
+  `scripts/43_check_reproduction.py` prints PASS only if all 28 pass.

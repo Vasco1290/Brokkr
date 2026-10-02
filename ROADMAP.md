@@ -339,6 +339,11 @@ results files.
 the slow end of each range. Old dates: step 1 10 October, 2 17 October, 3 28 October, 4 31 October,
 4b "in November", 5 12 November, 7 25 November.
 
+**Step 1's date revised on 3 October 2026** (asked by H): 7 October instead of 5 October. The ten
+labels are made; still to do are `brokkr-edge test` with the MobileNetV3-Large reproduction, the
+laptop latency run (started by H, overnight), the labels regenerated with their latency rows, and
+the merge into `main`. The later steps keep their dates for now.
+
 Set by H on 30 September 2026, then revised by H the same day: new dates, the Raspberry Pi 5 step
 moved to "when the board arrives", the "before making the repository public" checklist and a README
 update added to step 2, the quick-start page to step 4, the laptop-vs-Pi agreement check to step 6,
@@ -355,7 +360,7 @@ installs a `brokkr` command, so ours is **`brokkr-edge`** (e.g. `brokkr-edge tes
 
 Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published labels**.
 
-### 1. Labels (P1) `[ ]`, done by 5 October
+### 1. Labels (P1) `[ ]`, done by 7 October
 - `docs/label_schema.md` first (written: `label.json`, schema version 1). The label builder is made
   general enough for EEG/EMG signals (step 7), not image-only.
 - Then P1 as fixed in `docs/hypotheses_stage4.md` (notes of 29–30 September): 10 labels, the check

@@ -179,7 +179,7 @@ The platform plan, in order (details and "done when" lines in [ROADMAP.md](ROADM
 
 | Step | What | Planned |
 |---|---|---|
-| 1 | Labels for all ten models, the `brokkr-edge test` command, laptop latency | 5 October 2026 |
+| 1 | Labels for all ten models, the `brokkr-edge test` command, laptop latency | 7 October 2026 |
 | 2 | Catalog website and making this repository public | 10 October 2026 |
 | 3 | Testing your own ONNX or PyTorch model with your own labelled images | 16 October 2026 |
 | 4 | Label submission, PyPI package (`brokkr-edge`), quick start | 19 October 2026 |

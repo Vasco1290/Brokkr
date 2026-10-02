@@ -73,7 +73,7 @@ else is built on its measurements.
 * Task 4.2 may still run, overnight only, and only as pre-registered (in `docs/hypotheses_stage4.md`)
   before it starts. H23 is parked (in STATUS.md) and is not run during the freeze.
 * Work follows the Platform plan in `ROADMAP.md` (set by H, 30 September 2026), strictly in this order:
-  1 labels (by 5 Oct), 2 catalog site and going public (10 Oct), 3 testing a user's model (16 Oct),
+  1 labels (by 7 Oct), 2 catalog site and going public (10 Oct), 3 testing a user's model (16 Oct),
   4 label submission, PyPI and quick start (19 Oct), 4b unlabelled mode (23 Oct),
   5 hosted upload on Hugging Face Spaces (29 Oct),
   7 EEG/EMG pack (5 Nov); 6 Raspberry Pi 5 when the board arrives (dates revised by H, 1 October
