@@ -24,6 +24,10 @@ dependencies = [
     "py-cpuinfo==9.0.0",  # CPU features for latency records (MIT; checked 30 Sep 2026)
 ]
 
+[project.scripts]
+# The command is "brokkr-edge": another PyPI project installs a "brokkr" command (H, 30 September 2026).
+brokkr-edge = "brokkr_edge.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.16"]
 data = ["huggingface_hub>=1.32"]  # only needed to download datasets
