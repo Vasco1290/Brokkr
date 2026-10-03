@@ -94,7 +94,7 @@ fixes worked, and how its "I'm not sure" signal failed quietly under damage:
 [Brokkr Technical Report 1](docs/writeup.md); predictions and outcomes in
 [docs/hypotheses_stage3.md](docs/hypotheses_stage3.md).
 
-**Many models (Stage 4).** Plain-language summary: [docs/stage4_story.md](docs/stage4_story.md);
+**Stage 4: the breadth study.** Plain-language summary: [docs/stage4_story.md](docs/stage4_story.md);
 predictions and outcomes: [docs/hypotheses_stage4.md](docs/hypotheses_stage4.md).
 
 <!-- findings:start (written by scripts/45_readme_findings.py; do not edit by hand) -->
@@ -162,10 +162,14 @@ git clone https://github.com/Vasco1290/Brokkr.git
 cd Brokkr
 python -m venv .venv
 .venv\Scripts\activate        # Windows (on Linux/macOS: source .venv/bin/activate)
+python -m pip install --upgrade pip
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -e ".[dev]"
 pytest
 ```
+
+Upgrade pip first: the pip that comes with Python 3.10 fails on the torch step (it tries to build a
+dependency from source and cannot find the build tool on the PyTorch package index).
 
 To see a label, open `published/labels/mobilenet_v3_large/label.html` in a browser. Testing a model
 needs the ImageNet validation images (see [Reproduce](#reproduce)); testing your own model and images
