@@ -7,7 +7,7 @@ Needs:  the final run's test-split results (scripts/run_stage3_final.py), the St
 Writes: results/final/<model>_stage3_verdicts.json
 
 Written, and tested on fake data (tests/test_judge.py), BEFORE the final run. The rules are in
-brokkr/judge.py and use only the thresholds written in docs/hypotheses_stage3.md. Each prediction
+brokkr_edge/judge.py and use only the thresholds written in docs/hypotheses_stage3.md. Each prediction
 gets PASS, FAIL or NOT RUN, plus "within noise" where an INT8-vs-INT8 difference is smaller than the
 calibration-luck range. Every coverage number is printed next to its average set size.
 """
@@ -16,10 +16,10 @@ import argparse
 import json
 from pathlib import Path
 
-from brokkr import judge
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift import CORRUPTIONS
+from brokkr_edge import judge
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_arrays, make_record, save_record
+from brokkr_edge.shift import CORRUPTIONS
 
 DATASET = "imagenet-1k-val"
 HARMFUL = ([("defocus_blur", s) for s in (2, 3, 4, 5)] + [("motion_blur", s) for s in (2, 3, 4, 5)]
@@ -132,7 +132,8 @@ for name, check in checks:
         print(f"    note: {note}")
 
 record = make_record("verdicts", m, "all", {
-    "settings": {"hypotheses": "docs/hypotheses_stage3.md", "split": "test", "judging": "brokkr/judge.py",
+    "settings": {"hypotheses": "docs/hypotheses_stage3.md", "split": "test",
+                 "judging": "brokkr_edge/judge.py",
                  "noise_floor": {"top1_range": top1_noise, "e_aurc_range": e_aurc_noise}},
     "metrics": {name: {"verdict": r["verdict"], "within_noise": r["within_noise"]}
                 for name, r in verdicts.items()},

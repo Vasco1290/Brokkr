@@ -1,11 +1,11 @@
-"""Checks for brokkr.accuracy (no real dataset needed)."""
+"""Checks for brokkr_edge.accuracy (no real dataset needed)."""
 
 import numpy as np
 import pytest
 from PIL import Image
 from torchvision.models import MobileNet_V3_Large_Weights
 
-from brokkr.accuracy import bootstrap_ci, preprocess, topk_correct, unpaired_bootstrap_diff
+from brokkr_edge.accuracy import bootstrap_ci, preprocess, topk_correct, unpaired_bootstrap_diff
 
 
 def test_preprocess_matches_torchvision():
@@ -50,7 +50,7 @@ def test_bootstrap_is_reproducible():
 
 
 def test_accuracy_from_logits_on_known_scores():
-    from brokkr.accuracy import accuracy_from_logits
+    from brokkr_edge.accuracy import accuracy_from_logits
     logits = np.array([[0.1, 3.0, 0.2, 0.0, -1.0, -2.0],   # top-1 is class 1
                        [2.0, 0.0, 0.1, 0.2, 0.3, 0.4]])    # top-1 is class 0, class 1 is last
     result = accuracy_from_logits(logits, np.array([1, 1]))
@@ -60,8 +60,8 @@ def test_accuracy_from_logits_on_known_scores():
 
 
 def test_ties_are_broken_consistently_and_reported():
-    from brokkr.accuracy import accuracy_from_logits
-    from brokkr.shift.reliability import confidence_and_correct
+    from brokkr_edge.accuracy import accuracy_from_logits
+    from brokkr_edge.shift.reliability import confidence_and_correct
     logits = np.array([[5.0, 5.0, 1.0, 0.0, 0.0, 0.0],   # classes 0 and 1 tie; label 1
                        [5.0, 5.0, 1.0, 0.0, 0.0, 0.0],   # same tie; label 0
                        [0.0, 9.0, 1.0, 0.0, 0.0, 0.0]])  # no tie; label 1

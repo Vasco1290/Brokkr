@@ -10,23 +10,27 @@ import io
 import numpy as np
 from PIL import Image
 
-from brokkr.benchmark import make_session
+from brokkr_edge.benchmark import make_session
 
 # ImageNet colour statistics that torchvision's pretrained models expect.
 IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+INTERPOLATIONS = {"bilinear": Image.BILINEAR, "bicubic": Image.BICUBIC}
 
 
-def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224) -> np.ndarray:
+def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224,
+               interpolation: str = "bilinear") -> np.ndarray:
     """Turn a picture into the (3, 224, 224) array the model expects.
 
-    Same steps as torchvision's transforms for these weights: shrink so the shorter side
-    is 232 pixels, cut out the central 224x224 square, scale to 0-1, normalise colours.
+    Same steps as torchvision's transforms for the weights: shrink so the shorter side is
+    `resize_size` pixels (232 for MobileNetV3-Large), cut out the central 224x224 square, scale to
+    0-1, normalise colours. Each model's own settings come from brokkr_edge.export.preprocessing.
     """
-    return normalize(resize_and_crop(image, resize_size, crop_size))
+    return normalize(resize_and_crop(image, resize_size, crop_size, interpolation))
 
 
-def resize_and_crop(image: Image.Image, resize_size: int = 232, crop_size: int = 224) -> np.ndarray:
+def resize_and_crop(image: Image.Image, resize_size: int = 232, crop_size: int = 224,
+                    interpolation: str = "bilinear") -> np.ndarray:
     """First half of preprocessing: the (224, 224, 3) picture as uint8 pixels (0-255).
 
     Image corruptions are applied here, to the picture the model will actually see.
@@ -37,7 +41,7 @@ def resize_and_crop(image: Image.Image, resize_size: int = 232, crop_size: int =
         new_w, new_h = resize_size, int(resize_size * h / w)
     else:
         new_w, new_h = int(resize_size * w / h), resize_size
-    image = image.resize((new_w, new_h), Image.BILINEAR)
+    image = image.resize((new_w, new_h), INTERPOLATIONS[interpolation])
 
     left = int(round((new_w - crop_size) / 2.0))
     top = int(round((new_h - crop_size) / 2.0))

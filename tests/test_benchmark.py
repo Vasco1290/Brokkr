@@ -1,4 +1,4 @@
-"""Checks for brokkr.benchmark and brokkr.results.
+"""Checks for brokkr_edge.benchmark and brokkr_edge.results.
 
 Uses a tiny one-operation ONNX model built by hand, so the tests run in about a second.
 """
@@ -7,9 +7,9 @@ import onnx
 import pytest
 from onnx import TensorProto, helper
 
-from brokkr.benchmark import benchmark_latency, combine_sessions, summarise
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_records, make_record, save_record
+from brokkr_edge.benchmark import benchmark_latency, combine_sessions, summarise
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_records, make_record, save_record
 
 
 @pytest.fixture
@@ -103,7 +103,7 @@ def test_incomplete_record_is_refused(tmp_path):
 def test_pinning_to_one_cpu_then_back(tiny_model):
     import os
 
-    from brokkr.benchmark import pin_to_cpus
+    from brokkr_edge.benchmark import pin_to_cpus
     try:
         pin_to_cpus([0])
         result = benchmark_latency(tiny_model, input_shape=(1, 3, 8, 8), num_threads=1)
@@ -115,8 +115,8 @@ def test_pinning_to_one_cpu_then_back(tiny_model):
 def test_arrays_saved_with_checksum_and_reproduce_metrics(tmp_path):
     import numpy as np
 
-    from brokkr.accuracy import accuracy_from_logits
-    from brokkr.results import load_arrays, save_arrays
+    from brokkr_edge.accuracy import accuracy_from_logits
+    from brokkr_edge.results import load_arrays, save_arrays
 
     rng = np.random.default_rng(0)
     logits = rng.standard_normal((50, 1000)).astype(np.float32)
@@ -137,7 +137,7 @@ def test_arrays_saved_with_checksum_and_reproduce_metrics(tmp_path):
 def test_edited_array_file_is_detected(tmp_path):
     import numpy as np
 
-    from brokkr.results import load_arrays, save_arrays
+    from brokkr_edge.results import load_arrays, save_arrays
 
     record = make_record("accuracy", "m", "fp32", {"settings": {}, "metrics": {}},
                          machine_fingerprint())
@@ -154,7 +154,7 @@ def test_metrics_survive_a_json_round_trip_unchanged():
 
     import numpy as np
 
-    from brokkr.accuracy import accuracy_from_logits
+    from brokkr_edge.accuracy import accuracy_from_logits
     rng = np.random.default_rng(1)
     metrics = accuracy_from_logits(rng.standard_normal((20, 10)), rng.integers(0, 10, 20))["metrics"]
     assert json.loads(json.dumps(metrics)) == metrics

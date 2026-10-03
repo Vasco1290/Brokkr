@@ -19,10 +19,10 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import paired_bootstrap_diff
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import INT8_METHODS
-from brokkr.results import load_arrays, make_record, save_record
+from brokkr_edge.accuracy import paired_bootstrap_diff
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import INT8_METHODS
+from brokkr_edge.results import load_arrays, make_record, save_record
 
 DATASET = "imagenet-1k-val"
 # The default INT8 model ("int8") was built with MinMax; the other candidates are named after their method.

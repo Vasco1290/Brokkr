@@ -17,11 +17,11 @@ import argparse
 import json
 from pathlib import Path
 
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift import CORRUPTIONS
-from brokkr.shift.alarm import consecutive_window_means, fires
-from brokkr.shift.reliability import confidence_and_correct
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_arrays, make_record, save_record
+from brokkr_edge.shift import CORRUPTIONS
+from brokkr_edge.shift.alarm import consecutive_window_means, fires
+from brokkr_edge.shift.reliability import confidence_and_correct
 
 DATASET = "imagenet-1k-val"
 HARMFUL = ({("defocus_blur", s) for s in (2, 3, 4, 5)} | {("motion_blur", s) for s in (2, 3, 4, 5)}

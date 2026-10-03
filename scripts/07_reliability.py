@@ -23,11 +23,11 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift.conformal import conformal_threshold, evaluate_sets
-from brokkr.shift.reliability import calibration, confidence_and_correct, softmax
-from brokkr.shift.selective import selective_prediction
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_arrays, make_record, save_record
+from brokkr_edge.shift.conformal import conformal_threshold, evaluate_sets
+from brokkr_edge.shift.reliability import calibration, confidence_and_correct, softmax
+from brokkr_edge.shift.selective import selective_prediction
 
 TARGET_COVERAGE = 0.90
 
@@ -76,7 +76,7 @@ for test_path in tests:
     print(f"  ECE {cal['ece']:.4f} ({lo:.4f}-{hi:.4f}); mean confidence {cal['mean_confidence']:.2%} "
           f"vs accuracy {cal['accuracy']:.2%}")
     # Not "lo <= ece <= hi": ECE is biased upwards, so for near-zero ECE the bootstrap interval can
-    # sit entirely above it (see brokkr/shift/reliability.py).
+    # sit entirely above it (see brokkr_edge/shift/reliability.py).
     passed &= 0 <= cal["ece"] <= 1 and 0 <= lo <= hi <= 1
     passed &= abs(cal["accuracy"] - acc["metrics"]["top1"]) < 1e-9
 

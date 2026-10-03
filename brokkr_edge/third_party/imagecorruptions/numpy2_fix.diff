@@ -1,0 +1,11 @@
+--- imagecorruptions-1.1.2/imagecorruptions/corruptions.py (PyPI wheel)
++++ brokkr/third_party/imagecorruptions/corruptions.py
+@@ -43,7 +43,7 @@
+     'mapsize' must be a power of two.
+     """
+     assert (mapsize & (mapsize - 1) == 0)
+-    maparray = np.empty((mapsize, mapsize), dtype=np.float_)
++    maparray = np.empty((mapsize, mapsize), dtype=np.float64)
+     maparray[0, 0] = 0
+     stepsize = mapsize
+     wibble = 100

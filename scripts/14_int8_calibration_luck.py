@@ -8,7 +8,7 @@ Writes: models/<model>_<best>_calibseed<seed>.onnx (+ .json record) per seed, an
         results/checks/<model>_<best>_calibration_luck.json (+ .npz with the new models' tuning scores)
 
 The chosen INT8 method (Percentile 99.99) is rebuilt with other random 512-image calibration sets,
-drawn from the 29,488 images that belong to no split (brokkr.datasets.unassigned), one set per seed.
+drawn from the 29,488 images that belong to no split (brokkr_edge.datasets.unassigned), one set per seed.
 Everything else is identical: same method, groups of 128, per-channel weights. Each new model is
 checked before it is kept, and the run stops at the first failure.
 
@@ -25,23 +25,23 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import normalize, open_image, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import (
+from brokkr_edge.accuracy import normalize, open_image, preprocess
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import (
     DATASETS,
     count_images,
     parquet_files,
     read_parquet_images,
     unassigned,
 )
-from brokkr.export import MODELS, file_info
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH as BATCH
-from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
-from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, check_int8_build, to_int8, weight_quantization
-from brokkr.results import load_arrays, make_record, save_arrays, save_record
-from brokkr.shift.reliability import confidence_and_correct
-from brokkr.shift.selective import aurc, optimal_aurc
+from brokkr_edge.export import MODELS, file_info
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH as BATCH
+from brokkr_edge.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
+from brokkr_edge.quantize import INT8_METHODS, INT8_SETTINGS, check_int8_build, to_int8, weight_quantization
+from brokkr_edge.results import load_arrays, make_record, save_arrays, save_record
+from brokkr_edge.shift.reliability import confidence_and_correct
+from brokkr_edge.shift.selective import aurc, optimal_aurc
 
 DATASET = "imagenet-1k-val"
 N_CALIBRATION = 512

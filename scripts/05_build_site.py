@@ -6,7 +6,7 @@ Writes: site/index.html (gitignored; published separately to the gh-pages branch
 
 import sys
 
-from brokkr.report import build_site
+from brokkr_edge.report import build_site
 
 out = build_site("results", "models", "site")
 page = out.read_text(encoding="utf-8")

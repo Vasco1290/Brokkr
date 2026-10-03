@@ -1,9 +1,9 @@
-"""Checks for brokkr.shift.reliability, using simulated models whose true calibration we know."""
+"""Checks for brokkr_edge.shift.reliability, using simulated models whose true calibration we know."""
 
 import numpy as np
 import pytest
 
-from brokkr.shift.reliability import calibration, ece, fit_temperature, nll, reliability_bins, softmax
+from brokkr_edge.shift.reliability import calibration, ece, fit_temperature, nll, reliability_bins, softmax
 
 
 def test_softmax_sums_to_one_and_survives_huge_scores():

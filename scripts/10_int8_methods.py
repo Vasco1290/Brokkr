@@ -6,7 +6,7 @@ Needs:  models/<model>_fp32.onnx, models/<model>_int8.onnx (the default MinMax I
 Writes: models/<model>_int8_<method>.onnx and a .json record for each method
 
 Every candidate uses the same 512 "int8_calibration" images, per-channel int8 weights and per-tensor
-uint8 activations; only the calibration method differs (brokkr.quantize.INT8_METHODS). The images
+uint8 activations; only the calibration method differs (brokkr_edge.quantize.INT8_METHODS). The images
 are fed in groups of 128 (4 batches of 32), in the split's fixed order, because the histogram
 methods would otherwise need about 22 GB of memory.
 
@@ -30,14 +30,14 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import open_image, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH as BATCH
-from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
-from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, to_int8
+from brokkr_edge.accuracy import open_image, preprocess
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH as BATCH
+from brokkr_edge.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
+from brokkr_edge.quantize import INT8_METHODS, INT8_SETTINGS, to_int8
 
 DATASET = "imagenet-1k-val"
 FAIL_AGREEMENT = 0.20

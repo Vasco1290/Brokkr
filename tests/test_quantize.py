@@ -1,4 +1,4 @@
-"""Checks for brokkr.quantize, using a tiny convolutional model (fast, no dataset needed)."""
+"""Checks for brokkr_edge.quantize, using a tiny convolutional model (fast, no dataset needed)."""
 
 import numpy as np
 import onnx
@@ -6,9 +6,9 @@ import onnxruntime as ort
 import pytest
 import torch
 
-from brokkr.datasets import choose_calibration, choose_subset
-from brokkr.export import export_onnx
-from brokkr.quantize import (
+from brokkr_edge.datasets import choose_calibration, choose_subset
+from brokkr_edge.export import export_onnx
+from brokkr_edge.quantize import (
     INT8_METHODS,
     ImageBatches,
     damaged_calibration_plan,
@@ -128,3 +128,23 @@ def test_unrounded_output_leaves_the_final_layer_in_float(fp32_model, tmp_path):
     unrounded = to_int8(fp32_model, tmp_path / "unrounded.onnx", calibration, unrounded_output_ops=["Gemm"])
     assert gemm_output_is_quantized(rounded) and not gemm_output_is_quantized(unrounded)
     assert weight_quantization(unrounded) == {"per_channel": 2, "per_tensor": 0}  # weights still int8
+
+
+def test_keep_float_outputs_leaves_those_nodes_unquantized(fp32_model, tmp_path):
+    rng = np.random.default_rng(0)
+    calibration = [rng.standard_normal((8, 3, 32, 32)).astype(np.float32) for _ in range(2)]
+    relu_out = next(n for n in onnx.load(str(fp32_model)).graph.node if n.op_type == "Relu").output[0]
+
+    def quantized(path, tensor):
+        graph = onnx.load(str(path)).graph
+        return any(n.op_type == "QuantizeLinear" and n.input[0] == tensor for n in graph.node)
+
+    report = {}
+    normal = to_int8(fp32_model, tmp_path / "normal.onnx", calibration)
+    kept = to_int8(fp32_model, tmp_path / "kept.onnx", calibration, keep_float_outputs=[relu_out],
+                   report=report)
+    assert quantized(normal, relu_out) and not quantized(kept, relu_out)
+    assert len(report["nodes_kept_float"]) == 1 and run(kept, calibration[0]).shape == (8, 10)
+    with pytest.raises(ValueError, match="not found"):
+        to_int8(fp32_model, tmp_path / "bad.onnx", calibration, keep_float_outputs=["no_such_tensor"])
+    assert not (tmp_path / "bad_prep.onnx").exists()

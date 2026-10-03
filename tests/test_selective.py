@@ -1,9 +1,9 @@
-"""Checks for brokkr.shift.selective, on simulated models whose behaviour we know."""
+"""Checks for brokkr_edge.shift.selective, on simulated models whose behaviour we know."""
 
 import numpy as np
 import pytest
 
-from brokkr.shift.selective import aurc, optimal_aurc, risk_curve, selective_prediction
+from brokkr_edge.shift.selective import aurc, optimal_aurc, risk_curve, selective_prediction
 
 
 def test_small_example_by_hand():

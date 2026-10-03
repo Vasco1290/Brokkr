@@ -10,7 +10,7 @@ How each model is built (docs/hypotheses_stage3.md, design rules and dated notes
 - The chosen INT8 method (from scripts/11), the same 512 int8_calibration images, per-channel
   weights, groups of 128 images: everything as for "best INT8" except what the images show.
 - Exactly half of the 512 images are damaged: a random corruption from the four NOT held out, at a
-  random severity 1-5 (brokkr.quantize.damaged_calibration_plan, seed 5). The same images get damaged
+  random severity 1-5 (brokkr_edge.quantize.damaged_calibration_plan, seed 5). The same images get damaged
   at the same severities for all five models. Each image's damage pattern is seeded by its dataset
   position, as in the sweep.
 
@@ -29,21 +29,21 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import normalize, open_image, resize_and_crop
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH as BATCH
-from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
-from brokkr.quantize import (
+from brokkr_edge.accuracy import normalize, open_image, resize_and_crop
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH as BATCH
+from brokkr_edge.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
+from brokkr_edge.quantize import (
     INT8_METHODS,
     INT8_SETTINGS,
     damaged_calibration_plan,
     to_int8,
     weight_quantization,
 )
-from brokkr.shift import CORRUPTIONS, corrupt
+from brokkr_edge.shift import CORRUPTIONS, corrupt
 
 DATASET = "imagenet-1k-val"
 PLAN_SEED = 5

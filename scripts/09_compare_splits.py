@@ -7,7 +7,7 @@ Prints: top-1 per split, each split's difference from the test split with a 95% 
         (the splits are different images, so each side is resampled on its own), and how many
         images each class has in each split.
 
-How the splits are drawn (brokkr.datasets.make_splits): at random with fixed seeds, NOT stratified
+How the splits are drawn (brokkr_edge.datasets.make_splits): at random with fixed seeds, NOT stratified
 by class, so the number of images per class varies from split to split.
 """
 
@@ -17,9 +17,9 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.accuracy import unpaired_bootstrap_diff
-from brokkr.datasets import SPLIT_SIZES
-from brokkr.results import load_arrays
+from brokkr_edge.accuracy import unpaired_bootstrap_diff
+from brokkr_edge.datasets import SPLIT_SIZES
+from brokkr_edge.results import load_arrays
 
 DATASET = "imagenet-1k-val"
 SPLITS = ["test", "tuning", "conformal_calibration"]

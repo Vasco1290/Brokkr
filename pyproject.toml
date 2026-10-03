@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "brokkr"
+name = "brokkr-edge"
 version = "0.0.1"
 description = "Shrink vision models for edge hardware, stress-test them, and make them say when they're unsure."
 readme = "README.md"
@@ -21,20 +21,41 @@ dependencies = [
     "onnxconverter-common>=1.16",  # FP16 conversion (MIT)
     "pillow>=12.3",
     "pyarrow>=25.0",
+    "py-cpuinfo==9.0.0",  # CPU features for latency records (MIT; checked 30 Sep 2026)
+    # Idle CPU and other running Brokkr jobs, before a latency run (BSD-3-Clause: the licence field and
+    # the LICENSE file in the psutil 7.2.2 wheel, read 3 Oct 2026; it needs no other package).
+    "psutil>=7.2",
 ]
+
+[project.scripts]
+# The command is "brokkr-edge": another PyPI project installs a "brokkr" command (H, 30 September 2026).
+brokkr-edge = "brokkr_edge.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.16"]
 data = ["huggingface_hub>=1.32"]  # only needed to download datasets
+# ImageNet-C corruptions (task 4.1). Licences checked 26 Sep 2026 from each package's PyPI entry:
+# scipy 1.15.3 BSD-3-Clause; scikit-image 0.25.2 BSD-3-Clause; opencv-python-headless 4.14.0.94
+# Apache-2.0; imageio 2.37.0 BSD-2-Clause; tifffile 2025.5.10 BSD-3-Clause; lazy-loader 0.4
+# BSD-3-Clause. imagecorruptions 1.1.2 is Apache-2.0 (LICENSE file in its wheel); install it
+# separately with --no-deps, because it asks for opencv-python (the GUI build) instead of headless:
+#   pip install --no-deps imagecorruptions==1.1.2
+# These are the newest versions that still support Python 3.10.
+imagenet-c = ["scipy==1.15.3", "scikit-image==0.25.2", "opencv-python-headless==4.14.0.94"]
 
 [tool.setuptools.packages.find]
-include = ["brokkr*"]
+include = ["brokkr_edge*"]
+
+[tool.setuptools.package-data]
+brokkr_edge = ["model_list.json"]  # read without PyTorch (brokkr_edge.model_list)
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 110
+# Copied third-party code keeps its original style (see brokkr_edge/third_party/*/CHANGES.md).
+extend-exclude = ["brokkr_edge/third_party"]
 
 [tool.ruff.lint]
 # E/W: style errors and warnings, F: real mistakes (unused or undefined names),

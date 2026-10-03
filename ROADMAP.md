@@ -40,10 +40,17 @@ committed code, speed benchmark pinned to one core type with IQR-based stability
 
 ### Before making the repository public
 
+*H made the repository public on purpose (confirmed 3 October 2026), before this checklist was
+finished; its open items are now checks done after the fact, in step 2.*
+
 - [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
   contain the personal email
 - [ ] Publish the results page to GitHub Pages
 - [ ] Re-read README and ROADMAP for anything that overclaims
+- [x] Git-history scan (3 October 2026, after the repository became public; read-only, nothing rewritten):
+  all 180 commits on every branch and tag use the GitHub noreply email; no machine paths, Windows
+  usernames, personal email addresses or tokens in any commit's contents (matches were test data, a
+  redacted commit message and checklist text)
 
 ## Stage 2 — Stress test `[x]`
 
@@ -96,22 +103,478 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 **Done when:** one finding can be explained in two minutes, with the numbers behind it, and the
 write-up exists.
 
-## Stage 4 — Nutrition label + search `[ ]`
+## Stage 4 — Breadth, depth, labels and recommendations `[~]`
 
-- Standard label per (model, precision, device), generated from JSON
-- `brokkr recommend --task ... --device ... --min-fps ... --condition night`
-- Add object detection (permissive models only, e.g. YOLOX or torchvision detection)
+Stage 3 studied one model on one laptop. Stage 4 asks whether its findings hold across models, tests
+the likely explanation for INT8's darkness collapse, and turns results files into labels and
+recommendations. Plan revised 26 September 2026; progress is in `STATUS.md`.
 
-**Done when:** labels and recommendations come straight from results files.
+**Rules for the whole stage** (Stage 3's rules carry over unchanged):
+- Differences are "new minus old" only, with paired bootstrap 95% intervals and the direction stated
+  (accuracy/coverage: positive = better; E-AURC/ECE: positive = worse).
+- The metric set is Stage 3's: top-1, ECE, conformal coverage with average set size, E-AURC, alarm
+  firing, plus size and speed (p50/p95/p99). A new metric is added only with the question it answers
+  written next to it. Planned additions: levels used per layer (4.0), rank correlation across models
+  (4.1), laptop-vs-Pi agreement (4.4).
+- No example numbers in docs unless measured. Compute times below are **estimates**, scaled from
+  measured Stage 3 run times, and are replaced by measured times as each task runs.
+- No setting is tuned on the test split. Hypotheses are committed before measuring; later details go
+  in dated notes; outcomes are appended.
+- Every model, dataset and code package has its licence recorded before use (rules 3 and 8).
 
-## Stage 5 — Real devices `[ ]`
+**Compute reference** (measured in Stage 3, this laptop, MobileNetV3-Large, 10,000 test images): one
+model on one condition took about 2–3 minutes (clean runs 2.3–3.3 min; two INT8 models x 26
+conditions, 110 min). Each saved run (logits + record) is about 38 MB on disk.
 
-- Raspberry Pi 5 target over SSH, using the same testing code
-- Energy per inference (USB power meter) and thermal throttling over sustained runs
+**Order:** 4.0 -> 4.1 -> 4.3 -> 4.5, with 4.2 running alongside (its compute queued so it never
+overlaps 4.1's); 4.4 when the Pi 5 arrives (expected in a few weeks).
 
-**Done when:** the same test runs on laptop and Pi without changing testing logic.
+**Naming:** Brokkr's own corruptions and ImageNet-C's are labelled separately everywhere (records,
+tables, labels), e.g. "fog (Brokkr)" and "fog (ImageNet-C)".
+
+### 4.0 Foundations: result schema, hypotheses, mechanism test `[x]`
+
+*Scope*
+- **Unified result schema:** one versioned JSON format for every Stage 4 result, checked by a
+  validator. Fields: schema version; git commit and "dirty" flag; model (name, weights, licence);
+  precision and how it was made (e.g. INT8 method); runtime (ONNX Runtime version, execution
+  provider, threads); device (the existing fingerprint); dataset, split, number of images; condition
+  (corruption, its source — Brokkr's own or ImageNet-C — and severity); metrics, each with its 95%
+  interval; saved-logits path and checksum; `source: brokkr` (so community results, Stage 7, can
+  never be mixed in unlabelled).
+- A converter reads the Stage 1–3 records into the schema (no reruns), so 4.3 and 4.5 can use them.
+- **`docs/hypotheses_stage4.md`**, committed before any Stage 4 measurement: predictions and judging
+  rules for the mechanism test and 4.1 (including the ImageNet-C contrast prediction); the final
+  model and condition lists; the rule for trimming the model list if it is too slow (fixed before any
+  accuracy is seen); the rule for "INT8 degrades" used in 4.2.
+- **Mechanism test.** Question: does darkness (and fog) break default INT8 because the image's
+  values squeeze into only a few of the 256 quantization levels? (Report 1, section 5, calls this
+  the likely explanation, untested.) For default and Percentile INT8 MobileNetV3-Large, count how
+  many levels each quantized layer's activations actually use on clean, dark (Brokkr darkness,
+  severity 5) and foggy (Brokkr fog, severity 3) images. Tuning-split images, not test; image count
+  fixed in the hypotheses file, which also states, before running, which outcome supports the
+  "low-contrast images use fewer levels" explanation and which rejects it.
+
+*Done when:* the validator passes on every new record and on the converted Stage 1–3 records; the
+hypotheses file is committed; the mechanism test writes a results JSON and prints its verdict;
+`pytest` passes.
+
+*Depends on:* nothing.
+
+*Compute (estimate):* schema and converter, negligible. Mechanism test: minutes (a small sample of
+tuning images, two models, three conditions).
+
+### 4.1 Breadth: does clean accuracy predict robustness after quantization? `[~]`
+
+*Scope*
+- **Models:** 8–10 torchvision ImageNet classifiers, MobileNetV3-Large included. Candidates, before
+  licence check and timing probe: MobileNetV3-Small, MobileNetV2, EfficientNet-B0, ShuffleNetV2,
+  MNASNet, a RegNet, ResNet-18, ResNet-50, ConvNeXt-Tiny. Weights under non-commercial licences
+  (e.g. torchvision's SWAG weights) are excluded. The final list goes in the hypotheses file.
+- **Each model:** FP32 sanity check before any of its numbers are trusted: clean test-split top-1
+  within ±1.0 point of torchvision's published top-1. The tolerance allows for sampling error, since
+  we evaluate on 10,000 images and torchvision on 50,000; tolerance and reason are in the hypotheses
+  file. Each model uses its own torchvision preprocessing; damage is applied after its own resize and
+  crop (as in Stage 2).
+- **Precisions:** FP32 and Percentile 99.99 INT8 only. The Stage 3 method is applied as it is, not
+  re-tuned per model, with the same 512 calibration images. A model whose INT8 build fails its checks
+  is reported as failed, not dropped silently.
+- **Conditions** (test split, 10,000 images, 13 in all): clean; Brokkr's own fog 3, darkness 5,
+  defocus blur 3, noise 3; ImageNet-C fog, contrast, defocus blur and Gaussian noise at severities 3
+  and 5.
+- **ImageNet-C option:** generated on our test split with the official corruption code (the
+  `imagecorruptions` package). The 8 conditions are listed in the hypotheses file. **Before 4.1
+  starts:** confirm the package's licence (and its dependencies'), that it installs cleanly with our
+  numpy / scikit-image versions, and that its outputs look correct on 5 sample images. Any difference
+  from the released ImageNet-C files (for example how they were saved) is recorded, and our numbers
+  are not called directly comparable to published ImageNet-C results unless they are. Darkness stays
+  Brokkr's own, since ImageNet-C has no darkening corruption.
+- **Metrics:** the Stage 3 set; conformal thresholds tuned on clean `conformal_calibration` images
+  for each model and precision.
+- **Analysis:**
+  - Absolute weakness (FP32 under the condition, and FP32 minus its own clean score), reported
+    separately from compression-caused weakness (INT8 minus FP32 on the same images, paired).
+  - Absolute gaps in points and relative gaps (INT8 as a fraction of FP32).
+  - Floor effects noted: where FP32 is already near chance, the gap cannot be large, so a small gap
+    there is not evidence of robustness.
+  - The main question is answered by a rank correlation across models: clean FP32 top-1 against
+    INT8 minus FP32 under each condition, with a bootstrap interval over models. With 8–10 models this
+    is a small sample and is reported as such.
+- **Hypotheses** (in the file, before measuring) include: INT8's extra gap (INT8 minus FP32) is large
+  under ImageNet-C contrast, as the level-wasting mechanism predicts. "Large" is defined in the file.
+
+*Done when:* every listed model has a schema-valid record for each (precision, condition); the
+judging script prints PASS / FAIL per 4.1 hypothesis; a summary script prints the absolute and
+compression-caused tables.
+
+*Depends on:* 4.0 (schema; hypotheses file committed).
+
+*Compute (estimate):* first a timing probe for each candidate on tuning images (speed only; no
+accuracy is read). A MobileNetV3-sized model needs about 1–1.5 hours (26 runs at 2–3 min, plus
+calibration images). Larger models take longer, in proportion to their probe speed; the total is
+fixed after the probe. Disk: about 1 GB per model.
+
+### 4.2 Depth: the full Stage 3 pipeline on two more models `[ ]`
+
+*Scope*
+- **Models:** EfficientNet-B0 and ResNet-18. Reason for ResNet-18, recorded in the hypotheses file
+  before its runs: cheap, a different design family (plain convolutions, no depthwise layers), and
+  the most-studied model in quantization papers, so results can be compared with published work.
+- **Phase A (every model):** tuning and `conformal_calibration` outputs, clean and damaged (as 3.1);
+  INT8 method choice on tuning (3.2); temperature (3.5); robust conformal and alarm (3.6); one final
+  run on the test split from a tagged commit (3.7); ImageNetV2 (3.9).
+- **Phase B (only where INT8 degrades):** damaged-image calibration, leave-one-out (3.3), and
+  unrounded output (3.4). "INT8 degrades" is judged on the tuning split after Phase A's method choice,
+  by a numeric threshold written in the hypotheses file before any 4.2 run.
+- Same rules as Stage 3: settings from tuning/calibration splits only; leave one corruption out; one
+  final test run; reruns only for technical failure, logged with the reason.
+
+*Done when:* each model has a verdict JSON from the judging script and a final-run log; Phase B was
+either run or skipped, with the rule's output recorded.
+
+*Depends on:* 4.0; reuses 4.1's EfficientNet-B0 and ResNet-18 exports and sanity checks.
+
+*Compute (estimate):* MobileNetV3's Stage 3 pipeline took about 6 hours of logged run time (tuning
+sweeps 90 + 69 min, final run 3 h 17 min), plus builds and fits. Each 4.2 model: that, scaled by its
+probe speed. Phase B adds the leave-one-out sweeps (for MobileNetV3, 10–20 min each, five of them).
+Overnight runs.
+
+### 4.3 `brokkr shrink` / `brokkr test` and the label, for any ONNX model `[ ]`
+
+*29 September 2026: now P1 of the Product plan below.*
+
+*Scope*
+- **Input:** an FP32 ONNX ImageNet-1k classifier (1,000 outputs) and a small config: preprocessing
+  (resize, crop, mean, std) and its licence. The commands refuse to run without a licence (rule 8).
+- **`brokkr shrink`:** FP16 and Percentile 99.99 INT8 (Stage 3's method), standard 512 calibration
+  images, the existing INT8 sanity checks.
+- **`brokkr test`:** the 4.1 condition set on the test split, conformal thresholds from clean
+  `conformal_calibration` images, schema records saved.
+- **Label generator:** reads only results JSON. Shows size, accuracy with interval, coverage with set
+  size, absolute vs compression-caused weakness, the machine, split and image count, and the
+  reliability envelope. No hand-typed values: a test checks that every number on the label is in
+  the JSON.
+- **Reliability envelope:** the tested conditions in which the model is *not harmful* by the proposed
+  harm definition (clean-tuned 90% coverage at least 80%, and top-1 no more than 10 points below its
+  own clean top-1), applied to the label's own measurements. Untested conditions are shown as "not
+  tested", never assumed. Exact wording, and how intervals are handled, are fixed in the hypotheses
+  file before 4.3 runs.
+- The model list moves out of `export.py`, so these commands run without PyTorch.
+
+*Done when:* on one 4.1 model exported and treated as a user-supplied file, shrink -> test -> label
+runs end to end, and the label's numbers match that model's 4.1 records (check script prints pass /
+fail).
+
+*Depends on:* 4.0; 4.1 (condition set and reference records).
+
+*Compute (estimate):* one model, about as long as one 4.1 model (about 1.5 hours if MobileNetV3-sized).
+Label generation: seconds.
+
+### 4.4 Raspberry Pi 5 target over SSH `[ ]`
+
+*Scope*
+- **Target interface:** "where a model runs" is pluggable. The laptop (local) and a Pi 5 (over SSH)
+  run the same testing code. Deploy = copy the ONNX files and runner, run, fetch the results JSON.
+- **Pi fingerprint:** board, OS, ONNX Runtime version, CPU governor, temperature and throttling state
+  before and after each run.
+- **Speed** on the Pi for the 4.1 models, FP32 and Percentile INT8, with the same benchmark code as
+  the laptop speed runs in 4.5: fixed threads, >= 20 warm-up and >= 100 timed runs, p50/p95/p99.
+- **Laptop-vs-Pi agreement.** Question: does the same file give the same answers on ARM? (INT8
+  kernels differ between x86 and ARM.) Same ONNX files, same preprocessed inputs sent from the laptop
+  (so preprocessing cannot differ): top-1 agreement and largest logit difference. Image count fixed
+  in the hypotheses file. Accuracy on labels stays laptop-measured unless agreement shows it
+  transfers.
+- Results are labelled "Raspberry Pi 5" only when measured on one; cloud ARM stays "cloud ARM".
+
+*Done when:* one command runs the same speed benchmark and agreement check on the laptop and the Pi and
+writes schema records for both; the agreement check prints pass / fail.
+
+*Depends on:* 4.0; 4.3's PyTorch-free model list; a Pi 5 with SSH access and cooling (arriving in a
+few weeks).
+
+*Compute (estimate):* laptop side, minutes (agreement inputs). Pi: unknown until measured; the first
+step is a timing probe on one model.
+
+### 4.5 `brokkr recommend` `[ ]`
+
+*29 September 2026: comes after P1–P6 (Product plan below); its laptop latency moved to P1.*
+
+*Scope*
+- `brokkr recommend --task classification --device ... --min-fps ... --max-size ... --condition ...`,
+  reading only results JSON.
+- **Built on laptop results.** Laptop speed for the 4.1 models (FP32 and Percentile INT8; pinned,
+  fixed threads, >= 20 warm-up, >= 100 timed runs, p50/p95/p99) is measured here and always labelled
+  "laptop latency". Pi rows show "not measured" until 4.4 exists.
+- **Laptop latency needs its own fixed method, decided before 4.5** (note added 26 September 2026):
+  plugged in, a fixed power mode, a cool-down before each measurement, repeated runs reported as the
+  median and spread, and the whole setup recorded. Reason: the i5-1235U mixes fast and slow cores and
+  slows down when hot. Two back-to-back pipeline profiles on 26 September differed by 25–45% on most
+  steps, so a single run is not a valid latency number.
+- **Constraint filtering:** only options with a measurement for that device and condition. Anything
+  unmeasured is reported as "not measured", never estimated.
+- **Pareto frontier:** options that no other option beats on all three of accuracy under the
+  condition, speed (p95) on the device, and size.
+- **"Why this":** for each recommended option, its measured numbers and the result files they come
+  from.
+- **"Within measured noise" flag:** two options are marked as not distinguishable when their paired
+  difference interval includes zero, or the difference is smaller than the measured build-to-build
+  noise.
+- Condition names map only to measured conditions (e.g. `--condition night` -> darkness at the tested
+  severity), and the output says which.
+
+*Done when:* tests cover filtering, the frontier, noise flags and "not measured" (with small hand-made
+inputs, used in tests only and never shown as results); a run on the real Stage 4 results prints
+recommendations whose every number traces to a file (check script prints pass / fail).
+
+*Depends on:* 4.0, 4.1 (accuracy), 4.3 (labels). Not on 4.4: Pi rows fill in once 4.4 exists.
+
+*Compute (estimate):* laptop speed runs, minutes per model; recommendations, seconds.
+
+**Stage 4 done when:** every 4.x "done when" is met, and labels and recommendations come straight from
+results files.
+
+### Later (not Stage 4)
+
+- Object detection (permissive models only, e.g. YOLOX or torchvision detection)
+- Runtime monitoring
+- Adaptation
+
+## Platform plan (added 30 September 2026, dates revised the same day and again on 1 October 2026)
+
+**Dates revised by H on 1 October 2026**, from the time measured so far (commit times in git: about
+34 to 43 working hours over 24–30 September) and Claude's estimates for the remaining steps, taking
+the slow end of each range. Old dates: step 1 10 October, 2 17 October, 3 28 October, 4 31 October,
+4b "in November", 5 12 November, 7 25 November.
+
+**Step 1's date revised on 3 October 2026** (asked by H): 7 October instead of 5 October. The ten
+labels are made; still to do are `brokkr-edge test` with the MobileNetV3-Large reproduction, the
+laptop latency run (started by H, overnight), the labels regenerated with their latency rows, and
+the merge into `main`. The later steps keep their dates for now.
+
+Set by H on 30 September 2026, then revised by H the same day: new dates, the Raspberry Pi 5 step
+moved to "when the board arrives", the "before making the repository public" checklist and a README
+update added to step 2, the quick-start page to step 4, the laptop-vs-Pi agreement check to step 6,
+and every other open ROADMAP item moved to "Later versions" below. **It replaces the order and scope
+of the Product plan (P1–P6) below**, which stays for the record. Steps are built strictly in this
+order (1, 2, 3, 4, 4b, 5, 7; step 6 whenever the board arrives); each is finished (tested, documented,
+pushed) before the next starts. The project's rules are unchanged: numbers only from checked result
+files, licences recorded, no overclaiming, a pass / fail check for every step.
+
+Names (30 September 2026): the package is published as **`brokkr-edge`** and imported as
+**`brokkr_edge`** (the PyPI name "brokkr" belongs to an unrelated project). That project also
+installs a `brokkr` command, so ours is **`brokkr-edge`** (e.g. `brokkr-edge test`; decided by H,
+30 September 2026, at Checkpoint 1).
+
+Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published labels**.
+
+### 1. Labels (P1) `[ ]`, done by 7 October
+- `docs/label_schema.md` first (written: `label.json`, schema version 1). The label builder is made
+  general enough for EEG/EMG signals (step 7), not image-only.
+- Then P1 as fixed in `docs/hypotheses_stage4.md` (notes of 29–30 September): 10 labels, the check
+  script, laptop latency for 19 builds, the reproduction of MobileNetV3-Large's 4.1 records.
+- Checkpoint 1: the full MobileNetV3-Large label and MobileNetV3-Small's "INT8 build failed" label,
+  reviewed by H before the other 8 are built.
+
+*Done when:* the P1 "done when" line (Product plan, below) holds, and every `label.json` passes a
+validator for `docs/label_schema.md` version 1.
+
+### 2. Catalog site and going public `[ ]`, done by 10 October
+- GitHub Pages, generated only from `label.json` files: browse, filter, compare, one page per label,
+  and a methods page (harm definition and threshold history as recorded in
+  `docs/hypotheses_stage4.md`, the "12 conditions" sentence). User-submitted labels are clearly marked
+  "unverified".
+- The "before making the repository public" checklist (Stage 1 above) plus a licence and
+  commercial-use check of every model and dataset (each dataset tagged "research only" or "commercial
+  use allowed") and a re-read of README, ROADMAP, docs and site for overclaiming.
+- README update (it still says "Stages 1–2 of 7") and the licences: Apache-2.0 (code, already in
+  `LICENSE`) and CC BY 4.0 (published labels). The repository is already public (made so by H; confirmed
+  3 October 2026), so the checklist is done after the fact.
+
+*Done when:* the site builds from label files alone, and a test fails if any number on it is not in
+a `label.json`; filter and compare work on the 10 labels; a user-submitted test label shows
+"unverified"; every checklist item is ticked with its date; the README is current; the repository is
+public and the site is live.
+
+### 3. Testing a user's model `[ ]`, done by 16 October
+- A user's ONNX image classifier and a folder of their own labelled images -> INT8 build -> damage
+  tests -> `label.json`, run locally. Then PyTorch model input.
+- How the user's images are split (INT8 calibration, conformal calibration, test; no image in two
+  parts), the minimum image count and the required licence statement are fixed in a dated note before
+  coding.
+- Also accept a user-supplied pair: an FP32 ONNX model and an already-shrunk ONNX build of it, made by
+  any tool, not only builds Brokkr shrinks itself (added by H, 3 October 2026; plan only, not built).
+  What is checked about such a pair before testing it is fixed in the same dated note.
+
+*Done when:* on a small made-up model and made-up images (tests only), and on one real torchvision
+model with a folder of images, the command produces a schema-valid `label.json` marked
+`source: user-submitted`; the same for PyTorch input.
+
+### 4. Label submission, PyPI and quick start `[ ]`, done by 19 October
+- A GitHub pull-request template for submitting a `label.json`, with an automatic check (schema
+  validation; the label is marked "user-submitted, unverified"). The template says submitters license
+  their labels under CC BY 4.0.
+- The package published to PyPI as `brokkr-edge`, and a one-page quick start.
+
+*Done when:* a test pull request with a valid label passes the check and one with an invalid label
+fails it; in a fresh environment, installing from PyPI and following the quick start produces a label.
+
+### 4b. Unlabelled mode for a user's images `[ ]`, done by 23 October
+- Added by H on 30 September 2026 (Checkpoint 1), moved here from "Later versions"; estimated 6–10
+  hours. A user's ONNX image classifier and a folder of their own images **without** class labels ->
+  INT8 build -> how often INT8's top-1 answer agrees with FP32's, clean and under each damage type,
+  -> `label.json`. Without labels there is no accuracy or coverage, so the label says so.
+- What the label may and may not show without labels, and the minimum image count, are fixed in a
+  dated note before coding.
+
+*Done when (confirmed by H, 1 October 2026):* on a small made-up model and made-up images
+(tests only), and on one real torchvision model with a folder of images, the command produces a
+schema-valid `label.json` marked `source: user-submitted` that shows agreement and says accuracy
+and coverage were not measured.
+
+### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 29 October
+- Free CPU Space: accepts the user's ONNX model and a folder of their labelled images, runs one job at
+  a time, with a queue and status page; returns the label, marked as a user-submitted run.
+- **The Space never publishes users' models or images, only the resulting labels.** Upload limits,
+  how long uploads are kept, and how they are deleted are stated on the page.
+- H overrode `CLAUDE.md`'s "no backend server until real users need one" for this step (30 September
+  2026; recorded in `CLAUDE.md`).
+
+*Done when:* two jobs submitted together run one after the other, the status page shows both, each
+returns a schema-valid label, and no uploaded model or image is reachable from outside after its job.
+
+### 7. EEG/EMG pack, minimal `[ ]`, done by 5 November
+- One public dataset and one model (licences checked and recorded before use), three damage types
+  (electrode dropout, motion noise, power-line noise), an INT8 build, and a label in the same schema.
+
+*Done when:* the three damage types have tests; one EEG/EMG `label.json` passes the schema validator
+and appears in the catalog.
+
+### 6. Raspberry Pi 5 latency and labels `[ ]`, when the board arrives (no fixed date)
+- The Pi 5 as a target over SSH (4.4), its fingerprint, latency for the 19 builds by the latency
+  method adapted in a dated note before measuring, and labels regenerated with Pi rows. Results are
+  labelled "Raspberry Pi 5" only when measured on one.
+- The laptop-vs-Pi agreement check (from 4.4): does the same file give the same answers on ARM?
+- The label schema's hardware field stays exactly as planned, so Pi results need no schema change;
+  until then every label's Raspberry Pi 5 row says "not measured". No microcontroller (e.g. ESP32)
+  support in October.
+
+*Done when:* 19 Pi latency records and the agreement check exist and pass the checker, and the 10
+labels show Pi rows.
+
+### Later versions (not scheduled; kept, not deleted)
+- 4.1's summary tables script.
+- 4.2 (two more models, full pipeline; allowed overnight under the research freeze).
+- 4.5 `brokkr recommend`.
+- Fast mode, and the menu of conditions and severities (P4).
+- `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe.
+- The GitHub Action.
+- Stage 5 (energy and heat on the Pi with a USB power meter).
+- Stage 6's installer script and camera demo.
+- Stage 7's niche collections (e.g. factory defects, road scenes, farm pests).
+- Object detection, runtime monitoring, adaptation.
+- Technical Report 1's "Related work" section (to be written by H).
+- Stage 3 scripts 12, 14 and 15 need their tuning cache rebuilt (STATUS known gaps).
+- The parked research questions (STATUS).
+
+## Product plan (P1–P6), added 29 September 2026
+
+*Replaced on 30 September 2026 by the Platform plan above (kept for the record; its P1 "done when" line still defines step 1).*
+
+From 29 September 2026 the work follows this order, under the research freeze (`CLAUDE.md`). It
+replaces the order of Stage 4's 4.3–4.5 and brings the start of Stage 6's website forward: task 4.3
+becomes P1, and 4.5's laptop latency moves into P1. Task 4.2 may still run overnight if pre-registered.
+Every step keeps the project's rules: numbers only from checked result files, licences recorded, no
+overclaiming, and a check that prints pass / fail.
+
+### P1 Labels `[ ]`
+- `brokkr test`: one command that runs the 4.1 condition set on a model and writes schema-2 records,
+  and the label generator. Labels for all 10 models of 4.1, made from their 4.1 records: the 9 whose
+  INT8 build passed, and MobileNetV3-Small with the state "INT8 build failed" (revised 30 September
+  2026). `brokkr test` is shown to reproduce MobileNetV3-Large's 4.1 records by the reproduction rule
+  in `docs/hypotheses_stage4.md`.
+- One label per shrunk build, with FP32 beside it; a summary block at the top (conditions where it is
+  not harmful / harmful / borderline / not tested); the reliability envelope with three states (dated
+  note in `docs/hypotheses_stage4.md`); E-AURC in a details section. `label.json` is the only source;
+  Markdown (usable as a Hugging Face model card) and HTML are generated from it.
+- Laptop latency for 19 builds (FP32 of all 10 models, INT8 of the 9 whose build passed; revised 30
+  September 2026), by the method fixed in dated notes before measuring; the Raspberry Pi row says "not
+  measured".
+- The model list moves out of `export.py`, so testing and labelling run without PyTorch.
+
+*Done when:* `brokkr test` on MobileNetV3-Large passes the reproduction rule (dated note, 30 September
+2026); each of the 10 models has a `label.json`, Markdown and HTML label generated only from records
+that pass `scripts/22_check_results.py` (MobileNetV3-Small's INT8 row: "INT8 build failed", with the
+reason from its build record); a check script prints PASS only if every number in every `label.json`
+equals its source record and every number in the Markdown and HTML appears in its `label.json`; the
+Markdown's model-card metadata parses; laptop latency records exist for all 19 builds.
+
+### P2 Website v0 and going public `[ ]`
+- A static site (GitHub Pages) generated only from `label.json` files: a list of models and one page
+  per label. Nothing on it is computed separately.
+- The "before making the repository public" checklist (Stage 1 above), plus a licence and
+  commercial-use check of every model and dataset (each dataset tagged "research only" or "commercial
+  use allowed") and a re-read of README, ROADMAP, docs and site for overclaiming. Then H makes the
+  repository public.
+
+*Done when:* the site builds from label files alone and a test fails if any number on it is not in a
+`label.json`; every checklist item is ticked with its date; the repository is public and the site is
+live.
+
+### P3 The user's own images `[ ]`
+- `brokkr test --images <folder>`. With labels (ImageNet-1k class numbers, the models' own classes):
+  the full results, as for ImageNet. Without labels: INT8-vs-FP32 top-1 agreement under each damage
+  condition, with intervals (agreement needs no labels).
+- The user states the images' name and licence (no licence, no run: hard rule 8); results are marked
+  "user images" and never mixed with Brokkr's ImageNet results.
+
+*Done when:* the same small folder, run with and without its labels file, gives two labels that say
+which mode, how many images, and the stated licence; tests cover both modes on made-up images (used
+in tests only).
+
+### P4 Fast mode and a menu of conditions `[ ]`
+- `--fast`: fewer images (the count fixed in the code and printed on the label), the same pipeline;
+  the label marks the result "fast mode" and shows the wider intervals.
+- `--conditions`: choose damage types and severities from a catalogue; anything not chosen is "not
+  tested" on the label.
+
+*Done when:* a fast-mode label and a full label of the same model differ only in image count,
+intervals and the "fast mode" mark (checked by a script), and unchosen conditions show "not tested".
+
+### P5 `brokkr shrink --auto` `[ ]`
+- Tries the recipes Brokkr has measured: Percentile 99.99, calibration with damaged images (as 3.3),
+  unrounded last layer (as 3.4); tests each; recommends the smallest build that is "not harmful" in
+  every condition the user chose, or says plainly that none is.
+- The choice is made on the tuning split, never the test split; the chosen build's label reports its
+  test-split numbers.
+
+*Done when:* on one model it prints every recipe's size and envelope states and the one chosen (or
+"none"); tests cover the "none" case.
+
+### P6 `pip install brokkr` and a quick start `[ ]`
+- An installable package (testing and labelling without PyTorch; PyTorch only for exporting
+  torchvision models) and a one-page quick start.
+
+*Done when:* in a fresh virtual environment, installing the built package and following the quick
+start ends with a label, checked by a script. Publishing to PyPI only with H's go-ahead.
+
+### Then
+- 4.5 `brokkr recommend` (above), reading labels.
+- 4.4 Raspberry Pi 5 (above), when it arrives.
+- A GitHub Action that runs `brokkr test` on a model file in a repository and attaches its label.
+  *Done when:* an example workflow runs it on a small model and uploads the label.
+
+## Stage 5 — Energy and heat on real devices `[ ]`
+
+The Raspberry Pi 5 SSH target moved to task 4.4.
+
+- Energy per inference (USB power meter) and thermal throttling over sustained runs, using the 4.4
+  target
+
+**Done when:** energy and sustained-run results for the Pi come from the same testing code as 4.4.
 
 ## Stage 6 — Website + installer `[ ]`
+
+*29 September 2026: website v0 is brought forward as P2 of the Product plan above.*
 
 - Static catalog site (GitHub Pages) built from JSON: problem-based search, model pages with labels
 - Install script: detect device, pick model, install a camera runner that can say "not sure"

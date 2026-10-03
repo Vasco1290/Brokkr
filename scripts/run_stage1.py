@@ -17,7 +17,7 @@ import subprocess
 import sys
 import time
 
-from brokkr.fingerprint import git_info
+from brokkr_edge.fingerprint import git_info
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--full", action="store_true", help="also run FP32 accuracy on all 50,000 images")

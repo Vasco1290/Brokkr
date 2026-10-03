@@ -1,10 +1,179 @@
 # Brokkr status
 
-Snapshot as of **26 September 2026**. Branch `stage-3` (from `main` at `5da3bde`, "Merge Stage 2"),
-pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is merged into `main`; the merge is tagged
-`report-1` (Brokkr Technical Report 1, `docs/writeup.md`).
+Snapshot as of **3 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+(merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
+research is done** on branch `stage-4` (task 4.0, 4.1's sweep and verdicts, M2, SE1; 4.1's summary
+tables script is not), and the work now follows the Platform plan: **step 1 (labels) is in progress**
+(see "Pick up here"). **Research freeze** until website v0 ships (see "Research freeze" below).
 
 ## 0. Start here (a new session needs nothing else)
+
+### Pick up here (3 October 2026)
+Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
+- **Branch `stage-4`**, pushed to origin; `main` is still at `be01206` (Stage 3). Working tree clean.
+- **Platform plan step 1 (labels), due 7 October** (`ROADMAP.md`, "Platform plan"):
+  - **Ten labels made, with laptop speed rows**, at the clean commit `f682e21` (3 October 2026), in
+    `labels/` (gitignored): `python scripts/39_make_labels.py` makes them, `python
+    scripts/40_check_labels.py` checks every number against its source (last result: PASS, 10 labels).
+    Format: `docs/label_schema.md` and its dated notes (30 September to 3 October).
+    `scripts/42_label_tables.py` prints tables across the labels.
+  - **The README's label example is generated** by `scripts/41_readme_label_example.py` between the
+    `label-example` markers; never edit that block by hand (`scripts/40` and a test check it).
+  - **`brokkr-edge test`** (`brokkr_edge/test_run.py`, `brokkr_edge/cli.py`; built at `ca3d3b7`;
+    install the command with `pip install -e . --no-deps`). **Reproduction of MobileNetV3-Large's 28
+    records of 4.1: PASS, 28 of 28**, repeatable, every score identical bit for bit; recorded at
+    `0ad9938` (`results/reproduction/reproduction_check.json`; outcome appended to
+    `docs/hypotheses_stage4.md`).
+  - **Laptop latency run: done** (started by H; `scripts/44_laptop_latency.py` at the clean commit
+    `89dc9d6`, 3 October 2026, 13:24–15:02 local time, in the daytime rather than overnight: accepted
+    by H, no rerun). **38 of 38 records** in `results/latency/` (19 builds × 1 and 4 threads), all from
+    `89dc9d6` with nothing uncommitted, on mains power in "best performance" before and after every
+    model, 0 discarded sessions; `scripts/22_check_results.py` afterwards: PASS, 1901 of 1901 result
+    records. **7 of 38 are flagged "unstable"** (spread above 10%): all four ConvNeXt-Tiny records,
+    EfficientNet-B0 INT8 4 threads, ResNet-18 INT8 4 threads, ResNet-50 INT8 1 thread. Per the 29
+    September method note they are shown on the label, not hidden; no rerun and no new rerun rule
+    (that would be decided after seeing the data). A session never starts `scripts/44`; it may only
+    run `--smoke` outside `results/`. Any command longer than about 10 minutes is cut off in an
+    assistant session, so long runs are H's.
+- **Order, set by H on 3 October 2026:**
+  1. ~~H runs the laptop latency script~~ (done, above). The **website v0 plan** is drafted in
+     `scratch/website_v0_plan.md` (gitignored, not committed); H decided its eight open points on 3
+     October 2026 (plan section 9; summary under "H's website v0 decisions" below).
+  2. ~~H's fix list and H's latency-label decisions~~ (done 3 October 2026): dated notes at `e009759`
+     (with `docs/HANDOFF.md` removed), code at `310485e` and `1e7b054`. Fixes 1–3 and 5 done; check 4
+     done read-only. H confirmed the "(proposed)" points of that note on 3 October.
+     - **Later on 3 October:** next-step advice chosen line by line against FP32 (note `4ef62cf`, code
+       `f682e21`; 5 rows of the `1e7b054` labels changed, among them ConvNeXt-Tiny fog (ImageNet-C) s3).
+       H confirmed its "(proposed)" points (straddle cases, each suggestion once) at `f97255e`.
+     - **Check 4: approved by H and committed at `9b8505f`** (README findings, `docs/stage4_story.md`).
+       Every number was printed from `results/final/breadth_4.1_verdicts.json` and the labels by
+       `scratch/check4_draft.md`'s script; the noise/blur sentence leads with counts and denominators
+       (near-floor cells excluded). Xiao et al.'s full text (v1, the only version) names impulse noise,
+       not glass blur. The "Why labels?" text is in `scratch/website_v0_plan.md` section 11 (gitignored,
+       so not committed). Verified references: `scratch/related_work.md` (9 sources).
+  3. ~~Regenerate the labels with speed rows~~ (done 3 October 2026; last made from `f682e21`;
+     `scripts/40` PASS, 10 labels).
+  4. ~~Released label~~ (done 3 October 2026, `38e5c7c`): `published/labels/mobilenet_v3_large/`
+     (`label.json`, `label.html`, from `f682e21`), hard rule 4 changed for that folder only (dated note
+     in `docs/label_schema.md`, pointer in `CLAUDE.md` rule 4), `tests/test_published_labels.py`; the
+     label licence CC BY 4.0 recorded as H's decision. `.gitignore`: working labels anchored (`/labels/`),
+     `docs/assets/originals/` ignored (folder made, empty). Note: the working label files have Windows
+     line endings; git stores them with LF (`.gitattributes`), and the test reads them in text mode.
+  5. ~~The README~~ **written 3 October 2026 (`3f19127`), waiting for H's review on GitHub (light, dark,
+     phone) before the pull request.** Findings and label example are generated blocks (`scripts/45`,
+     `scripts/41`, both checked by `scripts/40`); screenshots by `scripts/46` from the released label.
+     Website plan committed as `docs/website_v0_plan.md` (`495c7d2`). The plan it followed:
+     - Top: banner only (`docs/assets/brokkr-banner.jpg`; the logo is for the website and Hugging
+       Face), title, tagline "Shrink AI models for small hardware, and find out honestly what you lost."
+     - Sections, in order: 1 Status (what works today; "not built yet" includes object detection and
+       devices other than the laptop); 2 What it does; 3 Example label (link to
+       `published/labels/mobilenet_v3_large/label.html` plus light and dark screenshots of its summary,
+       made from that committed label); 4 What we found (the approved check-4 wording, "in our tests",
+       links to the report and the hypotheses files); 5 Why Brokkr? (testing under damage, separating
+       shrinking damage from weakness that was already there, the uncertainty check, a shareable label,
+       one command; other tools named only for what they verifiably do, no "X can't do Y"); 6 When you
+       don't need Brokkr (the model only runs in controlled conditions; you already test on real field
+       data); 7 Quick start (only commands that work today); 8 How it works, plus the honesty rules;
+       9 Reproduce; 10 Licences and data terms (code Apache-2.0; labels CC BY 4.0; weights keep their
+       original licences; ImageNet non-commercial terms); 11 Roadmap link.
+     - No hand-typed result numbers: generated blocks checked by `scripts/40`, or links. The findings
+       numbers committed at `9b8505f` and the Status row's counts are typed today and must become a
+       generated, checked block. Must read well in GitHub light mode, dark mode and on a phone.
+     - Images: keep the current file names (`brokkr-banner.jpg`, `brokkr-logo.png`, `favicon.png`,
+       `brokkr-social-preview.jpg`); centring left as it is; H uploads the social preview.
+  6. **Then:** all checks (ruff, pytest, `scripts/22`, `scripts/40`), the **pull request `stage-4` into
+     `main`** with a merge commit (like PRs #1–#3); then tag `stage-4-done` and start step 2 on a new
+     branch. `gh` is not installed and the in-app browser is not signed in, so H opens the pull request
+     on GitHub (https://github.com/Vasco1290/Brokkr/compare/main...stage-4).
+  - **The repository is public** (made so by H on purpose; confirmed 3 October 2026). The git-history
+    scan was run that day, read-only: clean (ROADMAP, "Before making the repository public").
+- **H's fix list (received 3 October 2026; all done the same day, check 4's wording approved):**
+  1. **Next-step advice follows the line that actually failed**, for every verdict type, as a general
+     rule with a test (not a special case for the row that raised it: ConvNeXt-Tiny, fog (ImageNet-C)
+     s3, where the label says "consider a stronger model"). Show H the before/after for the affected
+     rows. H's answers for the dated note (decided after seeing the data; record that):
+     - Rule: every suggestion must plausibly fix the line that failed. Re-calibrating fixes coverage;
+       a stronger model fixes accuracy; another recipe fixes harm caused by shrinking (either line).
+     - Fails both lines: cause-based advice first, "re-calibrate on your own images" second.
+     - Fails accuracy only: cause-based advice only.
+     - Fails coverage only: "re-calibrate on your own images" first; "try another recipe" second only
+       where shrinking is involved ("hurt by shrinking", "cause unclear"). Never "consider a stronger
+       model" on a coverage-only row (FP32's accuracy holds there, so it would point at the wrong
+       problem).
+     - Tests for each case, with made-up rows.
+  2. **"Not informative" never hides a large shrinking cost:** if both apply, show both. Add a test
+     with a made-up row where both apply. (Today "not informative" takes priority; in the ten labels it
+     hides none: the most negative of its 14 rows is −1.18 points.)
+  3. **README threshold wording approved by H:** "a line whose value was written down before these
+     results existed and adopted for the labels afterwards, unchanged". Also append a correction to
+     the 30 September envelope note: 80% first appears in `a957652` (24 September, a Stage 2
+     prediction), before `237effa`.
+  4. **Claim check, read-only first.** ConvNeXt-Tiny INT8's labels show shrinking costs of −31.21
+     points at contrast (ImageNet-C) s5 and −11.94 / −18.56 at fog (ImageNet-C) s3 / s5. Compare with
+     the 4.1 summary ("only MobileNetV3-Large and EfficientNet-B0 collapse; others lose <2"). Explain,
+     from the 4.1 records, what measure and conditions that statement used and whether it conflicts
+     with the label numbers; then propose (don't commit) corrected wording for `docs/stage4_story.md`
+     and the README's findings. No new diagnostics, no cause analysis: wording only. The wording "all
+     failures are phone-optimised designs" is in no tracked file and not in `scratch/` (searched 3
+     October 2026), so for it the check only shapes future wording ("Why labels?" page, README
+     findings).
+  5. **Add to "Parked questions" below:** "Add severity 1 to label conditions (Phase B severity menu)
+     so labels show where models still work."
+- **H's latency-label decisions (3 October 2026, after seeing the latency records; done the same day,
+  in the labels made at `1e7b054`).**
+  Recorded in the next session's dated note before any code:
+  - **a. Spread and "unstable" on the labels** (required by the 29 September method note; the
+    renderer shows neither today): in plain words with the spread taken from the record, e.g. "Speed
+    varied a lot between repeat runs (up to X%); treat as rough", plus a glossary entry. No claim
+    about why a record is unstable.
+  - **b. Where INT8 is slower than FP32**, a plain sentence: "INT8 is slower than FP32 on this laptop
+    CPU (relative comparison only)". Never a negative "speed-up"; no wording that assumes INT8 is
+    faster. (Checked read-only on 3 October: the label code shows only each build's own p50 / p95 /
+    p99 today, with no comparison.)
+  - **c. Methods wording for the cores:** "Pinned to the laptop's 2 performance cores (4 hardware
+    threads, as reported by Windows). The 4-thread setting therefore runs on 2 physical cores." From
+    the records: `core_types.performance` = [0, 1, 2, 3], `pinned_cpus` = [0, 1, 2, 3],
+    `physical_core_of_each_cpu` maps 0 and 1 to core 0, 2 and 3 to core 2 (identical in all 38).
+    Stated as a limitation: the pin was not read back after setting (`benchmark.pin_to_cpus` stops
+    only if Windows refuses it).
+  - **d. Schema version 1 amendment** (nothing published yet), with a dated note in
+    `docs/label_schema.md`: runtime moves to its own field on each measurement and speed row, so one
+    device can have several runtimes. Evidence level is not added now (an optional field later, when
+    community results exist). Every rendered page states the label schema version (today's
+    `label.html` shows the brokkr-edge version and commit, not the schema version).
+  - **e.** The run time (3 October 2026, 13:24–15:02 local) is recorded with the speed rows. Add to
+    "Parked questions": "Why is RegNetY-400MF's INT8 slower than FP32 on this laptop?" Add to
+    "Suggestions parked for later": "Add a pin read-back check to the latency script."
+- **H's website v0 decisions (3 October 2026; for step 2, after the steps above; nothing started).**
+  Full text in `scratch/website_v0_plan.md`, section 9.
+  1. A committed folder `published/labels/` holds released labels only (at release points); working
+     labels stay gitignored in `labels/`. This changes hard rule 4 for that folder only: record it in a
+     dated note, and **in the same commit add a pointer to that note in `CLAUDE.md`'s rule 4**
+     (decided by H, 3 October 2026). For v0 the site is built locally and pushed to a `gh-pages`
+     branch; building on GitHub comes later.
+  2. Readable addresses (`/models/<model>/<build>/`, e.g. `/models/mobilenet-v3-large/int8-percentile-99.99/`);
+     a generator test fails if two builds produce the same address; the build checksum is shown on
+     the page, not in the address.
+  3. Display words: `official` → "Brokkr study"; `user-submitted` → "User-submitted";
+     "Community-submitted" is reserved for results others send to the site later.
+  4. Evidence field: after v0.
+  5. The relative speed line is shown, never hidden: "INT8 takes N× the time of FP32", with
+     "(slower)" when INT8 is slower; N generated from the records; when either row is unstable, shown
+     with the unstable flag and the plain-words note. **N = INT8's p50 divided by FP32's p50** (each
+     the median across sessions, from the latency records), shown separately for 1 thread and 4
+     threads (decided by H, 3 October 2026); recorded in the dated note of 3 October (`e009759`).
+  6. Cores wording: decision c above.
+  7. The roadmap page is generated from `ROADMAP.md`: phases and Now / Next / Later plus what is
+     built; no dates on the website.
+  8. Report 1: replace the "Related work" placeholder ("To be written by H") with "Related work: not
+     yet written; planned before the next report." `docs/HANDOFF.md`: removed on 3 October 2026
+     (`e009759`) after its two unrecorded items went into the dated note of that day.
+  9. **Claims register** on the pre-public checklist (H, 3 October 2026): every public claim lists its
+     scope (models, conditions, pre-registered or exploratory), its prior-work citation, and the command
+     that backs it; the checker verifies each claim against the records.
+- **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
+  keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
+  commits; H writes the review notes.
 
 ### Where things stand
 - **Stage 3 is done** (tasks 3.0–3.9). Predictions and outcomes: `docs/hypotheses_stage3.md`. Final-run
@@ -12,8 +181,10 @@ pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is merged into `main`; the m
   `results/final/mobilenet_v3_large_stage3_verdicts.json` (3.7) and `..._verdicts_with_h17.json` (3.9).
 - **Brokkr Technical Report 1** (`docs/writeup.md`, task 3.8) is approved and committed. Its "Related
   work" section is a placeholder marked "To be written by H"; do not draft it.
-- **Open decisions (yours):** start Stage 4 (on a new branch from `main`); confirm the "reliability
-  envelope" wording (below).
+- **Stage 4 is in progress** (plan: `ROADMAP.md`; predictions and outcomes: `docs/hypotheses_stage4.md`).
+  Task 4.0 is done; task 4.1's sweep, reliability and H18–H22 verdicts are done (27 September 2026;
+  see "Stage 4 progress" below). M2 and SE1 are judged. **Research freeze:** the work now follows the
+  Platform plan (see "Pick up here" above and "Research freeze" below).
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -52,6 +223,10 @@ pushed. **Stages 1, 2 and 3 are complete.** Stage 3 is merged into `main`; the m
   never because of a result; every rerun is logged with its reason.
 - **Label what came later:** analyses done after the verdicts are marked "after the verdicts" or
   "exploratory"; likely explanations are marked "likely", never stated as proven.
+- **Literature check before any new research question** (H, 3 October 2026): a time-boxed check of
+  prior work (2–3 hours), with criteria written down first for what happens if prior work exists. Every
+  research idea needs a product fallback. No claim of being "first" anywhere.
+- **Unknown values say "not recorded"**, never a guess (H, 3 October 2026).
 - **Report absolute and compression-caused weakness separately** (see below).
 
 ### Absolute weakness vs compression-caused weakness
@@ -71,20 +246,135 @@ coverage falls below 80%, or (b) its top-1 is more than 10 points below the same
 Alarm firing on a harmful condition = catch; on a condition that is neither harmful nor clean = "early
 warning" (reported separately, not a false alarm); on clean images = false alarm.
 
-### "Reliability envelope": wording NOT yet agreed
-The term does not appear in any Brokkr file or earlier decision. **Draft for you to confirm or
-replace (not agreed):** a model's reliability envelope is the set of conditions (damage type x
-severity) under which it stays within stated bounds on both accuracy and its 90% coverage promise
-(with set size), measured on a named split and machine.
+### "Reliability envelope": direction agreed, exact wording not yet fixed
+Agreed in the Stage 4 plan (26 September 2026): a model's reliability envelope is the set of *tested*
+conditions (damage type x severity) in which it is not harmful by the proposed harm definition above,
+measured on a named split and machine; untested conditions are shown as "not tested". The exact
+wording, and how intervals are handled, are fixed in `docs/hypotheses_stage4.md` before task 4.3 runs.
 
-### Stage 4 plan (not started)
-From `ROADMAP.md`: standard nutrition label per (model, precision, device) generated from JSON;
-`brokkr recommend --task ... --device ... --min-fps ... --condition night`; add object detection
-(permissive models only, e.g. YOLOX or torchvision detection). Done when labels and recommendations come
-straight from results files. Candidate inputs from Stage 3 (suggestions, not decided): show absolute vs
-compression-caused weakness and coverage with set size on the label; use the proposed harm definition.
+### Stage 4 progress (27 September 2026)
+Plan: `ROADMAP.md` (order 4.0 -> 4.1 -> 4.3 -> 4.5, 4.2 alongside; 4.4 when the Pi 5 arrives).
+Predictions (M1, H18–H22, M2, 4.2 rules) and outcomes: `docs/hypotheses_stage4.md`, committed before
+measuring.
+
+**Task 4.0 (done).** Result format schema 2 (`brokkr/schema.py`) and a checker for results and model
+build records (`scripts/22_check_results.py`). Mechanism test M1 (`scripts/27_mechanism_levels.py`, 500
+tuning images): **INCONCLUSIVE** for darkness and fog by the pre-set rule; accepted as recorded, never
+re-run with another summary (outcome and exploratory notes in the hypotheses file).
+
+**Task 4.1 models.** 10 torchvision models; weights hash-checked; licences in `brokkr/export.py`.
+Percentile 99.99 INT8 usable for 9; **MobileNetV3-Small INT8 failed** (2.7% agreement with FP32 on 256
+tuning images; FP32 only). ConvNeXt-Tiny's INT8 was built with `skip_symbolic_shape` (recorded; checked
+to leave MobileNetV3-Large's model unchanged). Default MinMax INT8 was built for M2 for 8 models;
+**EfficientNet-B0's MinMax failed** (17.6%).
+
+**Task 4.1 sweep (finished).** `scripts/28_breadth_sweep.py`: 13 test conditions (Brokkr's own and
+ImageNet-C, labelled separately) plus clean `conformal_calibration`; 8 threads; 6 passes, smallest
+models first.
+- Commits: `5be2cb5` (first 30 records, thread spinning on); stopped by hand after 15:03:24 on 26
+  September because steps ran about 3x slower than estimated (idle sessions' threads spinning);
+  spinning switched off after checks (`4e4c4e5`, `fc965cd`: 2.46x faster, every score bit-identical;
+  a full tuning dry run gave 247 of 247 score files bit-identical); resumed at `fc965cd` for every
+  later record. The stop, reason and both commits are in `results/breadth/run_log.txt`.
+- Both pre-flight checks passed at both starts: cached pictures equal fresh ones; MobileNetV3-Large
+  reproduces Stage 3's scores exactly on 64 test images.
+- Finished 2026-09-27 04:22:41, exit code 0, no model excluded. **266 of 266 records** (247 test, 19
+  conformal_calibration), no leftover `.tmp` files. 9 slow-step warnings (1.5–1.8x the estimate; none
+  at 2x); no disk stop.
+- FP32 sanity check (clean test top-1 within 1.0 point of torchvision's published top-1), all PASS:
+
+```
+sanity check PASS (mobilenet_v3_small): FP32 clean top-1 0.6761, torchvision 0.6767, tolerance 0.01
+sanity check PASS (shufflenet_v2_x1_0): FP32 clean top-1 0.6984, torchvision 0.6936, tolerance 0.01
+sanity check PASS (mnasnet1_0): FP32 clean top-1 0.7386, torchvision 0.7346, tolerance 0.01
+sanity check PASS (mobilenet_v2): FP32 clean top-1 0.7269, torchvision 0.7215, tolerance 0.01
+sanity check PASS (mobilenet_v3_large): FP32 clean top-1 0.7558, torchvision 0.7527, tolerance 0.01
+sanity check PASS (regnet_y_400mf): FP32 clean top-1 0.7611, torchvision 0.7580, tolerance 0.01
+sanity check PASS (efficientnet_b0): FP32 clean top-1 0.7798, torchvision 0.7769, tolerance 0.01
+sanity check PASS (resnet18): FP32 clean top-1 0.6987, torchvision 0.6976, tolerance 0.01
+sanity check PASS (resnet50): FP32 clean top-1 0.8118, torchvision 0.8086, tolerance 0.01
+sanity check PASS (convnext_tiny): FP32 clean top-1 0.8279, torchvision 0.8252, tolerance 0.01
+```
+
+- Checker after the sweep: `PASS: 909 of 909 result records pass the schema check; 42 of 42 build
+  records acceptable; 0 results use an unusable build`. Free disk after: 16.4 GB.
+
+**Task 4.1 analysis (27 September 2026).** Scripts committed at `1bcc63b` with a dated note fixing
+how the rules are computed (near-floor cells, absolute pass counts, rank ties), tried first on the
+64-image tuning dry run, then run once on the test split; no reruns.
+- Reliability (`scripts/31_breadth_reliability.py`, reported, not judged): 741 records (ECE, conformal
+  coverage with set size, E-AURC) from 247 test results, all checks PASS; `results/breadth_reliability/`.
+  Checker afterwards: `PASS: 1650 of 1650 result records pass the schema check`.
+- Verdicts (`scripts/32_judge_breadth.py`, 9 models; `results/final/breadth_4.1_verdicts.json`):
+  **H18a FAIL** (3 of 12 conditions, 8 needed), **H18b PASS** (8, 8 needed; a weak test), **H19 PASS**
+  (9, 6 needed), **H20 FAIL** (2 models, 5 needed), **H21 FAIL** (2, 5 needed), **H22 FAIL** (4, 5
+  needed). Numbers and intervals: `docs/hypotheses_stage4.md`, "H18–H22 outcome".
+- The only large extra gaps (H20, H21) are MobileNetV3-Large (contrast s3 −13.23, darkness s5 −11.60
+  points) and EfficientNet-B0 (−37.87, −38.94). MobileNetV3-Large reproduces Stage 3 exactly.
+
+**After the verdicts (27 September 2026).**
+- Calibration vs evaluation preprocessing (`scripts/33_calibration_preprocessing_check.py`): identical
+  for every model and INT8 build (bit-identical arrays on the 512 calibration images); no technical
+  failure.
+- New rule (dated note): any correlation from now on needs at least 6 models.
+- Exploratory H19 without MobileNetV3-Large and EfficientNet-B0 (`scripts/34_h19_without_two.py`):
+  1 condition with the interval above zero (9 with all models).
+
+**M2 (27 September 2026).** `scripts/35_m2_rounding_error.py` at `ed4f920` (the start at `b1397aa`
+crashed before measuring; logged). Check against `scripts/26`: PASS (largest difference 0.0050 dB).
+Tuning images 500–627. **M2a Percentile: REJECTS** (darkness and fog: 6 of 8 reject, 5 needed);
+**M2a default: INCONCLUSIVE** (darkness and fog; every E_early positive but below 3.0 dB);
+**M2b Percentile: SUPPORTS** (darkness and fog, 8 of 8). Numbers: `docs/hypotheses_stage4.md`,
+"M2 outcome".
+
+**Exploratory (done):** where the largest M2 extra rounding errors sit, `scripts/36_m2_top_tensors.py`
+(`results/checks/m2_top_tensors_*.json`). Plain-language summary of Stage 4: `docs/stage4_story.md`
+(updated after each result).
+
+**SE1 (27 September 2026).** `scripts/37_se1.py` at `126af6a`, tuning positions 64–4,999 (4,936
+images; the first 64 were seen in the dry run and left out). **FAIL:** keeping the
+squeeze-and-excitation blocks in float recovered 0% of EfficientNet-B0's darkness s5 extra gap
+(−37.82 points; change +0.08, interval −0.71 to +0.83) and 5% of MobileNetV3-Large's (−11.79; +0.59,
+−0.14 to +1.32); control RegNetY-400MF +0.10 (holds). Numbers: `docs/hypotheses_stage4.md`, "SE1
+outcome".
+
+### Research freeze (from 27 September 2026, until website v0 ships; also in `CLAUDE.md`)
+- No new research questions, diagnostics or hypotheses until website v0 ships. If a result raises a
+  new question, add it to "Parked questions" below and move on.
+- Task 4.2 may still run, overnight only, and only as pre-registered (in `docs/hypotheses_stage4.md`)
+  before it starts. H23 is parked (29 September 2026): not run during the freeze.
+- Work follows the Platform plan in `ROADMAP.md` (set by H, 30 September 2026; dates revised 1 October
+  2026): 1 labels (7 Oct), 2 catalog site and going public (10 Oct), 3 testing a user's model (16 Oct),
+  4 label submission, PyPI and quick start (19 Oct), 4b unlabelled mode (23 Oct), 5 hosted upload on
+  Hugging Face Spaces (29 Oct), 7 EEG/EMG pack (5 Nov); 6 Raspberry Pi 5 when the board arrives.
+  (Replaces "4.3, website v0, 4.5".)
+
+**Next.** See "Pick up here" at the top of this section (3 October 2026). The package is imported as
+`brokkr_edge` and published as `brokkr-edge`; the command is `brokkr-edge` (decided 30 September).
+
+### Parked questions (research freeze: written down, not pursued)
+- Where does the darkness and low-contrast collapse of EfficientNet-B0 and MobileNetV3-Large come
+  from? Not from extra early rounding error (M2a Percentile: REJECTS) and likely not from quantizing
+  the squeeze-and-excitation blocks (SE1: FAIL).
+- Why does MobileNetV3-Small's INT8 build fail (about 3% agreement with FP32), even with its
+  squeeze-and-excitation blocks in float?
+- Why is the largest per-tensor extra rounding error in RegNetY-400MF inside squeeze-and-excitation
+  blocks (up to +12.10 dB) while its accuracy barely suffers?
+- H23 (parked 29 September 2026; never written down or pre-registered): not run during the freeze.
+- Add severity 1 to label conditions (Phase B severity menu) so labels show where models still work
+  (H, 3 October 2026).
+- Why is RegNetY-400MF's INT8 slower than FP32 on this laptop? (H, 3 October 2026; its label says so
+  plainly.)
 
 ### Suggestions parked for later (not decided)
+- **After the merge (small):** a `.gitattributes` rule forcing LF line endings for label files (H, 3 October
+  2026); the label maker writes them with Windows line endings today.
+- **No Stage 5 research on damage-aware INT8 calibration** (decided by H, 3 October 2026): prior work
+  already tested it, mostly with negative results (Karimov et al., 2025, arXiv:2508.19600, object
+  detection; Brokkr's own H12 in Stage 3 also failed). Parked instead under Phase B: damage-aware
+  calibration as a cited recipe in `shrink --auto`.
+- Add a pin read-back check to the latency script (H, 3 October 2026; today the label states the pin
+  was not read back).
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
   dataset "research only" / "commercial use allowed" in `brokkr/datasets.py`.
 - Robust conformal for more INT8 variants (needs damage sweeps on `conformal_calibration`).
@@ -120,7 +410,7 @@ Intel Core i5-1235U laptop (Windows 11, CPU only). Accuracy and reliability are 
 - **Speed (rough, laptop only):** the CPU has fast "performance" and slow "efficiency" cores; unpinned,
   Windows moved the benchmark between them. What held up across runs: one performance core is about
   2x as fast as one efficiency core (FP32 7.50 vs 13.74 ms/image); FP16 is never faster; default INT8
-  is not reliably faster. Proper speed measurement waits for the Raspberry Pi 5 (Stage 5).
+  is not reliably faster. Proper speed measurement waits for the Raspberry Pi 5 (task 4.4).
 
 ### Stage 2: damaged images, and whether the model knows when it's wrong
 
@@ -205,13 +495,13 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | ruff + pytest in GitHub Actions; `.gitattributes` for LF endings; `requirements-lock.txt` | Code quality and reproducibility |
 | One branch per stage, merged to `main` when the stage is done | `main` always holds finished work |
 | No AI co-author lines in commits; commits use your GitHub noreply email | Your preference; privacy before going public |
-| Repository stays private for now; results page built locally | Your decision; publishing is on the "before going public" checklist |
+| Repository public (H's decision, confirmed 3 October 2026); results page still built locally | The site comes in Platform plan step 2 |
 
 ---
 
 ## 3. Where everything lives
 
-### Code (`brokkr/`)
+### Code (`brokkr_edge/`, called `brokkr/` before 30 September 2026)
 | File | What it does |
 |---|---|
 | `fingerprint.py` | Records machine, OS, core types, power, versions, git commit |
@@ -257,9 +547,16 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | `19_alarm_all_conditions.py` | Exploratory, after the verdicts: alarm firing rate for every test condition |
 | `20_robust_conformal_clean.py` | After the verdicts: robust thresholds' coverage and set size on clean test images |
 | `21_imagenetv2_summary.py` | ImageNetV2 (3.9): top-1 and coverage with set size, FP32 and best INT8 |
+| `31_breadth_reliability.py` | 4.1: `results/breadth_reliability/*_{calibration,conformal,selective}.json` |
+| `32_judge_breadth.py` | 4.1: `results/final/breadth_4.1_verdicts.json` (H18–H22) and the absolute vs compression-caused table |
+| `33_calibration_preprocessing_check.py` | Diagnostic: `results/checks/*_calibration_preprocessing.json` |
+| `34_h19_without_two.py` | Exploratory: `results/checks/breadth_4.1_h19_without_two_*.json` |
+| `35_m2_rounding_error.py` | M2: `results/m2/`, `results/final/m2_verdicts.json` (`--dry-run --out` for a tool check) |
+| `36_m2_top_tensors.py` | Exploratory: `results/checks/m2_top_tensors_*.json` |
+| `37_se1.py` | SE1: `results/se1/`, `results/final/se1_verdict.json` (`--dry-run --out` for a tool check) |
 | `run_stage1.py` | Reruns all of Stage 1 in one command |
 
-Tests: `tests/` (137 tests, run with `pytest`; style check `ruff check .`). One test uses the real
+Tests: `tests/` (233 tests on 27 September 2026, run with `pytest`; style check `ruff check .`). One test uses the real
 ImageNet data (skipped where it isn't downloaded): all split images are validation images, by their
 original ImageNet file names, and no two splits share an image.
 Docs: `docs/hypotheses.md` (Stage 2 predictions and outcomes), `docs/hypotheses_stage3.md` (Stage 3
@@ -311,11 +608,16 @@ images, so it is only used for the FP32 correctness check.
 
 1. ~~The 50,000-image correctness result isn't in `results/`.~~ Fixed 25 September 2026: rerun gave
    75.26% (95% CI 74.88–75.61%), torchvision publishes 75.27%, PASS; back on the results page.
-2. **Speed numbers are laptop-only and rough.** Real speed study is Stage 5 (Raspberry Pi 5).
-3. **The results page isn't published** (repository is private). See ROADMAP's "before going public".
+2. **Speed numbers are laptop-only and rough.** Real speed study is task 4.4 (Raspberry Pi 5).
+3. **The results page isn't published** (the repository is public since H's decision, confirmed 3 October
+   2026; the site comes in Platform plan step 2). See ROADMAP's "before going public".
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
-   accuracy script needs PyTorch installed. Move the model list to its own file before Stage 5.
+   accuracy script needs PyTorch installed. Move the model list to its own file (planned in task 4.3).
 5. ~~ImageNetV2 not downloaded yet.~~ Done in task 3.9 (licence recorded as the sources state it).
+6. **Stage 3 scripts 12, 14 and 15 need `scripts/08_corruption_sweep.py --split tuning` run first.**
+   The old unkeyed caches in `data/cache/` were deleted on 26 September 2026 to free disk space (with
+   `data/old_results_3.1_dirty/`); those scripts read the old tuning cache and stop with "not found"
+   until it is rebuilt.
 
 ---
 

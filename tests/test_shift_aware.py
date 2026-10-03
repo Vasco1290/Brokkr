@@ -5,8 +5,8 @@ from collections import Counter
 import numpy as np
 import pytest
 
-from brokkr.shift.alarm import alarm_threshold, consecutive_window_means, fires, random_window_means
-from brokkr.shift.robust_conformal import robust_calibration_plan
+from brokkr_edge.shift.alarm import alarm_threshold, consecutive_window_means, fires, random_window_means
+from brokkr_edge.shift.robust_conformal import robust_calibration_plan
 
 
 def test_alarm_fires_on_about_one_percent_of_clean_windows():

@@ -1,4 +1,4 @@
-"""Checks for brokkr.shift (the image corruptions shared with Argos)."""
+"""Checks for brokkr_edge.shift (the image corruptions shared with Argos)."""
 
 import ast
 import sys
@@ -7,8 +7,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from brokkr.shift import CORRUPTIONS, SEVERITIES, corrupt
-from brokkr.shift.corruptions import convolve, disc_kernel, line_kernel
+from brokkr_edge.shift import CORRUPTIONS, SEVERITIES, corrupt
+from brokkr_edge.shift.corruptions import convolve, disc_kernel, line_kernel
 
 
 def sample_image(seed: int = 0) -> np.ndarray:
@@ -87,7 +87,7 @@ def test_bad_inputs_are_refused():
 def test_package_is_self_contained():
     # Shared with Argos: may import only the standard library, numpy, PIL, and its own files.
     allowed = {"numpy", "PIL"}
-    for path in Path("brokkr/shift").glob("*.py"):
+    for path in Path("brokkr_edge/shift").glob("*.py"):
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             if isinstance(node, ast.Import):
                 roots = {alias.name.split(".")[0] for alias in node.names}
@@ -95,5 +95,5 @@ def test_package_is_self_contained():
                 roots = {node.module.split(".")[0]}
             else:
                 continue
-            assert "brokkr" not in roots, f"{path} imports from brokkr"
+            assert not {"brokkr", "brokkr_edge"} & roots, f"{path} imports from Brokkr"
             assert roots <= allowed | set(sys.stdlib_module_names), f"{path} imports {roots}"

@@ -36,8 +36,8 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.results import load_arrays
-from brokkr.shift import CORRUPTIONS
+from brokkr_edge.results import load_arrays
+from brokkr_edge.shift import CORRUPTIONS
 
 DATASET = "imagenet-1k-val"
 N_TEST, N_CLASSES = 10_000, 1000

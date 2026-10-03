@@ -2,6 +2,11 @@
 models/
 data/
 results/
+# Working labels (generated). Released labels are committed in published/labels/ (docs/label_schema.md,
+# note of 3 October 2026); anchored so that folder is not caught by this rule.
+/labels/
+# Original, full-size brand images (only the web-sized copies in docs/assets/ are committed)
+docs/assets/originals/
 *.onnx
 *.pt
 *.pth
@@ -224,3 +229,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Scratch notes (never results)
+scratch/

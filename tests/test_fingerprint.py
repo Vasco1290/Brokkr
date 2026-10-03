@@ -1,9 +1,9 @@
-"""Checks for brokkr.fingerprint."""
+"""Checks for brokkr_edge.fingerprint."""
 
 import json
 import re
 
-from brokkr.fingerprint import (
+from brokkr_edge.fingerprint import (
     ARM_FEATURES,
     X86_FEATURES,
     features_from_cpuinfo,
@@ -42,13 +42,13 @@ def test_power_state_has_valid_values():
 
 
 def test_missing_package_is_none_not_an_error():
-    versions = package_versions(("brokkr", "definitely-not-a-real-package-xyz"))
-    assert versions["brokkr"] is not None
+    versions = package_versions(("brokkr-edge", "definitely-not-a-real-package-xyz"))
+    assert versions["brokkr-edge"] is not None
     assert versions["definitely-not-a-real-package-xyz"] is None
 
 
 def test_parse_cpu_list():
-    from brokkr.fingerprint import parse_cpu_list
+    from brokkr_edge.fingerprint import parse_cpu_list
     assert parse_cpu_list("0-3,8\n") == [0, 1, 2, 3, 8]
     assert parse_cpu_list("5") == [5]
 

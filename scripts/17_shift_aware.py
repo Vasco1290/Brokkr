@@ -13,12 +13,12 @@ are RAW (no temperature).
 Robust conformal (FP32, FP16, default INT8; best INT8 as an extra analysis, dated 3.7 note): for
 each held-out corruption, the 5,000
 conformal_calibration images are one-third clean and two-thirds damaged with the four other
-corruptions at severities 1-5, balanced (brokkr.shift.robust_conformal, seed 9). The threshold is
+corruptions at severities 1-5, balanced (brokkr_edge.shift.robust_conformal, seed 9). The threshold is
 the same LAC threshold as Stage 2, only on these images. Check: for the models Stage 2 measured,
 the clean-only threshold recomputed here must equal Stage 2's saved one exactly.
 
 Alarm (every final-run model): threshold = 1st percentile of the average confidence of 10,000
-random windows of 100 clean tuning images (brokkr.shift.alarm, seed 4).
+random windows of 100 clean tuning images (brokkr_edge.shift.alarm, seed 4).
 
 Tool checks (not results): coverage on the calibration mix itself is at least 90%, and about 1% of
 the clean tuning windows fire. Coverage and alarm rates on the TEST split are measured in task 3.7.
@@ -32,13 +32,13 @@ from pathlib import Path
 
 import numpy as np
 
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.results import load_arrays, make_record, save_record
-from brokkr.shift import CORRUPTIONS
-from brokkr.shift.alarm import alarm_threshold, fires, random_window_means
-from brokkr.shift.conformal import conformal_threshold, evaluate_sets
-from brokkr.shift.reliability import confidence_and_correct, softmax
-from brokkr.shift.robust_conformal import robust_calibration_plan
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.results import load_arrays, make_record, save_record
+from brokkr_edge.shift import CORRUPTIONS
+from brokkr_edge.shift.alarm import alarm_threshold, fires, random_window_means
+from brokkr_edge.shift.conformal import conformal_threshold, evaluate_sets
+from brokkr_edge.shift.reliability import confidence_and_correct, softmax
+from brokkr_edge.shift.robust_conformal import robust_calibration_plan
 
 DATASET = "imagenet-1k-val"
 COVERAGE = 0.9

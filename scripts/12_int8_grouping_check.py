@@ -27,15 +27,21 @@ import numpy as np
 import onnx
 from onnx import numpy_helper
 
-from brokkr.accuracy import accuracy_from_logits, normalize, open_image, paired_bootstrap_diff, preprocess
-from brokkr.benchmark import make_session
-from brokkr.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
-from brokkr.export import MODELS, file_info
-from brokkr.fingerprint import machine_fingerprint
-from brokkr.quantize import CALIBRATION_BATCH as BATCH
-from brokkr.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
-from brokkr.quantize import INT8_METHODS, INT8_SETTINGS, to_int8
-from brokkr.results import load_arrays, make_record, save_arrays, save_record
+from brokkr_edge.accuracy import (
+    accuracy_from_logits,
+    normalize,
+    open_image,
+    paired_bootstrap_diff,
+    preprocess,
+)
+from brokkr_edge.benchmark import make_session
+from brokkr_edge.datasets import DATASETS, count_images, make_splits, parquet_files, read_parquet_images
+from brokkr_edge.export import MODELS, file_info
+from brokkr_edge.fingerprint import machine_fingerprint
+from brokkr_edge.quantize import CALIBRATION_BATCH as BATCH
+from brokkr_edge.quantize import CALIBRATION_GROUP_BATCHES as GROUP_BATCHES
+from brokkr_edge.quantize import INT8_METHODS, INT8_SETTINGS, to_int8
+from brokkr_edge.results import load_arrays, make_record, save_arrays, save_record
 
 DATASET = "imagenet-1k-val"
 
