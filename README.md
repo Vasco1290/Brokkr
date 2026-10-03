@@ -39,7 +39,7 @@ damaged ones?
 | "I'm not sure": calibration, prediction sets with their size, confidence ranking | works (`brokkr_edge/shift/`) |
 | Ten models, thirteen conditions, every result checked against a schema | done (`scripts/28`, `scripts/22`) |
 | Labels: `label.json`, a Markdown model card and an HTML page, checked against their sources | made for all ten models, not published yet (`scripts/39`, `scripts/40`) |
-| Speed (latency) by a fixed method for 19 builds | **not measured yet** (rough Stage 1 timings only, see [STATUS.md](STATUS.md)) |
+| Speed (latency) by a fixed method for 19 builds | measured on the laptop only (38 records: 1 and 4 threads; 7 flagged unstable), shown on the labels |
 | `brokkr-edge` command, PyPI package | **not built yet** |
 | Catalog website, testing your own model, hosted upload | **not built yet** (see [Roadmap](#roadmap)) |
 | Raspberry Pi 5 | **not measured**; waiting for the board |
@@ -73,14 +73,20 @@ Then it sorts each condition by what happened to the shrunk model, and why:
 - **Harmful, hurt by shrinking (FP32 copes, INT8 doesn't)** (2 of 12): darkness (Brokkr) s5, contrast (ImageNet-C) s3
 - **Harmful, cause unclear (FP32 is borderline)** (1 of 12): fog (ImageNet-C) s3
 
-"Harmful" means a whole 95% interval is below a line fixed before these results existed: coverage below 80%, or a damage drop (accuracy under the damage minus clean accuracy) below -10 points. "Not harmful in our tests" is not a guarantee.
+"Harmful" means a whole 95% interval is below a line whose value was written down before these results existed and adopted for the labels afterwards, unchanged: coverage below 80%, or a damage drop (accuracy under the damage minus clean accuracy) below -10 points. "Not harmful in our tests" is not a guarantee.
 
 A recipe that breaks a model is labelled as such: MobileNetV3-Small's INT8 build matched FP32's first answer on only 2.73% of 256 tuning images (a usable build needs at least 20%), so its label opens with "do not use this INT8 build".
 <!-- label-example:end -->
 
 Every harmful row of a label says which line it failed (accuracy, coverage or both) and carries a
-suggested next step, such as "try another recipe or model". The suggestions are general; they were not
-tested for the model.
+suggested next step that follows that line: "re-calibrate on your own images" where coverage failed,
+"try another recipe or model" or "consider a stronger model" where accuracy failed. The suggestions are
+general; they were not tested for the model.
+
+Each label also shows laptop latency (p50, p95, p99 and the spread between repeat runs) for both
+builds, at 1 and 4 threads, and INT8's time as a multiple of FP32's; where INT8 is slower, it says so.
+It is laptop latency only, never the speed of an edge device; the Raspberry Pi 5 rows say "not
+measured".
 
 The format is defined in [docs/label_schema.md](docs/label_schema.md). Every number in a label names
 the result file it came from, and `scripts/40_check_labels.py` recomputes each one.

@@ -12,10 +12,11 @@ tables script is not), and the work now follows the Platform plan: **step 1 (lab
 Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
 - **Branch `stage-4`**, pushed to origin; `main` is still at `be01206` (Stage 3). Working tree clean.
 - **Platform plan step 1 (labels), due 7 October** (`ROADMAP.md`, "Platform plan"):
-  - **Ten labels made** at the clean commit `753cdf1`, in `labels/` (gitignored): `python
-    scripts/39_make_labels.py` makes them, `python scripts/40_check_labels.py` checks every number
-    against its source (last result: PASS, 10 labels). Format: `docs/label_schema.md` and its dated
-    notes (30 September to 2 October). `scripts/42_label_tables.py` prints tables across the labels.
+  - **Ten labels made, with laptop speed rows**, at the clean commit `1e7b054` (3 October 2026), in
+    `labels/` (gitignored): `python scripts/39_make_labels.py` makes them, `python
+    scripts/40_check_labels.py` checks every number against its source (last result: PASS, 10 labels).
+    Format: `docs/label_schema.md` and its dated notes (30 September to 3 October).
+    `scripts/42_label_tables.py` prints tables across the labels.
   - **The README's label example is generated** by `scripts/41_readme_label_example.py` between the
     `label-example` markers; never edit that block by hand (`scripts/40` and a test check it).
   - **`brokkr-edge test`** (`brokkr_edge/test_run.py`, `brokkr_edge/cli.py`; built at `ca3d3b7`;
@@ -38,12 +39,12 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
   1. ~~H runs the laptop latency script~~ (done, above). The **website v0 plan** is drafted in
      `scratch/website_v0_plan.md` (gitignored, not committed); H decided its eight open points on 3
      October 2026 (plan section 9; summary under "H's website v0 decisions" below).
-  2. **Next session: H's fix list and H's latency-label decisions** (both below). First one dated
-     note covering both, then fixes 1–3 and 5, then the read-only check 4 with proposed wording left
-     uncommitted. Wording, advice and display only: no verdict, threshold, state or rule changes.
-  3. **Regenerate the labels with speed rows:** read `results/latency/` into the labels' speed rows
-     (today they say "not measured"), with H's latency-label decisions (below); regenerate the ten
-     labels from a clean commit, run `scripts/40`, update the README.
+  2. ~~H's fix list and H's latency-label decisions~~ (done 3 October 2026): dated notes at `e009759`
+     (with `docs/HANDOFF.md` removed), code at `310485e` and `1e7b054`. Fixes 1–3 and 5 done; check 4
+     done read-only, its proposed wording **waits for H** (not committed). Open for H: the "(proposed)"
+     points in the 3 October notes (`docs/hypotheses_stage4.md`, `docs/label_schema.md`).
+  3. ~~Regenerate the labels with speed rows~~ (done 3 October 2026, from `1e7b054`; `scripts/40`
+     PASS, 10 labels; README updated).
   4. **README and images task** (H sends it): generate the "What we have found so far" numbers from
      result records, checked locally by `scripts/40` the way label sources are; any number that cannot
      be generated becomes a link. Brand images are in `docs/assets/` (the favicon and logo are for the
@@ -51,7 +52,8 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      `main`** with a merge commit (like PRs #1–#3), merged before step 2 makes the repository public;
      then tag `stage-4-done` and start step 2 on a new branch. `gh` is not installed, so H opens the
      pull request on GitHub unless it is installed.
-- **H's fix list (received 3 October 2026; nothing started):**
+- **H's fix list (received 3 October 2026; done the same day except check 4's wording, which waits
+  for H):**
   1. **Next-step advice follows the line that actually failed**, for every verdict type, as a general
      rule with a test (not a special case for the row that raised it: ConvNeXt-Tiny, fog (ImageNet-C)
      s3, where the label says "consider a stronger model"). Show H the before/after for the affected
@@ -83,7 +85,8 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      findings).
   5. **Add to "Parked questions" below:** "Add severity 1 to label conditions (Phase B severity menu)
      so labels show where models still work."
-- **H's latency-label decisions (3 October 2026, after seeing the latency records; nothing started).**
+- **H's latency-label decisions (3 October 2026, after seeing the latency records; done the same day,
+  in the labels made at `1e7b054`).**
   Recorded in the next session's dated note before any code:
   - **a. Spread and "unstable" on the labels** (required by the 29 September method note; the
     renderer shows neither today): in plain words with the spread taken from the record, e.g. "Speed
@@ -124,17 +127,13 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      "(slower)" when INT8 is slower; N generated from the records; when either row is unstable, shown
      with the unstable flag and the plain-words note. **N = INT8's p50 divided by FP32's p50** (each
      the median across sessions, from the latency records), shown separately for 1 thread and 4
-     threads (decided by H, 3 October 2026); recorded in the next session's dated note.
+     threads (decided by H, 3 October 2026); recorded in the dated note of 3 October (`e009759`).
   6. Cores wording: decision c above.
   7. The roadmap page is generated from `ROADMAP.md`: phases and Now / Next / Later plus what is
      built; no dates on the website.
   8. Report 1: replace the "Related work" placeholder ("To be written by H") with "Related work: not
-     yet written; planned before the next report." `docs/HANDOFF.md`: H decided on 3 October 2026 to
-     remove it (`git rm`, no history rewrite), but only once everything in it is in a dated note. Two
-     items are not (found 3 October): the move of labels out of `results/` into `labels/` (decided by
-     H on 30 September; recorded only in commit `94f1b97` and `tests/test_label_location.py`), and the
-     model card's `license: other` metadata (a Checkpoint 1 point with no recorded decision). Waiting
-     for H.
+     yet written; planned before the next report." `docs/HANDOFF.md`: removed on 3 October 2026
+     (`e009759`) after its two unrecorded items went into the dated note of that day.
 - **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
   keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
   commits; H writes the review notes.
@@ -321,8 +320,14 @@ outcome".
 - Why is the largest per-tensor extra rounding error in RegNetY-400MF inside squeeze-and-excitation
   blocks (up to +12.10 dB) while its accuracy barely suffers?
 - H23 (parked 29 September 2026; never written down or pre-registered): not run during the freeze.
+- Add severity 1 to label conditions (Phase B severity menu) so labels show where models still work
+  (H, 3 October 2026).
+- Why is RegNetY-400MF's INT8 slower than FP32 on this laptop? (H, 3 October 2026; its label says so
+  plainly.)
 
 ### Suggestions parked for later (not decided)
+- Add a pin read-back check to the latency script (H, 3 October 2026; today the label states the pin
+  was not read back).
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
   dataset "research only" / "commercial use allowed" in `brokkr/datasets.py`.
 - Robust conformal for more INT8 variants (needs damage sweeps on `conformal_calibration`).

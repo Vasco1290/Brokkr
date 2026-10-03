@@ -111,8 +111,10 @@ def check_speed(label: dict, builds_by_id: dict) -> list:
             problems.append(f"{where}: thread count differs, or {path} is from uncommitted code")
         if record["derived_from"][0]["sha256"] != builds_by_id[s["build_id"]]["file"]["sha256"]:
             problems.append(f"{where}: {path} timed another file than this build")
-        rt = runtimes.get(s["runtime_id"])
-        if rt is None or rt["sources"][0]["file"] != path.as_posix():
+        rt, own = runtimes.get(s["runtime_id"]), record["runtime"]
+        fields = ("name", "version", "execution_provider", "threads", "intra_op_threads", "inter_op_threads",
+                  "spinning", "graph_optimisation")
+        if rt is None or any(rt[k] != own.get(k) for k in fields):
             problems.append(f"{where}: its runtime is not the one its latency record states")
         measured[(builds_by_id[s["build_id"]]["role"], threads)] = s
     for (role, threads), s in measured.items():
