@@ -1257,3 +1257,19 @@ unchanged. No latency has been measured: on 3 October the script was run once in
 - **Which physical core each pinned CPU is** is read at run time (`brokkr_edge.fingerprint.physical_cores`)
   and stored in every record.
 - **Started by H only.** The real run is started by H, at the desk, overnight.
+
+## Reproduction outcome (added 3 October 2026, after the run)
+
+`scripts/43_check_reproduction.py` at the clean commit `0aa9e0d`, on mains power. The first attempt
+was cut off by the assistant session's time limit after step 1 and 4 of the 28 records; H ran the same
+command again in a terminal, which kept those and made the rest (the script is resumable; no record
+was redone).
+- **Step 1: repeatable.** INT8 on clean tuning images 0–63, two separate runs: identical bit for bit
+  (and all 26 score files of the dry run, every condition and both builds). So the rule for step 2 was
+  "identical top-1 predictions on every image".
+- **Step 2: PASS, 28 of 28 records.** Every record has the same images in the same order and identical
+  top-1 predictions as its 4.1 record. Reported, not judged: all 28 score files are identical bit for
+  bit (largest score difference 0). All 28 new records pass the schema check, come from the clean
+  commit and state the same build settings. Record: `results/reproduction/reproduction_check.json`.
+- `scripts/22_check_results.py` afterwards: PASS, 1863 of 1863 result records (the 54 new ones
+  included).
