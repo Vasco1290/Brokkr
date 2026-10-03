@@ -1,7 +1,7 @@
 # Stage 4 so far, in plain words
 
-*Last updated 27 September 2026, after the squeeze-and-excitation test (SE1). Every
-number here was measured on one Windows laptop; details and exact rules are in
+*Last updated 3 October 2026 (findings wording approved by H; numbers generated from the 4.1 records and
+the labels). Every number here was measured on one Windows laptop; details and exact rules are in
 [hypotheses_stage4.md](hypotheses_stage4.md).*
 
 ## The starting point
@@ -35,11 +35,25 @@ shrunk version (MobileNetV3-Small) broke completely when shrunk, so it was studi
 - *If shrinking hurts a model a little on clean photos, does it also hurt it more under damage?* Yes,
   in 9 of 12 kinds of damage (6 needed). **Confirmed.** But a later check showed this rests mostly on
   two models: without them, it holds in only 1.
-- *Is the darkness collapse common?* No. Only 2 of 9 models lose much more to darkness when shrunk:
-  EfficientNet-B0 (39 points more) and MobileNetV3-Large (12 points). The other seven lose at most
-  about 2 points. Low contrast looks similar: the same two models stand out (38 and 13 points more),
-  ConvNeXt-Tiny loses 4 points more, and the rest at most 2. **Not confirmed** (we had predicted at
-  least 5 of 9 for each).
+- *Is the collapse common?* Not in our pre-registered test. (9 models, 10,000 test images.) The two
+  predictions about collapse were judged at two conditions only, darkness (Brokkr) s5 (H21) and contrast
+  (ImageNet-C) s3 (H20). In each, 2 of 9 models lost much more to shrinking under the damage than on
+  clean images (MobileNetV3-Large and EfficientNet-B0); we had predicted at least 5, so both are FAIL.
+  Clean accuracy and how much shrinking cost under damage showed no strong relation (H18b: PASS, 8 of 11
+  judged conditions, 8 needed; a weak test with 9 models). For example, MobileNetV3-Large's shrunk build
+  scores 73.60% on clean images, 2.0 points below its full-precision build, but 13.6 points below it
+  under darkness (Brokkr) s5.
+
+  *Looking wider (exploratory, not pre-registered):* Across all 12 damaged conditions on the labels, 6
+  of the 9 usable shrunk builds have at least one condition with a large shrinking cost (the whole
+  interval more than 5.0 points below the full-precision build). Besides MobileNetV3-Large and
+  EfficientNet-B0, this includes ConvNeXt-Tiny, MobileNetV2, RegNetY-400MF and ResNet-50. The condition
+  hitting the most models is contrast (ImageNet-C) s5 (6 models). Exploratory, not pre-registered: large
+  shrinking costs appeared in 19 of 51 usable build-condition pairs under darkness, fog and low
+  contrast, against 3 of 43 under noise and blur (worst extra gap 38.9 vs 8.8 points; near-floor cells
+  excluded). The median build's extra loss was under 5.0 points in every condition except contrast
+  (ImageNet-C) s5 (14.0 points). Our conditions did not include impulse noise, which Xiao et al. found
+  hit quantized models most.
 
 **3. Was it a set-up mistake?** Before trusting these numbers we checked that each shrunk model was
 tuned on photos prepared exactly like the photos it was tested on. They were identical, to the last
@@ -75,8 +89,11 @@ collapse is still unknown.
 
 ## The main lesson so far
 
-Shrinking usually costs little, even on damaged photos, but a few models collapse under darkness
-and low contrast. A model's accuracy on clean photos does not predict which ones. How much a model
-loses when shrunk, measured on clean photos, does go together with how much it loses under damage,
-but mostly because of the two collapsing models: without them the link almost disappears. So it is
-not an established warning sign, and each model has to be tested under the conditions it will meet.
+Consistent with prior work on quantized models (Xiao et al., 2023, arXiv:2304.03968; Yaghoubi Araghi et
+al., 2026, 4-bit, arXiv:2607.18540), we found that shrunk models can pass a normal accuracy check and
+still collapse in dark or low-contrast images, and in our small pre-registered test, clean accuracy
+didn't predict which. In wider exploratory checks, which models were hit varied with the condition, and
+fog hit some models too. How much a model loses when shrunk, measured on clean photos, does go together
+with how much it loses under damage, but mostly because of the two collapsing models: without them the
+link almost disappears. So it is not an established warning sign, and each model has to be tested under
+the conditions it will meet.

@@ -120,10 +120,31 @@ predictions and outcomes: [docs/hypotheses_stage4.md](docs/hypotheses_stage4.md)
 - Ten torchvision models, 13 conditions, 266 checked result records. All ten full-precision models
   scored within one point of their published accuracy. Nine INT8 builds were usable; one
   (MobileNetV3-Small) broke.
-- Of six predictions committed before measuring, 2 passed and 4 failed. The darkness collapse is not
-  common: only 2 of the 9 models lose much more to darkness when shrunk (we had predicted at least 5).
-- The tests of *why* it happens have not found the cause: each was inconclusive or rejected our
-  guess. The question is still open, and research is paused until the labels and the website ship.
+- Consistent with prior work on quantized models (Xiao et al., 2023, arXiv:2304.03968; Yaghoubi Araghi
+  et al., 2026, 4-bit, arXiv:2607.18540), we found that shrunk models can pass a normal accuracy check
+  and still collapse in dark or low-contrast images, and in our small pre-registered test, clean
+  accuracy didn't predict which. In wider exploratory checks, which models were hit varied with the
+  condition, and fog hit some models too.
+- Pre-registered (Stage 4, 9 models, 10,000 test images; verdicts unchanged): the two predictions about
+  collapse were judged at two conditions only, darkness (Brokkr) s5 (H21) and contrast (ImageNet-C) s3
+  (H20). In each, 2 of 9 models lost much more to shrinking under the damage than on clean images
+  (MobileNetV3-Large and EfficientNet-B0); we had predicted at least 5, so both are FAIL. Clean accuracy
+  and how much shrinking cost under damage showed no strong relation (H18b: PASS, 8 of 11 judged
+  conditions, 8 needed; a weak test with 9 models).
+- For example, MobileNetV3-Large's shrunk build scores 73.60% on clean images, 2.0 points below its
+  full-precision build, but 13.6 points below it under darkness (Brokkr) s5.
+- Exploratory, not pre-registered: across all 12 damaged conditions on the labels, 6 of the 9 usable
+  shrunk builds have at least one condition with a large shrinking cost (the whole interval more than
+  5.0 points below the full-precision build). Besides MobileNetV3-Large and EfficientNet-B0, this
+  includes ConvNeXt-Tiny, MobileNetV2, RegNetY-400MF and ResNet-50. The condition hitting the most
+  models is contrast (ImageNet-C) s5 (6 models).
+- Exploratory, not pre-registered: large shrinking costs appeared in 19 of 51 usable build-condition
+  pairs under darkness, fog and low contrast, against 3 of 43 under noise and blur (worst extra gap 38.9
+  vs 8.8 points; near-floor cells excluded). The median build's extra loss was under 5.0 points in every
+  condition except contrast (ImageNet-C) s5 (14.0 points). Our conditions did not include impulse noise,
+  which Xiao et al. found hit quantized models most.
+- The tests of *why* it happens have not found the cause: each was inconclusive or rejected our guess.
+  The question is parked while the labels and the website ship.
 
 ## How we measure
 
