@@ -15,7 +15,8 @@ DEVICE_KINDS = ("laptop", "raspberry-pi-5", "cloud-arm")
 BUILD_ROLES = ("reference", "labelled")
 BUILD_STATUSES = ("usable", "failed")
 STATES = ("not harmful", "harmful", "borderline", "not tested", "INT8 build failed")
-SHRINKING_COST_FLAGS = (None, "large shrinking cost", "not informative")
+# A row lists each shrinking-cost flag that applies, in this order (note of 3 October 2026).
+SHRINKING_COST_FLAGS = ("large shrinking cost", "not informative")
 # Summary: lines by the labelled build's own state, harmful ones also by cause (second note of 30
 # September 2026 in docs/label_schema.md; the rule is brokkr_edge.label).
 HARM_CAUSES = ("too hard for this model", "hurt by shrinking", "cause unclear")
@@ -40,6 +41,7 @@ REQUIRED_KEYS = (
     "model",
     "builds",
     "hardware",
+    "runtimes",
     "datasets",
     "conditions",
     "checks",
@@ -49,8 +51,12 @@ REQUIRED_KEYS = (
     "speed",
     "details",
     "limits",
+    "licences",
     "sources",
 )
+LICENCE_FIELDS = ("brokkr_code", "model_code", "model_weights", "label_data")  # each must be non-empty
+# What a measured laptop speed row copies from its latency record (note of 3 October 2026).
+SPEED_FIELDS = ("p50_ms", "p95_ms", "p99_ms", "spread_pct", "unstable_above_pct")
 ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9_.:/@#-]*$")
 ABSOLUTE_PATH = re.compile(r"^([A-Za-z]:)?[/\\]")  # a path from this machine: "C:/...", "/home/..."
 
@@ -80,6 +86,12 @@ def dataset_id(publisher: str, dataset: str, split: str) -> str:
 
 def condition_id(suite: str | None, damage: str, severity: int | None) -> str:
     return "clean" if damage == "clean" else f"{slug(suite)}/{slug(damage)}/{severity}"
+
+
+def runtime_id(name: str, version: str, provider: str, threads: int, spinning: str) -> str:
+    """e.g. onnxruntime@1.23.2:cpuexecutionprovider:4t:spin-on (spinning as a record states it: "on ...")."""
+    spin = "on" if str(spinning).startswith("on") else "off"
+    return f"{slug(name)}@{version}:{slug(provider)}:{int(threads)}t:spin-{spin}"
 
 
 def _finite(x) -> bool:
@@ -155,6 +167,18 @@ def check_label(label: dict) -> list:
             problems.append(
                 f"hardware {h.get('hardware_id')!r}: needs a valid ID and a kind in {DEVICE_KINDS}"
             )
+        if "runtime" in h:
+            problems.append(f"hardware {h.get('hardware_id')!r}: runtime belongs in 'runtimes', not here")
+    runtimes = {r.get("runtime_id"): r for r in label["runtimes"]}
+    for r in label["runtimes"]:
+        if not ID_PATTERN.match(str(r.get("runtime_id", ""))) or not (r.get("name") and r.get("version")):
+            problems.append(f"runtime {r.get('runtime_id')!r}: needs a valid ID, a name and a version")
+        problems += _check_sources(r.get("sources"), f"runtime {r.get('runtime_id')}")
+    licences = label["licences"]
+    if not all(licences.get(k) for k in LICENCE_FIELDS):
+        problems.append(f"licences: each of {LICENCE_FIELDS} must be stated (hard rule 8)")
+    else:
+        problems += _check_sources(licences.get("sources"), "licences")
     datasets = {d.get("dataset_id"): d for d in label["datasets"]}
     for d in label["datasets"]:
         if not d.get("licence"):
@@ -174,8 +198,11 @@ def check_label(label: dict) -> list:
             or m.get("dataset_id") not in datasets
             or m.get("condition_id") not in conditions
             or m.get("hardware_id") not in hardware
+            or m.get("runtime_id") not in runtimes
         ):
-            problems.append(f"{where}: refers to a build, dataset, condition or hardware not in the label")
+            problems.append(
+                f"{where}: refers to a build, dataset, condition, hardware or runtime not in the label"
+            )
         elif builds[m["build_id"]].get("status") == "failed":
             problems.append(f"{where}: a failed build has no measurements")
         ci = m.get("ci95")
@@ -200,8 +227,12 @@ def check_label(label: dict) -> list:
     for row in label["envelope"].get("rows", []):
         if row.get("state") not in STATES:
             problems.append(f"envelope row {row.get('condition_id')}: unknown state {row.get('state')!r}")
-        if row.get("shrinking_cost_flag") not in SHRINKING_COST_FLAGS:
-            problems.append(f"envelope row {row.get('condition_id')}: unknown flag")
+        flags = row.get("shrinking_cost_flags")
+        if not isinstance(flags, list) or flags != [f for f in SHRINKING_COST_FLAGS if f in flags]:
+            problems.append(
+                f"envelope row {row.get('condition_id')}: shrinking_cost_flags must be a list from "
+                f"{SHRINKING_COST_FLAGS}, in that order"
+            )
         if row.get("build_id") not in builds or row.get("condition_id") not in conditions:
             problems.append(
                 f"envelope row {row.get('condition_id')}: refers to an unknown build or condition"
@@ -245,7 +276,7 @@ def check_label(label: dict) -> list:
     ]
     expected = {  # the three counts that open the label, each in row order
         "large_shrinking_cost": [
-            r for r in labelled_rows if r.get("shrinking_cost_flag") == "large shrinking cost"
+            r for r in labelled_rows if "large shrinking cost" in (r.get("shrinking_cost_flags") or [])
         ],
         "reference_harmful": [r for r in reference_rows if r.get("state") == "harmful"],
         "coverage_failed": [r for r in labelled_rows if "coverage" in r.get("failed", [])],
@@ -261,15 +292,26 @@ def check_label(label: dict) -> list:
                 f"speed row {s.get('build_id')}: needs a known build and a status in {SPEED_STATUSES}"
             )
         elif s["status"] == "measured":
-            if s.get("hardware_id") not in hardware or not all(
-                _finite(s.get(k)) for k in ("p50_ms", "p95_ms", "p99_ms")
+            where = f"speed row {s.get('build_id')} ({(s.get('settings') or {}).get('threads')} threads)"
+            if (
+                s.get("hardware_id") not in hardware
+                or s.get("runtime_id") not in runtimes
+                or not all(_finite(s.get(k)) for k in SPEED_FIELDS)
+                or not isinstance(s.get("unstable"), bool)
             ):
                 problems.append(
-                    f"speed row {s.get('build_id')}: a measured row needs its hardware and p50/p95/p99"
+                    f"{where}: a measured row needs its hardware, runtime, {SPEED_FIELDS} and 'unstable'"
                 )
-            problems += _check_sources(s.get("sources"), f"speed row {s.get('build_id')}")
-        elif not s.get("reason"):
-            problems.append(f"speed row {s.get('build_id')}: 'not measured' needs a reason")
+            elif s["unstable"] != (s["spread_pct"] > s["unstable_above_pct"]):
+                problems.append(f"{where}: 'unstable' must say whether the spread is above its line")
+            ratio = s.get("time_vs_reference")
+            if ratio is not None and (
+                not _finite(ratio.get("ratio_p50")) or ratio.get("slower") != (ratio["ratio_p50"] > 1)
+            ):
+                problems.append(f"{where}: time_vs_reference needs a ratio, and 'slower' means above 1")
+            problems += _check_sources(s.get("sources"), where)
+        elif not s.get("reason") or s.get("runtime_id") is not None:
+            problems.append(f"speed row {s.get('build_id')}: 'not measured' needs a reason and no runtime")
     if not label["sources"]:
         problems.append("the label lists no source files")
     else:

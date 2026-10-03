@@ -9,8 +9,9 @@ the checked records and pass the numbers in, so the same rules serve images, sig
 - Envelope state of a build in a condition, from its coverage interval and damage-drop interval:
   "not harmful" if coverage's lower end >= 80% and the drop's lower end >= -10 points;
   "harmful" if coverage's upper end < 80% or the drop's upper end < -10 points; otherwise "borderline".
-- Shrinking-cost flag: "not informative" if FP32 top-1 under the condition is below 10%; else "large
-  shrinking cost" if the whole interval is below -5 points.
+- Shrinking-cost flags, each that applies (note of 3 October 2026: one never hides the other):
+  "large shrinking cost" if the whole interval is below -5 points; "not informative" if FP32 top-1
+  under the condition is below 10%.
 - Failed lines of a harmful row: which whole interval is below its line ("damage drop", "coverage").
 - Summary (docs/label_schema.md, second note of 30 September 2026): the labelled build's conditions by
   its own state, harmful ones by cause (see harm_cause()), and every large shrinking cost named.
@@ -81,12 +82,14 @@ def envelope_state(coverage_ci: list, drop_ci: list, rule: dict = ENVELOPE_RULE)
     return "borderline", [f"{name} interval straddles its line" for name in straddles]
 
 
-def shrinking_cost_flag(cost_ci: list, fp32_top1: float, rule: dict = ENVELOPE_RULE) -> str | None:
-    if fp32_top1 < rule["near_floor_fp32_top1_below"]:
-        return "not informative"
+def shrinking_cost_flags(cost_ci: list, fp32_top1: float, rule: dict = ENVELOPE_RULE) -> list:
+    """Every flag that applies, in a fixed order; both when both apply, so neither hides the other."""
+    flags = []
     if cost_ci[1] < rule["large_shrinking_cost_below"]:
-        return "large shrinking cost"
-    return None
+        flags.append("large shrinking cost")
+    if fp32_top1 < rule["near_floor_fp32_top1_below"]:
+        flags.append("not informative")
+    return flags
 
 
 def harm_cause(reference_state: str) -> str:
@@ -137,7 +140,7 @@ def summary(rows: list, labelled_build_id: str) -> dict:
         "tested_conditions": len(own),
         "lines": lines,
         "large_shrinking_cost": _counted(
-            [r["condition_id"] for r in own if r.get("shrinking_cost_flag") == "large shrinking cost"]
+            [r["condition_id"] for r in own if "large shrinking cost" in r.get("shrinking_cost_flags", [])]
         ),
         "reference_harmful": _counted(
             [

@@ -1,19 +1,21 @@
-"""Make the P1 labels from the 4.1 records (no model is run).
+"""Make the P1 labels from the 4.1 records and the laptop latency records (no model is run).
 
 Usage:  python scripts/39_make_labels.py [--models mobilenet_v3_large mobilenet_v3_small]
                                          [--out labels]
 Needs:  the 4.1 test and conformal_calibration records with their scores (results/breadth), their
-        reliability records (results/breadth_reliability), the build records (models/), and
-        brokkr_edge/model_list.json
+        reliability records (results/breadth_reliability), the laptop latency records with their timings
+        (results/latency), the build records (models/), and brokkr_edge/model_list.json
 Writes: <out>/<model>/label.json (the only source), label.md (Hugging Face model card) and label.html
 
-Rules (docs/label_schema.md; docs/hypotheses_stage4.md, notes of 29-30 September 2026):
+Rules (docs/label_schema.md; docs/hypotheses_stage4.md, notes of 29 September to 3 October 2026):
 - Every input record must pass the schema check and come from a clean commit, or the label is refused.
 - One label per shrunk build (the 4.1 Percentile INT8), with FP32 beside it. A failed INT8 build gives
   a label whose INT8 rows say "INT8 build failed", with the reason from its build record.
 - Every number is copied from a record field, or computed from saved scores (damage drop, shrinking
-  cost: paired bootstrap, 1,000 resamples, seed 0), and names its source file, checksum and field.
-- Speed rows say "not measured" until the P1 latency run; the Raspberry Pi 5 row until a Pi exists.
+  cost: paired bootstrap, 1,000 resamples, seed 0) or from two copied numbers (INT8's p50 over FP32's),
+  and names its source file, checksum and field.
+- Laptop speed rows come from the latency records; the Raspberry Pi 5 rows say "not measured".
+- The licence section comes from the build records (note of 3 October 2026, point 6).
 """
 
 import argparse
@@ -32,7 +34,7 @@ from brokkr_edge.label import (
     envelope_state,
     failed_lines,
     paired,
-    shrinking_cost_flag,
+    shrinking_cost_flags,
     summary,
 )
 from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
@@ -43,6 +45,7 @@ from brokkr_edge.label_schema import (
     dataset_id,
     hardware_id,
     model_id,
+    runtime_id,
 )
 from brokkr_edge.model_list import MODEL_LIST_FILE, load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
@@ -72,6 +75,9 @@ CONDITIONS = (
     ]
 )
 SANITY_TOLERANCE = 0.010  # FP32 clean top-1 within 1.0 point of torchvision's published top-1 (4.1 rule)
+THREAD_COUNTS = (1, 4)  # the laptop latency method's thread counts (note of 29 September 2026)
+BROKKR_CODE_LICENCE = "Apache-2.0"
+LABEL_DATA_LICENCE = "CC BY 4.0"
 RELIABILITY = {
     "coverage": ("conformal", "coverage"),
     "mean_set_size": ("conformal", "mean_set_size"),
@@ -118,6 +124,28 @@ def checked(path: Path) -> tuple:
     return record, arrays
 
 
+def runtime_entry(record: dict, path: Path) -> dict:
+    """One `runtimes` entry from a record's runtime block (docs/label_schema.md, note of 3 October 2026)."""
+    rt = record["runtime"]
+    return {
+        "runtime_id": runtime_id(rt["name"], rt["version"], rt["execution_provider"], rt["threads"],
+                                 rt.get("spinning", "")),
+        "name": rt["name"],
+        "version": rt["version"],
+        "execution_provider": rt["execution_provider"],
+        "threads": rt["threads"],
+        "intra_op_threads": rt.get("intra_op_threads"),
+        "inter_op_threads": rt.get("inter_op_threads"),
+        "spinning": rt.get("spinning"),
+        "graph_optimisation": rt.get("graph_optimisation"),
+        "sources": [source(path, "runtime")],
+    }
+
+
+def utc(seconds: float) -> str:
+    return datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc).isoformat(timespec="seconds")
+
+
 def write(path: Path, text: str) -> None:
     tmp = path.with_name(path.name + ".tmp")
     tmp.write_text(text, encoding="utf-8")
@@ -131,7 +159,7 @@ def make_label(model: str) -> dict:
     mid = model_id(entry["publisher"], model, entry["weights"])
 
     # Builds.
-    builds, status = {}, {}
+    builds, status, build_records = {}, {}, {}
     for role, precision in PRECISIONS.items():
         path = Path("models") / f"{model}_{precision}.json"
         build = json.loads(path.read_text(encoding="utf-8"))
@@ -139,6 +167,7 @@ def make_label(model: str) -> dict:
         if problems:
             sys.exit(f"REFUSED: {path}: {problems}")
         note(path, "brokkr_edge.schema.check_build_record")
+        build_records[role] = (path, build)
         onnx_file = Path("models") / f"{model}_{precision}.onnx"
         if sha256_of(onnx_file) != build["file"]["sha256"]:
             sys.exit(f"REFUSED: {onnx_file} does not match its build record")
@@ -222,7 +251,10 @@ def make_label(model: str) -> dict:
     if test_positions & set(cal_arrays["positions"].tolist()):
         sys.exit("REFUSED: calibration and test images overlap")
     hw_id = hardware_id("laptop", fp["cpu_model"], f"{fp['os']} {fp['os_release']}")
-    runtime = ref_clean["runtime"]
+    accuracy_runtime = runtime_entry(ref_clean, ref_clean_path)
+    for path, record in list(acc.values()) + [(p, r) for p, r in rel.values()]:
+        if record.get("runtime") and record["runtime"] != ref_clean["runtime"]:
+            sys.exit(f"REFUSED: {path} was run with another runtime set-up")
     hardware = [
         {
             "hardware_id": hw_id,
@@ -232,15 +264,10 @@ def make_label(model: str) -> dict:
             "architecture": fp.get("architecture"),
             "cores": {"types": fp.get("core_types"), "map": None},
             "features": (fp.get("cpu_features") or {}).get("features"),
-            "runtime": {
-                "name": runtime["name"],
-                "version": runtime["version"],
-                "execution_provider": runtime["execution_provider"],
-                "threads": runtime["threads"],
-            },
             "fingerprint_source": source(ref_clean_path, "device.fingerprint"),
         }
     ]
+    runtimes = [accuracy_runtime]
 
     test_id = dataset_id("imagenet", DATASET, "test")
     cal_id = dataset_id("imagenet", DATASET, "conformal_calibration")
@@ -288,6 +315,7 @@ def make_label(model: str) -> dict:
                 "dataset_id": test_id,
                 "condition_id": cid,
                 "hardware_id": hw_id,
+                "runtime_id": accuracy_runtime["runtime_id"],
                 "value": value,
                 "ci95": ci,
                 "n_items": n,
@@ -376,17 +404,17 @@ def make_label(model: str) -> dict:
                         "state": "INT8 build failed",
                         "why": [f"build check failed: {f['check']}"],
                         "failed": [],
-                        "shrinking_cost_flag": None,
+                        "shrinking_cost_flags": [],
                     }
                 )
                 continue
             coverage_ci = index[("coverage", bid, cid)]["ci95"]
             drop_ci = index[("damage_drop", bid, cid)]["ci95"]
             state, why = envelope_state(coverage_ci, drop_ci)
-            flag = None
+            flags = []
             if role == "labelled":
                 fp32_top1 = index[("top1", builds["reference"]["build_id"], cid)]["value"]
-                flag = shrinking_cost_flag(index[("shrinking_cost", bid, cid)]["ci95"], fp32_top1)
+                flags = shrinking_cost_flags(index[("shrinking_cost", bid, cid)]["ci95"], fp32_top1)
             rows.append(
                 {
                     "build_id": bid,
@@ -395,39 +423,108 @@ def make_label(model: str) -> dict:
                     "state": state,
                     "why": why,
                     "failed": failed_lines(coverage_ci, drop_ci),
-                    "shrinking_cost_flag": flag,
+                    "shrinking_cost_flags": flags,
                 }
             )
 
-    # Speed: not measured yet.
-    speed = []
-    for role in ("reference", "labelled"):
-        reason_laptop = (
-            "INT8 build failed"
-            if status[role] != "usable"
-            else "the P1 laptop latency run has not been done yet"
-        )
-        for threads in (1, 4):
-            speed.append(
-                {
-                    "build_id": builds[role]["build_id"],
-                    "hardware_id": hw_id,
-                    "hardware_kind": "laptop",
-                    "status": "not measured",
-                    "reason": reason_laptop,
-                    "settings": {"threads": threads},
-                }
-            )
+    # Speed: laptop rows from the latency records (note of 3 October 2026), Raspberry Pi 5 not measured.
+    speed, latency = [], {}
+    for role, precision in PRECISIONS.items():
+        for threads in THREAD_COUNTS:
+            if status[role] != "usable":
+                speed.append({"build_id": builds[role]["build_id"], "hardware_id": hw_id,
+                              "hardware_kind": "laptop", "runtime_id": None, "status": "not measured",
+                              "reason": "INT8 build failed", "settings": {"threads": threads}})
+                continue
+            path = Path("results/latency") / f"{model}_{precision}_laptop_{threads}threads.json"
+            record, arrays = checked(path)
+            f, s = record["device"]["fingerprint"], record["settings"]
+            if (f["cpu_model"], f["os"], f["os_release"]) != (fp["cpu_model"], fp["os"], fp["os_release"]):
+                sys.exit(f"REFUSED: {path} was timed on another machine")
+            if record.get("derived_from", [{}])[0].get("sha256") != builds[role]["file"]["sha256"]:
+                sys.exit(f"REFUSED: {path} timed another file than the labelled build")
+            if s["pinned_cpus"] != f["core_types"]["performance"]:
+                sys.exit(f"REFUSED: {path} was not pinned to the performance cores its fingerprint lists")
+            rt = runtime_entry(record, path)
+            if rt["runtime_id"] not in {r["runtime_id"] for r in runtimes}:
+                runtimes.append(rt)
+            physical = sorted({s["physical_core_of_each_cpu"][str(c)] for c in s["pinned_cpus"]})
+            m = record["metrics"]
+            row = {
+                "build_id": builds[role]["build_id"],
+                "hardware_id": hw_id,
+                "hardware_kind": "laptop",
+                "runtime_id": rt["runtime_id"],
+                "status": "measured",
+                "reason": None,
+                "settings": {"threads": threads, "batch": s["batch"], "input": s["input"],
+                             "what_is_timed": s["what_is_timed"]},
+                "p50_ms": m["p50_ms"]["value"],
+                "p95_ms": m["p95_ms"]["value"],
+                "p99_ms": m["p99_ms"]["value"],
+                "spread_pct": m["spread_pct"]["value"],
+                "unstable": s["unstable"],
+                "unstable_above_pct": s["unstable_above_pct"],
+                "sessions": s["sessions"],
+                "warmup_runs": s["warmup_runs"],
+                "timed_runs": s["timed_runs"],
+                "discarded_sessions": len(s["discarded_sessions"]),
+                "timed_utc": {"first_start": utc(float(arrays["run_starts"].min())),
+                              "last_end": utc(float(arrays["run_ends"].max()))},
+                "pinning": {"logical_cpus": s["pinned_cpus"], "physical_cores": physical,
+                            "n_logical": len(s["pinned_cpus"]), "n_physical": len(physical),
+                            "core_kind": "performance", "reported_by": f["os"], "read_back": False},
+                "vnni": s["vnni"]["text"],
+                "sources": [source(path, f"metrics.{k}.value")
+                            for k in ("p50_ms", "p95_ms", "p99_ms", "spread_pct")]
+                + [source(path, k) for k in ("settings.unstable", "settings.unstable_above_pct",
+                                             "settings.pinned_cpus", "settings.physical_core_of_each_cpu",
+                                             "settings.discarded_sessions")]
+                + [source(path.with_suffix(".npz"), "run_starts, run_ends")],
+            }
+            latency[(role, threads)] = (path, row)
+            speed.append(row)
+    for threads in THREAD_COUNTS:  # INT8's time as a multiple of FP32's, same machine and thread count
+        if ("labelled", threads) in latency:
+            ref_path, ref_row = latency[("reference", threads)]
+            lab_path, lab_row = latency[("labelled", threads)]
+            ratio = lab_row["p50_ms"] / ref_row["p50_ms"]
+            lab_row["time_vs_reference"] = {
+                "ratio_p50": ratio,
+                "reference_p50_ms": ref_row["p50_ms"],
+                "slower": ratio > 1,
+                "sources": [source(p, "metrics.p50_ms.value") for p in (lab_path, ref_path)],
+            }
+    timed = [r for _, r in latency.values()]
+    if len({(r["sessions"], r["warmup_runs"], r["timed_runs"], r["unstable_above_pct"]) for r in timed}) > 1:
+        sys.exit(f"REFUSED: {model}'s latency records differ in sessions, runs or the unstable line")
+    for role in PRECISIONS:
         speed.append(
             {
                 "build_id": builds[role]["build_id"],
                 "hardware_id": None,
                 "hardware_kind": "raspberry-pi-5",
+                "runtime_id": None,
                 "status": "not measured",
                 "reason": "no Raspberry Pi 5 yet (Platform plan step 6)",
                 "settings": {},
             }
         )
+
+    # Licences, from the build records (note of 3 October 2026, point 6).
+    ref_build_path, ref_build = build_records["reference"]
+    lab_build_path, lab_build = build_records["labelled"]
+    if ref_build["licence"] != lab_build["licence"]:
+        sys.exit(f"REFUSED: {model}'s build records state different licences")
+    licences = {
+        "brokkr_code": BROKKR_CODE_LICENCE,
+        "model_code": lab_build["licence"]["code"],
+        "model_weights": lab_build["licence"]["weights"],
+        "weights_trained_on": "ImageNet-1k" if "IMAGENET1K" in ref_build["weights"].upper() else None,
+        "label_data": LABEL_DATA_LICENCE,
+        "sources": [source(lab_build_path, "licence.code"), source(lab_build_path, "licence.weights"),
+                    source(ref_build_path, "licence"), source(ref_build_path, "weights")],
+    }
 
     measured_fp32 = index[("top1", builds["reference"]["build_id"], "clean")]["value"]
     published = entry["published"]["top1"]
@@ -447,7 +544,7 @@ def make_label(model: str) -> dict:
             "dirty": git["dirty"],
             "date_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
             "ci_level": CI_LEVEL,
-            "label_licence": "CC BY 4.0",
+            "label_licence": LABEL_DATA_LICENCE,  # = licences.label_data
             "envelope_rule": ENVELOPE_RULE["name"],
         },
         "model": {
@@ -464,6 +561,7 @@ def make_label(model: str) -> dict:
         },
         "builds": [builds["reference"], builds["labelled"]],
         "hardware": hardware,
+        "runtimes": runtimes,
         "datasets": datasets,
         "conditions": conditions,
         "checks": {
@@ -499,7 +597,14 @@ def make_label(model: str) -> dict:
             "coverage promise, and the label shows what was measured.",
             "Accuracy was measured on the laptop; it has not been checked on other hardware.",
             "The suggested next steps are general suggestions; they were not tested for this model.",
-        ],
+        ]
+        + (
+            ["Latency is laptop latency from one run on one machine; the CPU pin was not read back after "
+             "it was set."]
+            if any(not r["pinning"]["read_back"] for r in timed)
+            else []
+        ),
+        "licences": licences,
         "sources": [
             {"file": f, "sha256": sha, "check": check} for f, (sha, check) in sorted(used_files.items())
         ],

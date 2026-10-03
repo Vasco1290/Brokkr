@@ -24,6 +24,9 @@ FORMATS = {
     "mb": lambda v: f"{v / 1e6:.2f}",  # file size in MB (from bytes)
     "int": lambda v: f"{int(v):d}",
     "thr": lambda v: f"{v:.6f}",  # conformal threshold
+    "ms": lambda v: f"{v:.2f}",  # latency in milliseconds
+    "pctv": lambda v: f"{v:.1f}%",  # a value already in percent (the latency spread and its line)
+    "ratio": lambda v: f"{v:.2f}",  # INT8 time as a multiple of FP32 time
 }
 # Words that contain digits but are not numbers.
 WORDS_WITH_DIGITS = (
@@ -69,14 +72,19 @@ CAUSE_TITLE = {
     "hurt by shrinking": "Hurt by shrinking (FP32 copes, INT8 doesn't)",
     "cause unclear": "Cause unclear (FP32 is borderline)",
 }
-# A suggested next step for a harmful row, by its cause (note of 1 October 2026). General suggestions,
-# not results: the label says so under the damage table and in its limits.
-NEXT_STEP = {
+# A suggested next step for a harmful row (notes of 1 and 3 October 2026): every suggestion must
+# plausibly fix the line that failed. Re-calibrating fixes coverage; a stronger model fixes accuracy;
+# another recipe fixes harm caused by shrinking. General suggestions, not results: the label says so
+# under the damage table and in its limits.
+NEXT_STEP = {  # the cause-based advice, for a row whose accuracy line failed
     "hurt by shrinking": "try another recipe or model",
     "too hard for this model": "consider a stronger model",
     "cause unclear": "try another recipe or a stronger model",
 }
 RECALIBRATE = "re-calibrate on your own images"
+ANOTHER_RECIPE = "try another recipe"  # second step on a coverage-only row where shrinking is involved
+SHRINKING_INVOLVED = ("hurt by shrinking", "cause unclear")
+SLOWER = "INT8 is slower than FP32 on this laptop CPU (relative comparison only)"
 DAMAGE_NOTE = (
     "Damage drop and shrinking cost in points (positive = better). The suggested next steps are general "
     "suggestions; they were not tested for this model."
@@ -155,12 +163,24 @@ TERMS = {
     "Latency": "the time the model takes for one image.",
     "p50, p95, p99": "latency percentiles: p50 is the typical time; p95 and p99 are slow runs, with only a "
     "small share of runs slower still.",
+    "Spread": "how much the typical time (p50) changed between the repeat sessions: the range of the "
+    "middle half of the sessions' p50s, as a share of their median.",
+    "Unstable": "the spread is above the line given under \"Speed\": the timing varied a lot between repeat "
+    "runs, so treat those times as rough. The label does not say why.",
+    "Time vs FP32": "the INT8 build's typical time (p50) divided by the FP32 build's, on the same machine "
+    "and thread count. Below one means INT8 took less time; above one means it was slower. It compares "
+    "the two builds on this machine only.",
     "Threads": "how many CPU workers the model may use at once.",
+    "Pinned": "the timing was only allowed to run on the named CPU cores, so the operating system could "
+    "not move it to slower ones.",
+    "Hardware threads": "one physical CPU core can run two streams of work at once; each stream is a "
+    "hardware thread, and the operating system counts it as a CPU of its own.",
     "FP32 sanity check": "our FP32 top-1 on clean images compared with the figure torchvision publishes, to "
     "catch a broken setup.",
     "onnxruntime, CPUExecutionProvider": "the program that runs the model (ONNX Runtime), here on the CPU.",
     "SHA-256": "a fingerprint of a file; it changes if even one byte of the file changes.",
     "Commit": "the exact version of Brokkr's code that made this label.",
+    "Label schema version": "the version of the label format this label follows (docs/label_schema.md).",
     "CC BY 4.0": "the licence of this label's data: anyone may reuse it, with credit.",
 }
 # Which term explains each table heading, envelope state and summary group (HTML hover notes).
@@ -180,6 +200,8 @@ HOVER = {
     "Build": "Reference and labelled build",
     "Recipe": "Recipe",
     "Latency": "p50, p95, p99",
+    "Spread": "Spread",
+    "Time vs FP32": "Time vs FP32",
     "Threads": "Threads",
     "not harmful in our tests": "Not harmful in our tests",
     "not harmful": "Not harmful in our tests",
@@ -305,10 +327,14 @@ def _envelope_cell(row: dict | None, rule: dict) -> str:
 
 
 def _next_step(row: dict | None, cause: str | None) -> str:
-    """The suggested next step for a harmful row of the labelled build; nothing for any other row."""
+    """The suggested next step for a harmful row of the labelled build, following the line it failed
+    (note of 3 October 2026); nothing for any other row."""
     if row is None or row["state"] != "harmful":
         return "—"
-    steps = [NEXT_STEP[cause]] + ([RECALIBRATE] if "coverage" in row["failed"] else [])
+    if "damage drop" in row["failed"]:  # accuracy failed: the cause-based advice first
+        steps = [NEXT_STEP[cause]] + ([RECALIBRATE] if "coverage" in row["failed"] else [])
+    else:  # coverage only: FP32's accuracy holds, so never "a stronger model"
+        steps = [RECALIBRATE] + ([ANOTHER_RECIPE] if cause in SHRINKING_INVOLVED else [])
     return "; ".join(steps)
 
 
@@ -379,6 +405,102 @@ def _summary(label: dict, ix: dict) -> list:
     return out
 
 
+def _speed(label: dict, ref: dict, lab: dict) -> tuple:
+    """The speed table and the notes under it (note of 3 October 2026): p50/p95/p99 and the spread on
+    every measured row, unstable rows said in plain words, INT8's time as a multiple of FP32's (never a
+    "speed-up"), and a plain sentence where INT8 is slower."""
+    by_key = {(s["build_id"], s.get("hardware_id"), s.get("settings", {}).get("threads")): s
+              for s in label["speed"] if s["status"] == "measured"}
+    rows = []
+    for s in label["speed"]:
+        b = ref if s["build_id"] == ref["build_id"] else lab
+        threads = (s.get("settings") or {}).get("threads")
+        row = [b["precision"].upper(), s.get("hardware_kind") or s.get("hardware_id"),
+               fmt(threads, "int") if threads else "—"]
+        if s["status"] != "measured":
+            rows.append(row + [f"not measured: {s['reason']}", "—", "—"])
+            continue
+        spread = fmt(s["spread_pct"], "pctv")
+        if s["unstable"]:
+            spread = f"unstable: speed varied a lot between repeat runs (spread {spread}); treat as rough"
+        vs = "reference"
+        ratio = s.get("time_vs_reference")
+        if ratio:
+            vs = f"INT8 takes {fmt(ratio['ratio_p50'], 'ratio')}× the time of FP32" + (
+                " (slower)" if ratio["slower"] else ""
+            )
+            other = by_key.get((ref["build_id"], s["hardware_id"], threads))
+            if s["unstable"] or (other and other["unstable"]):
+                vs += "; one or both timings unstable, treat as rough"
+        latency = (f"p50 {fmt(s['p50_ms'], 'ms')} ms, p95 {fmt(s['p95_ms'], 'ms')} ms, "
+                   f"p99 {fmt(s['p99_ms'], 'ms')} ms")
+        rows.append(row + [latency, spread, vs])
+
+    measured = [s for s in label["speed"] if s["status"] == "measured"]
+    if not measured:
+        return rows, []
+    first, pin = measured[0], measured[0]["pinning"]
+    hw = next(h for h in label["hardware"] if h["hardware_id"] == first["hardware_id"])
+    st = first["settings"]
+    notes = [
+        f"Laptop latency: {hw['cpu_model']}, {hw['os']}, batch {fmt(st['batch'], 'int')}; "
+        f"{st['what_is_timed']}; input: {st['input']}. Laptop latency is never the speed of an edge device.",
+    ]
+    pinned = (
+        f"Pinned to the laptop's {fmt(pin['n_physical'], 'int')} {pin['core_kind']} cores "
+        f"({fmt(pin['n_logical'], 'int')} hardware threads, as reported by {pin['reported_by']})."
+    )
+    most = max(s["settings"]["threads"] for s in measured)
+    if most == pin["n_logical"]:
+        pinned += (f" The {fmt(most, 'int')}-thread setting therefore runs on "
+                   f"{fmt(pin['n_physical'], 'int')} physical cores.")
+    if not pin["read_back"]:
+        pinned += " The pin was not read back after it was set."
+    notes.append(pinned)
+    starts = sorted(s["timed_utc"]["first_start"] for s in measured)
+    ends = sorted(s["timed_utc"]["last_end"] for s in measured)
+    discarded = [
+        f"{(ref if s['build_id'] == ref['build_id'] else lab)['precision'].upper()} at "
+        f"{fmt(s['settings']['threads'], 'int')} threads: {fmt(s['discarded_sessions'], 'int')}"
+        for s in measured if s["discarded_sessions"]
+    ]
+    notes.append(
+        f"Timed between {starts[0]} and {ends[-1]} (UTC). Each row: {fmt(first['sessions'], 'int')} "
+        f"sessions of {fmt(first['warmup_runs'], 'int')} warm-up and {fmt(first['timed_runs'], 'int')} "
+        f"timed runs; p50, p95 and p99 are medians across the sessions. Sessions discarded (laptop slept "
+        f"or paused): {'; '.join(discarded) if discarded else 'none'}."
+    )
+    line = fmt(first["unstable_above_pct"], "pctv")
+    notes.append(f"A row is marked unstable when its spread is above {line}.")
+    slower = sorted({s["settings"]["threads"] for s in measured
+                     if (s.get("time_vs_reference") or {}).get("slower")})
+    compared = sorted({s["settings"]["threads"] for s in measured if s.get("time_vs_reference")})
+    if slower and slower == compared:
+        notes.append(f"{SLOWER}.")
+    elif slower:
+        at = " and ".join(f"{fmt(t, 'int')} thread{'s' if t != 1 else ''}" for t in slower)
+        notes.append(f"{SLOWER.replace(' (relative', f' at {at} (relative')}.")
+    notes.append(f"CPU instructions for INT8: {first['vnni']}.")
+    return rows, notes
+
+
+def _licences(label: dict) -> list:
+    """The label's licence section, from its `licences` field (built from the build records)."""
+    lic = label["licences"]
+    lines = [
+        f"Brokkr's code, which made this label: {lic['brokkr_code']}.",
+        f"The model's code: {lic['model_code']}.",
+        f"The model's weights keep their original licence: {lic['model_weights']}",
+    ]
+    if lic.get("weights_trained_on"):
+        lines.append(
+            f"These weights were trained on {lic['weights_trained_on']} and carry ImageNet's non-commercial "
+            f"terms of access."
+        )
+    lines.append(f"This label's own numbers and text are Brokkr output, licensed {lic['label_data']}.")
+    return lines
+
+
 def _sections(label: dict) -> dict:
     """Plain rows of text for each part of the label, shared by Markdown and HTML."""
     ix = _by(label)
@@ -398,12 +520,13 @@ def _sections(label: dict) -> dict:
     ds = {d["dataset_id"]: d for d in label["datasets"]}
     test = ds[label["measurements"][0]["dataset_id"]] if label["measurements"] else next(iter(ds.values()))
     hw = label["hardware"][0]
+    runtimes = {r["runtime_id"]: r for r in label["runtimes"]}
+    rt = runtimes[label["measurements"][0]["runtime_id"]] if label["measurements"] else label["runtimes"][0]
     out["tested"] = [
         f"Images: {test['name']}, split {test['split']}, {fmt(test['n_items'], 'int')} items; "
         f"licence: {test['licence']}",
-        f"Machine: {hw['cpu_model']}, {hw['os']} ({hw['kind']}); {hw['runtime']['name']} "
-        f"{hw['runtime']['version']}, "
-        f"{hw['runtime']['execution_provider']}",
+        f"Machine: {hw['cpu_model']}, {hw['os']} ({hw['kind']}); accuracy run with {rt['name']} "
+        f"{rt['version']}, {rt['execution_provider']}, {fmt(rt['threads'], 'int')} threads",
         f"Intervals: {fmt(level, 'pct0')} bootstrap intervals over the same items (paired for differences).",
         f"Envelope: {rule['name']} ({rule['fixed_in']}); {rule['harm_definition']}. A condition is "
         f"harmful if "
@@ -414,8 +537,9 @@ def _sections(label: dict) -> dict:
         f"Shrinking cost is marked \"large shrinking cost\" when its whole interval is below "
         f"{fmt(rule['large_shrinking_cost_below'], 'pts0')} points, and \"not informative\" when FP32 top-1 "
         f"under that condition is below {fmt(rule['near_floor_fp32_top1_below'], 'pct0')}.",
-        f"Label made by {label['generated']['by']} at commit {label['generated']['commit'][:12]}; label data "
-        f"licence {label['generated']['label_licence']}.",
+        f"Label made by {label['generated']['by']} at commit {label['generated']['commit'][:12]}; label "
+        f"schema version {fmt(label['schema_version'], 'int')}; label data licence "
+        f"{label['generated']['label_licence']}.",
     ]
     out["builds"] = [
         [
@@ -461,33 +585,18 @@ def _sections(label: dict) -> dict:
             row += ["—", "—", "—", STATE_MARK["INT8 build failed"], "—", "—"]
         else:
             cost = ix["m"].get(("shrinking_cost", lab["build_id"], cid))
-            flag = l_row.get("shrinking_cost_flag") if l_row else None
+            flags = l_row.get("shrinking_cost_flags", []) if l_row else []
             row += [
                 _value(ix["m"].get(("top1", lab["build_id"], cid)), "pct", ci=False),
                 _value(ix["m"].get(("damage_drop", lab["build_id"], cid)), "pts"),
                 _coverage(ix, lab["build_id"], cid),
                 _envelope_cell(l_row, rule),
-                _value(cost, "pts") + (f" [{flag}]" if flag else ""),
+                _value(cost, "pts") + (f" [{'; '.join(flags)}]" if flags else ""),
                 _next_step(l_row, cause.get(cid)),
             ]
         damage_rows.append(row)
     out["damage"] = damage_rows
-    out["speed"] = [
-        [
-            b["precision"].upper(),
-            s.get("hardware_kind") or s.get("hardware_id"),
-            fmt(s["settings"]["threads"], "int") if s.get("settings", {}).get("threads") else "—",
-            (
-                f"p50 {fmt(s['p50_ms'], 'size')} ms, p95 {fmt(s['p95_ms'], 'size')} ms, p99 "
-                f"{fmt(s['p99_ms'], 'size')} ms"
-                if s["status"] == "measured"
-                else f"not measured: {s['reason']}"
-            ),
-        ]
-        for s in label["speed"]
-        for b in (ix["builds"]["reference"], lab)
-        if s["build_id"] == b["build_id"]
-    ]
+    out["speed"], out["speed_notes"] = _speed(label, ref, lab)
     details = []
     for b in (ref, lab):
         if b["status"] == "failed":
@@ -514,6 +623,7 @@ def _sections(label: dict) -> dict:
     )
     out["details"] = details
     out["limits"] = label["limits"]
+    out["licences"] = _licences(label)
     out["sources"] = [f"{x['file']} (SHA-256 {x['sha256'][:12]}…)" for x in label["sources"]]
     return out
 
@@ -532,7 +642,7 @@ DAMAGE_HEAD = [
 ]
 BUILDS_HEAD = ["Role", "Recipe", "File size", "Status"]
 CLEAN_HEAD = ["Build", "Top-1", "Coverage", "Shrinking cost"]
-SPEED_HEAD = ["Build", "Hardware", "Threads", "Latency"]
+SPEED_HEAD = ["Build", "Hardware", "Threads", "Latency", "Spread", "Time vs FP32"]
 TERMS_NOTE = "Every technical word is explained under \"What the words mean\" below."
 
 
@@ -548,6 +658,7 @@ def to_markdown(label: dict) -> str:
         "---",
         "license: other",
         "license_name: see-label-licences",
+        'license_link: "#licences"',
         "library_name: onnx",
         "tags:",
         "- brokkr",
@@ -577,6 +688,7 @@ def to_markdown(label: dict) -> str:
         _md_table(DAMAGE_HEAD, s["damage"]),
         "## Speed",
         _md_table(SPEED_HEAD, s["speed"]),
+        "\n".join(f"- {line}" for line in s["speed_notes"]),
         "## Details",
         "\n".join(f"- {line}" for line in s["details"]),
         "## What the words mean",
@@ -584,8 +696,7 @@ def to_markdown(label: dict) -> str:
         "## Limits",
         "\n".join(f"- {line}" for line in s["limits"]),
         "## Licences",
-        f"- Model code: {meta['licence']['code']}\n- Model weights: {meta['licence']['weights']}\n"
-        f"- This label's data: {label['generated']['label_licence']}",
+        "\n".join(f"- {line}" for line in s["licences"]),
         "## Sources",
         "\n".join(f"- {line}" for line in s["sources"]),
     ]
@@ -638,7 +749,6 @@ def _html_table(head: list, rows: list) -> str:
 
 def to_html(label: dict) -> str:
     s = _sections(label)
-    meta = label["model"]
     unverified = label["source"]["kind"] != "official"
 
     def items(lines):
@@ -669,6 +779,7 @@ def to_html(label: dict) -> str:
         _html_table(DAMAGE_HEAD, s["damage"]),
         "<h2>Speed</h2>",
         _html_table(SPEED_HEAD, s["speed"]),
+        items(s["speed_notes"]) if s["speed_notes"] else "",
         "<h2>Details</h2>",
         items(s["details"]),
         "<h2>What the words mean</h2>",
@@ -677,14 +788,8 @@ def to_html(label: dict) -> str:
         + "</dl>",
         "<h2>Limits</h2>",
         items(s["limits"]),
-        "<h2>Licences</h2>",
-        items(
-            [
-                f"Model code: {meta['licence']['code']}",
-                f"Model weights: {meta['licence']['weights']}",
-                f"This label's data: {label['generated']['label_licence']}",
-            ]
-        ),
+        '<h2 id="licences">Licences</h2>',
+        items(s["licences"]),
         "<h2>Sources</h2>",
         items(s["sources"]),
     ]
@@ -760,7 +865,8 @@ def readme_example(label: dict) -> str:
     lines += [
         "",
         f"\"Harmful\" means a whole {fmt(label['generated']['ci_level'], 'pct0')} interval is below a line "
-        f"fixed before these results existed: coverage below {fmt(rule['coverage_min'], 'pct0')}, or a "
+        f"whose value was written down before these results existed and adopted for the labels afterwards, "
+        f"unchanged: coverage below {fmt(rule['coverage_min'], 'pct0')}, or a "
         f"damage drop (accuracy under the damage minus clean accuracy) below "
         f"{fmt(rule['damage_drop_min'], 'pts0')} points. \"Not harmful in our tests\" is not a guarantee.",
     ]

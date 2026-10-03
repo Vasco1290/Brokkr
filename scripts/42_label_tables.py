@@ -161,7 +161,7 @@ for label in labels.values():
     p = parts(label)
     fp32, int8 = p["builds"]["FP32"]["build_id"], p["builds"]["INT8"]["build_id"]
     for (bid, cid), r in p["rows"].items():
-        if bid == int8 and r["shrinking_cost_flag"] == "not informative":
+        if bid == int8 and "not informative" in r["shrinking_cost_flags"]:
             fp32_top1 = 100 * p["m"][("top1", fp32, cid)]["value"]
             print(f"{p['name']:20s} {p['cond'][cid]:30s} FP32 top-1 {fp32_top1:.2f}%  "
                   f"shrinking cost {interval(p['m'][('shrinking_cost', int8, cid)])}  "
@@ -187,4 +187,4 @@ if args.model:
                       f"{p['m'][('mean_set_size', bid, cid)]['value']:.2f}; [{row['state']}"
                       f"{': failed ' + ' and '.join(row['failed']) if row['failed'] else ''}]")
             print(f"    shrinking cost {interval(p['m'][('shrinking_cost', int8, cid)])} "
-                  f"[{p['rows'][(int8, cid)]['shrinking_cost_flag']}]")
+                  f"[{'; '.join(p['rows'][(int8, cid)]['shrinking_cost_flags']) or 'none'}]")
