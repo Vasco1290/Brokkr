@@ -5,7 +5,9 @@ Needs:  OLD/<model>/label.json and NEW/<model>/label.json for the same models
 
 Used when labels are made again from the same records by newer code (docs/label_schema.md, second note of
 4 October 2026). The only differences allowed are:
-- a source file's fingerprint: a "sha256" inside a "sources" entry;
+- a source file's fingerprint: a "sha256" beside a "file" key (every source reference, in "sources"
+  lists and in hardware[].fingerprint_source); a model file's checksum (builds[].file.sha256) has no
+  "file" key beside it, so it must not change;
 - which commit made the label, and when: generated.commit and generated.date_utc.
 Everything else (every number, interval, state, ID, build checksum and text) must be equal. Prints, for
 each model, how many fields differ in each allowed group and any other difference, then PASS or FAIL.
@@ -32,8 +34,14 @@ def differences(old, new, path=()):
         yield path, old, new
 
 
-def group(path: tuple) -> str:
-    if path[-1] == "sha256" and "sources" in path:
+def parent(label: dict, path: tuple):
+    for part in path[:-1]:
+        label = label[part]
+    return label
+
+
+def group(label: dict, path: tuple) -> str:
+    if path[-1] == "sha256" and "file" in parent(label, path):
         return "source fingerprint"
     if path in (("generated", "commit"), ("generated", "date_utc")):
         return ".".join(path)
@@ -55,7 +63,7 @@ def main() -> None:
                     for folder in (args.old, args.new))
         counts, others = {}, []
         for path, a, b in differences(old, new):
-            g = group(path)
+            g = group(old, path)
             counts[g] = counts.get(g, 0) + 1
             if g not in ALLOWED:
                 others.append(f"{g}: {a!r} -> {b!r}")

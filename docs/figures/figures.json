@@ -47,7 +47,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        2,
@@ -60,7 +60,7 @@
      "fmt": "pts1",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rule",
@@ -73,7 +73,7 @@
      "fmt": "abs0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rule",
@@ -86,7 +86,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "generated",
        "ci_level"
@@ -166,7 +166,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_small/label.json",
-      "sha256": "d726c6c1cfdff2d41190b32c4bcd66b63af55aac31de0310abf1675021a557aa",
+      "sha256": "62d43e61b41fb71b58dae531dbf4872704880da7a65186e43893d280d46834af",
       "field": [
        "model",
        "display_name"
@@ -178,7 +178,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "model",
        "display_name"
@@ -194,7 +194,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        180
@@ -217,7 +217,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        182
@@ -273,7 +273,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "model",
        "display_name"
@@ -289,7 +289,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        180
@@ -312,7 +312,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        182
@@ -368,7 +368,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "model",
        "display_name"
@@ -384,7 +384,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        180
@@ -407,7 +407,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        182
@@ -463,7 +463,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "model",
        "display_name"
@@ -479,7 +479,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        180
@@ -502,7 +502,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        182
@@ -558,7 +558,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "model",
        "display_name"
@@ -574,7 +574,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        180
@@ -597,7 +597,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        182
@@ -653,7 +653,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "model",
        "display_name"
@@ -669,7 +669,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        180
@@ -692,7 +692,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        182
@@ -748,7 +748,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "model",
        "display_name"
@@ -764,7 +764,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        180
@@ -787,7 +787,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        182
@@ -843,7 +843,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "model",
        "display_name"
@@ -859,7 +859,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        180
@@ -882,7 +882,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        182
@@ -938,7 +938,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "model",
        "display_name"
@@ -954,7 +954,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        180
@@ -977,7 +977,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        182
@@ -1050,7 +1050,7 @@
      "fmt": "abs0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rule",
@@ -1063,7 +1063,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rule",
@@ -1076,7 +1076,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "generated",
        "ci_level"
@@ -1088,7 +1088,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        1,
@@ -1101,7 +1101,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        2,
@@ -1114,7 +1114,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        3,
@@ -1127,7 +1127,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        4,
@@ -1140,7 +1140,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        5,
@@ -1153,7 +1153,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        6,
@@ -1166,7 +1166,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        7,
@@ -1179,7 +1179,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        8,
@@ -1192,7 +1192,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        9,
@@ -1205,7 +1205,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        10,
@@ -1218,7 +1218,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        11,
@@ -1231,7 +1231,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        12,
@@ -1244,7 +1244,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        180,
@@ -1261,7 +1261,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        181
@@ -1282,7 +1282,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1300,7 +1300,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        182
@@ -1321,7 +1321,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1339,7 +1339,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        183
@@ -1358,7 +1358,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1376,7 +1376,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        184
@@ -1395,7 +1395,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1413,7 +1413,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        185
@@ -1434,7 +1434,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1452,7 +1452,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        186
@@ -1473,7 +1473,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1491,7 +1491,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        187
@@ -1512,7 +1512,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1530,7 +1530,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        188
@@ -1551,7 +1551,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1569,7 +1569,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        189
@@ -1588,7 +1588,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1606,7 +1606,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        190
@@ -1625,7 +1625,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1643,7 +1643,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        191
@@ -1662,7 +1662,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1680,7 +1680,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        192
@@ -1701,7 +1701,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rows",
@@ -1715,7 +1715,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "model",
        "display_name"
@@ -1727,7 +1727,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -1744,7 +1744,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        181
@@ -1763,7 +1763,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -1781,7 +1781,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        182
@@ -1800,7 +1800,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -1818,7 +1818,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        183
@@ -1837,7 +1837,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -1855,7 +1855,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        184
@@ -1874,7 +1874,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -1892,7 +1892,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        185
@@ -1911,7 +1911,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -1929,7 +1929,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        186
@@ -1948,7 +1948,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -1966,7 +1966,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        187
@@ -1985,7 +1985,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -2003,7 +2003,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        188
@@ -2024,7 +2024,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -2042,7 +2042,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        189
@@ -2061,7 +2061,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -2079,7 +2079,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        190
@@ -2100,7 +2100,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -2118,7 +2118,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        191
@@ -2137,7 +2137,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -2155,7 +2155,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "measurements",
        192
@@ -2176,7 +2176,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "envelope",
        "rows",
@@ -2190,7 +2190,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "model",
        "display_name"
@@ -2202,7 +2202,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -2219,7 +2219,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        181
@@ -2240,7 +2240,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2258,7 +2258,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        182
@@ -2279,7 +2279,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2297,7 +2297,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        183
@@ -2318,7 +2318,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2336,7 +2336,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        184
@@ -2355,7 +2355,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2373,7 +2373,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        185
@@ -2394,7 +2394,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2412,7 +2412,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        186
@@ -2433,7 +2433,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2451,7 +2451,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        187
@@ -2472,7 +2472,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2490,7 +2490,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        188
@@ -2511,7 +2511,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2529,7 +2529,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        189
@@ -2550,7 +2550,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2568,7 +2568,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        190
@@ -2589,7 +2589,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2607,7 +2607,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        191
@@ -2626,7 +2626,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2644,7 +2644,7 @@
      ],
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "measurements",
        192
@@ -2665,7 +2665,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "envelope",
        "rows",
@@ -2679,7 +2679,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "model",
        "display_name"
@@ -2691,7 +2691,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -2708,7 +2708,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        181
@@ -2727,7 +2727,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2745,7 +2745,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        182
@@ -2764,7 +2764,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2782,7 +2782,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        183
@@ -2801,7 +2801,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2819,7 +2819,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        184
@@ -2838,7 +2838,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2856,7 +2856,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        185
@@ -2875,7 +2875,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2893,7 +2893,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        186
@@ -2912,7 +2912,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2930,7 +2930,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        187
@@ -2949,7 +2949,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -2967,7 +2967,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        188
@@ -2988,7 +2988,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -3006,7 +3006,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        189
@@ -3025,7 +3025,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -3043,7 +3043,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        190
@@ -3064,7 +3064,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -3082,7 +3082,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        191
@@ -3103,7 +3103,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -3121,7 +3121,7 @@
      ],
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "measurements",
        192
@@ -3142,7 +3142,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "envelope",
        "rows",
@@ -3156,7 +3156,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "model",
        "display_name"
@@ -3168,7 +3168,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -3185,7 +3185,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        181
@@ -3204,7 +3204,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3222,7 +3222,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        182
@@ -3241,7 +3241,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3259,7 +3259,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        183
@@ -3278,7 +3278,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3296,7 +3296,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        184
@@ -3315,7 +3315,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3333,7 +3333,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        185
@@ -3352,7 +3352,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3370,7 +3370,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        186
@@ -3389,7 +3389,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3407,7 +3407,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        187
@@ -3426,7 +3426,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3444,7 +3444,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        188
@@ -3465,7 +3465,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3483,7 +3483,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        189
@@ -3502,7 +3502,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3520,7 +3520,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        190
@@ -3539,7 +3539,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3557,7 +3557,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        191
@@ -3576,7 +3576,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3594,7 +3594,7 @@
      ],
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "measurements",
        192
@@ -3615,7 +3615,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "envelope",
        "rows",
@@ -3629,7 +3629,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "model",
        "display_name"
@@ -3641,7 +3641,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -3658,7 +3658,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        181
@@ -3677,7 +3677,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3695,7 +3695,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        182
@@ -3714,7 +3714,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3732,7 +3732,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        183
@@ -3751,7 +3751,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3769,7 +3769,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        184
@@ -3788,7 +3788,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3806,7 +3806,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        185
@@ -3825,7 +3825,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3843,7 +3843,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        186
@@ -3862,7 +3862,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3880,7 +3880,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        187
@@ -3899,7 +3899,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3917,7 +3917,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        188
@@ -3938,7 +3938,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3956,7 +3956,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        189
@@ -3975,7 +3975,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -3993,7 +3993,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        190
@@ -4012,7 +4012,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -4030,7 +4030,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        191
@@ -4049,7 +4049,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -4067,7 +4067,7 @@
      ],
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "measurements",
        192
@@ -4088,7 +4088,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "envelope",
        "rows",
@@ -4102,7 +4102,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "model",
        "display_name"
@@ -4114,7 +4114,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -4131,7 +4131,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        181
@@ -4150,7 +4150,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4168,7 +4168,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        182
@@ -4187,7 +4187,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4205,7 +4205,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        183
@@ -4224,7 +4224,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4242,7 +4242,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        184
@@ -4261,7 +4261,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4279,7 +4279,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        185
@@ -4298,7 +4298,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4316,7 +4316,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        186
@@ -4335,7 +4335,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4353,7 +4353,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        187
@@ -4372,7 +4372,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4390,7 +4390,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        188
@@ -4411,7 +4411,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4429,7 +4429,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        189
@@ -4448,7 +4448,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4466,7 +4466,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        190
@@ -4485,7 +4485,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4503,7 +4503,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        191
@@ -4522,7 +4522,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4540,7 +4540,7 @@
      ],
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "measurements",
        192
@@ -4561,7 +4561,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "envelope",
        "rows",
@@ -4575,7 +4575,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "model",
        "display_name"
@@ -4587,7 +4587,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -4604,7 +4604,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        181
@@ -4623,7 +4623,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4641,7 +4641,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        182
@@ -4660,7 +4660,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4678,7 +4678,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        183
@@ -4697,7 +4697,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4715,7 +4715,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        184
@@ -4734,7 +4734,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4752,7 +4752,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        185
@@ -4771,7 +4771,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4789,7 +4789,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        186
@@ -4808,7 +4808,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4826,7 +4826,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        187
@@ -4845,7 +4845,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4863,7 +4863,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        188
@@ -4884,7 +4884,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4902,7 +4902,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        189
@@ -4921,7 +4921,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4939,7 +4939,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        190
@@ -4958,7 +4958,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -4976,7 +4976,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        191
@@ -4995,7 +4995,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -5013,7 +5013,7 @@
      ],
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "measurements",
        192
@@ -5034,7 +5034,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "envelope",
        "rows",
@@ -5048,7 +5048,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "model",
        "display_name"
@@ -5060,7 +5060,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -5077,7 +5077,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        181
@@ -5096,7 +5096,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5114,7 +5114,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        182
@@ -5133,7 +5133,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5151,7 +5151,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        183
@@ -5170,7 +5170,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5188,7 +5188,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        184
@@ -5207,7 +5207,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5225,7 +5225,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        185
@@ -5246,7 +5246,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5264,7 +5264,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        186
@@ -5285,7 +5285,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5303,7 +5303,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        187
@@ -5324,7 +5324,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5342,7 +5342,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        188
@@ -5363,7 +5363,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5381,7 +5381,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        189
@@ -5400,7 +5400,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5418,7 +5418,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        190
@@ -5437,7 +5437,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5455,7 +5455,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        191
@@ -5474,7 +5474,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5492,7 +5492,7 @@
      ],
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "measurements",
        192
@@ -5511,7 +5511,7 @@
      "fmt": "flags",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "envelope",
        "rows",
@@ -5525,7 +5525,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "model",
        "display_name"
@@ -5537,7 +5537,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "summary",
        "large_shrinking_cost",
@@ -5598,7 +5598,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "model",
        "display_name"
@@ -5610,7 +5610,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "builds",
        0,
@@ -5623,7 +5623,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "builds",
        1,
@@ -5636,7 +5636,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        2,
@@ -5650,7 +5650,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        2,
@@ -5664,7 +5664,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        2,
@@ -5677,7 +5677,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "envelope",
        "rule",
@@ -5690,7 +5690,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "generated",
        "ci_level"
@@ -5702,7 +5702,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        0,
@@ -5719,7 +5719,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        2
@@ -5742,7 +5742,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        3
@@ -5765,7 +5765,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        80
@@ -5788,7 +5788,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        81
@@ -5807,7 +5807,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        1,
@@ -5824,7 +5824,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        8
@@ -5847,7 +5847,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        9
@@ -5870,7 +5870,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        86
@@ -5893,7 +5893,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        87
@@ -5912,7 +5912,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        2,
@@ -5929,7 +5929,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        14
@@ -5952,7 +5952,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        15
@@ -5975,7 +5975,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        92
@@ -5998,7 +5998,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        93
@@ -6017,7 +6017,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        3,
@@ -6034,7 +6034,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        20
@@ -6057,7 +6057,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        21
@@ -6080,7 +6080,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        98
@@ -6103,7 +6103,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        99
@@ -6122,7 +6122,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        4,
@@ -6139,7 +6139,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        26
@@ -6162,7 +6162,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        27
@@ -6185,7 +6185,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        104
@@ -6208,7 +6208,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        105
@@ -6227,7 +6227,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        5,
@@ -6244,7 +6244,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        32
@@ -6267,7 +6267,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        33
@@ -6290,7 +6290,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        110
@@ -6313,7 +6313,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        111
@@ -6332,7 +6332,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        6,
@@ -6349,7 +6349,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        38
@@ -6372,7 +6372,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        39
@@ -6395,7 +6395,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        116
@@ -6418,7 +6418,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        117
@@ -6437,7 +6437,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        7,
@@ -6454,7 +6454,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        44
@@ -6477,7 +6477,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        45
@@ -6500,7 +6500,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        122
@@ -6523,7 +6523,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        123
@@ -6542,7 +6542,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        8,
@@ -6559,7 +6559,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        50
@@ -6582,7 +6582,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        51
@@ -6605,7 +6605,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        128
@@ -6628,7 +6628,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        129
@@ -6647,7 +6647,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        9,
@@ -6664,7 +6664,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        56
@@ -6687,7 +6687,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        57
@@ -6710,7 +6710,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        134
@@ -6733,7 +6733,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        135
@@ -6752,7 +6752,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        10,
@@ -6769,7 +6769,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        62
@@ -6792,7 +6792,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        63
@@ -6815,7 +6815,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        140
@@ -6838,7 +6838,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        141
@@ -6857,7 +6857,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        11,
@@ -6874,7 +6874,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        68
@@ -6897,7 +6897,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        69
@@ -6920,7 +6920,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        146
@@ -6943,7 +6943,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        147
@@ -6962,7 +6962,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "conditions",
        12,
@@ -6979,7 +6979,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        74
@@ -7002,7 +7002,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        75
@@ -7025,7 +7025,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        152
@@ -7048,7 +7048,7 @@
      ],
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "measurements",
        153
@@ -7102,7 +7102,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "model",
        "display_name"
@@ -7114,7 +7114,7 @@
      "fmt": "pct0",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "generated",
        "ci_level"
@@ -7356,7 +7356,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "model",
        "display_name"
@@ -7368,7 +7368,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "speed",
        2,
@@ -7382,7 +7382,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "speed",
        2,
@@ -7395,7 +7395,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "speed",
        0,
@@ -7408,7 +7408,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        2,
@@ -7422,7 +7422,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "speed",
        3,
@@ -7436,7 +7436,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "speed",
        3,
@@ -7449,7 +7449,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/convnext_tiny/label.json",
-      "sha256": "5c6b38799bdea5c6815f171d81e20c9b8699d9f0cc31fb6ec8b8cb200363735a",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
       "field": [
        "speed",
        1,
@@ -7462,7 +7462,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        3,
@@ -7476,7 +7476,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "model",
        "display_name"
@@ -7488,7 +7488,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "speed",
        2,
@@ -7502,7 +7502,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "speed",
        2,
@@ -7515,7 +7515,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "speed",
        0,
@@ -7528,7 +7528,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "speed",
        3,
@@ -7542,7 +7542,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "speed",
        3,
@@ -7555,7 +7555,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/efficientnet_b0/label.json",
-      "sha256": "ff281990b228dfc38c12ee79c9d107e0716fb6781b421b9ca7998930510b6e50",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
       "field": [
        "speed",
        1,
@@ -7568,7 +7568,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "model",
        "display_name"
@@ -7580,7 +7580,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "speed",
        2,
@@ -7594,7 +7594,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "speed",
        2,
@@ -7607,7 +7607,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "speed",
        0,
@@ -7620,7 +7620,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "speed",
        3,
@@ -7634,7 +7634,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "speed",
        3,
@@ -7647,7 +7647,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mnasnet1_0/label.json",
-      "sha256": "69cb997b4d7c66056e264ef2f82a4b6bc0c483f3d5edd6668220e91633f58810",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
       "field": [
        "speed",
        1,
@@ -7660,7 +7660,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "model",
        "display_name"
@@ -7672,7 +7672,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "speed",
        2,
@@ -7686,7 +7686,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "speed",
        2,
@@ -7699,7 +7699,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "speed",
        0,
@@ -7712,7 +7712,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "speed",
        3,
@@ -7726,7 +7726,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "speed",
        3,
@@ -7739,7 +7739,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v2/label.json",
-      "sha256": "41172c9cb0d035e6024b9a5d3e9a98cbef05bc4589141d0af8b81bfe120ceb9a",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
       "field": [
        "speed",
        1,
@@ -7752,7 +7752,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "model",
        "display_name"
@@ -7764,7 +7764,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -7778,7 +7778,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -7791,7 +7791,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        0,
@@ -7804,7 +7804,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        3,
@@ -7818,7 +7818,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        3,
@@ -7831,7 +7831,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        1,
@@ -7844,7 +7844,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_small/label.json",
-      "sha256": "d726c6c1cfdff2d41190b32c4bcd66b63af55aac31de0310abf1675021a557aa",
+      "sha256": "62d43e61b41fb71b58dae531dbf4872704880da7a65186e43893d280d46834af",
       "field": [
        "model",
        "display_name"
@@ -7869,7 +7869,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "model",
        "display_name"
@@ -7881,7 +7881,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "speed",
        2,
@@ -7895,7 +7895,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "speed",
        2,
@@ -7908,7 +7908,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "speed",
        0,
@@ -7921,7 +7921,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "speed",
        3,
@@ -7935,7 +7935,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "speed",
        3,
@@ -7948,7 +7948,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/regnet_y_400mf/label.json",
-      "sha256": "9f165a04c54b06bfeda274a5a595395626f5d49204e4dc60210bcb468b577a3c",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
       "field": [
        "speed",
        1,
@@ -7961,7 +7961,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "model",
        "display_name"
@@ -7973,7 +7973,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "speed",
        2,
@@ -7987,7 +7987,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "speed",
        2,
@@ -8000,7 +8000,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "speed",
        0,
@@ -8013,7 +8013,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "speed",
        3,
@@ -8027,7 +8027,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "speed",
        3,
@@ -8040,7 +8040,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet18/label.json",
-      "sha256": "8ba16751283aa9acba985fc6e91e3ed85d879cacdfb82f1222b7325f8dec266f",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
       "field": [
        "speed",
        1,
@@ -8053,7 +8053,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "model",
        "display_name"
@@ -8065,7 +8065,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "speed",
        2,
@@ -8079,7 +8079,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "speed",
        2,
@@ -8092,7 +8092,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "speed",
        0,
@@ -8105,7 +8105,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "speed",
        3,
@@ -8119,7 +8119,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "speed",
        3,
@@ -8132,7 +8132,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/resnet50/label.json",
-      "sha256": "936348917d662c62337d93fa0937288e009f4b79f6f757d1eaef71b4d4ecad25",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
       "field": [
        "speed",
        1,
@@ -8145,7 +8145,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "model",
        "display_name"
@@ -8157,7 +8157,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        2,
@@ -8171,7 +8171,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        2,
@@ -8184,7 +8184,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        0,
@@ -8197,7 +8197,7 @@
      "fmt": "ratio",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        3,
@@ -8211,7 +8211,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        3,
@@ -8224,7 +8224,7 @@
      "fmt": "bool",
      "source": {
       "file": "published/labels/shufflenet_v2_x1_0/label.json",
-      "sha256": "c4f5358f11f81bc622abc7d9e12c21e844640eaeeaabc5eee43ef45461ba2982",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
       "field": [
        "speed",
        1,
@@ -8237,7 +8237,7 @@
      "fmt": "pctv",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -8250,7 +8250,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -8263,7 +8263,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -8277,7 +8277,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -8291,7 +8291,7 @@
      "fmt": "int",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -8305,7 +8305,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "speed",
        2,
@@ -8319,7 +8319,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "hardware",
        0,
@@ -8332,7 +8332,7 @@
      "fmt": "text",
      "source": {
       "file": "published/labels/mobilenet_v3_large/label.json",
-      "sha256": "84f76d0c6f445aacde22cd1119d1efb4035a194654e4bd351cbbcb269eedef10",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
       "field": [
        "hardware",
        0,

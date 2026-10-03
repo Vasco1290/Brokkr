@@ -9,9 +9,9 @@
   },
   "generated": {
     "by": "brokkr-edge 0.0.1",
-    "commit": "f682e217d0da345d01f80b21c234b9f4c7789b96",
+    "commit": "6a6ac0ddf54afc7091b4bafd2d0416384968138e",
     "dirty": false,
-    "date_utc": "2026-10-03T15:38:14+00:00",
+    "date_utc": "2026-10-03T20:08:31+00:00",
     "ci_level": 0.95,
     "label_licence": "CC BY 4.0",
     "envelope_rule": "reliability envelope, version 1"
@@ -138,7 +138,7 @@
       },
       "fingerprint_source": {
         "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0.json",
-        "sha256": "1bbc4be9112c19613496fe26de7d0bd11f4d5d0b685031039ed110f7e0c2faeb",
+        "sha256": "be355d54a13f98d626f632aa4dfe018ee72db0909041612404b95e88805dadcb",
         "field": "device.fingerprint"
       }
     }
@@ -157,7 +157,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0.json",
-          "sha256": "1bbc4be9112c19613496fe26de7d0bd11f4d5d0b685031039ed110f7e0c2faeb",
+          "sha256": "be355d54a13f98d626f632aa4dfe018ee72db0909041612404b95e88805dadcb",
           "field": "runtime"
         }
       ]
@@ -175,7 +175,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-          "sha256": "add260bf95f0a8dbd907799b45a31c3db7e51c5e805e6f6234b4dfa17832f55b",
+          "sha256": "71761eac0aa7f09ee0221d18427ed9272efc42e97591fe6515968b624d95dc0f",
           "field": "runtime"
         }
       ]
@@ -193,7 +193,7 @@
       "sources": [
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "runtime"
         }
       ]
@@ -211,7 +211,7 @@
       "sources": [
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "runtime"
         }
       ]
@@ -357,12 +357,12 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0.json",
-          "sha256": "1bbc4be9112c19613496fe26de7d0bd11f4d5d0b685031039ed110f7e0c2faeb",
+          "sha256": "be355d54a13f98d626f632aa4dfe018ee72db0909041612404b95e88805dadcb",
           "field": "metrics.top1"
         },
         {
           "file": "brokkr_edge/model_list.json",
-          "sha256": "e3fe7d0dbb4e366a7af07a46c4045a0049753f42896a2ba7d5d90a4512158fef",
+          "sha256": "8d6a237935d82ac70c9be7aef70d36c48394016831e8c5b7c2b906e4a14bf5a2",
           "field": "models.shufflenet_v2_x1_0.published.top1"
         }
       ]
@@ -387,7 +387,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0.json",
-          "sha256": "1bbc4be9112c19613496fe26de7d0bd11f4d5d0b685031039ed110f7e0c2faeb",
+          "sha256": "be355d54a13f98d626f632aa4dfe018ee72db0909041612404b95e88805dadcb",
           "field": "metrics.top1"
         }
       ]
@@ -410,7 +410,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0.json",
-          "sha256": "1bbc4be9112c19613496fe26de7d0bd11f4d5d0b685031039ed110f7e0c2faeb",
+          "sha256": "be355d54a13f98d626f632aa4dfe018ee72db0909041612404b95e88805dadcb",
           "field": "metrics.top5"
         }
       ]
@@ -439,7 +439,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_conformal.json",
-          "sha256": "eb9cb55e07a7c3e366add1d1ed34a7a6dc8730ec32704214570f60ef90f18af9",
+          "sha256": "bac6b31aadf3c14c3260e1e01921263af29c1871caf53e690c859edc4d333ca0",
           "field": "metrics.coverage"
         }
       ]
@@ -468,7 +468,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_conformal.json",
-          "sha256": "eb9cb55e07a7c3e366add1d1ed34a7a6dc8730ec32704214570f60ef90f18af9",
+          "sha256": "bac6b31aadf3c14c3260e1e01921263af29c1871caf53e690c859edc4d333ca0",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -491,7 +491,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_calibration.json",
-          "sha256": "8a3fdaddf066d5827d6400acef332b7ef5ced4c2afdb78bcf2e849759834d26e",
+          "sha256": "de65fd0069c5efddb1f16267747317b191792c40b340f3da45f12aaa18863978",
           "field": "metrics.ece"
         }
       ]
@@ -514,7 +514,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_selective.json",
-          "sha256": "46cb0168a2ee2f90350087e2e60cd2ef0d643f7b28e4977fe35aa05c4b3cb432",
+          "sha256": "c726293ff87d3f39223f392a487f6454d3f772381133d065e7e6cebedc35edf9",
           "field": "metrics.e_aurc"
         }
       ]
@@ -537,7 +537,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3.json",
-          "sha256": "93047eb7105f3cf27ecaf0c27bf060fdf70af79595c61c37fae2466cac1193d5",
+          "sha256": "ec5baf3c8ae6cdd2b2931570ae64463f9c4985f28d5d9e1b3ce050d0ba34199a",
           "field": "metrics.top1"
         }
       ]
@@ -560,7 +560,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3.json",
-          "sha256": "93047eb7105f3cf27ecaf0c27bf060fdf70af79595c61c37fae2466cac1193d5",
+          "sha256": "ec5baf3c8ae6cdd2b2931570ae64463f9c4985f28d5d9e1b3ce050d0ba34199a",
           "field": "metrics.top5"
         }
       ]
@@ -589,7 +589,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
-          "sha256": "0bb1bab639ac8b4a42bd730336a8d23ca6436ae74c83ab5f39e444278fa4ac89",
+          "sha256": "497c7bb2df7df226e4dcb5f8ea45cd5ec10941b92e8cebd88801173f4f0eed25",
           "field": "metrics.coverage"
         }
       ]
@@ -618,7 +618,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
-          "sha256": "0bb1bab639ac8b4a42bd730336a8d23ca6436ae74c83ab5f39e444278fa4ac89",
+          "sha256": "497c7bb2df7df226e4dcb5f8ea45cd5ec10941b92e8cebd88801173f4f0eed25",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -641,7 +641,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_calibration.json",
-          "sha256": "a8f98d8eb632b3ec6fe69e7212db6c63275e26b1061b9623462f16ceb23b7912",
+          "sha256": "8507e7951406b3d2a9b2ab90c8e0b8b7fd73347685064b8dd84faf17e09ec442",
           "field": "metrics.ece"
         }
       ]
@@ -664,7 +664,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_selective.json",
-          "sha256": "c7f2cd15c3ae1c8b093d1ba847f27b71c94d0b78c89df3169b6a44e5ec6d0a2e",
+          "sha256": "1c88e3a65c213a8c1365b1e360b6d5abc96363153eb9d0b25f66306a598d0ba4",
           "field": "metrics.e_aurc"
         }
       ]
@@ -687,7 +687,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5.json",
-          "sha256": "822670fab6d6c8bf7b98d7b52d512d9090495562fe1fd6f375d0179b5334be60",
+          "sha256": "66fceff978c344678001a20a994e2244a3c00eb950a1c156e65042348b06af05",
           "field": "metrics.top1"
         }
       ]
@@ -710,7 +710,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5.json",
-          "sha256": "822670fab6d6c8bf7b98d7b52d512d9090495562fe1fd6f375d0179b5334be60",
+          "sha256": "66fceff978c344678001a20a994e2244a3c00eb950a1c156e65042348b06af05",
           "field": "metrics.top5"
         }
       ]
@@ -739,7 +739,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
-          "sha256": "0222419fee26ca7836471e4d30d48afa4106cc27c257823127ed1f072f45de2b",
+          "sha256": "cfc6869431e9fd6280ee498a45228dd79cf9dbc8bebd6b74bbb9e4a0a328f747",
           "field": "metrics.coverage"
         }
       ]
@@ -768,7 +768,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
-          "sha256": "0222419fee26ca7836471e4d30d48afa4106cc27c257823127ed1f072f45de2b",
+          "sha256": "cfc6869431e9fd6280ee498a45228dd79cf9dbc8bebd6b74bbb9e4a0a328f747",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -791,7 +791,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_calibration.json",
-          "sha256": "a37d7a78a19ef9e14355c4b7cf882ef87f2588a4295eeda38ed0e538dcf79b82",
+          "sha256": "2e33362575bbe55771b138b73bdbe7eca9e048e4ec57f455bc1574eaa44c63e3",
           "field": "metrics.ece"
         }
       ]
@@ -814,7 +814,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_selective.json",
-          "sha256": "548b03e1a93d960997d67eedbe6b888f86ac26a95a4e46ee4e734e1aa8f0ea47",
+          "sha256": "e99550c984c21fe5d395e846a8471043d362bf5358c8137c5019a1b78538cff7",
           "field": "metrics.e_aurc"
         }
       ]
@@ -837,7 +837,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
-          "sha256": "bfdf65f152f4c56e78afcc0536442b9cf528a02aae04c0992240dad3933b30b2",
+          "sha256": "377462818cac7d88c09c42a53b8fe0306b9a810dfe0ef6e2d874c6be86ac5f77",
           "field": "metrics.top1"
         }
       ]
@@ -860,7 +860,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
-          "sha256": "bfdf65f152f4c56e78afcc0536442b9cf528a02aae04c0992240dad3933b30b2",
+          "sha256": "377462818cac7d88c09c42a53b8fe0306b9a810dfe0ef6e2d874c6be86ac5f77",
           "field": "metrics.top5"
         }
       ]
@@ -889,7 +889,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
-          "sha256": "fd486b9f3c5fd128e37f6b674537aabc8fa06ec357a4a001d761ec583bc29d55",
+          "sha256": "5f91a45324a28e2e9ccb411dec220018908daeb6185f88c70a80cab5f6fd720b",
           "field": "metrics.coverage"
         }
       ]
@@ -918,7 +918,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
-          "sha256": "fd486b9f3c5fd128e37f6b674537aabc8fa06ec357a4a001d761ec583bc29d55",
+          "sha256": "5f91a45324a28e2e9ccb411dec220018908daeb6185f88c70a80cab5f6fd720b",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -941,7 +941,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_calibration.json",
-          "sha256": "2a663ca973c8d11bcdba622cb3c0327c029fb6eddf752bb0e22dbd88c5d6edaa",
+          "sha256": "c274a261356fa645f3b59b62249e41a93def8688495e4a7e608222788c1f1334",
           "field": "metrics.ece"
         }
       ]
@@ -964,7 +964,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_selective.json",
-          "sha256": "1b02eb53c89ee7f410c29d6d2ecf283068dd3c04e8a8045f864939add256104f",
+          "sha256": "bd5f66579a274f196e84e0bfe61feaec4b5ef6da0bde5049ee6cb231d4504d76",
           "field": "metrics.e_aurc"
         }
       ]
@@ -987,7 +987,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3.json",
-          "sha256": "0c96ac0f61f006130e5b18f56c26aa6c88fa9c2a2dae4f496fe949562b5460bc",
+          "sha256": "1a9e2c5ef4b529e1abe92c5317b03be94dfcc3bda34e3501ac812a7f022085ed",
           "field": "metrics.top1"
         }
       ]
@@ -1010,7 +1010,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3.json",
-          "sha256": "0c96ac0f61f006130e5b18f56c26aa6c88fa9c2a2dae4f496fe949562b5460bc",
+          "sha256": "1a9e2c5ef4b529e1abe92c5317b03be94dfcc3bda34e3501ac812a7f022085ed",
           "field": "metrics.top5"
         }
       ]
@@ -1039,7 +1039,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
-          "sha256": "26732f7d947328b10abb6ef295ed4a0ddfbd40c29bd3cbfe217ad6af3be4d830",
+          "sha256": "81a8dc03591f2a4b742629bc22a807d2d81cf79aef62e6b815e2e9166381960e",
           "field": "metrics.coverage"
         }
       ]
@@ -1068,7 +1068,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
-          "sha256": "26732f7d947328b10abb6ef295ed4a0ddfbd40c29bd3cbfe217ad6af3be4d830",
+          "sha256": "81a8dc03591f2a4b742629bc22a807d2d81cf79aef62e6b815e2e9166381960e",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1091,7 +1091,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_calibration.json",
-          "sha256": "dfb1befe2a585162f4e20e5a199a67ed3f767cae957fbfb6e1d5ddd199efb1d8",
+          "sha256": "1b970b00cb2a10a605b73f8a06e422e0ce0b5a4025e5bb4ebeee449a8a9da77b",
           "field": "metrics.ece"
         }
       ]
@@ -1114,7 +1114,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_selective.json",
-          "sha256": "cdd3fe71f72ee1741c663cc317bc9c29545c5340bf717192177605b408d72f7b",
+          "sha256": "f133d243de919c6f1970173d0d1f9d9edab90520ef5276f673e825131d9614a9",
           "field": "metrics.e_aurc"
         }
       ]
@@ -1137,7 +1137,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.json",
-          "sha256": "1a1e12c7b5f6614a9191900cd223e01beff577d0aff30bf1b6b87d9357dcabd3",
+          "sha256": "0dbf692b3c0e7f2754accc017a7f40096e7d35114c91b0de1e3166ff46cd3b11",
           "field": "metrics.top1"
         }
       ]
@@ -1160,7 +1160,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.json",
-          "sha256": "1a1e12c7b5f6614a9191900cd223e01beff577d0aff30bf1b6b87d9357dcabd3",
+          "sha256": "0dbf692b3c0e7f2754accc017a7f40096e7d35114c91b0de1e3166ff46cd3b11",
           "field": "metrics.top5"
         }
       ]
@@ -1189,7 +1189,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
-          "sha256": "a440aeaa7a43936cb6a25a2faddcadb472b2710b061f8874f0a65ba8b813c371",
+          "sha256": "eefb1b13f4897a290cf94a55a3b2de042ead7f24ef5a0408cb50495430c48e95",
           "field": "metrics.coverage"
         }
       ]
@@ -1218,7 +1218,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
-          "sha256": "a440aeaa7a43936cb6a25a2faddcadb472b2710b061f8874f0a65ba8b813c371",
+          "sha256": "eefb1b13f4897a290cf94a55a3b2de042ead7f24ef5a0408cb50495430c48e95",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1241,7 +1241,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_calibration.json",
-          "sha256": "55095215805d8df91d33417b8a251a3a961e74a5f461588db4fb67b603fc940a",
+          "sha256": "f172b02b0d5fddf9859659f9a5bdf2cbd97622dfd32b8bea1a4c22d4c1ccb4a3",
           "field": "metrics.ece"
         }
       ]
@@ -1264,7 +1264,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_selective.json",
-          "sha256": "d5a6fa0cd830e79b44cf0e43dfa5f8781be95b683bcb4cb2f06a86a953fba2bb",
+          "sha256": "49ba57437775d4959ab7cc63b33ac4d3db9137a803e6450364633e69b4bb2f67",
           "field": "metrics.e_aurc"
         }
       ]
@@ -1287,7 +1287,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-          "sha256": "add260bf95f0a8dbd907799b45a31c3db7e51c5e805e6f6234b4dfa17832f55b",
+          "sha256": "71761eac0aa7f09ee0221d18427ed9272efc42e97591fe6515968b624d95dc0f",
           "field": "metrics.top1"
         }
       ]
@@ -1310,7 +1310,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-          "sha256": "add260bf95f0a8dbd907799b45a31c3db7e51c5e805e6f6234b4dfa17832f55b",
+          "sha256": "71761eac0aa7f09ee0221d18427ed9272efc42e97591fe6515968b624d95dc0f",
           "field": "metrics.top5"
         }
       ]
@@ -1339,7 +1339,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
-          "sha256": "85a4a2e7bc81ccf2b963fb3848d0639515e9454b98253f8b53baf40d5668c35a",
+          "sha256": "ca0c9228ba1766076d67a561df7376a1ca3620326e067e8d9f974c5ffbafea0f",
           "field": "metrics.coverage"
         }
       ]
@@ -1368,7 +1368,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
-          "sha256": "85a4a2e7bc81ccf2b963fb3848d0639515e9454b98253f8b53baf40d5668c35a",
+          "sha256": "ca0c9228ba1766076d67a561df7376a1ca3620326e067e8d9f974c5ffbafea0f",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1391,7 +1391,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_calibration.json",
-          "sha256": "198bd640b4c7954289e75dc21a18d2a5457f8510369b86b37c2f0572ffba1a45",
+          "sha256": "6f19f3814acc2cee50ffa4976e4a801b19106fbf9f31692441362cb0445f87e6",
           "field": "metrics.ece"
         }
       ]
@@ -1414,7 +1414,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_selective.json",
-          "sha256": "9a1f87806cd0ddbde54e3116bc5816b3f0040774817871777eac076b7a6434ea",
+          "sha256": "d9dbe939861d3883f6f8d3b6c57886bbb150b1ac13694090a752def53bee83f2",
           "field": "metrics.e_aurc"
         }
       ]
@@ -1437,7 +1437,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
-          "sha256": "b8df81cdee054158081dbcdcc39a55fe76a9114d6c860c3873cfa667c3ea9065",
+          "sha256": "e6449e06efef559b57f7921f90f30fd3a5f40ae6257b4419bbb7e8f79431a363",
           "field": "metrics.top1"
         }
       ]
@@ -1460,7 +1460,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
-          "sha256": "b8df81cdee054158081dbcdcc39a55fe76a9114d6c860c3873cfa667c3ea9065",
+          "sha256": "e6449e06efef559b57f7921f90f30fd3a5f40ae6257b4419bbb7e8f79431a363",
           "field": "metrics.top5"
         }
       ]
@@ -1489,7 +1489,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
-          "sha256": "7e82d23dfa32d691beca0fc2e1551f1a8aad17a556d032ab32c36948f7c070e0",
+          "sha256": "fa295d03cb3d1d782456f9e4bcf5834e1bf9eec266d4559c23af2d5f5d387782",
           "field": "metrics.coverage"
         }
       ]
@@ -1518,7 +1518,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
-          "sha256": "7e82d23dfa32d691beca0fc2e1551f1a8aad17a556d032ab32c36948f7c070e0",
+          "sha256": "fa295d03cb3d1d782456f9e4bcf5834e1bf9eec266d4559c23af2d5f5d387782",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1541,7 +1541,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_calibration.json",
-          "sha256": "bc4bd39c3ef2978dce513aac6629f81789e763394b0bbeabbfaf4a8105af01c5",
+          "sha256": "d636f25aee505d09b14274e291dbf838d4d7a662a755139471596d0e42c88fd9",
           "field": "metrics.ece"
         }
       ]
@@ -1564,7 +1564,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_selective.json",
-          "sha256": "b19197b334df0fd7099f0677cb1d6894c75cda09f4fe3a42346d7a6c15cba104",
+          "sha256": "b8a0e3b36545f8c9a48cea4d06cc049f257d101f6737c5c22fbc0580ddfc5697",
           "field": "metrics.e_aurc"
         }
       ]
@@ -1587,7 +1587,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
-          "sha256": "1fe141367db65f7b0aaf58ba929ae21ee6cfedb804fd81bf16d1e9a7d261494b",
+          "sha256": "33d0b92a8394bc005ae75931c6cb76799c864c9b32ec2918633bc0caf10b7571",
           "field": "metrics.top1"
         }
       ]
@@ -1610,7 +1610,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
-          "sha256": "1fe141367db65f7b0aaf58ba929ae21ee6cfedb804fd81bf16d1e9a7d261494b",
+          "sha256": "33d0b92a8394bc005ae75931c6cb76799c864c9b32ec2918633bc0caf10b7571",
           "field": "metrics.top5"
         }
       ]
@@ -1639,7 +1639,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
-          "sha256": "a3544af31c817e34de588d587a280bd38add7244a5371a27de27596f6e41ce1d",
+          "sha256": "4f1b3258c857b8169e74a4e07868121ebe8cadb5ee8917465e799100757765ca",
           "field": "metrics.coverage"
         }
       ]
@@ -1668,7 +1668,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
-          "sha256": "a3544af31c817e34de588d587a280bd38add7244a5371a27de27596f6e41ce1d",
+          "sha256": "4f1b3258c857b8169e74a4e07868121ebe8cadb5ee8917465e799100757765ca",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1691,7 +1691,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_calibration.json",
-          "sha256": "d2693489c71b3fd1a3aaf443d301f0ed1ba104ededb8bf6421527876b798829b",
+          "sha256": "f746879244e1ccf5dc886b6031308fce7ed0ad3219d4bb3062cc6dbc1bc98d83",
           "field": "metrics.ece"
         }
       ]
@@ -1714,7 +1714,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_selective.json",
-          "sha256": "bdfa77a1d242c1510c7567362cb079227c8c3c7e3049c30b06d1e5e738e5189a",
+          "sha256": "1fa4ae43bccdafe371245f4eafa922c37a479e2e6f56b4cbc7093087f00d13e8",
           "field": "metrics.e_aurc"
         }
       ]
@@ -1737,7 +1737,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
-          "sha256": "076b9505130d3476e5bd42c562aa9e1e7b8b3a8e78f6cffbed795a8cc5de25ac",
+          "sha256": "9019036d5a023f905de222e8ef85e1c99ee49d76facaa259ebb23abed5f4dde4",
           "field": "metrics.top1"
         }
       ]
@@ -1760,7 +1760,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
-          "sha256": "076b9505130d3476e5bd42c562aa9e1e7b8b3a8e78f6cffbed795a8cc5de25ac",
+          "sha256": "9019036d5a023f905de222e8ef85e1c99ee49d76facaa259ebb23abed5f4dde4",
           "field": "metrics.top5"
         }
       ]
@@ -1789,7 +1789,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
-          "sha256": "21b2f8b38fa6f880b6160642d3137ff70906d1a14d7ffc00f1234eaf8b11238c",
+          "sha256": "56957c65f47e342703fd8486c796a99c7bfb1112ba1940620a91ae8f73de1630",
           "field": "metrics.coverage"
         }
       ]
@@ -1818,7 +1818,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
-          "sha256": "21b2f8b38fa6f880b6160642d3137ff70906d1a14d7ffc00f1234eaf8b11238c",
+          "sha256": "56957c65f47e342703fd8486c796a99c7bfb1112ba1940620a91ae8f73de1630",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1841,7 +1841,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_calibration.json",
-          "sha256": "9a70bf746024f5b35d2a38d41b583322f4c01ccb6f4bd7bd76d3a1d8c844438e",
+          "sha256": "76247e5c56935cc7d3dc03a73b84326d3d46dd1d42179e993572b22713ac51b7",
           "field": "metrics.ece"
         }
       ]
@@ -1864,7 +1864,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_selective.json",
-          "sha256": "e30a186177c8f9c6034ca43d3b30fe0f028348922649a74ae377f6d326c121a9",
+          "sha256": "81cf013c50365b9370d40d79a19e9744f86d9701a64011875c338038913e902f",
           "field": "metrics.e_aurc"
         }
       ]
@@ -1887,7 +1887,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
-          "sha256": "0c0125f9ab73887024dbe8adc21f757302cdf654e355a53e2064e9491fb47cad",
+          "sha256": "ff7cf286632bcfffca67ce5047f6969818dadbf404a9c70acfd06e66ed79cc76",
           "field": "metrics.top1"
         }
       ]
@@ -1910,7 +1910,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
-          "sha256": "0c0125f9ab73887024dbe8adc21f757302cdf654e355a53e2064e9491fb47cad",
+          "sha256": "ff7cf286632bcfffca67ce5047f6969818dadbf404a9c70acfd06e66ed79cc76",
           "field": "metrics.top5"
         }
       ]
@@ -1939,7 +1939,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
-          "sha256": "42d65a65ad1f8b6f39bbcfd4e04c215891d252324dc408855356e76ffa9c9618",
+          "sha256": "cc4676c85ed45e7427d28f55654b2b1e12ed14417d82fe88115c0fc4ab163508",
           "field": "metrics.coverage"
         }
       ]
@@ -1968,7 +1968,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
-          "sha256": "42d65a65ad1f8b6f39bbcfd4e04c215891d252324dc408855356e76ffa9c9618",
+          "sha256": "cc4676c85ed45e7427d28f55654b2b1e12ed14417d82fe88115c0fc4ab163508",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -1991,7 +1991,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_calibration.json",
-          "sha256": "667f4eadf2eeeb706deb73a7d6eae71a663ab6ba7a3abf04be78a273f323c64e",
+          "sha256": "a3f2a67182e39f07b4203b113508338b77b80dd39835d50372abbb87de9b5f62",
           "field": "metrics.ece"
         }
       ]
@@ -2014,7 +2014,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_selective.json",
-          "sha256": "885041ca935fb7a7dcc9eccc088a2ea6fbbaa20799a49b4ad117dcb2c3eb861e",
+          "sha256": "88c40bba9a5803c00d11f6386af314d7c6ce5095259750488ca55fc9269ef408",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2037,7 +2037,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
-          "sha256": "cd7dcbced6ad01f84f0fa69c6a19a0d4cd4817383a6ef1ec4dc95da0aa6f8b88",
+          "sha256": "4ba3c529bf5c1707535d9d35d578cd4b6075d810f1770cca442f41cd822d10ed",
           "field": "metrics.top1"
         }
       ]
@@ -2060,7 +2060,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
-          "sha256": "cd7dcbced6ad01f84f0fa69c6a19a0d4cd4817383a6ef1ec4dc95da0aa6f8b88",
+          "sha256": "4ba3c529bf5c1707535d9d35d578cd4b6075d810f1770cca442f41cd822d10ed",
           "field": "metrics.top5"
         }
       ]
@@ -2089,7 +2089,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
-          "sha256": "971b4d00ad723508ba341bd6ce79e32ff2a880cc75807e675e47911365bf9dc5",
+          "sha256": "8708ad7592b3f9eb11f1e47aaa63ba698a58fc066114e7546135b76027d99f68",
           "field": "metrics.coverage"
         }
       ]
@@ -2118,7 +2118,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
-          "sha256": "971b4d00ad723508ba341bd6ce79e32ff2a880cc75807e675e47911365bf9dc5",
+          "sha256": "8708ad7592b3f9eb11f1e47aaa63ba698a58fc066114e7546135b76027d99f68",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -2141,7 +2141,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_calibration.json",
-          "sha256": "c5e68a09c84275ea686175dcb98238627258524b86a8dbcbd1fa65222c03c056",
+          "sha256": "95f7dc536ee4427c6ee68524e09362db4e136187e16b8639eadd11c3c86db1ab",
           "field": "metrics.ece"
         }
       ]
@@ -2164,7 +2164,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_selective.json",
-          "sha256": "eeee4cb29f90d4f289556c36b855510db3ed05448ca33dfecb87e9ec06a7b6e0",
+          "sha256": "a3726966a8da978b4f081b74686454b25ac696749d105a0a2d26cb6e8e7d414c",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2187,7 +2187,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
-          "sha256": "76ed5154ba982668ee9558d32e96323e7071afa8e8312380270b393e41269fef",
+          "sha256": "2b4e0d158866d29e70947048dcb3fa2c33260f35c651f344ef2b8a4bddc6872f",
           "field": "metrics.top1"
         }
       ]
@@ -2210,7 +2210,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
-          "sha256": "76ed5154ba982668ee9558d32e96323e7071afa8e8312380270b393e41269fef",
+          "sha256": "2b4e0d158866d29e70947048dcb3fa2c33260f35c651f344ef2b8a4bddc6872f",
           "field": "metrics.top5"
         }
       ]
@@ -2239,7 +2239,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
-          "sha256": "94e61cd9cd37af424f0ec4147dc8678c74f4bb3c633a1f761825365f5e3b42ee",
+          "sha256": "9ed0125acb6ad009ba442689458f2a03b2431e7f66100d23c2110deec4f1094a",
           "field": "metrics.coverage"
         }
       ]
@@ -2268,7 +2268,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
-          "sha256": "94e61cd9cd37af424f0ec4147dc8678c74f4bb3c633a1f761825365f5e3b42ee",
+          "sha256": "9ed0125acb6ad009ba442689458f2a03b2431e7f66100d23c2110deec4f1094a",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -2291,7 +2291,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_calibration.json",
-          "sha256": "e1a9830317e9e89f205a086b97df5acb7877774c4734dfc677879e6ae3bf20cb",
+          "sha256": "57a8f21d7818474d451192db593e22c4155ca8b022198534b615b13d6442c730",
           "field": "metrics.ece"
         }
       ]
@@ -2314,7 +2314,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_selective.json",
-          "sha256": "702ddc0a83aff0829ecbb492d2f0ca915c50cedeefdecc36cf671586253a4846",
+          "sha256": "41cef654ffe00a99d986660fe82aaedcefc02cd7849e4311af14ceab497d9ffc",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2337,7 +2337,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0.json",
-          "sha256": "655d7cc4a95ef1b2447f62501114196ce9916e978bfee925d7ce4831f48877f9",
+          "sha256": "0bfc1c16da14ca0b3138fc755bdf04e53bf3f31fb891c02656ef80e5c674883f",
           "field": "metrics.top1"
         }
       ]
@@ -2360,7 +2360,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0.json",
-          "sha256": "655d7cc4a95ef1b2447f62501114196ce9916e978bfee925d7ce4831f48877f9",
+          "sha256": "0bfc1c16da14ca0b3138fc755bdf04e53bf3f31fb891c02656ef80e5c674883f",
           "field": "metrics.top5"
         }
       ]
@@ -2389,7 +2389,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_conformal.json",
-          "sha256": "42a2bbd89c28c1d8d3b1c87ceb0b88329fa956c78b6430e98917cdcd4f592338",
+          "sha256": "c2b8962779776e63ef93227ebd151769cb7f0121b5e4ecf04bc0d41e67673ef6",
           "field": "metrics.coverage"
         }
       ]
@@ -2418,7 +2418,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_conformal.json",
-          "sha256": "42a2bbd89c28c1d8d3b1c87ceb0b88329fa956c78b6430e98917cdcd4f592338",
+          "sha256": "c2b8962779776e63ef93227ebd151769cb7f0121b5e4ecf04bc0d41e67673ef6",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -2441,7 +2441,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_calibration.json",
-          "sha256": "cc054258806f6bfa02b34034f346030bda3b80f86c23e8fbf8ba94273bdddda8",
+          "sha256": "cf7c36d3c45486f19de9c9606d12ca7fcb14fbafe53ec82c23204425615430d4",
           "field": "metrics.ece"
         }
       ]
@@ -2464,7 +2464,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_selective.json",
-          "sha256": "6cd15b61a5e8ccf872d4e6e1e9bf3f39019aac5eb9cf58071c9cd9d684a1a4e6",
+          "sha256": "d815328775ab54f6c99268690891ea31c2d708a80136635c7b5a164734719052",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2487,7 +2487,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3.json",
-          "sha256": "77a31627d2cca50f79bfcc229d6ad10b6b13a11407d01ab991b68239445cbc43",
+          "sha256": "266825cc4192f414d9d7ab38daf8590cf1a7153385f45c22d496eb1b0a8f4d1b",
           "field": "metrics.top1"
         }
       ]
@@ -2510,7 +2510,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3.json",
-          "sha256": "77a31627d2cca50f79bfcc229d6ad10b6b13a11407d01ab991b68239445cbc43",
+          "sha256": "266825cc4192f414d9d7ab38daf8590cf1a7153385f45c22d496eb1b0a8f4d1b",
           "field": "metrics.top5"
         }
       ]
@@ -2539,7 +2539,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
-          "sha256": "13a5812d9de930b2f4ba6e8023df7002f3f483ae4c862e7cfafa52830afbebe3",
+          "sha256": "2ee8a388591248af26a91194c08be4c8b0baa95caf8f634ac6ee75256753e3b1",
           "field": "metrics.coverage"
         }
       ]
@@ -2568,7 +2568,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
-          "sha256": "13a5812d9de930b2f4ba6e8023df7002f3f483ae4c862e7cfafa52830afbebe3",
+          "sha256": "2ee8a388591248af26a91194c08be4c8b0baa95caf8f634ac6ee75256753e3b1",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -2591,7 +2591,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_calibration.json",
-          "sha256": "da7e313a7c0db3251d4f367af79ad4d76a2a911cf0d6ba451b55b9646c3864ee",
+          "sha256": "9bead68c15f4ca6c694caf8d7b80535a6391b3d8822a673f2959b7ba5c194942",
           "field": "metrics.ece"
         }
       ]
@@ -2614,7 +2614,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_selective.json",
-          "sha256": "6f8964834eb2eb97e2f326f3b2203e496345f5a5756766f63e4da83784311702",
+          "sha256": "b2b8ab0a240b145e47debe42cd150cafb1e06050d14992bbcf9a6aba28970d26",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2637,7 +2637,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5.json",
-          "sha256": "1623940c9fa39b7b68624fb56cd35b7e4672e77c899aca033884e57409641cf3",
+          "sha256": "f2cffb6a4d7cff3e0719371a2658dcb3d8771ca205df7f1b131ce6b63e0544ba",
           "field": "metrics.top1"
         }
       ]
@@ -2660,7 +2660,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5.json",
-          "sha256": "1623940c9fa39b7b68624fb56cd35b7e4672e77c899aca033884e57409641cf3",
+          "sha256": "f2cffb6a4d7cff3e0719371a2658dcb3d8771ca205df7f1b131ce6b63e0544ba",
           "field": "metrics.top5"
         }
       ]
@@ -2689,7 +2689,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
-          "sha256": "7402da75bc98403b9fee5b096947a7d0a2ed06264f5cebf7f0fd1ff7bb407458",
+          "sha256": "39a0860324533cde2aef96faae096308ddec11662c429d290d622b796bf580c5",
           "field": "metrics.coverage"
         }
       ]
@@ -2718,7 +2718,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
-          "sha256": "7402da75bc98403b9fee5b096947a7d0a2ed06264f5cebf7f0fd1ff7bb407458",
+          "sha256": "39a0860324533cde2aef96faae096308ddec11662c429d290d622b796bf580c5",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -2741,7 +2741,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_calibration.json",
-          "sha256": "2779c1ae9c98911a38fe9447ebc08098810b9ec29cbed34c04865268ec0b113e",
+          "sha256": "75c9bbfdd15d043a10fab377148bd5f3aa214354b78bab572aa73aac0df08cd9",
           "field": "metrics.ece"
         }
       ]
@@ -2764,7 +2764,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_selective.json",
-          "sha256": "7764b8630f3cc5a0242a800432a17cfa61462ffe6f492170348ab9b9a04d2f3f",
+          "sha256": "b6026a40b5ba877923fe814d948ce19889fe7da4b946b16db92cd3c135c97def",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2787,7 +2787,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
-          "sha256": "69372e035878e5bfa0d778e1bdfd244fa0570623c25a2c2c77bd4db4d5b7953a",
+          "sha256": "4abbc6ab03aa912ecd6525332fe0c017492083e239945e27db715eb848afbc1d",
           "field": "metrics.top1"
         }
       ]
@@ -2810,7 +2810,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
-          "sha256": "69372e035878e5bfa0d778e1bdfd244fa0570623c25a2c2c77bd4db4d5b7953a",
+          "sha256": "4abbc6ab03aa912ecd6525332fe0c017492083e239945e27db715eb848afbc1d",
           "field": "metrics.top5"
         }
       ]
@@ -2839,7 +2839,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
-          "sha256": "d3a9302ee0ec44d4a96dca6fafda75a2140c2430b17988a7fcc03c141d4927a5",
+          "sha256": "d4fdf645c7d9392000d977413b181d9f7ab10ae07d0fc910170996fafcb72641",
           "field": "metrics.coverage"
         }
       ]
@@ -2868,7 +2868,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
-          "sha256": "d3a9302ee0ec44d4a96dca6fafda75a2140c2430b17988a7fcc03c141d4927a5",
+          "sha256": "d4fdf645c7d9392000d977413b181d9f7ab10ae07d0fc910170996fafcb72641",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -2891,7 +2891,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_calibration.json",
-          "sha256": "5fa8bc28e7ddd54b6e48609c32dd0d309486f9a4cec8d7cafacf3ca0539d2778",
+          "sha256": "b30db6039d0554db7f12ae4f4c16569eb15145b510eefcbc9e1e4bf7d4bcb1c9",
           "field": "metrics.ece"
         }
       ]
@@ -2914,7 +2914,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_selective.json",
-          "sha256": "f66e0b4a5dedf2cefe47007c587092c75b673b3a71d877af62238b1a8d7d64d2",
+          "sha256": "a3915dc7baf15d4dd27c2d0391b75d68ab8ab6f77bb7dfb25b0d96632ee72aa9",
           "field": "metrics.e_aurc"
         }
       ]
@@ -2937,7 +2937,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3.json",
-          "sha256": "27855b42ec888d92b638f8f84b80b812a92ef3b4f060f744d03be0057c9cc547",
+          "sha256": "760859b9c563d47efdaf5a9bcbf30e74d460a526fe83bef4d4dadf5ee806af21",
           "field": "metrics.top1"
         }
       ]
@@ -2960,7 +2960,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3.json",
-          "sha256": "27855b42ec888d92b638f8f84b80b812a92ef3b4f060f744d03be0057c9cc547",
+          "sha256": "760859b9c563d47efdaf5a9bcbf30e74d460a526fe83bef4d4dadf5ee806af21",
           "field": "metrics.top5"
         }
       ]
@@ -2989,7 +2989,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
-          "sha256": "b3f2dc110913bc148c1d999e107aad2067cf2f700d72a2a5744bb4aad7f15370",
+          "sha256": "c0fa83c8ccffca0f9b848c2d29d2449abf708c724e3743538f271d9f83521c87",
           "field": "metrics.coverage"
         }
       ]
@@ -3018,7 +3018,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
-          "sha256": "b3f2dc110913bc148c1d999e107aad2067cf2f700d72a2a5744bb4aad7f15370",
+          "sha256": "c0fa83c8ccffca0f9b848c2d29d2449abf708c724e3743538f271d9f83521c87",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3041,7 +3041,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_calibration.json",
-          "sha256": "e585fe0041da01b847af02773c422abfd839bd9f65150fa06bb12254f4077e39",
+          "sha256": "31e5d902cd11f823898a8765cd90347d2ec7a6087eed8cea0b905a92b2cc0fef",
           "field": "metrics.ece"
         }
       ]
@@ -3064,7 +3064,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_selective.json",
-          "sha256": "1a05e705c84dd821dcc2b0f2dba8bfe2846f2066502e568197a2c1f043c5971e",
+          "sha256": "503f2c7fcf9ad12c80f0f11de7673d330ccd7bdba851e4525a0f75835963d3e0",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3087,7 +3087,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3.json",
-          "sha256": "a134cadb96edb590570892379a8f9090e1c49de1d44f96b5d2d8b9ee25d67943",
+          "sha256": "56c1a37a05cb53d43131bff328b3c7afe15f9d1de881962fe3c4c7bbc2eb3398",
           "field": "metrics.top1"
         }
       ]
@@ -3110,7 +3110,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3.json",
-          "sha256": "a134cadb96edb590570892379a8f9090e1c49de1d44f96b5d2d8b9ee25d67943",
+          "sha256": "56c1a37a05cb53d43131bff328b3c7afe15f9d1de881962fe3c4c7bbc2eb3398",
           "field": "metrics.top5"
         }
       ]
@@ -3139,7 +3139,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
-          "sha256": "852f9e865282682b8783a588ab09c1079c8d1077b0b0f67b71d7d369931a67fa",
+          "sha256": "7e59a8d970acca1985511ef4c00147a69dfb76c3a623004ccaaf05d90c33e654",
           "field": "metrics.coverage"
         }
       ]
@@ -3168,7 +3168,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
-          "sha256": "852f9e865282682b8783a588ab09c1079c8d1077b0b0f67b71d7d369931a67fa",
+          "sha256": "7e59a8d970acca1985511ef4c00147a69dfb76c3a623004ccaaf05d90c33e654",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3191,7 +3191,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_calibration.json",
-          "sha256": "6bbf38ce6ee480c3d8767f26fa1e33ec3ea6e7f7b4b465530ef49b6e1a41c161",
+          "sha256": "a0c4a529066bf539d56f793e8d732c1833cc03ef82062ec7fa697f6e3568eab5",
           "field": "metrics.ece"
         }
       ]
@@ -3214,7 +3214,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_selective.json",
-          "sha256": "18ad92ecc3e499151e2ce59d68a6dfc73d1441870ed4c42fc975dd1e28382d3e",
+          "sha256": "3a5fe1bb906589dd2a4419532b89d381a9c0e6a30e1f45cae99c575dbe98503c",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3237,7 +3237,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-          "sha256": "08c1197d210fc5c2d580ac31f4ce6d2a2fdbb2d625fb67ccb3d2acc2aa0d85cd",
+          "sha256": "ae3cb7f401c5255da39143314ac9ef297b29851e37ae7cc1ffa07f161aac7b9f",
           "field": "metrics.top1"
         }
       ]
@@ -3260,7 +3260,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-          "sha256": "08c1197d210fc5c2d580ac31f4ce6d2a2fdbb2d625fb67ccb3d2acc2aa0d85cd",
+          "sha256": "ae3cb7f401c5255da39143314ac9ef297b29851e37ae7cc1ffa07f161aac7b9f",
           "field": "metrics.top5"
         }
       ]
@@ -3289,7 +3289,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
-          "sha256": "13b21b793bb96e375053c35f983aa2aec0d4cc829c202ff3069ab22969fb2cf1",
+          "sha256": "fef84f88b4d567f44b5c66c38d292187f7c2ebd319c3669e0187d83db39f29bb",
           "field": "metrics.coverage"
         }
       ]
@@ -3318,7 +3318,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
-          "sha256": "13b21b793bb96e375053c35f983aa2aec0d4cc829c202ff3069ab22969fb2cf1",
+          "sha256": "fef84f88b4d567f44b5c66c38d292187f7c2ebd319c3669e0187d83db39f29bb",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3341,7 +3341,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_calibration.json",
-          "sha256": "92eee92caeead302ff8222b6e27972fbc8dd8efb1a9a2b775d4b714c40c37ec2",
+          "sha256": "ee4de7e82efb5bdde65a3079c04b20680b452fbdb68096f83c40ef51ee133424",
           "field": "metrics.ece"
         }
       ]
@@ -3364,7 +3364,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_selective.json",
-          "sha256": "a932c8d39ea9f07affa726ac5f29b2e9487ef7ab323ae8f8c0d8af58d8f185b2",
+          "sha256": "0f2144c59f092511462fe0eed58d82d6790f7b6bfd4759aa1b2bfa9aee3f3f39",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3387,7 +3387,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
-          "sha256": "c98116013fdb84e27186ecc9609b96ca9bc35c5eb1c784005f2cceba34b727fe",
+          "sha256": "c743e14206a6af44a438822c4d9d159f11467dc1216fb5794c6842f421de7284",
           "field": "metrics.top1"
         }
       ]
@@ -3410,7 +3410,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
-          "sha256": "c98116013fdb84e27186ecc9609b96ca9bc35c5eb1c784005f2cceba34b727fe",
+          "sha256": "c743e14206a6af44a438822c4d9d159f11467dc1216fb5794c6842f421de7284",
           "field": "metrics.top5"
         }
       ]
@@ -3439,7 +3439,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
-          "sha256": "63908ef2ab1c5298ecab905531790969e1dc6732eee017f47e57931b42b9be9f",
+          "sha256": "5d9140831ab02223eae7b92f5cfb50c90905e2787f03e7839321259565499bfd",
           "field": "metrics.coverage"
         }
       ]
@@ -3468,7 +3468,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
-          "sha256": "63908ef2ab1c5298ecab905531790969e1dc6732eee017f47e57931b42b9be9f",
+          "sha256": "5d9140831ab02223eae7b92f5cfb50c90905e2787f03e7839321259565499bfd",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3491,7 +3491,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_calibration.json",
-          "sha256": "6be1b1ff20ecf247b70ee3b99b77adf361ab544057ffe66c743472324f0252b6",
+          "sha256": "07d9f8be0755d7ae73c87fbf48e48b4dfe4635a9d4002e9fc566a4832b391d2a",
           "field": "metrics.ece"
         }
       ]
@@ -3514,7 +3514,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_selective.json",
-          "sha256": "7c51f54b4d10a9d78520daa85f88c91dc9ab42478f52fc599db675eb9aa10fce",
+          "sha256": "7cb531decd581b21fbb5b29c3421d49ce905a070d7236b0c9f4a16007597f730",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3537,7 +3537,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
-          "sha256": "20b2bc0df3f183dec38fe58783a7d957a74f073703a8732f6ba95f46d2cf054b",
+          "sha256": "6f2525ad2e0060e3a41b56141e43c38acccdce7a00133a12edc1debd995c7966",
           "field": "metrics.top1"
         }
       ]
@@ -3560,7 +3560,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
-          "sha256": "20b2bc0df3f183dec38fe58783a7d957a74f073703a8732f6ba95f46d2cf054b",
+          "sha256": "6f2525ad2e0060e3a41b56141e43c38acccdce7a00133a12edc1debd995c7966",
           "field": "metrics.top5"
         }
       ]
@@ -3589,7 +3589,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
-          "sha256": "ea1ad8850a9bf1923748757f75bb6c3e3b329bf04d54571ee60c20aea7ca7e61",
+          "sha256": "da772beeb798167ceabf351790bdd887b151ecfc5e7938e33df38ea65ba3714f",
           "field": "metrics.coverage"
         }
       ]
@@ -3618,7 +3618,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
-          "sha256": "ea1ad8850a9bf1923748757f75bb6c3e3b329bf04d54571ee60c20aea7ca7e61",
+          "sha256": "da772beeb798167ceabf351790bdd887b151ecfc5e7938e33df38ea65ba3714f",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3641,7 +3641,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_calibration.json",
-          "sha256": "352a20212157604ddb89a41f50647445660887ba38b74600efd5f21ecd20e18b",
+          "sha256": "ba917ae0399a3f4b7af20c9b121fe84030e2a19ae75d480326494985daef9962",
           "field": "metrics.ece"
         }
       ]
@@ -3664,7 +3664,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_selective.json",
-          "sha256": "0d1142fa98138cf16de2851c17538467e84ecba483621d86c537241138fe7e8f",
+          "sha256": "656b01b0df1520ed7fd695cc5bbb151a784552f61bcc0ab013e47225f0d21d6e",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3687,7 +3687,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
-          "sha256": "1c1f96b0749d58e44aec4a49c4151932c7f361196b89073e800790d66908c95f",
+          "sha256": "b93c9157a4ce5dcece3aaced0e8676aaea8302b78e78cbc6b63bd719a1224a55",
           "field": "metrics.top1"
         }
       ]
@@ -3710,7 +3710,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
-          "sha256": "1c1f96b0749d58e44aec4a49c4151932c7f361196b89073e800790d66908c95f",
+          "sha256": "b93c9157a4ce5dcece3aaced0e8676aaea8302b78e78cbc6b63bd719a1224a55",
           "field": "metrics.top5"
         }
       ]
@@ -3739,7 +3739,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
-          "sha256": "af7cb4820031a754905877e1da24fe9ff33b642f3a2a00812c2bc0d9be48f7c0",
+          "sha256": "22b38cf1a3d169c3fc91b44950e2ed7e36fb57f29ac01fea7daf810c327aa4a0",
           "field": "metrics.coverage"
         }
       ]
@@ -3768,7 +3768,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
-          "sha256": "af7cb4820031a754905877e1da24fe9ff33b642f3a2a00812c2bc0d9be48f7c0",
+          "sha256": "22b38cf1a3d169c3fc91b44950e2ed7e36fb57f29ac01fea7daf810c327aa4a0",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3791,7 +3791,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_calibration.json",
-          "sha256": "fc1963fd55a92bc85574ca845d356cef6d46d316cac92d6a8bf6528124dc75cc",
+          "sha256": "14620cfc150b316c35aaf0321e6a3513b26e39e58bac97852b848602cd7128e3",
           "field": "metrics.ece"
         }
       ]
@@ -3814,7 +3814,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_selective.json",
-          "sha256": "943f886b52de046f569981b78549c4a051206377f74eced7f446fee29f492230",
+          "sha256": "ab87b60aa85f3f05f1df7384ee3ef79cf682071fe1bd72ee79af560b026a7f55",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3837,7 +3837,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
-          "sha256": "c4bedde9fa3dbc8c7f17399cf71720394a7e0a53847c1d04548b073f9a3c199a",
+          "sha256": "641e182356c3286ba875a7b7e4dc7e5e11d2eb7faa86bfbad72b0a070290d46b",
           "field": "metrics.top1"
         }
       ]
@@ -3860,7 +3860,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
-          "sha256": "c4bedde9fa3dbc8c7f17399cf71720394a7e0a53847c1d04548b073f9a3c199a",
+          "sha256": "641e182356c3286ba875a7b7e4dc7e5e11d2eb7faa86bfbad72b0a070290d46b",
           "field": "metrics.top5"
         }
       ]
@@ -3889,7 +3889,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
-          "sha256": "5ca88dacdaba398b2cf2af4cede6e2eccc01e0acb16e392fcd108d7e90dd693d",
+          "sha256": "c82e23cd630d8886a89a95d91fbfb2908d54a9d22177c9eb2d1030a2ea9be74f",
           "field": "metrics.coverage"
         }
       ]
@@ -3918,7 +3918,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
-          "sha256": "5ca88dacdaba398b2cf2af4cede6e2eccc01e0acb16e392fcd108d7e90dd693d",
+          "sha256": "c82e23cd630d8886a89a95d91fbfb2908d54a9d22177c9eb2d1030a2ea9be74f",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -3941,7 +3941,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_calibration.json",
-          "sha256": "7ec521fe97f24d131b79d44a03866b19d04d710ad6184fda7b51d172ebd7dce5",
+          "sha256": "18567f3aab8e50987ca737bffc8483d39ea79a0094c8659b8293a37680509a3f",
           "field": "metrics.ece"
         }
       ]
@@ -3964,7 +3964,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_selective.json",
-          "sha256": "a52f3194b9f5b3fa6d19b68b43de46bf1066389d28ea9caf84042ab596d65b8f",
+          "sha256": "6886bcf17653d56ce471ed47304b62c8633af69eecca12fd87d40b6e171bac9d",
           "field": "metrics.e_aurc"
         }
       ]
@@ -3987,7 +3987,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
-          "sha256": "f441172ef6f464d0011c9b5a1727aa41955086fbf1c68b483afc5a8282cd02cd",
+          "sha256": "da79ad1cf361b70a0eb6f200133e493b3d2233f6e195a569266b497020f363c2",
           "field": "metrics.top1"
         }
       ]
@@ -4010,7 +4010,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
-          "sha256": "f441172ef6f464d0011c9b5a1727aa41955086fbf1c68b483afc5a8282cd02cd",
+          "sha256": "da79ad1cf361b70a0eb6f200133e493b3d2233f6e195a569266b497020f363c2",
           "field": "metrics.top5"
         }
       ]
@@ -4039,7 +4039,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
-          "sha256": "0f1b6a913229c625bd0a78816b984d1dc70f0a582570bfb51a64618bb1e49b82",
+          "sha256": "f461ce1649a6a315d50e8df6ce813e85870abcbb47612a96de7ab982b1658a9c",
           "field": "metrics.coverage"
         }
       ]
@@ -4068,7 +4068,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
-          "sha256": "0f1b6a913229c625bd0a78816b984d1dc70f0a582570bfb51a64618bb1e49b82",
+          "sha256": "f461ce1649a6a315d50e8df6ce813e85870abcbb47612a96de7ab982b1658a9c",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -4091,7 +4091,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_calibration.json",
-          "sha256": "7c43bda4ee0f74ad98a809d2906e7e55740b26c60a4fd4dc655a6a1d36d3efff",
+          "sha256": "07e3385c3c32d2e55fde5dfbd8960ef319824d39cfa55ed49bb5c1f61f3fa06f",
           "field": "metrics.ece"
         }
       ]
@@ -4114,7 +4114,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_selective.json",
-          "sha256": "d72e027fa720e59196ace25cb7d8b778e454c542d2ae4255615e61a5e491b418",
+          "sha256": "b93bb64fb9ce814d47a7fc647191a96e2d03326095556081bdc62b77f8a31f88",
           "field": "metrics.e_aurc"
         }
       ]
@@ -4137,7 +4137,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
-          "sha256": "76edc187a51b2a70c154ce0ef2e9b943c178740ef522b3157165fe48743c5243",
+          "sha256": "9c892fa370b87d73441fbc2efd7ca1fce849e86609934b16ca976f210e19f267",
           "field": "metrics.top1"
         }
       ]
@@ -4160,7 +4160,7 @@
       "sources": [
         {
           "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
-          "sha256": "76edc187a51b2a70c154ce0ef2e9b943c178740ef522b3157165fe48743c5243",
+          "sha256": "9c892fa370b87d73441fbc2efd7ca1fce849e86609934b16ca976f210e19f267",
           "field": "metrics.top5"
         }
       ]
@@ -4189,7 +4189,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
-          "sha256": "36d4dbce811dd98e1ba543baa837afbed7e07fec1d749386915de0deb4499581",
+          "sha256": "ff29c0b3f6771b29d62ea6d13aa2ad0f50b224ca858dd1c6d249f14e809a8539",
           "field": "metrics.coverage"
         }
       ]
@@ -4218,7 +4218,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
-          "sha256": "36d4dbce811dd98e1ba543baa837afbed7e07fec1d749386915de0deb4499581",
+          "sha256": "ff29c0b3f6771b29d62ea6d13aa2ad0f50b224ca858dd1c6d249f14e809a8539",
           "field": "metrics.mean_set_size"
         }
       ]
@@ -4241,7 +4241,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_calibration.json",
-          "sha256": "2dead331fbf1b977b0536db909678ed167c6062e60fd873c0ec029d7312cb2a4",
+          "sha256": "a95568035f023144092cfb7b9d679a0d2ac35b183291f1c13911f6455fa379b7",
           "field": "metrics.ece"
         }
       ]
@@ -4264,7 +4264,7 @@
       "sources": [
         {
           "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_selective.json",
-          "sha256": "4aac1aa12f73745344b8d5279fd11909907efd45601beae8399846c487d6168e",
+          "sha256": "ac8889fe249a2b2d4eaf11c16d1bad2069cea595d7cdbeea5c6cb07173c8b9ae",
           "field": "metrics.e_aurc"
         }
       ]
@@ -6195,47 +6195,47 @@
       "sources": [
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "metrics.p50_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "metrics.p95_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "metrics.p99_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "metrics.spread_pct.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "settings.unstable"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "settings.unstable_above_pct"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "settings.pinned_cpus"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "settings.physical_core_of_each_cpu"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-          "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+          "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
           "field": "settings.discarded_sessions"
         },
         {
@@ -6293,47 +6293,47 @@
       "sources": [
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "metrics.p50_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "metrics.p95_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "metrics.p99_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "metrics.spread_pct.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "settings.unstable"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "settings.unstable_above_pct"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "settings.pinned_cpus"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "settings.physical_core_of_each_cpu"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-          "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+          "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
           "field": "settings.discarded_sessions"
         },
         {
@@ -6391,47 +6391,47 @@
       "sources": [
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "metrics.p50_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "metrics.p95_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "metrics.p99_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "metrics.spread_pct.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "settings.unstable"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "settings.unstable_above_pct"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "settings.pinned_cpus"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "settings.physical_core_of_each_cpu"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-          "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+          "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
           "field": "settings.discarded_sessions"
         },
         {
@@ -6447,12 +6447,12 @@
         "sources": [
           {
             "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-            "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+            "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
             "field": "metrics.p50_ms.value"
           },
           {
             "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-            "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+            "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
             "field": "metrics.p50_ms.value"
           }
         ]
@@ -6506,47 +6506,47 @@
       "sources": [
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "metrics.p50_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "metrics.p95_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "metrics.p99_ms.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "metrics.spread_pct.value"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "settings.unstable"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "settings.unstable_above_pct"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "settings.pinned_cpus"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "settings.physical_core_of_each_cpu"
         },
         {
           "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-          "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+          "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
           "field": "settings.discarded_sessions"
         },
         {
@@ -6562,12 +6562,12 @@
         "sources": [
           {
             "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-            "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+            "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
             "field": "metrics.p50_ms.value"
           },
           {
             "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-            "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+            "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
             "field": "metrics.p50_ms.value"
           }
         ]
@@ -6625,22 +6625,22 @@
     "sources": [
       {
         "file": "models/shufflenet_v2_x1_0_int8_percentile99.99.json",
-        "sha256": "2e8a2c0803777cb067b857ee538c1d0fcd3f786d0bc4f779a4b6c5ca8b65612c",
+        "sha256": "cb7acd3fddceb5cc400ddcd576aad54b8b31c722a75b621df2ea1e834a58d47c",
         "field": "licence.code"
       },
       {
         "file": "models/shufflenet_v2_x1_0_int8_percentile99.99.json",
-        "sha256": "2e8a2c0803777cb067b857ee538c1d0fcd3f786d0bc4f779a4b6c5ca8b65612c",
+        "sha256": "cb7acd3fddceb5cc400ddcd576aad54b8b31c722a75b621df2ea1e834a58d47c",
         "field": "licence.weights"
       },
       {
         "file": "models/shufflenet_v2_x1_0_fp32.json",
-        "sha256": "68daaa84de52c94a7fe16dabf97b1f9e7232d33699c74719514299c50fe9bac1",
+        "sha256": "6acac7bf36652b38cbbc5f286ef4553ff120cc793c72d62f1277f53da6438812",
         "field": "licence"
       },
       {
         "file": "models/shufflenet_v2_x1_0_fp32.json",
-        "sha256": "68daaa84de52c94a7fe16dabf97b1f9e7232d33699c74719514299c50fe9bac1",
+        "sha256": "6acac7bf36652b38cbbc5f286ef4553ff120cc793c72d62f1277f53da6438812",
         "field": "weights"
       }
     ]
@@ -6648,22 +6648,22 @@
   "sources": [
     {
       "file": "brokkr_edge/model_list.json",
-      "sha256": "e3fe7d0dbb4e366a7af07a46c4045a0049753f42896a2ba7d5d90a4512158fef",
+      "sha256": "8d6a237935d82ac70c9be7aef70d36c48394016831e8c5b7c2b906e4a14bf5a2",
       "check": "generated from torchvision metadata; tests/test_model_list.py"
     },
     {
       "file": "models/shufflenet_v2_x1_0_fp32.json",
-      "sha256": "68daaa84de52c94a7fe16dabf97b1f9e7232d33699c74719514299c50fe9bac1",
+      "sha256": "6acac7bf36652b38cbbc5f286ef4553ff120cc793c72d62f1277f53da6438812",
       "check": "brokkr_edge.schema.check_build_record"
     },
     {
       "file": "models/shufflenet_v2_x1_0_int8_percentile99.99.json",
-      "sha256": "2e8a2c0803777cb067b857ee538c1d0fcd3f786d0bc4f779a4b6c5ca8b65612c",
+      "sha256": "cb7acd3fddceb5cc400ddcd576aad54b8b31c722a75b621df2ea1e834a58d47c",
       "check": "brokkr_edge.schema.check_build_record"
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_conformal_calibration_none_clean_s0.json",
-      "sha256": "5c0083b3a975041f7682463cc1c9b6236ef7505e537907acca9336a5f62d1708",
+      "sha256": "823c8b59674ef146130790e9503dc645ae6c8be0e935f0ba848597b9187083bf",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6673,7 +6673,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5.json",
-      "sha256": "822670fab6d6c8bf7b98d7b52d512d9090495562fe1fd6f375d0179b5334be60",
+      "sha256": "66fceff978c344678001a20a994e2244a3c00eb950a1c156e65042348b06af05",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6683,7 +6683,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
-      "sha256": "bfdf65f152f4c56e78afcc0536442b9cf528a02aae04c0992240dad3933b30b2",
+      "sha256": "377462818cac7d88c09c42a53b8fe0306b9a810dfe0ef6e2d874c6be86ac5f77",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6693,7 +6693,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3.json",
-      "sha256": "93047eb7105f3cf27ecaf0c27bf060fdf70af79595c61c37fae2466cac1193d5",
+      "sha256": "ec5baf3c8ae6cdd2b2931570ae64463f9c4985f28d5d9e1b3ce050d0ba34199a",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6703,7 +6703,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3.json",
-      "sha256": "0c96ac0f61f006130e5b18f56c26aa6c88fa9c2a2dae4f496fe949562b5460bc",
+      "sha256": "1a9e2c5ef4b529e1abe92c5317b03be94dfcc3bda34e3501ac812a7f022085ed",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6713,7 +6713,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
-      "sha256": "b8df81cdee054158081dbcdcc39a55fe76a9114d6c860c3873cfa667c3ea9065",
+      "sha256": "e6449e06efef559b57f7921f90f30fd3a5f40ae6257b4419bbb7e8f79431a363",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6723,7 +6723,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
-      "sha256": "1fe141367db65f7b0aaf58ba929ae21ee6cfedb804fd81bf16d1e9a7d261494b",
+      "sha256": "33d0b92a8394bc005ae75931c6cb76799c864c9b32ec2918633bc0caf10b7571",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6733,7 +6733,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
-      "sha256": "076b9505130d3476e5bd42c562aa9e1e7b8b3a8e78f6cffbed795a8cc5de25ac",
+      "sha256": "9019036d5a023f905de222e8ef85e1c99ee49d76facaa259ebb23abed5f4dde4",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6743,7 +6743,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
-      "sha256": "0c0125f9ab73887024dbe8adc21f757302cdf654e355a53e2064e9491fb47cad",
+      "sha256": "ff7cf286632bcfffca67ce5047f6969818dadbf404a9c70acfd06e66ed79cc76",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6753,7 +6753,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.json",
-      "sha256": "1a1e12c7b5f6614a9191900cd223e01beff577d0aff30bf1b6b87d9357dcabd3",
+      "sha256": "0dbf692b3c0e7f2754accc017a7f40096e7d35114c91b0de1e3166ff46cd3b11",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6763,7 +6763,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-      "sha256": "add260bf95f0a8dbd907799b45a31c3db7e51c5e805e6f6234b4dfa17832f55b",
+      "sha256": "71761eac0aa7f09ee0221d18427ed9272efc42e97591fe6515968b624d95dc0f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6773,7 +6773,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
-      "sha256": "cd7dcbced6ad01f84f0fa69c6a19a0d4cd4817383a6ef1ec4dc95da0aa6f8b88",
+      "sha256": "4ba3c529bf5c1707535d9d35d578cd4b6075d810f1770cca442f41cd822d10ed",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6783,7 +6783,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
-      "sha256": "76ed5154ba982668ee9558d32e96323e7071afa8e8312380270b393e41269fef",
+      "sha256": "2b4e0d158866d29e70947048dcb3fa2c33260f35c651f344ef2b8a4bddc6872f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6793,7 +6793,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0.json",
-      "sha256": "1bbc4be9112c19613496fe26de7d0bd11f4d5d0b685031039ed110f7e0c2faeb",
+      "sha256": "be355d54a13f98d626f632aa4dfe018ee72db0909041612404b95e88805dadcb",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6803,7 +6803,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5.json",
-      "sha256": "1623940c9fa39b7b68624fb56cd35b7e4672e77c899aca033884e57409641cf3",
+      "sha256": "f2cffb6a4d7cff3e0719371a2658dcb3d8771ca205df7f1b131ce6b63e0544ba",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6813,7 +6813,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
-      "sha256": "69372e035878e5bfa0d778e1bdfd244fa0570623c25a2c2c77bd4db4d5b7953a",
+      "sha256": "4abbc6ab03aa912ecd6525332fe0c017492083e239945e27db715eb848afbc1d",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6823,7 +6823,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3.json",
-      "sha256": "77a31627d2cca50f79bfcc229d6ad10b6b13a11407d01ab991b68239445cbc43",
+      "sha256": "266825cc4192f414d9d7ab38daf8590cf1a7153385f45c22d496eb1b0a8f4d1b",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6833,7 +6833,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3.json",
-      "sha256": "27855b42ec888d92b638f8f84b80b812a92ef3b4f060f744d03be0057c9cc547",
+      "sha256": "760859b9c563d47efdaf5a9bcbf30e74d460a526fe83bef4d4dadf5ee806af21",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6843,7 +6843,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
-      "sha256": "c98116013fdb84e27186ecc9609b96ca9bc35c5eb1c784005f2cceba34b727fe",
+      "sha256": "c743e14206a6af44a438822c4d9d159f11467dc1216fb5794c6842f421de7284",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6853,7 +6853,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
-      "sha256": "20b2bc0df3f183dec38fe58783a7d957a74f073703a8732f6ba95f46d2cf054b",
+      "sha256": "6f2525ad2e0060e3a41b56141e43c38acccdce7a00133a12edc1debd995c7966",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6863,7 +6863,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
-      "sha256": "1c1f96b0749d58e44aec4a49c4151932c7f361196b89073e800790d66908c95f",
+      "sha256": "b93c9157a4ce5dcece3aaced0e8676aaea8302b78e78cbc6b63bd719a1224a55",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6873,7 +6873,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
-      "sha256": "c4bedde9fa3dbc8c7f17399cf71720394a7e0a53847c1d04548b073f9a3c199a",
+      "sha256": "641e182356c3286ba875a7b7e4dc7e5e11d2eb7faa86bfbad72b0a070290d46b",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6883,7 +6883,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3.json",
-      "sha256": "a134cadb96edb590570892379a8f9090e1c49de1d44f96b5d2d8b9ee25d67943",
+      "sha256": "56c1a37a05cb53d43131bff328b3c7afe15f9d1de881962fe3c4c7bbc2eb3398",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6893,7 +6893,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5.json",
-      "sha256": "08c1197d210fc5c2d580ac31f4ce6d2a2fdbb2d625fb67ccb3d2acc2aa0d85cd",
+      "sha256": "ae3cb7f401c5255da39143314ac9ef297b29851e37ae7cc1ffa07f161aac7b9f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6903,7 +6903,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
-      "sha256": "f441172ef6f464d0011c9b5a1727aa41955086fbf1c68b483afc5a8282cd02cd",
+      "sha256": "da79ad1cf361b70a0eb6f200133e493b3d2233f6e195a569266b497020f363c2",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6913,7 +6913,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
-      "sha256": "76edc187a51b2a70c154ce0ef2e9b943c178740ef522b3157165fe48743c5243",
+      "sha256": "9c892fa370b87d73441fbc2efd7ca1fce849e86609934b16ca976f210e19f267",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6923,7 +6923,7 @@
     },
     {
       "file": "results/breadth/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0.json",
-      "sha256": "655d7cc4a95ef1b2447f62501114196ce9916e978bfee925d7ce4831f48877f9",
+      "sha256": "0bfc1c16da14ca0b3138fc755bdf04e53bf3f31fb891c02656ef80e5c674883f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -6933,397 +6933,397 @@
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_calibration.json",
-      "sha256": "a37d7a78a19ef9e14355c4b7cf882ef87f2588a4295eeda38ed0e538dcf79b82",
+      "sha256": "2e33362575bbe55771b138b73bdbe7eca9e048e4ec57f455bc1574eaa44c63e3",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
-      "sha256": "0222419fee26ca7836471e4d30d48afa4106cc27c257823127ed1f072f45de2b",
+      "sha256": "cfc6869431e9fd6280ee498a45228dd79cf9dbc8bebd6b74bbb9e4a0a328f747",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_darkness_s5_selective.json",
-      "sha256": "548b03e1a93d960997d67eedbe6b888f86ac26a95a4e46ee4e734e1aa8f0ea47",
+      "sha256": "e99550c984c21fe5d395e846a8471043d362bf5358c8137c5019a1b78538cff7",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_calibration.json",
-      "sha256": "2a663ca973c8d11bcdba622cb3c0327c029fb6eddf752bb0e22dbd88c5d6edaa",
+      "sha256": "c274a261356fa645f3b59b62249e41a93def8688495e4a7e608222788c1f1334",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
-      "sha256": "fd486b9f3c5fd128e37f6b674537aabc8fa06ec357a4a001d761ec583bc29d55",
+      "sha256": "5f91a45324a28e2e9ccb411dec220018908daeb6185f88c70a80cab5f6fd720b",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_selective.json",
-      "sha256": "1b02eb53c89ee7f410c29d6d2ecf283068dd3c04e8a8045f864939add256104f",
+      "sha256": "bd5f66579a274f196e84e0bfe61feaec4b5ef6da0bde5049ee6cb231d4504d76",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_calibration.json",
-      "sha256": "a8f98d8eb632b3ec6fe69e7212db6c63275e26b1061b9623462f16ceb23b7912",
+      "sha256": "8507e7951406b3d2a9b2ab90c8e0b8b7fd73347685064b8dd84faf17e09ec442",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
-      "sha256": "0bb1bab639ac8b4a42bd730336a8d23ca6436ae74c83ab5f39e444278fa4ac89",
+      "sha256": "497c7bb2df7df226e4dcb5f8ea45cd5ec10941b92e8cebd88801173f4f0eed25",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_fog_s3_selective.json",
-      "sha256": "c7f2cd15c3ae1c8b093d1ba847f27b71c94d0b78c89df3169b6a44e5ec6d0a2e",
+      "sha256": "1c88e3a65c213a8c1365b1e360b6d5abc96363153eb9d0b25f66306a598d0ba4",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_calibration.json",
-      "sha256": "dfb1befe2a585162f4e20e5a199a67ed3f767cae957fbfb6e1d5ddd199efb1d8",
+      "sha256": "1b970b00cb2a10a605b73f8a06e422e0ce0b5a4025e5bb4ebeee449a8a9da77b",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
-      "sha256": "26732f7d947328b10abb6ef295ed4a0ddfbd40c29bd3cbfe217ad6af3be4d830",
+      "sha256": "81a8dc03591f2a4b742629bc22a807d2d81cf79aef62e6b815e2e9166381960e",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_brokkr_noise_s3_selective.json",
-      "sha256": "cdd3fe71f72ee1741c663cc317bc9c29545c5340bf717192177605b408d72f7b",
+      "sha256": "f133d243de919c6f1970173d0d1f9d9edab90520ef5276f673e825131d9614a9",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_calibration.json",
-      "sha256": "bc4bd39c3ef2978dce513aac6629f81789e763394b0bbeabbfaf4a8105af01c5",
+      "sha256": "d636f25aee505d09b14274e291dbf838d4d7a662a755139471596d0e42c88fd9",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
-      "sha256": "7e82d23dfa32d691beca0fc2e1551f1a8aad17a556d032ab32c36948f7c070e0",
+      "sha256": "fa295d03cb3d1d782456f9e4bcf5834e1bf9eec266d4559c23af2d5f5d387782",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_selective.json",
-      "sha256": "b19197b334df0fd7099f0677cb1d6894c75cda09f4fe3a42346d7a6c15cba104",
+      "sha256": "b8a0e3b36545f8c9a48cea4d06cc049f257d101f6737c5c22fbc0580ddfc5697",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_calibration.json",
-      "sha256": "d2693489c71b3fd1a3aaf443d301f0ed1ba104ededb8bf6421527876b798829b",
+      "sha256": "f746879244e1ccf5dc886b6031308fce7ed0ad3219d4bb3062cc6dbc1bc98d83",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
-      "sha256": "a3544af31c817e34de588d587a280bd38add7244a5371a27de27596f6e41ce1d",
+      "sha256": "4f1b3258c857b8169e74a4e07868121ebe8cadb5ee8917465e799100757765ca",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_selective.json",
-      "sha256": "bdfa77a1d242c1510c7567362cb079227c8c3c7e3049c30b06d1e5e738e5189a",
+      "sha256": "1fa4ae43bccdafe371245f4eafa922c37a479e2e6f56b4cbc7093087f00d13e8",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_calibration.json",
-      "sha256": "9a70bf746024f5b35d2a38d41b583322f4c01ccb6f4bd7bd76d3a1d8c844438e",
+      "sha256": "76247e5c56935cc7d3dc03a73b84326d3d46dd1d42179e993572b22713ac51b7",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
-      "sha256": "21b2f8b38fa6f880b6160642d3137ff70906d1a14d7ffc00f1234eaf8b11238c",
+      "sha256": "56957c65f47e342703fd8486c796a99c7bfb1112ba1940620a91ae8f73de1630",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_selective.json",
-      "sha256": "e30a186177c8f9c6034ca43d3b30fe0f028348922649a74ae377f6d326c121a9",
+      "sha256": "81cf013c50365b9370d40d79a19e9744f86d9701a64011875c338038913e902f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_calibration.json",
-      "sha256": "667f4eadf2eeeb706deb73a7d6eae71a663ab6ba7a3abf04be78a273f323c64e",
+      "sha256": "a3f2a67182e39f07b4203b113508338b77b80dd39835d50372abbb87de9b5f62",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
-      "sha256": "42d65a65ad1f8b6f39bbcfd4e04c215891d252324dc408855356e76ffa9c9618",
+      "sha256": "cc4676c85ed45e7427d28f55654b2b1e12ed14417d82fe88115c0fc4ab163508",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_selective.json",
-      "sha256": "885041ca935fb7a7dcc9eccc088a2ea6fbbaa20799a49b4ad117dcb2c3eb861e",
+      "sha256": "88c40bba9a5803c00d11f6386af314d7c6ce5095259750488ca55fc9269ef408",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_calibration.json",
-      "sha256": "55095215805d8df91d33417b8a251a3a961e74a5f461588db4fb67b603fc940a",
+      "sha256": "f172b02b0d5fddf9859659f9a5bdf2cbd97622dfd32b8bea1a4c22d4c1ccb4a3",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
-      "sha256": "a440aeaa7a43936cb6a25a2faddcadb472b2710b061f8874f0a65ba8b813c371",
+      "sha256": "eefb1b13f4897a290cf94a55a3b2de042ead7f24ef5a0408cb50495430c48e95",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_selective.json",
-      "sha256": "d5a6fa0cd830e79b44cf0e43dfa5f8781be95b683bcb4cb2f06a86a953fba2bb",
+      "sha256": "49ba57437775d4959ab7cc63b33ac4d3db9137a803e6450364633e69b4bb2f67",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_calibration.json",
-      "sha256": "198bd640b4c7954289e75dc21a18d2a5457f8510369b86b37c2f0572ffba1a45",
+      "sha256": "6f19f3814acc2cee50ffa4976e4a801b19106fbf9f31692441362cb0445f87e6",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
-      "sha256": "85a4a2e7bc81ccf2b963fb3848d0639515e9454b98253f8b53baf40d5668c35a",
+      "sha256": "ca0c9228ba1766076d67a561df7376a1ca3620326e067e8d9f974c5ffbafea0f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_selective.json",
-      "sha256": "9a1f87806cd0ddbde54e3116bc5816b3f0040774817871777eac076b7a6434ea",
+      "sha256": "d9dbe939861d3883f6f8d3b6c57886bbb150b1ac13694090a752def53bee83f2",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_calibration.json",
-      "sha256": "c5e68a09c84275ea686175dcb98238627258524b86a8dbcbd1fa65222c03c056",
+      "sha256": "95f7dc536ee4427c6ee68524e09362db4e136187e16b8639eadd11c3c86db1ab",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
-      "sha256": "971b4d00ad723508ba341bd6ce79e32ff2a880cc75807e675e47911365bf9dc5",
+      "sha256": "8708ad7592b3f9eb11f1e47aaa63ba698a58fc066114e7546135b76027d99f68",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_selective.json",
-      "sha256": "eeee4cb29f90d4f289556c36b855510db3ed05448ca33dfecb87e9ec06a7b6e0",
+      "sha256": "a3726966a8da978b4f081b74686454b25ac696749d105a0a2d26cb6e8e7d414c",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_calibration.json",
-      "sha256": "e1a9830317e9e89f205a086b97df5acb7877774c4734dfc677879e6ae3bf20cb",
+      "sha256": "57a8f21d7818474d451192db593e22c4155ca8b022198534b615b13d6442c730",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
-      "sha256": "94e61cd9cd37af424f0ec4147dc8678c74f4bb3c633a1f761825365f5e3b42ee",
+      "sha256": "9ed0125acb6ad009ba442689458f2a03b2431e7f66100d23c2110deec4f1094a",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_selective.json",
-      "sha256": "702ddc0a83aff0829ecbb492d2f0ca915c50cedeefdecc36cf671586253a4846",
+      "sha256": "41cef654ffe00a99d986660fe82aaedcefc02cd7849e4311af14ceab497d9ffc",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_calibration.json",
-      "sha256": "8a3fdaddf066d5827d6400acef332b7ef5ced4c2afdb78bcf2e849759834d26e",
+      "sha256": "de65fd0069c5efddb1f16267747317b191792c40b340f3da45f12aaa18863978",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_conformal.json",
-      "sha256": "eb9cb55e07a7c3e366add1d1ed34a7a6dc8730ec32704214570f60ef90f18af9",
+      "sha256": "bac6b31aadf3c14c3260e1e01921263af29c1871caf53e690c859edc4d333ca0",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_fp32_imagenet-1k-val_test_none_clean_s0_selective.json",
-      "sha256": "46cb0168a2ee2f90350087e2e60cd2ef0d643f7b28e4977fe35aa05c4b3cb432",
+      "sha256": "c726293ff87d3f39223f392a487f6454d3f772381133d065e7e6cebedc35edf9",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_calibration.json",
-      "sha256": "2779c1ae9c98911a38fe9447ebc08098810b9ec29cbed34c04865268ec0b113e",
+      "sha256": "75c9bbfdd15d043a10fab377148bd5f3aa214354b78bab572aa73aac0df08cd9",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
-      "sha256": "7402da75bc98403b9fee5b096947a7d0a2ed06264f5cebf7f0fd1ff7bb407458",
+      "sha256": "39a0860324533cde2aef96faae096308ddec11662c429d290d622b796bf580c5",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_darkness_s5_selective.json",
-      "sha256": "7764b8630f3cc5a0242a800432a17cfa61462ffe6f492170348ab9b9a04d2f3f",
+      "sha256": "b6026a40b5ba877923fe814d948ce19889fe7da4b946b16db92cd3c135c97def",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_calibration.json",
-      "sha256": "5fa8bc28e7ddd54b6e48609c32dd0d309486f9a4cec8d7cafacf3ca0539d2778",
+      "sha256": "b30db6039d0554db7f12ae4f4c16569eb15145b510eefcbc9e1e4bf7d4bcb1c9",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
-      "sha256": "d3a9302ee0ec44d4a96dca6fafda75a2140c2430b17988a7fcc03c141d4927a5",
+      "sha256": "d4fdf645c7d9392000d977413b181d9f7ab10ae07d0fc910170996fafcb72641",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_defocus_blur_s3_selective.json",
-      "sha256": "f66e0b4a5dedf2cefe47007c587092c75b673b3a71d877af62238b1a8d7d64d2",
+      "sha256": "a3915dc7baf15d4dd27c2d0391b75d68ab8ab6f77bb7dfb25b0d96632ee72aa9",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_calibration.json",
-      "sha256": "da7e313a7c0db3251d4f367af79ad4d76a2a911cf0d6ba451b55b9646c3864ee",
+      "sha256": "9bead68c15f4ca6c694caf8d7b80535a6391b3d8822a673f2959b7ba5c194942",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
-      "sha256": "13a5812d9de930b2f4ba6e8023df7002f3f483ae4c862e7cfafa52830afbebe3",
+      "sha256": "2ee8a388591248af26a91194c08be4c8b0baa95caf8f634ac6ee75256753e3b1",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_fog_s3_selective.json",
-      "sha256": "6f8964834eb2eb97e2f326f3b2203e496345f5a5756766f63e4da83784311702",
+      "sha256": "b2b8ab0a240b145e47debe42cd150cafb1e06050d14992bbcf9a6aba28970d26",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_calibration.json",
-      "sha256": "e585fe0041da01b847af02773c422abfd839bd9f65150fa06bb12254f4077e39",
+      "sha256": "31e5d902cd11f823898a8765cd90347d2ec7a6087eed8cea0b905a92b2cc0fef",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
-      "sha256": "b3f2dc110913bc148c1d999e107aad2067cf2f700d72a2a5744bb4aad7f15370",
+      "sha256": "c0fa83c8ccffca0f9b848c2d29d2449abf708c724e3743538f271d9f83521c87",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_brokkr_noise_s3_selective.json",
-      "sha256": "1a05e705c84dd821dcc2b0f2dba8bfe2846f2066502e568197a2c1f043c5971e",
+      "sha256": "503f2c7fcf9ad12c80f0f11de7673d330ccd7bdba851e4525a0f75835963d3e0",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_calibration.json",
-      "sha256": "6be1b1ff20ecf247b70ee3b99b77adf361ab544057ffe66c743472324f0252b6",
+      "sha256": "07d9f8be0755d7ae73c87fbf48e48b4dfe4635a9d4002e9fc566a4832b391d2a",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
-      "sha256": "63908ef2ab1c5298ecab905531790969e1dc6732eee017f47e57931b42b9be9f",
+      "sha256": "5d9140831ab02223eae7b92f5cfb50c90905e2787f03e7839321259565499bfd",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s3_selective.json",
-      "sha256": "7c51f54b4d10a9d78520daa85f88c91dc9ab42478f52fc599db675eb9aa10fce",
+      "sha256": "7cb531decd581b21fbb5b29c3421d49ce905a070d7236b0c9f4a16007597f730",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_calibration.json",
-      "sha256": "352a20212157604ddb89a41f50647445660887ba38b74600efd5f21ecd20e18b",
+      "sha256": "ba917ae0399a3f4b7af20c9b121fe84030e2a19ae75d480326494985daef9962",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
-      "sha256": "ea1ad8850a9bf1923748757f75bb6c3e3b329bf04d54571ee60c20aea7ca7e61",
+      "sha256": "da772beeb798167ceabf351790bdd887b151ecfc5e7938e33df38ea65ba3714f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_contrast_s5_selective.json",
-      "sha256": "0d1142fa98138cf16de2851c17538467e84ecba483621d86c537241138fe7e8f",
+      "sha256": "656b01b0df1520ed7fd695cc5bbb151a784552f61bcc0ab013e47225f0d21d6e",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_calibration.json",
-      "sha256": "fc1963fd55a92bc85574ca845d356cef6d46d316cac92d6a8bf6528124dc75cc",
+      "sha256": "14620cfc150b316c35aaf0321e6a3513b26e39e58bac97852b848602cd7128e3",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
-      "sha256": "af7cb4820031a754905877e1da24fe9ff33b642f3a2a00812c2bc0d9be48f7c0",
+      "sha256": "22b38cf1a3d169c3fc91b44950e2ed7e36fb57f29ac01fea7daf810c327aa4a0",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_selective.json",
-      "sha256": "943f886b52de046f569981b78549c4a051206377f74eced7f446fee29f492230",
+      "sha256": "ab87b60aa85f3f05f1df7384ee3ef79cf682071fe1bd72ee79af560b026a7f55",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_calibration.json",
-      "sha256": "7ec521fe97f24d131b79d44a03866b19d04d710ad6184fda7b51d172ebd7dce5",
+      "sha256": "18567f3aab8e50987ca737bffc8483d39ea79a0094c8659b8293a37680509a3f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
-      "sha256": "5ca88dacdaba398b2cf2af4cede6e2eccc01e0acb16e392fcd108d7e90dd693d",
+      "sha256": "c82e23cd630d8886a89a95d91fbfb2908d54a9d22177c9eb2d1030a2ea9be74f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_selective.json",
-      "sha256": "a52f3194b9f5b3fa6d19b68b43de46bf1066389d28ea9caf84042ab596d65b8f",
+      "sha256": "6886bcf17653d56ce471ed47304b62c8633af69eecca12fd87d40b6e171bac9d",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_calibration.json",
-      "sha256": "6bbf38ce6ee480c3d8767f26fa1e33ec3ea6e7f7b4b465530ef49b6e1a41c161",
+      "sha256": "a0c4a529066bf539d56f793e8d732c1833cc03ef82062ec7fa697f6e3568eab5",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
-      "sha256": "852f9e865282682b8783a588ab09c1079c8d1077b0b0f67b71d7d369931a67fa",
+      "sha256": "7e59a8d970acca1985511ef4c00147a69dfb76c3a623004ccaaf05d90c33e654",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s3_selective.json",
-      "sha256": "18ad92ecc3e499151e2ce59d68a6dfc73d1441870ed4c42fc975dd1e28382d3e",
+      "sha256": "3a5fe1bb906589dd2a4419532b89d381a9c0e6a30e1f45cae99c575dbe98503c",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_calibration.json",
-      "sha256": "92eee92caeead302ff8222b6e27972fbc8dd8efb1a9a2b775d4b714c40c37ec2",
+      "sha256": "ee4de7e82efb5bdde65a3079c04b20680b452fbdb68096f83c40ef51ee133424",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
-      "sha256": "13b21b793bb96e375053c35f983aa2aec0d4cc829c202ff3069ab22969fb2cf1",
+      "sha256": "fef84f88b4d567f44b5c66c38d292187f7c2ebd319c3669e0187d83db39f29bb",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_fog_s5_selective.json",
-      "sha256": "a932c8d39ea9f07affa726ac5f29b2e9487ef7ab323ae8f8c0d8af58d8f185b2",
+      "sha256": "0f2144c59f092511462fe0eed58d82d6790f7b6bfd4759aa1b2bfa9aee3f3f39",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_calibration.json",
-      "sha256": "7c43bda4ee0f74ad98a809d2906e7e55740b26c60a4fd4dc655a6a1d36d3efff",
+      "sha256": "07e3385c3c32d2e55fde5dfbd8960ef319824d39cfa55ed49bb5c1f61f3fa06f",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
-      "sha256": "0f1b6a913229c625bd0a78816b984d1dc70f0a582570bfb51a64618bb1e49b82",
+      "sha256": "f461ce1649a6a315d50e8df6ce813e85870abcbb47612a96de7ab982b1658a9c",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_selective.json",
-      "sha256": "d72e027fa720e59196ace25cb7d8b778e454c542d2ae4255615e61a5e491b418",
+      "sha256": "b93bb64fb9ce814d47a7fc647191a96e2d03326095556081bdc62b77f8a31f88",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_calibration.json",
-      "sha256": "2dead331fbf1b977b0536db909678ed167c6062e60fd873c0ec029d7312cb2a4",
+      "sha256": "a95568035f023144092cfb7b9d679a0d2ac35b183291f1c13911f6455fa379b7",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
-      "sha256": "36d4dbce811dd98e1ba543baa837afbed7e07fec1d749386915de0deb4499581",
+      "sha256": "ff29c0b3f6771b29d62ea6d13aa2ad0f50b224ca858dd1c6d249f14e809a8539",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_selective.json",
-      "sha256": "4aac1aa12f73745344b8d5279fd11909907efd45601beae8399846c487d6168e",
+      "sha256": "ac8889fe249a2b2d4eaf11c16d1bad2069cea595d7cdbeea5c6cb07173c8b9ae",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_calibration.json",
-      "sha256": "cc054258806f6bfa02b34034f346030bda3b80f86c23e8fbf8ba94273bdddda8",
+      "sha256": "cf7c36d3c45486f19de9c9606d12ca7fcb14fbafe53ec82c23204425615430d4",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_conformal.json",
-      "sha256": "42a2bbd89c28c1d8d3b1c87ceb0b88329fa956c78b6430e98917cdcd4f592338",
+      "sha256": "c2b8962779776e63ef93227ebd151769cb7f0121b5e4ecf04bc0d41e67673ef6",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/breadth_reliability/shufflenet_v2_x1_0_int8_percentile99.99_imagenet-1k-val_test_none_clean_s0_selective.json",
-      "sha256": "6cd15b61a5e8ccf872d4e6e1e9bf3f39019aac5eb9cf58071c9cd9d684a1a4e6",
+      "sha256": "d815328775ab54f6c99268690891ea31c2d708a80136635c7b5a164734719052",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
       "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_1threads.json",
-      "sha256": "ccdbf2e466bfedb8b76c4df2df36b770f8a6e3a4515542e1e900ae30fb24293b",
+      "sha256": "95c06470a2f4f3a0b2453f5ed0117cb2bbc502a9d795cf6dca0db2e812aa0d06",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -7333,7 +7333,7 @@
     },
     {
       "file": "results/latency/shufflenet_v2_x1_0_fp32_laptop_4threads.json",
-      "sha256": "05e2c1c7c8e3a020657a742359b8856fa1f0066e752f099dc0455c4e4658a189",
+      "sha256": "e97d84be801a97b07e8715737cec7fec0e425546465516d395e1e4bcc86e0968",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -7343,7 +7343,7 @@
     },
     {
       "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_1threads.json",
-      "sha256": "095ba1e5611d18875356bfac8524ad9ede640177f694981cc8dd27265f1e2f5f",
+      "sha256": "22aee37ab76177573d501faed5b93e8270a46e98b8f4ab09923fa07d5639b1c5",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {
@@ -7353,7 +7353,7 @@
     },
     {
       "file": "results/latency/shufflenet_v2_x1_0_int8_percentile99.99_laptop_4threads.json",
-      "sha256": "c9c9b45d2e2891a7a808cf517138c7f812bbe6e0de4f9d903605aa8bf29302d5",
+      "sha256": "be1339a5f8398b65e769b45c9009064075c6f071d177351acd1869f92c5be813",
       "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
     },
     {

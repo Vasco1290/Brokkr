@@ -1,15 +1,45 @@
 # Brokkr status
 
-Snapshot as of **3 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **4 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
-research is done** on branch `stage-4` (task 4.0, 4.1's sweep and verdicts, M2, SE1; 4.1's summary
-tables script is not), and the work now follows the Platform plan: **step 1 (labels) is in progress**
-(see "Pick up here"). **Research freeze** until website v0 ships (see "Research freeze" below).
+research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
+commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
+(catalog site and going public) is in progress** on branch `step-2` (see "Pick up here"). **Research
+freeze** until website v0 ships (see "Research freeze" below).
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (3 October 2026)
-Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
+### Pick up here (4 October 2026)
+Read this first.
+- **Step 1 (labels) is done:** merged into `main` by pull request #4 (merge commit `0422a8c`), tagged
+  `stage-4-done` (on `790c197`). The record of how it was done is under "Step 1 record" below.
+- **Step 2 (catalog site and going public), due 10 October, is in progress on branch `step-2`**
+  (pushed to origin; not merged; H reviews the figures before anything merges). Done so far:
+  - **Task 1, figures:** `scripts/47_figures.py` draws five figures (light and dark SVGs in
+    `docs/figures/`) from the released labels and records; `figures.json` names every plotted value's
+    source; `--check` (also run by `scripts/40`) checks values, positions, stray numbers and the claims
+    register (`docs/claims.json`, started here); `tests/test_figures.py` checks font size and contrast.
+    The README shows the hero figure (generated block between `figure-hero` markers). Plan and H's
+    decisions: `docs/label_schema.md`, notes of 4 October 2026.
+  - **All ten labels released** in `published/labels/` (hard rule 4 now has two exceptions: released
+    labels and the figures).
+  - **One file fingerprint** (`brokkr_edge.results.sha256_of`): text files are hashed with CRLF turned
+    into LF, other files as raw bytes; the label maker writes LF; `.gitattributes` names the text
+    suffixes as LF. The labels were remade from the clean commit `6a6ac0d` and released again;
+    `scripts/48_compare_labels.py` showed them equal to the earlier release apart from source
+    fingerprints and the commit that made them (PASS, 10 labels).
+- **Honest note: `main`'s `scripts/40_check_labels.py` has failed since the 4 October checkout of
+  `main`.** The labels made at `f682e21` recorded the SHA-256 of `brokkr_edge/model_list.json` as its
+  Windows (CRLF) working copy; that checkout rewrote the file with LF, so its bytes changed though its
+  text did not. Fixed on `step-2` by the fingerprint rule and the remade labels (second note of 4
+  October 2026 in `docs/label_schema.md`); `main` stays failing until `step-2` merges.
+- **Next in step 2** (`ROADMAP.md`, step 2; plan in `docs/website_v0_plan.md`): the catalog site built
+  from the labels (browse, filter, compare, label pages, methods, "Why labels?", licences, roadmap
+  pages), the pre-public checklist (overclaiming re-read, dataset commercial-use tags, claims register
+  for the README and site text, Report 1's "Related work" line), and GitHub Pages.
+
+### Step 1 record (3 October 2026; done, kept for the record)
+(`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
 - **Branch `stage-4`**, pushed to origin; `main` is still at `be01206` (Stage 3). Working tree clean.
 - **Platform plan step 1 (labels), due 7 October** (`ROADMAP.md`, "Platform plan"):
   - **Ten labels made, with laptop speed rows**, at the clean commit `f682e21` (3 October 2026), in
