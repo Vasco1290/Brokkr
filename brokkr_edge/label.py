@@ -60,6 +60,16 @@ def failed_lines(coverage_ci: list, drop_ci: list, rule: dict = ENVELOPE_RULE) -
     return failed
 
 
+def line_states(coverage_ci: list, drop_ci: list, rule: dict = ENVELOPE_RULE) -> dict:
+    """The row's state on each line (note of 3 October 2026, later the same day): "fails" (whole interval
+    below the line), "copes" (whole interval at or above it) or "straddles"."""
+    def one(ci, line):
+        return "fails" if ci[1] < line else "copes" if ci[0] >= line else "straddles"
+
+    return {"damage drop": one(drop_ci, rule["damage_drop_min"]),
+            "coverage": one(coverage_ci, rule["coverage_min"])}
+
+
 def envelope_state(coverage_ci: list, drop_ci: list, rule: dict = ENVELOPE_RULE) -> tuple:
     """(state, reasons) for one build in one condition."""
     cov_min, drop_min = rule["coverage_min"], rule["damage_drop_min"]

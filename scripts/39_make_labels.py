@@ -33,6 +33,7 @@ from brokkr_edge.label import (
     ENVELOPE_RULE,
     envelope_state,
     failed_lines,
+    line_states,
     paired,
     shrinking_cost_flags,
     summary,
@@ -411,6 +412,7 @@ def make_label(model: str) -> dict:
                         "state": "INT8 build failed",
                         "why": [f"build check failed: {f['check']}"],
                         "failed": [],
+                        "line_states": None,
                         "shrinking_cost_flags": [],
                     }
                 )
@@ -430,6 +432,7 @@ def make_label(model: str) -> dict:
                     "state": state,
                     "why": why,
                     "failed": failed_lines(coverage_ci, drop_ci),
+                    "line_states": line_states(coverage_ci, drop_ci),
                     "shrinking_cost_flags": flags,
                 }
             )

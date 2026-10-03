@@ -126,37 +126,63 @@ def test_the_three_opening_counts_come_from_the_envelope_rows():
         assert text.index("Uncertainty signal") < text.index("Not harmful in our tests")  # before the groups
 
 
-NEXT_STEPS = {  # (failed lines, cause) -> suggested next step (note of 3 October 2026)
-    # both lines failed: the cause-based advice first, re-calibrating second
-    ("both", "too hard for this model"): "consider a stronger model; re-calibrate on your own images",
-    ("both", "hurt by shrinking"): "try another recipe or model; re-calibrate on your own images",
-    ("both", "cause unclear"): "try another recipe or a stronger model; re-calibrate on your own images",
-    # accuracy only: the cause-based advice only
-    ("accuracy", "too hard for this model"): "consider a stronger model",
-    ("accuracy", "hurt by shrinking"): "try another recipe or model",
-    ("accuracy", "cause unclear"): "try another recipe or a stronger model",
-    # coverage only: re-calibrate first; "try another recipe" only where shrinking is involved
-    ("coverage", "too hard for this model"): "re-calibrate on your own images",
-    ("coverage", "hurt by shrinking"): "re-calibrate on your own images; try another recipe",
-    ("coverage", "cause unclear"): "re-calibrate on your own images; try another recipe",
+def harmful(*failed):
+    return {"state": "harmful", "failed": list(failed)}
+
+
+def fp32(accuracy, coverage):
+    """A reference row with the given state on each line (made up)."""
+    return {"line_states": {"damage drop": accuracy, "coverage": coverage}}
+
+
+# (INT8's failed lines, FP32 on accuracy, FP32 on coverage) -> suggested next step
+# (note of 3 October 2026, later the same day: advice chosen line by line)
+NEXT_STEPS = {
+    # INT8 fails accuracy only: FP32 also fails accuracy -> stronger model; FP32 copes -> another recipe
+    (("damage drop",), "fails", "copes"): "consider a stronger model",
+    (("damage drop",), "copes", "copes"): "try another recipe",
+    (("damage drop",), "straddles", "copes"): "try another recipe or a stronger model",
+    # INT8 fails coverage only: re-calibrate; another recipe only if FP32 copes on coverage
+    (("coverage",), "copes", "copes"): "re-calibrate on your own images; try another recipe",
+    (("coverage",), "copes", "fails"): "re-calibrate on your own images",
+    (("coverage",), "fails", "straddles"): "re-calibrate on your own images",
+    # both: accuracy advice first, coverage advice second
+    (("damage drop", "coverage"), "fails", "fails"): (
+        "consider a stronger model; re-calibrate on your own images"
+    ),
+    (("damage drop", "coverage"), "copes", "fails"): "try another recipe; re-calibrate on your own images",
+    # "try another recipe" is said once, even when the accuracy advice already names it
+    (("damage drop", "coverage"), "copes", "copes"): "try another recipe; re-calibrate on your own images",
+    (("damage drop", "coverage"), "straddles", "copes"): (
+        "try another recipe or a stronger model; re-calibrate on your own images"
+    ),
 }
-FAILED = {"both": ["damage drop", "coverage"], "accuracy": ["damage drop"], "coverage": ["coverage"]}
 
 
-def test_the_suggested_next_step_follows_the_line_that_failed():
-    for (failed, cause), expected in NEXT_STEPS.items():
-        assert _next_step({"state": "harmful", "failed": FAILED[failed]}, cause) == expected, (failed, cause)
+def test_the_suggested_next_step_compares_int8_with_fp32_line_by_line():
+    for (failed, acc, cov), expected in NEXT_STEPS.items():
+        assert _next_step(harmful(*failed), fp32(acc, cov)) == expected, (failed, acc, cov)
+
+
+def test_the_convnext_fog_pattern_gets_accuracy_advice_from_fp32s_accuracy():
+    """INT8 fails both lines; FP32 is harmful only on coverage (its accuracy copes). The cause group says
+    "too hard for this model", but the accuracy advice must follow FP32's accuracy: another recipe."""
+    step = _next_step(harmful("damage drop", "coverage"), fp32("copes", "fails"))
+    assert step == "try another recipe; re-calibrate on your own images"
+    assert "stronger model" not in step
 
 
 def test_a_coverage_only_row_never_suggests_a_stronger_model():
-    for cause in ("too hard for this model", "hurt by shrinking", "cause unclear"):
-        assert "stronger model" not in _next_step({"state": "harmful", "failed": ["coverage"]}, cause)
+    for acc in ("fails", "copes", "straddles"):
+        for cov in ("fails", "copes", "straddles"):
+            assert "stronger model" not in _next_step(harmful("coverage"), fp32(acc, cov))
 
 
 def test_only_a_harmful_row_gets_a_suggested_next_step():
-    assert _next_step({"state": "not harmful", "failed": []}, None) == "—"
-    assert _next_step({"state": "borderline", "failed": []}, None) == "—"
-    assert _next_step({"state": "INT8 build failed", "failed": []}, None) == "—"
+    ok = fp32("copes", "copes")
+    assert _next_step({"state": "not harmful", "failed": []}, ok) == "—"
+    assert _next_step({"state": "borderline", "failed": []}, ok) == "—"
+    assert _next_step({"state": "INT8 build failed", "failed": []}, ok) == "—"
     assert _next_step(None, None) == "—"
 
 
@@ -245,6 +271,7 @@ def tiny_label() -> dict:
             "state": "not harmful",
             "why": [],
             "failed": [],
+            "line_states": {"damage drop": "copes", "coverage": "copes"},
             "shrinking_cost_flags": [],
         }
         for b in (ref, lab)
@@ -383,6 +410,7 @@ def test_the_validator_catches_each_rule():
     assert broken(lambda x: x["sources"][0].update(file="C:/Users/someone/Brokkr/x.json"))  # machine path
     assert broken(lambda x: x["measurements"][0]["sources"][0].update(file="/home/someone/x.json"))
     assert broken(lambda x: x["envelope"]["rows"][1].update(state="harmful"))  # harmful, no failed line
+    assert broken(lambda x: x["envelope"]["rows"][1]["line_states"].update(coverage="fails"))  # disagrees
     assert broken(lambda x: x["summary"]["coverage_failed"].update(count=3))  # an opening count is wrong
     # a large shrinking cost left out of the summary
     assert broken(lambda x: x["envelope"]["rows"][1].update(shrinking_cost_flags=["large shrinking cost"]))
@@ -559,3 +587,12 @@ def test_the_readme_example_uses_the_approved_threshold_wording():
     text = readme_example(tiny_label())
     assert ("a line whose value was written down before these results existed and adopted for the labels "
             "afterwards, unchanged") in text
+
+
+def test_line_states_read_each_interval_against_its_line():
+    rule = lb.ENVELOPE_RULE
+    assert lb.line_states([0.85, 0.9], [-0.05, 0.0], rule) == {"damage drop": "copes", "coverage": "copes"}
+    assert lb.line_states([0.70, 0.75], [-0.20, -0.15], rule) == {"damage drop": "fails", "coverage": "fails"}
+    assert lb.line_states([0.79, 0.85], [-0.12, -0.05], rule) == {"damage drop": "straddles",
+                                                                 "coverage": "straddles"}
+    assert lb.line_states([0.80, 0.85], [-0.10, -0.05], rule)["coverage"] == "copes"  # ends count as clear

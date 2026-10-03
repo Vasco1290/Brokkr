@@ -79,9 +79,10 @@ A recipe that breaks a model is labelled as such: MobileNetV3-Small's INT8 build
 <!-- label-example:end -->
 
 Every harmful row of a label says which line it failed (accuracy, coverage or both) and carries a
-suggested next step that follows that line: "re-calibrate on your own images" where coverage failed,
-"try another recipe or model" or "consider a stronger model" where accuracy failed. The suggestions are
-general; they were not tested for the model.
+suggested next step for each failed line, chosen by comparing the shrunk build with the full-precision
+one on that line: where accuracy failed, "try another recipe" if the full-precision build copes and
+"consider a stronger model" if it fails too; where coverage failed, "re-calibrate on your own images".
+The suggestions are general; they were not tested for the model.
 
 Each label also shows laptop latency (p50, p95, p99 and the spread between repeat runs) for both
 builds, at 1 and 4 threads, and INT8's time as a multiple of FP32's; where INT8 is slower, it says so.

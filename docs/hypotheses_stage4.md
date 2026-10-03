@@ -1391,7 +1391,9 @@ is read: it *fails* (whole interval below the line), *copes* (whole interval at 
   copes).
 - **Order:** the accuracy advice first when accuracy failed, the coverage advice second. (proposed) A
   suggestion is shown once: if both lines give "try another recipe", it appears once, in the first
-  place.
+  place. *Added before the labels are regenerated:* this includes the straddle advice "try another
+  recipe or a stronger model", which already names another recipe (two rows of the `1e7b054` labels
+  would otherwise repeat it).
 - Rows that are not harmful, and rows of a failed build, get no suggestion. Tests on made-up rows for
   each case, including the ConvNeXt-Tiny fog (ImageNet-C) s3 pattern.
 - To read FP32's state on each line, every envelope row stores its per-line states

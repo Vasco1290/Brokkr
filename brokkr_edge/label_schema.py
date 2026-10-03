@@ -21,6 +21,7 @@ SHRINKING_COST_FLAGS = ("large shrinking cost", "not informative")
 # September 2026 in docs/label_schema.md; the rule is brokkr_edge.label).
 HARM_CAUSES = ("too hard for this model", "hurt by shrinking", "cause unclear")
 FAILED_LINES = ("damage drop", "coverage")  # the lines a harmful row can fail, in the order shown
+LINE_STATES = ("fails", "copes", "straddles")  # a row's state on one line (note of 3 October 2026)
 SPEED_STATUSES = ("measured", "not measured")
 # Metric name -> unit. Derived comparisons (damage_drop, shrinking_cost) are measurements too.
 METRICS = {
@@ -243,6 +244,21 @@ def check_label(label: dict) -> list:
                 f"envelope row {row.get('condition_id')}: a failed build's rows say 'INT8 build failed'"
             )
         failed = row.get("failed", [])
+        lines = row.get("line_states")
+        if row.get("state") == "INT8 build failed":
+            if lines is not None:
+                problems.append(f"envelope row {row.get('condition_id')}: a failed build has no line states")
+        elif (
+            not isinstance(lines, dict)
+            or sorted(lines) != sorted(FAILED_LINES)
+            or any(v not in LINE_STATES for v in lines.values())
+            or [x for x in FAILED_LINES if lines[x] == "fails"] != failed
+            or (row.get("state") == "not harmful") != all(v == "copes" for v in lines.values())
+        ):
+            problems.append(
+                f"envelope row {row.get('condition_id')}: line_states must give {LINE_STATES} for each of "
+                f"{FAILED_LINES}, agreeing with its state and failed lines"
+            )
         in_order = [x for x in FAILED_LINES if x in failed] == failed
         if not in_order or bool(failed) != (row.get("state") == "harmful"):
             problems.append(

@@ -72,18 +72,17 @@ CAUSE_TITLE = {
     "hurt by shrinking": "Hurt by shrinking (FP32 copes, INT8 doesn't)",
     "cause unclear": "Cause unclear (FP32 is borderline)",
 }
-# A suggested next step for a harmful row (notes of 1 and 3 October 2026): every suggestion must
-# plausibly fix the line that failed. Re-calibrating fixes coverage; a stronger model fixes accuracy;
-# another recipe fixes harm caused by shrinking. General suggestions, not results: the label says so
-# under the damage table and in its limits.
-NEXT_STEP = {  # the cause-based advice, for a row whose accuracy line failed
-    "hurt by shrinking": "try another recipe or model",
-    "too hard for this model": "consider a stronger model",
-    "cause unclear": "try another recipe or a stronger model",
+# A suggested next step for a harmful row, chosen line by line (note of 3 October 2026, later the same
+# day): every suggestion must plausibly fix the line that failed, judged by comparing INT8 with FP32 on
+# that line. Re-calibrating fixes coverage; a stronger model fixes accuracy; another recipe fixes harm
+# caused by shrinking. General suggestions, not results: the label says so under the damage table.
+ANOTHER_RECIPE = "try another recipe"
+ACCURACY_ADVICE = {  # INT8 failed the damage-drop line; keyed by FP32's state on that line
+    "fails": "consider a stronger model",
+    "copes": ANOTHER_RECIPE,
+    "straddles": "try another recipe or a stronger model",
 }
 RECALIBRATE = "re-calibrate on your own images"
-ANOTHER_RECIPE = "try another recipe"  # second step on a coverage-only row where shrinking is involved
-SHRINKING_INVOLVED = ("hurt by shrinking", "cause unclear")
 SLOWER = "INT8 is slower than FP32 on this laptop CPU (relative comparison only)"
 DAMAGE_NOTE = (
     "Damage drop and shrinking cost in points (positive = better). The suggested next steps are general "
@@ -326,15 +325,20 @@ def _envelope_cell(row: dict | None, rule: dict) -> str:
     return STATE_MARK[row["state"]] + (f": {reason}" if reason else "")
 
 
-def _next_step(row: dict | None, cause: str | None) -> str:
-    """The suggested next step for a harmful row of the labelled build, following the line it failed
-    (note of 3 October 2026); nothing for any other row."""
-    if row is None or row["state"] != "harmful":
+def _next_step(row: dict | None, reference: dict | None) -> str:
+    """The suggested next step for a harmful row of the labelled build, line by line against the
+    reference (FP32) row in the same condition; nothing for any other row."""
+    if row is None or row["state"] != "harmful" or reference is None:
         return "—"
-    if "damage drop" in row["failed"]:  # accuracy failed: the cause-based advice first
-        steps = [NEXT_STEP[cause]] + ([RECALIBRATE] if "coverage" in row["failed"] else [])
-    else:  # coverage only: FP32's accuracy holds, so never "a stronger model"
-        steps = [RECALIBRATE] + ([ANOTHER_RECIPE] if cause in SHRINKING_INVOLVED else [])
+    fp32 = reference["line_states"]
+    steps = []
+    if "damage drop" in row["failed"]:  # accuracy advice first
+        steps.append(ACCURACY_ADVICE[fp32["damage drop"]])
+    if "coverage" in row["failed"]:
+        steps.append(RECALIBRATE)
+        # FP32 keeps its coverage, so shrinking is involved; said once, even inside earlier advice
+        if fp32["coverage"] == "copes" and not any(ANOTHER_RECIPE in s for s in steps):
+            steps.append(ANOTHER_RECIPE)
     return "; ".join(steps)
 
 
@@ -573,7 +577,6 @@ def _sections(label: dict) -> dict:
         )
     out["clean"] = clean_rows
     damage_rows = []
-    cause = {c: line["cause"] for line in label["summary"]["lines"] for c in line["conditions"]}
     for c in label["conditions"]:
         cid = c["condition_id"]
         if cid == "clean":
@@ -596,7 +599,7 @@ def _sections(label: dict) -> dict:
                 _coverage(ix, lab["build_id"], cid),
                 _envelope_cell(l_row, rule),
                 _value(cost, "pts") + (f" [{'; '.join(flags)}]" if flags else ""),
-                _next_step(l_row, cause.get(cid)),
+                _next_step(l_row, r_row),
             ]
         damage_rows.append(row)
     out["damage"] = damage_rows
