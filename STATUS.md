@@ -59,7 +59,10 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      label licence CC BY 4.0 recorded as H's decision. `.gitignore`: working labels anchored (`/labels/`),
      `docs/assets/originals/` ignored (folder made, empty). Note: the working label files have Windows
      line endings; git stores them with LF (`.gitattributes`), and the test reads them in text mode.
-  5. **Next session: the README, per the plan H approved on 3 October 2026** (H starts a fresh session):
+  5. ~~The README~~ **written 3 October 2026 (`3f19127`), waiting for H's review on GitHub (light, dark,
+     phone) before the pull request.** Findings and label example are generated blocks (`scripts/45`,
+     `scripts/41`, both checked by `scripts/40`); screenshots by `scripts/46` from the released label.
+     Website plan committed as `docs/website_v0_plan.md` (`495c7d2`). The plan it followed:
      - Top: banner only (`docs/assets/brokkr-banner.jpg`; the logo is for the website and Hugging
        Face), title, tagline "Shrink AI models for small hardware, and find out honestly what you lost."
      - Sections, in order: 1 Status (what works today; "not built yet" includes object detection and
