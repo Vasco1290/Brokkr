@@ -30,32 +30,60 @@ Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of da
     programs closed, no repository changes while it runs). A session never starts it; it may only run
     `--smoke` outside `results/`. Any command longer than about 10 minutes is cut off in an assistant
     session, so long runs are H's (the reproduction was finished that way).
-  - **Still to do in step 1, after the latency run:** read `results/latency/` into the labels' speed
-    rows (today they say "not measured"), regenerate the ten labels from a clean commit, run
-    `scripts/40`, update the README.
-- **Next, in this order:**
-  1. **H's fix list (H is sending it; nothing started).** Record each in a dated note before code:
-     - the suggested next step follows the line that failed (e.g. a row that fails only on coverage);
-       the case that raised it: ConvNeXt-Tiny, fog (ImageNet-C) s3, where FP32 fails only on coverage
-       and the label says "consider a stronger model";
-     - "not informative" never hides a large shrinking cost (today it takes priority; in the ten labels
-       it hides none: the most negative of its 14 rows is −1.18 points);
-     - the README's threshold wording approved by H (the values were written down before the 4.1
-       results and adopted for the labels afterwards, unchanged), and a correction appended to the
-       30 September envelope note: 80% first appears in `a957652` (24 September, a Stage 2
-       prediction), before `237effa`;
-     - check the ConvNeXt-Tiny claims in `docs/stage4_story.md` against the 4.1 summary and verdict
-       records (its label shows a −31.21-point shrinking cost under contrast (ImageNet-C) s5);
-     - add the severity-1 question to "Parked questions" below.
-  2. **Website v0 plan** (Platform plan step 2): a draft written in `scratch/` (gitignored) while the
-     latency run is going; a plan only, no code, nothing committed.
-  3. **README and images task** (H sends it): generate the "What we have found so far" numbers from
+- **Order, set by H on 3 October 2026:**
+  1. **H runs the laptop latency script** (above), overnight at the desk. No edits to tracked files
+     while it runs.
+     - *While it runs:* the **website v0 plan** (Platform plan step 2), in `scratch/` only (gitignored;
+       nothing tracked): page list (one page per model, comparison table, "Why labels?", methods), how
+       pages are generated from `label.json`, the test that fails on any number not in a label, GitHub
+       Pages setup, phone and dark-mode checks, and a pre-public checklist (licence and commercial
+       use, ImageNet terms, overclaiming re-read, git-history check for full machine paths or H's
+       username). Plan only, no code.
+  2. **Next session: H's fix list** (below). First a dated note, then fixes 1–3 and 5, then the
+     read-only check 4 with proposed wording left uncommitted. Wording and advice only: no verdict,
+     threshold, state or rule changes.
+  3. **Regenerate the labels with speed rows:** read `results/latency/` into the labels' speed rows
+     (today they say "not measured"), regenerate the ten labels from a clean commit, run `scripts/40`,
+     update the README.
+  4. **README and images task** (H sends it): generate the "What we have found so far" numbers from
      result records, checked locally by `scripts/40` the way label sources are; any number that cannot
      be generated becomes a link. Brand images are in `docs/assets/` (the favicon and logo are for the
-     site; H uploads the social preview in GitHub settings).
-  4. **Pull request `stage-4` into `main`** with a merge commit (like PRs #1–#3), merged before step 2
-     makes the repository public; then tag `stage-4-done` and start step 2 on a new branch. `gh` is not
-     installed, so H opens the pull request on GitHub unless it is installed.
+     site; H uploads the social preview in GitHub settings). Then the **pull request `stage-4` into
+     `main`** with a merge commit (like PRs #1–#3), merged before step 2 makes the repository public;
+     then tag `stage-4-done` and start step 2 on a new branch. `gh` is not installed, so H opens the
+     pull request on GitHub unless it is installed.
+- **H's fix list (received 3 October 2026; nothing started):**
+  1. **Next-step advice follows the line that actually failed**, for every verdict type, as a general
+     rule with a test (not a special case for the row that raised it: ConvNeXt-Tiny, fog (ImageNet-C)
+     s3, where the label says "consider a stronger model"). Show H the before/after for the affected
+     rows. H's answers for the dated note (decided after seeing the data; record that):
+     - Rule: every suggestion must plausibly fix the line that failed. Re-calibrating fixes coverage;
+       a stronger model fixes accuracy; another recipe fixes harm caused by shrinking (either line).
+     - Fails both lines: cause-based advice first, "re-calibrate on your own images" second.
+     - Fails accuracy only: cause-based advice only.
+     - Fails coverage only: "re-calibrate on your own images" first; "try another recipe" second only
+       where shrinking is involved ("hurt by shrinking", "cause unclear"). Never "consider a stronger
+       model" on a coverage-only row (FP32's accuracy holds there, so it would point at the wrong
+       problem).
+     - Tests for each case, with made-up rows.
+  2. **"Not informative" never hides a large shrinking cost:** if both apply, show both. Add a test
+     with a made-up row where both apply. (Today "not informative" takes priority; in the ten labels it
+     hides none: the most negative of its 14 rows is −1.18 points.)
+  3. **README threshold wording approved by H:** "a line whose value was written down before these
+     results existed and adopted for the labels afterwards, unchanged". Also append a correction to
+     the 30 September envelope note: 80% first appears in `a957652` (24 September, a Stage 2
+     prediction), before `237effa`.
+  4. **Claim check, read-only first.** ConvNeXt-Tiny INT8's labels show shrinking costs of −31.21
+     points at contrast (ImageNet-C) s5 and −11.94 / −18.56 at fog (ImageNet-C) s3 / s5. Compare with
+     the 4.1 summary ("only MobileNetV3-Large and EfficientNet-B0 collapse; others lose <2"). Explain,
+     from the 4.1 records, what measure and conditions that statement used and whether it conflicts
+     with the label numbers; then propose (don't commit) corrected wording for `docs/stage4_story.md`
+     and the README's findings. No new diagnostics, no cause analysis: wording only. The wording "all
+     failures are phone-optimised designs" is in no tracked file and not in `scratch/` (searched 3
+     October 2026), so for it the check only shapes future wording ("Why labels?" page, README
+     findings).
+  5. **Add to "Parked questions" below:** "Add severity 1 to label conditions (Phase B severity menu)
+     so labels show where models still work."
 - **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
   keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
   commits; H writes the review notes.
