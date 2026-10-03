@@ -435,3 +435,31 @@ line; "copes": whole interval at or above it; "straddles": neither). A row of a 
 "not harmful" means both lines cope; `scripts/40` recomputes them. The suggested next step reads the
 labelled build's `failed` and the reference build's `line_states` in the same condition
 (`docs/hypotheses_stage4.md`, note of 3 October 2026, later the same day).
+
+## Note added 3 October 2026: released labels are committed in `published/labels/`, and the label licence
+
+Decided by H on 3 October 2026 (website v0 decision 1, and README plan decisions 3a and 3c).
+
+**1. Hard rule 4 changes for one folder only.** Generated results stay out of git, and working labels
+stay in the gitignored top-level `labels/` folder. Released labels, and only those, are committed in
+`published/labels/<model>/`: `label.json` (the only source) and `label.html` (its render). They are
+added at release points, copied byte for byte from a `labels/` folder that was made from a clean commit
+and passed `scripts/40_check_labels.py`. `CLAUDE.md` rule 4 points here. The `.gitignore` rule for
+working labels is anchored (`/labels/`) so it does not also catch `published/labels/`.
+- **First release (3 October 2026):** MobileNetV3-Large, from the labels made at `f682e21`
+  (`scripts/40` PASS for all ten on 3 October). It is the README's example label and the source of its
+  screenshots.
+- **Check:** `tests/test_published_labels.py` fails unless every published label passes the schema
+  validator, comes from a clean commit, renders to exactly its committed `label.html`, and shows no
+  number that is not in its `label.json`. It needs no results or ImageNet files, so it runs on a fresh
+  clone. (Recomputing each number from its sources stays with `scripts/40`, which needs the records.)
+- Rejected for now (H): building the site on GitHub from committed labels; v0 is built locally and
+  pushed to `gh-pages`.
+
+**2. The label licence.** CC BY 4.0 for published labels is H's decision (first recorded 30 September
+2026; confirmed 3 October 2026). Every label, its HTML page and its Markdown model card state the same
+four things, generated from the label (`licences`, note of 3 October 2026 above): Brokkr's code is
+Apache-2.0; the label's own numbers and text are Brokkr output, licensed CC BY 4.0; the model's weights
+keep their original licence; ImageNet-trained weights carry ImageNet's non-commercial terms of access.
+The README says the same. Checked on 3 October 2026 in `labels/mobilenet_v3_large/label.md` and the
+README's licence section: consistent, so no code changes.

@@ -30,7 +30,8 @@ else is built on its measurements.
 3. NEVER copy code from or ship AGPL/GPL projects or models (e.g. Ultralytics YOLO). Only permissively
    licensed code and models (Apache-2.0, MIT, BSD). YOLOX (Apache-2.0) and torchvision models are fine.
 4. Model files, datasets, and generated results are NOT committed to git. Anything re-downloadable or
-   regenerable stays out (see `.gitignore`).
+   regenerable stays out (see `.gitignore`). One exception: released labels in `published/labels/`
+   (decided by H, 3 October 2026; `docs/label_schema.md`, note of 3 October 2026).
 5. Stay inside the CURRENT STAGE's scope (see `ROADMAP.md`; from 30 September 2026, the current step of
    the Platform plan). Do not pull in work from later stages or add
    unrequested features. Suggest them at the end instead. The website is a walking skeleton: each stage may
