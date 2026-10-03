@@ -82,9 +82,11 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      - Images: keep the current file names (`brokkr-banner.jpg`, `brokkr-logo.png`, `favicon.png`,
        `brokkr-social-preview.jpg`); centring left as it is; H uploads the social preview.
   6. **Then:** all checks (ruff, pytest, `scripts/22`, `scripts/40`), the **pull request `stage-4` into
-     `main`** with a merge commit (like PRs #1–#3), merged before step 2 makes the repository public;
-     then tag `stage-4-done` and start step 2 on a new branch. `gh` is not installed, so H opens the
-     pull request on GitHub unless it is installed.
+     `main`** with a merge commit (like PRs #1–#3); then tag `stage-4-done` and start step 2 on a new
+     branch. `gh` is not installed and the in-app browser is not signed in, so H opens the pull request
+     on GitHub (https://github.com/Vasco1290/Brokkr/compare/main...stage-4).
+  - **The repository is public** (made so by H on purpose; confirmed 3 October 2026). The git-history
+    scan was run that day, read-only: clean (ROADMAP, "Before making the repository public").
 - **H's fix list (received 3 October 2026; all done the same day, check 4's wording approved):**
   1. **Next-step advice follows the line that actually failed**, for every verdict type, as a general
      rule with a test (not a special case for the row that raised it: ConvNeXt-Tiny, fog (ImageNet-C)
@@ -493,7 +495,7 @@ Nine predictions were committed before measuring: **6 confirmed, 3 rejected**.
 | ruff + pytest in GitHub Actions; `.gitattributes` for LF endings; `requirements-lock.txt` | Code quality and reproducibility |
 | One branch per stage, merged to `main` when the stage is done | `main` always holds finished work |
 | No AI co-author lines in commits; commits use your GitHub noreply email | Your preference; privacy before going public |
-| Repository stays private for now; results page built locally | Your decision; publishing is on the "before going public" checklist |
+| Repository public (H's decision, confirmed 3 October 2026); results page still built locally | The site comes in Platform plan step 2 |
 
 ---
 
@@ -607,7 +609,8 @@ images, so it is only used for the FP32 correctness check.
 1. ~~The 50,000-image correctness result isn't in `results/`.~~ Fixed 25 September 2026: rerun gave
    75.26% (95% CI 74.88–75.61%), torchvision publishes 75.27%, PASS; back on the results page.
 2. **Speed numbers are laptop-only and rough.** Real speed study is task 4.4 (Raspberry Pi 5).
-3. **The results page isn't published** (repository is private). See ROADMAP's "before going public".
+3. **The results page isn't published** (the repository is public since H's decision, confirmed 3 October
+   2026; the site comes in Platform plan step 2). See ROADMAP's "before going public".
 4. **Raspberry Pi readiness:** the model list lives in `export.py`, which imports PyTorch, so the
    accuracy script needs PyTorch installed. Move the model list to its own file (planned in task 4.3).
 5. ~~ImageNetV2 not downloaded yet.~~ Done in task 3.9 (licence recorded as the sources state it).

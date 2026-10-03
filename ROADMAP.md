@@ -40,10 +40,17 @@ committed code, speed benchmark pinned to one core type with IQR-based stability
 
 ### Before making the repository public
 
+*H made the repository public on purpose (confirmed 3 October 2026), before this checklist was
+finished; its open items are now checks done after the fact, in step 2.*
+
 - [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
   contain the personal email
 - [ ] Publish the results page to GitHub Pages
 - [ ] Re-read README and ROADMAP for anything that overclaims
+- [x] Git-history scan (3 October 2026, after the repository became public; read-only, nothing rewritten):
+  all 180 commits on every branch and tag use the GitHub noreply email; no machine paths, Windows
+  usernames, personal email addresses or tokens in any commit's contents (matches were test data, a
+  redacted commit message and checklist text)
 
 ## Stage 2 — Stress test `[x]`
 
@@ -380,7 +387,8 @@ validator for `docs/label_schema.md` version 1.
   commercial-use check of every model and dataset (each dataset tagged "research only" or "commercial
   use allowed") and a re-read of README, ROADMAP, docs and site for overclaiming.
 - README update (it still says "Stages 1–2 of 7") and the licences: Apache-2.0 (code, already in
-  `LICENSE`) and CC BY 4.0 (published labels). Then H makes the repository public.
+  `LICENSE`) and CC BY 4.0 (published labels). The repository is already public (made so by H; confirmed
+  3 October 2026), so the checklist is done after the fact.
 
 *Done when:* the site builds from label files alone, and a test fails if any number on it is not in
 a `label.json`; filter and compare work on the 10 labels; a user-submitted test label shows

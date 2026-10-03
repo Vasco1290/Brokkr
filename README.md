@@ -261,5 +261,5 @@ started by hand with the laptop plugged in and other programs closed.
 
 ## Roadmap
 
-Next: the catalog website and making this repository public, then testing your own model. The full
-plan, in order and with dates: [ROADMAP.md](ROADMAP.md).
+Next: the catalog website, then testing your own model. The full plan, in order and with dates:
+[ROADMAP.md](ROADMAP.md).
