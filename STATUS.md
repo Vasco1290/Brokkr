@@ -44,23 +44,45 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      done read-only. H confirmed the "(proposed)" points of that note on 3 October.
      - **Later on 3 October:** next-step advice chosen line by line against FP32 (note `4ef62cf`, code
        `f682e21`; 5 rows of the `1e7b054` labels changed, among them ConvNeXt-Tiny fog (ImageNet-C) s3).
-       New "(proposed)" points in that note wait for H: FP32 straddling a line, and saying a suggestion
-       once.
-     - **Check 4, new headline (H, 3 October): draft waits for H** in `scratch/check4_draft.md`
-       (README findings, `docs/stage4_story.md`, "Why labels?" page; every number printed from the
-       records by a scratch script; nothing committed). Verified references: `scratch/related_work.md`
-       (8 sources, each checked on its own page; 3 advisor notes narrowed, none dropped).
+       H confirmed its "(proposed)" points (straddle cases, each suggestion once) at `f97255e`.
+     - **Check 4: approved by H and committed at `9b8505f`** (README findings, `docs/stage4_story.md`).
+       Every number was printed from `results/final/breadth_4.1_verdicts.json` and the labels by
+       `scratch/check4_draft.md`'s script; the noise/blur sentence leads with counts and denominators
+       (near-floor cells excluded). Xiao et al.'s full text (v1, the only version) names impulse noise,
+       not glass blur. The "Why labels?" text is in `scratch/website_v0_plan.md` section 11 (gitignored,
+       so not committed). Verified references: `scratch/related_work.md` (9 sources).
   3. ~~Regenerate the labels with speed rows~~ (done 3 October 2026; last made from `f682e21`;
-     `scripts/40` PASS, 10 labels; README updated).
-  4. **README and images task** (H sends it): generate the "What we have found so far" numbers from
-     result records, checked locally by `scripts/40` the way label sources are; any number that cannot
-     be generated becomes a link. Brand images are in `docs/assets/` (the favicon and logo are for the
-     site; H uploads the social preview in GitHub settings). Then the **pull request `stage-4` into
+     `scripts/40` PASS, 10 labels).
+  4. ~~Released label~~ (done 3 October 2026, `38e5c7c`): `published/labels/mobilenet_v3_large/`
+     (`label.json`, `label.html`, from `f682e21`), hard rule 4 changed for that folder only (dated note
+     in `docs/label_schema.md`, pointer in `CLAUDE.md` rule 4), `tests/test_published_labels.py`; the
+     label licence CC BY 4.0 recorded as H's decision. `.gitignore`: working labels anchored (`/labels/`),
+     `docs/assets/originals/` ignored (folder made, empty). Note: the working label files have Windows
+     line endings; git stores them with LF (`.gitattributes`), and the test reads them in text mode.
+  5. **Next session: the README, per the plan H approved on 3 October 2026** (H starts a fresh session):
+     - Top: banner only (`docs/assets/brokkr-banner.jpg`; the logo is for the website and Hugging
+       Face), title, tagline "Shrink AI models for small hardware, and find out honestly what you lost."
+     - Sections, in order: 1 Status (what works today; "not built yet" includes object detection and
+       devices other than the laptop); 2 What it does; 3 Example label (link to
+       `published/labels/mobilenet_v3_large/label.html` plus light and dark screenshots of its summary,
+       made from that committed label); 4 What we found (the approved check-4 wording, "in our tests",
+       links to the report and the hypotheses files); 5 Why Brokkr? (testing under damage, separating
+       shrinking damage from weakness that was already there, the uncertainty check, a shareable label,
+       one command; other tools named only for what they verifiably do, no "X can't do Y"); 6 When you
+       don't need Brokkr (the model only runs in controlled conditions; you already test on real field
+       data); 7 Quick start (only commands that work today); 8 How it works, plus the honesty rules;
+       9 Reproduce; 10 Licences and data terms (code Apache-2.0; labels CC BY 4.0; weights keep their
+       original licences; ImageNet non-commercial terms); 11 Roadmap link.
+     - No hand-typed result numbers: generated blocks checked by `scripts/40`, or links. The findings
+       numbers committed at `9b8505f` and the Status row's counts are typed today and must become a
+       generated, checked block. Must read well in GitHub light mode, dark mode and on a phone.
+     - Images: keep the current file names (`brokkr-banner.jpg`, `brokkr-logo.png`, `favicon.png`,
+       `brokkr-social-preview.jpg`); centring left as it is; H uploads the social preview.
+  6. **Then:** all checks (ruff, pytest, `scripts/22`, `scripts/40`), the **pull request `stage-4` into
      `main`** with a merge commit (like PRs #1–#3), merged before step 2 makes the repository public;
      then tag `stage-4-done` and start step 2 on a new branch. `gh` is not installed, so H opens the
      pull request on GitHub unless it is installed.
-- **H's fix list (received 3 October 2026; done the same day except check 4's wording, which waits
-  for H):**
+- **H's fix list (received 3 October 2026; all done the same day, check 4's wording approved):**
   1. **Next-step advice follows the line that actually failed**, for every verdict type, as a general
      rule with a test (not a special case for the row that raised it: ConvNeXt-Tiny, fog (ImageNet-C)
      s3, where the label says "consider a stronger model"). Show H the before/after for the affected
