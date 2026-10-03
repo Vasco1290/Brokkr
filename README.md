@@ -277,3 +277,7 @@ started by hand with the laptop plugged in and other programs closed.
 
 Next: the catalog website, then testing your own model. The full plan, in order and with dates:
 [ROADMAP.md](ROADMAP.md).
+
+---
+
+Built with AI coding assistance (Claude Code). Research design, decisions and reviews by H.
