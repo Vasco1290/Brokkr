@@ -416,3 +416,11 @@ validator refuses an empty field; `scripts/40_check_labels.py` checks it against
 The Markdown model card adds `license_link: "#licences"`, the anchor of its "Licences" section.
 
 **5. Every rendered page states the label schema version** beside the Brokkr version and commit.
+
+*Added 3 October 2026 while building, before the labels are regenerated:* 30 of the 4.1 records (made
+at `5be2cb5`, before thread spinning was switched off; `results/breadth/run_log.txt` says spinning was
+on for them) have no `spinning` field in their runtime block. Their runtime entry records spinning as
+not stated (`null`, and `spin-not-recorded` in its ID); it is never filled in. Each measurement takes
+the runtime of the record it was read or computed from; a damage drop or shrinking cost whose two
+records ran with different runtimes carries the first record's `runtime_id` and the second's in
+`settings.paired_runtime_id`. The label lists every runtime its measurements used.

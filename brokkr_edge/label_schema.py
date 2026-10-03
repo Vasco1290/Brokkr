@@ -88,9 +88,10 @@ def condition_id(suite: str | None, damage: str, severity: int | None) -> str:
     return "clean" if damage == "clean" else f"{slug(suite)}/{slug(damage)}/{severity}"
 
 
-def runtime_id(name: str, version: str, provider: str, threads: int, spinning: str) -> str:
-    """e.g. onnxruntime@1.23.2:cpuexecutionprovider:4t:spin-on (spinning as a record states it: "on ...")."""
-    spin = "on" if str(spinning).startswith("on") else "off"
+def runtime_id(name: str, version: str, provider: str, threads: int, spinning: str | None) -> str:
+    """e.g. onnxruntime@1.23.2:cpuexecutionprovider:4t:spin-on. Spinning as the record states it ("on ...",
+    "off"); a record that does not state it gets "spin-not-recorded", never a guess."""
+    spin = "not-recorded" if not spinning else ("on" if str(spinning).startswith("on") else "off")
     return f"{slug(name)}@{version}:{slug(provider)}:{int(threads)}t:spin-{spin}"
 
 

@@ -129,7 +129,7 @@ def runtime_entry(record: dict, path: Path) -> dict:
     rt = record["runtime"]
     return {
         "runtime_id": runtime_id(rt["name"], rt["version"], rt["execution_provider"], rt["threads"],
-                                 rt.get("spinning", "")),
+                                 rt.get("spinning")),
         "name": rt["name"],
         "version": rt["version"],
         "execution_provider": rt["execution_provider"],
@@ -251,10 +251,12 @@ def make_label(model: str) -> dict:
     if test_positions & set(cal_arrays["positions"].tolist()):
         sys.exit("REFUSED: calibration and test images overlap")
     hw_id = hardware_id("laptop", fp["cpu_model"], f"{fp['os']} {fp['os_release']}")
-    accuracy_runtime = runtime_entry(ref_clean, ref_clean_path)
-    for path, record in list(acc.values()) + [(p, r) for p, r in rel.values()]:
-        if record.get("runtime") and record["runtime"] != ref_clean["runtime"]:
-            sys.exit(f"REFUSED: {path} was run with another runtime set-up")
+    runtimes, acc_runtime = [], {}  # each accuracy record's runtime (note of 3 October 2026)
+    for key, (path, record) in acc.items():
+        rt = runtime_entry(record, path)
+        if rt["runtime_id"] not in {r["runtime_id"] for r in runtimes}:
+            runtimes.append(rt)
+        acc_runtime[key] = rt["runtime_id"]
     hardware = [
         {
             "hardware_id": hw_id,
@@ -267,7 +269,6 @@ def make_label(model: str) -> dict:
             "fingerprint_source": source(ref_clean_path, "device.fingerprint"),
         }
     ]
-    runtimes = [accuracy_runtime]
 
     test_id = dataset_id("imagenet", DATASET, "test")
     cal_id = dataset_id("imagenet", DATASET, "conformal_calibration")
@@ -307,7 +308,11 @@ def make_label(model: str) -> dict:
     # Measurements.
     measurements = []
 
-    def add(metric, role, cid, value, ci, n, settings, sources):
+    def add(metric, role, cid, value, ci, n, settings, sources, paired_with=None):
+        """paired_with: the (role, condition) of a derived measurement's second record."""
+        rid = acc_runtime[(role, cid)]
+        if paired_with and acc_runtime[paired_with] != rid:
+            settings = {**settings, "paired_runtime_id": acc_runtime[paired_with]}
         measurements.append(
             {
                 "metric": metric,
@@ -315,7 +320,7 @@ def make_label(model: str) -> dict:
                 "dataset_id": test_id,
                 "condition_id": cid,
                 "hardware_id": hw_id,
-                "runtime_id": accuracy_runtime["runtime_id"],
+                "runtime_id": rid,
                 "value": value,
                 "ci95": ci,
                 "n_items": n,
@@ -368,6 +373,7 @@ def make_label(model: str) -> dict:
                     source(acc[(role, cid)][0].with_suffix(".npz"), "logits, labels"),
                     source(acc[(role, "clean")][0].with_suffix(".npz"), "logits, labels"),
                 ],
+                paired_with=(role, "clean"),
             )
     if status["labelled"] == "usable":
         for c in conditions:
@@ -385,6 +391,7 @@ def make_label(model: str) -> dict:
                     source(acc[("labelled", cid)][0].with_suffix(".npz"), "logits, labels"),
                     source(acc[("reference", cid)][0].with_suffix(".npz"), "logits, labels"),
                 ],
+                paired_with=("reference", cid),
             )
 
     # Envelope and summary.

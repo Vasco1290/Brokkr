@@ -191,6 +191,12 @@ def test_ids_are_stable_and_lowercase():
         and condition_id("imagenet-c", "contrast", 3) == "imagenet-c/contrast/3"
     )
     assert slug("  Fog (Brokkr)  ") == "fog-brokkr"
+    assert runtime_id("onnxruntime", "1.23.2", "CPUExecutionProvider", 4, "on (ONNX Runtime's default)") == (
+        "onnxruntime@1.23.2:cpuexecutionprovider:4t:spin-on"
+    )
+    assert runtime_id("onnxruntime", "1.23.2", "CPUExecutionProvider", 8, "off").endswith(":8t:spin-off")
+    # a record that does not state its spinning setting is never guessed
+    assert runtime_id("onnxruntime", "1.23.2", "CPUExecutionProvider", 8, None).endswith("spin-not-recorded")
 
 
 RT = runtime_id("rt", "v1", "cpu", 8, "off")

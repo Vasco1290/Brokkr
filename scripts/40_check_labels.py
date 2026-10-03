@@ -190,7 +190,27 @@ def check(folder: Path) -> list:
     ):
         problems.append("a display name differs from brokkr_edge/model_list.json")
 
-    # 4 and 5. Every measurement.
+    # 4 and 5. Every measurement, and the runtime of the accuracy record it comes from.
+    record_runtime = {}
+    for m in label["measurements"]:
+        if m["metric"] == "top1":
+            rt = json.loads(Path(m["sources"][0]["file"]).read_text(encoding="utf-8"))["runtime"]
+            match = [r["runtime_id"] for r in label["runtimes"]
+                     if all(r[k] == rt.get(k) for k in ("name", "version", "execution_provider", "threads",
+                                                        "spinning"))]
+            record_runtime[(m["build_id"], m["condition_id"])] = match[0] if match else None
+    reference_id = next(b["build_id"] for b in label["builds"] if b["role"] == "reference")
+    for m in label["measurements"]:
+        where = f"{m['metric']} {m['build_id']} {m['condition_id']}"
+        if m["runtime_id"] != record_runtime.get((m["build_id"], m["condition_id"])):
+            problems.append(f"{where}: runtime differs from its record")
+        other = {"damage_drop": (m["build_id"], "clean"),
+                 "shrinking_cost": (reference_id, m["condition_id"])}.get(m["metric"])
+        if other:
+            paired_rt = record_runtime.get(other)
+            expected = paired_rt if paired_rt != m["runtime_id"] else None
+            if m["settings"].get("paired_runtime_id") != expected:
+                problems.append(f"{where}: paired_runtime_id differs from its second record")
     for m in label["measurements"]:
         where = f"{m['metric']} {m['build_id']} {m['condition_id']}"
         if m["metric"] in ("damage_drop", "shrinking_cost"):

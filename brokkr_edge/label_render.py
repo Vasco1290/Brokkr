@@ -520,13 +520,17 @@ def _sections(label: dict) -> dict:
     ds = {d["dataset_id"]: d for d in label["datasets"]}
     test = ds[label["measurements"][0]["dataset_id"]] if label["measurements"] else next(iter(ds.values()))
     hw = label["hardware"][0]
-    runtimes = {r["runtime_id"]: r for r in label["runtimes"]}
-    rt = runtimes[label["measurements"][0]["runtime_id"]] if label["measurements"] else label["runtimes"][0]
+    used = {m["runtime_id"] for m in label["measurements"]}
+    accuracy_runtimes = "; ".join(
+        f"{r['name']} {r['version']}, {r['execution_provider']}, {fmt(r['threads'], 'int')} threads, thread "
+        f"spinning {r.get('spinning') or 'not recorded'}"
+        for r in label["runtimes"]
+        if r["runtime_id"] in used
+    )
     out["tested"] = [
         f"Images: {test['name']}, split {test['split']}, {fmt(test['n_items'], 'int')} items; "
         f"licence: {test['licence']}",
-        f"Machine: {hw['cpu_model']}, {hw['os']} ({hw['kind']}); accuracy run with {rt['name']} "
-        f"{rt['version']}, {rt['execution_provider']}, {fmt(rt['threads'], 'int')} threads",
+        f"Machine: {hw['cpu_model']}, {hw['os']} ({hw['kind']}); accuracy runs: {accuracy_runtimes or '—'}",
         f"Intervals: {fmt(level, 'pct0')} bootstrap intervals over the same items (paired for differences).",
         f"Envelope: {rule['name']} ({rule['fixed_in']}); {rule['harm_definition']}. A condition is "
         f"harmful if "
