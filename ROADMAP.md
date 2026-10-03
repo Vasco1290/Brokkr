@@ -367,7 +367,7 @@ installs a `brokkr` command, so ours is **`brokkr-edge`** (e.g. `brokkr-edge tes
 
 Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published labels**.
 
-### 1. Labels (P1) `[ ]`, done by 7 October
+### 1. Labels (P1) `[x]`, done by 7 October (done 3 October 2026; merged 4 October)
 - `docs/label_schema.md` first (written: `label.json`, schema version 1). The label builder is made
   general enough for EEG/EMG signals (step 7), not image-only.
 - Then P1 as fixed in `docs/hypotheses_stage4.md` (notes of 29–30 September): 10 labels, the check
@@ -378,7 +378,7 @@ Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published
 *Done when:* the P1 "done when" line (Product plan, below) holds, and every `label.json` passes a
 validator for `docs/label_schema.md` version 1.
 
-### 2. Catalog site and going public `[ ]`, done by 10 October
+### 2. Catalog site and going public `[~]`, done by 10 October
 - GitHub Pages, generated only from `label.json` files: browse, filter, compare, one page per label,
   and a methods page (harm definition and threshold history as recorded in
   `docs/hypotheses_stage4.md`, the "12 conditions" sentence). User-submitted labels are clearly marked

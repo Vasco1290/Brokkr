@@ -6,7 +6,6 @@ are on the machine (they are not in git). Its label screenshots (scripts/46_read
 the released label as it is now.
 """
 
-import hashlib
 import json
 import re
 import subprocess
@@ -14,6 +13,8 @@ import sys
 from pathlib import Path
 
 import pytest
+
+from brokkr_edge.results import sha256_of
 
 README = Path("README.md").read_text(encoding="utf-8")
 # Markdown links and images "](target)", and HTML images 'src="target"'.
@@ -55,15 +56,15 @@ def test_the_findings_equal_a_fresh_render_of_the_records():
 
 
 def test_the_generated_blocks_are_present_once():
-    for marker in ("label-example:start", "label-example:end", "findings:start", "findings:end"):
+    for marker in ("label-example:start", "label-example:end", "findings:start", "findings:end",
+                   "figure-hero:start", "figure-hero:end"):
         assert README.count(marker) == 1, marker
 
 
 def test_the_label_screenshots_show_the_released_label_as_it_is_now():
     record = json.loads(Path("docs/assets/label-summary.json").read_text(encoding="utf-8"))
     label = Path(record["label"])
-    text_hash = hashlib.sha256(label.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
-    assert record["sha256"] == text_hash, "rerun scripts/46_readme_screenshots.py: the label has changed"
+    assert record["sha256"] == sha256_of(label), "rerun scripts/46_readme_screenshots.py: the label changed"
     for picture in record["pictures"]:
         assert (Path("docs/assets") / picture).exists() and f"docs/assets/{picture}" in README
 

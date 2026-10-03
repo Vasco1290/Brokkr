@@ -148,8 +148,9 @@ def utc(seconds: float) -> str:
 
 
 def write(path: Path, text: str) -> None:
+    """Write `text` with LF line endings on every OS (the label files are then identical everywhere)."""
     tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
+    tmp.write_text(text, encoding="utf-8", newline="\n")
     os.replace(tmp, path)
 
 

@@ -1,0 +1,88 @@
+{
+ "about": "Brokkr's claims register (decided by H, 3 October 2026; started 4 October 2026 with the figures). Every public claim lists its scope, whether it was pre-registered or exploratory, the prior work it is consistent with (verified references only), the command that produces it and the command that checks it. Numbers are never typed here: they live in the generated figures and docs/figures/figures.json, which the check command verifies against the records. No claim of being first.",
+ "claims": [
+  {
+   "id": "fig-hero",
+   "figure": "hero-shrinking-cost",
+   "claim": "Under darkness (Brokkr) s5, shrinking costs some models much more than it does on clean images, while others lose about as much as on clean images; H21's prediction that at least half of the models would show a large extra gap failed.",
+   "scope": {
+    "models": "every usable INT8 build of the Stage 4 (task 4.1) models, percentile 99.99 recipe; MobileNetV3-Small left out (its INT8 build failed)",
+    "conditions": "clean and darkness (Brokkr) s5",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap"
+   },
+   "status": "pre-registered: H21 in docs/hypotheses_stage4.md (verdict unchanged); the dashed large-cost line is the label rule, adopted after these results existed",
+   "prior_work": [
+    "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968",
+    "Yaghoubi Araghi et al., 2026, Recti-Q, arXiv:2607.18540"
+   ],
+   "command": "python scripts/47_figures.py",
+   "check": "python scripts/47_figures.py --check"
+  },
+  {
+   "id": "fig-grid",
+   "figure": "grid-shrinking-cost",
+   "claim": "Which models lose much more to shrinking varies with the damage condition; large shrinking costs cluster under darkness, fog and low contrast.",
+   "scope": {
+    "models": "every usable INT8 build in published/labels (the Stage 4 models)",
+    "conditions": "the twelve damaged conditions on the labels (Brokkr's own and ImageNet-C, named separately)",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap (in each cell's hover note)"
+   },
+   "status": "exploratory, not pre-registered",
+   "prior_work": [
+    "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968",
+    "Hendrycks and Dietterich, 2019, Benchmarking Neural Network Robustness to Common Corruptions and Perturbations, arXiv:1903.12261"
+   ],
+   "command": "python scripts/47_figures.py",
+   "check": "python scripts/47_figures.py --check"
+  },
+  {
+   "id": "fig-uncertainty",
+   "figure": "mnv3l-uncertainty",
+   "claim": "For MobileNetV3-Large, prediction sets calibrated on clean images keep their coverage target on clean images but fall below it under several kinds of damage, while their average size changes little.",
+   "scope": {
+    "models": "MobileNetV3-Large, FP32 and INT8 (percentile 99.99)",
+    "conditions": "clean and the twelve damaged conditions on its label",
+    "data": "ImageNet-1k validation, test split; prediction sets calibrated on the clean conformal-calibration split",
+    "intervals": "95% bootstrap"
+   },
+   "status": "measured and reported (Stage 4 records); not a pre-registered verdict",
+   "prior_work": [
+    "Kasa and Taylor, 2023, Empirically Validating Conformal Prediction on Modern Vision Architectures Under Distribution Shift and Long-tailed Data, arXiv:2307.01088"
+   ],
+   "command": "python scripts/47_figures.py",
+   "check": "python scripts/47_figures.py --check"
+  },
+  {
+   "id": "fig-clean-accuracy",
+   "figure": "mnv3l-clean-accuracy",
+   "claim": "For MobileNetV3-Large, the default INT8 recipe lost much more clean accuracy than the percentile recipe chosen in Stage 3.",
+   "scope": {
+    "models": "MobileNetV3-Large: FP32, default INT8 (min-max calibration), INT8 (percentile 99.99)",
+    "conditions": "clean only",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% bootstrap, each build on its own (not paired)"
+   },
+   "status": "Stage 1 and Stage 3 records; the percentile recipe was chosen on the tuning split and judged on the test split (H10, docs/hypotheses_stage3.md)",
+   "prior_work": ["none cited: Brokkr's own records"],
+   "command": "python scripts/47_figures.py",
+   "check": "python scripts/47_figures.py --check"
+  },
+  {
+   "id": "fig-speed",
+   "figure": "speed-ratio",
+   "claim": "On this laptop CPU, INT8 does not always take less time than FP32; for some models it takes more.",
+   "scope": {
+    "models": "every usable INT8 build and its FP32 reference in published/labels",
+    "conditions": "random input, batch 1, 1 and 4 threads pinned to the laptop's performance cores",
+    "data": "laptop latency records (results/latency), median across sessions",
+    "intervals": "none; spread across sessions is shown as the unstable mark"
+   },
+   "status": "measured by the latency method fixed in dated notes before measuring; a relative comparison on one laptop CPU only",
+   "prior_work": ["none cited: Brokkr's own records"],
+   "command": "python scripts/47_figures.py",
+   "check": "python scripts/47_figures.py --check"
+  }
+ ]
+}

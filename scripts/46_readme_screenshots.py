@@ -14,7 +14,6 @@ come from its generated blocks.
 """
 
 import argparse
-import hashlib
 import json
 import subprocess
 import sys
@@ -23,6 +22,8 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
+
+from brokkr_edge.results import sha256_of
 
 LABEL = Path("published/labels/mobilenet_v3_large/label.html")
 OUT = Path("docs/assets")
@@ -35,11 +36,6 @@ BROWSERS = [
 ]
 # Hide every section after the summary: the second <h2> ("What was tested") and everything after it.
 SUMMARY_ONLY = "<style>h2~h2,h2~h2~*{display:none!important}</style></head>"
-
-
-def text_sha256(path: Path) -> str:
-    """SHA-256 of the file's text with line endings as LF, so a Windows and a Linux checkout agree."""
-    return hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
 
 
 def trim_bottom(path: Path, margin: int = 24) -> Image.Image:
@@ -89,7 +85,7 @@ def main() -> None:
             print(f"wrote {out}: {im.width}x{im.height}, {out.stat().st_size} bytes")
     record = {
         "label": LABEL.as_posix(),
-        "sha256": text_sha256(LABEL),
+        "sha256": sha256_of(LABEL),  # Brokkr's fingerprint: LF line endings for text files
         "pictures": [f"label-summary-{s}.png" for s in ("light", "dark")],
         "browser": browser.name,
         "width_px": WIDTH,

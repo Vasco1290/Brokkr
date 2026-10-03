@@ -26,7 +26,8 @@ For each label, independently of the code that made it:
    label.json number, and the Markdown's model-card metadata parses (huggingface_hub.ModelCard) with
    license "other" and license_link "#licences".
 Then, once: the README's label example and its Stage 4 findings equal a fresh render of their labels and
-records (scripts/41_readme_label_example.py --check, scripts/45_readme_findings.py --check).
+records (scripts/41_readme_label_example.py --check, scripts/45_readme_findings.py --check), and the figures
+in docs/figures/ pass scripts/47_figures.py --check (up to date, values, positions, stray numbers, claims).
 """
 
 import argparse
@@ -300,9 +301,12 @@ for folder in folders:
     )
     for p in problems[:20]:
         print(f"     {p}")
-for script in ("scripts/41_readme_label_example.py", "scripts/45_readme_findings.py"):
-    readme = subprocess.run([sys.executable, script, "--check", "--labels", args.labels],
-                            capture_output=True, text=True)
+for command in (
+    ["scripts/41_readme_label_example.py", "--check", "--labels", args.labels],
+    ["scripts/45_readme_findings.py", "--check", "--labels", args.labels],
+    ["scripts/47_figures.py", "--check"],  # the figures read the released labels in published/labels/
+):
+    readme = subprocess.run([sys.executable, *command], capture_output=True, text=True)
     print((readme.stdout + readme.stderr).strip())
     all_ok &= readme.returncode == 0
 print(f"\n{'PASS' if all_ok else 'FAIL'}: {len(folders)} labels in {args.labels}")

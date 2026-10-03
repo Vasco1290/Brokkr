@@ -4,6 +4,7 @@ The numbers in these records are made up for the tests; they are never results.
 """
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -271,3 +272,19 @@ def test_non_default_settings_are_shown():
     record["settings"]["skip_symbolic_shape"] = True
     record["settings"]["calibration"]["group_images"] = 64
     assert non_default_settings(record) == {"skip_symbolic_shape": True, "calibration group_images": 64}
+
+
+def test_a_text_file_has_one_fingerprint_whatever_its_line_endings(tmp_path):
+    """Brokkr's fingerprint turns CRLF into LF before hashing text files (docs/label_schema.md, second note
+    of 4 October 2026), so a Windows and a Linux checkout of the same text agree."""
+    (tmp_path / "windows.json").write_bytes(b'{\r\n "x": 1\r\n}\r\n')
+    (tmp_path / "linux.json").write_bytes(b'{\n "x": 1\n}\n')
+    expected = hashlib.sha256(b'{\n "x": 1\n}\n').hexdigest()
+    assert sha256_of(tmp_path / "windows.json") == sha256_of(tmp_path / "linux.json") == expected
+
+
+def test_a_binary_file_is_fingerprinted_as_its_raw_bytes(tmp_path):
+    data = b"\x00\r\n\x01\r\n"
+    (tmp_path / "scores.npz").write_bytes(data)
+    assert sha256_of(tmp_path / "scores.npz") == hashlib.sha256(data).hexdigest()
+
