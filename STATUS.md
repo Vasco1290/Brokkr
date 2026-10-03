@@ -1,12 +1,64 @@
 # Brokkr status
 
-Snapshot as of **27 September 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
-(merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4
-is in progress** on branch `stage-4` (created from `main` at `be01206`): task 4.0 done; task 4.1's
-sweep, reliability numbers and H18–H22 verdicts are done (its summary tables script is not); M2 and
-SE1 done. **Research freeze** until website v0 ships (see "Research freeze" below).
+Snapshot as of **3 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+(merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
+research is done** on branch `stage-4` (task 4.0, 4.1's sweep and verdicts, M2, SE1; 4.1's summary
+tables script is not), and the work now follows the Platform plan: **step 1 (labels) is in progress**
+(see "Pick up here"). **Research freeze** until website v0 ships (see "Research freeze" below).
 
 ## 0. Start here (a new session needs nothing else)
+
+### Pick up here (3 October 2026)
+Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of date) wherever they differ.
+- **Branch `stage-4`**, pushed to origin; `main` is still at `be01206` (Stage 3). Working tree clean.
+- **Platform plan step 1 (labels), due 7 October** (`ROADMAP.md`, "Platform plan"):
+  - **Ten labels made** at the clean commit `753cdf1`, in `labels/` (gitignored): `python
+    scripts/39_make_labels.py` makes them, `python scripts/40_check_labels.py` checks every number
+    against its source (last result: PASS, 10 labels). Format: `docs/label_schema.md` and its dated
+    notes (30 September to 2 October). `scripts/42_label_tables.py` prints tables across the labels.
+  - **The README's label example is generated** by `scripts/41_readme_label_example.py` between the
+    `label-example` markers; never edit that block by hand (`scripts/40` and a test check it).
+  - **`brokkr-edge test`** (`brokkr_edge/test_run.py`, `brokkr_edge/cli.py`; built at `ca3d3b7`;
+    install the command with `pip install -e . --no-deps`). **Reproduction of MobileNetV3-Large's 28
+    records of 4.1: PASS, 28 of 28**, repeatable, every score identical bit for bit; recorded at
+    `0ad9938` (`results/reproduction/reproduction_check.json`; outcome appended to
+    `docs/hypotheses_stage4.md`).
+  - **Laptop latency script ready at `0aa9e0d`, not run.** `scripts/44_laptop_latency.py` (rules in
+    `brokkr_edge/latency.py`, sleep/pause rule confirmed by H on 2 October; psutil 7.2.2,
+    BSD-3-Clause, recorded). **H starts it**, overnight at the desk:
+    `.venv/Scripts/python.exe scripts/44_laptop_latency.py` (plugged in, "best performance", other
+    programs closed, no repository changes while it runs). A session never starts it; it may only run
+    `--smoke` outside `results/`. Any command longer than about 10 minutes is cut off in an assistant
+    session, so long runs are H's (the reproduction was finished that way).
+  - **Still to do in step 1, after the latency run:** read `results/latency/` into the labels' speed
+    rows (today they say "not measured"), regenerate the ten labels from a clean commit, run
+    `scripts/40`, update the README.
+- **Next, in this order:**
+  1. **H's fix list (H is sending it; nothing started).** Record each in a dated note before code:
+     - the suggested next step follows the line that failed (e.g. a row that fails only on coverage);
+       the case that raised it: ConvNeXt-Tiny, fog (ImageNet-C) s3, where FP32 fails only on coverage
+       and the label says "consider a stronger model";
+     - "not informative" never hides a large shrinking cost (today it takes priority; in the ten labels
+       it hides none: the most negative of its 14 rows is −1.18 points);
+     - the README's threshold wording approved by H (the values were written down before the 4.1
+       results and adopted for the labels afterwards, unchanged), and a correction appended to the
+       30 September envelope note: 80% first appears in `a957652` (24 September, a Stage 2
+       prediction), before `237effa`;
+     - check the ConvNeXt-Tiny claims in `docs/stage4_story.md` against the 4.1 summary and verdict
+       records (its label shows a −31.21-point shrinking cost under contrast (ImageNet-C) s5);
+     - add the severity-1 question to "Parked questions" below.
+  2. **Website v0 plan** (Platform plan step 2): a draft written in `scratch/` (gitignored) while the
+     latency run is going; a plan only, no code, nothing committed.
+  3. **README and images task** (H sends it): generate the "What we have found so far" numbers from
+     result records, checked locally by `scripts/40` the way label sources are; any number that cannot
+     be generated becomes a link. Brand images are in `docs/assets/` (the favicon and logo are for the
+     site; H uploads the social preview in GitHub settings).
+  4. **Pull request `stage-4` into `main`** with a merge commit (like PRs #1–#3), merged before step 2
+     makes the repository public; then tag `stage-4-done` and start step 2 on a new branch. `gh` is not
+     installed, so H opens the pull request on GitHub unless it is installed.
+- **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
+  keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
+  commits; H writes the review notes.
 
 ### Where things stand
 - **Stage 3 is done** (tasks 3.0–3.9). Predictions and outcomes: `docs/hypotheses_stage3.md`. Final-run
@@ -16,8 +68,8 @@ SE1 done. **Research freeze** until website v0 ships (see "Research freeze" belo
   work" section is a placeholder marked "To be written by H"; do not draft it.
 - **Stage 4 is in progress** (plan: `ROADMAP.md`; predictions and outcomes: `docs/hypotheses_stage4.md`).
   Task 4.0 is done; task 4.1's sweep, reliability and H18–H22 verdicts are done (27 September 2026;
-  see "Stage 4 progress" below). M2 and SE1 are judged. **Research freeze:** next is the product
-  (4.3 label proposal first); see "Research freeze" below.
+  see "Stage 4 progress" below). M2 and SE1 are judged. **Research freeze:** the work now follows the
+  Platform plan (see "Pick up here" above and "Research freeze" below).
 - Always use `.venv/Scripts/python.exe` (the system Python lacks the packages). Tests: `pytest`; style:
   `ruff check .`.
 
@@ -178,12 +230,8 @@ outcome".
   Hugging Face Spaces (29 Oct), 7 EEG/EMG pack (5 Nov); 6 Raspberry Pi 5 when the board arrives.
   (Replaces "4.3, website v0, 4.5".)
 
-**Next.** Platform plan step 1 (labels): the label format is fixed in `docs/label_schema.md` and the
-dated notes of 29–30 September in `docs/hypotheses_stage4.md`; next is the label builder, up to
-Checkpoint 1 (the MobileNetV3-Large label and MobileNetV3-Small's "INT8 build failed" label, reviewed
-by H before the other 8). The package was renamed on 30 September 2026: imported as `brokkr_edge`,
-published as `brokkr-edge` (the PyPI name "brokkr" is taken); our command's name is still open.
-Handoff details: `results/handoff_4.1.md` (gitignored).
+**Next.** See "Pick up here" at the top of this section (3 October 2026). The package is imported as
+`brokkr_edge` and published as `brokkr-edge`; the command is `brokkr-edge` (decided 30 September).
 
 ### Parked questions (research freeze: written down, not pursued)
 - Where does the darkness and low-contrast collapse of EfficientNet-B0 and MobileNetV3-Large come
