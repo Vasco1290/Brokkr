@@ -2,8 +2,23 @@
 # so Windows and Linux (CI, Raspberry Pi) see identical files.
 * text=auto eol=lf
 
+# Text files Brokkr writes or fingerprints are always text with LF endings, never left to git's guess
+# (docs/label_schema.md, second note of 4 October 2026; brokkr_edge.results.sha256_of hashes them as LF).
+*.json text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.svg text eol=lf
+*.py text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+
 # Never touch binary files
 *.onnx binary
 *.parquet binary
+*.npz binary
 *.png binary
 *.jpg binary
