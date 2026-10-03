@@ -526,7 +526,9 @@ per model). No value, rule or threshold changes; only layout.
 
 **1. The hero has two layouts of the same values.** `hero-shrinking-cost-wide` (800 wide, one line per model,
 H21 as a right-hand column, light row bands; readable at 600 px and wider) and `hero-shrinking-cost` (the
-tall layout, readable at 343 px). The README's `<picture>` shows the wide one on screens at least 768 px
+tall layout). Checked on GitHub in the browser pane: wide screens in light and dark get the wide files, a
+375 px phone gets the tall ones, shown 310 px wide (not the 343 px assumed before), so the tall layout's
+text was enlarged to stay at least 11 px at 310 px. The README's `<picture>` shows the wide one on screens at least 768 px
 wide and the tall one on phones, each in light and dark (option b). Both are entries in `figures.json`
 with the same values, checked the same way; `tests/test_figures.py` checks each at its own smallest width.
 

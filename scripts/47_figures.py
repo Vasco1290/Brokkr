@@ -198,7 +198,7 @@ def hero_figure(labs: dict) -> tuple:
     narrow_uses = ["README.md (phones)", "website: Why labels? (phones)"]
     wide_uses = ["README.md (wide screens)", "website: Why labels?", "Report 2"]
     return [
-        (figure_entry("hero-shrinking-cost", narrow_uses, "fig-hero", 343, caption, svgs, axes, v), svgs),
+        (figure_entry("hero-shrinking-cost", narrow_uses, "fig-hero", 310, caption, svgs, axes, v), svgs),
         (
             figure_entry("hero-shrinking-cost-wide", wide_uses, "fig-hero", 600, caption, wide, wide_axes, v),
             wide,

@@ -290,9 +290,11 @@ def legend_item(cv: Canvas, x, y, shape, colour, text, *, hollow=False, dash=Non
 
 def hero(rows: list, v: dict, theme: str) -> tuple:
     """rows: [{"name", "clean", "dark", "gap", "holds"} value ids], sorted as they are drawn.
-    Constants in v: dark_label, large_cost_line, failed_name."""
-    W, FS = 600, 20
-    cv = Canvas(W, theme, FS, 343)
+    Constants in v: dark_label, large_cost_line, failed_name.
+    Phones: GitHub shows the README's images 310 px wide on a 375 px phone (measured 4 October 2026), so the
+    smallest text is 22 units of 600 (11 px there)."""
+    W, FS = 600, 22
+    cv = Canvas(W, theme, FS, 310)
     lows = [v[r[k]]["ci95"][0] for r in rows for k in ("clean", "dark")] + [v["large_cost_line"]["value"]]
     highs = [v[r[k]]["ci95"][1] for r in rows for k in ("clean", "dark")] + [0.0]
     d0, d1 = math.floor((min(lows) - 0.005) / 0.05) * 0.05, math.ceil((max(highs) + 0.005) / 0.05) * 0.05
@@ -304,21 +306,21 @@ def hero(rows: list, v: dict, theme: str) -> tuple:
     dark = show(v, "dark_label")
 
     cv.text(16, 34, f"Shrinking cost: clean vs {dark}", size=22, bold=True)
-    cv.text(16, 62, "INT8 minus FP32 top-1, in points; left = INT8 worse", colour="muted")
-    x = legend_item(cv, 16, 98, "circle", "fp32", "clean images")
-    legend_item(cv, x, 98, "square", "int8", dark)
+    cv.text(16, 64, "INT8 minus FP32 top-1 (points); left = worse", colour="muted")
+    x = legend_item(cv, 16, 102, "circle", "fp32", "clean images")
+    legend_item(cv, x, 102, "square", "int8", dark)
     legend_item(
         cv,
         16,
-        130,
+        136,
         "line",
         "muted",
         f"label's large-cost line ({show(v, 'large_cost_line')} points)",
         dash="7 6",
     )
-    top = 182
-    bottom = top + 96 * len(rows)
-    cv.axis_ticks("x", sc, tick_values, tick_labels, 168, top, bottom)
+    top = 190
+    bottom = top + 100 * len(rows)
+    cv.axis_ticks("x", sc, tick_values, tick_labels, 176, top, bottom)
     line_x = sc(v["large_cost_line"]["value"])
     cv.line(
         line_x,
@@ -332,10 +334,10 @@ def hero(rows: list, v: dict, theme: str) -> tuple:
     )
 
     for i, r in enumerate(rows):
-        y0 = top + 96 * i
+        y0 = top + 100 * i
         name = show(v, r["name"])
-        cv.text(16, y0 + 24, name, bold=True, halo=True)
-        y = y0 + 50
+        cv.text(16, y0 + 26, name, bold=True, halo=True)
+        y = y0 + 54
         xc, xd = sc(v[r["clean"]]["value"]), sc(v[r["dark"]]["value"])
         cv.line(xc, y, xd, y, "muted", 2)
         for vid, colour, label in ((r["dark"], "int8", dark), (r["clean"], "fp32", "clean images")):
@@ -357,17 +359,17 @@ def hero(rows: list, v: dict, theme: str) -> tuple:
         yes = "yes" if v[r["holds"]]["value"] else "no"
         cv.text(
             16,
-            y0 + 82,
-            f"large extra gap: {yes}, {show(v, r['gap'])} points {show_ci(v, r['gap'])}",
+            y0 + 88,
+            f"large extra gap: {yes}, {show(v, r['gap'])} {show_ci(v, r['gap'])}",
             colour="muted",
             halo=True,
         )
-    cv.text(16, bottom + 34, f"{show(v, 'failed_name')} is not shown: its INT8 build failed.", colour="muted")
+    cv.text(16, bottom + 36, f"Not shown: {show(v, 'failed_name')} (INT8 build failed).", colour="muted")
     title = f"Shrinking cost of each model, clean images vs {dark}"
     desc = "; ".join(
         f"{show(v, r['name'])}: clean {show(v, r['clean'])}, {dark} {show(v, r['dark'])} points" for r in rows
     )
-    return cv.svg(bottom + 56, title, desc), {
+    return cv.svg(bottom + 58, title, desc), {
         "x": {
             "domain": list(domain),
             "range": list(rng),
