@@ -13,12 +13,11 @@
     "dark": "docs/figures/hero-shrinking-cost-dark.svg"
    },
    "appears_in": [
-    "README.md",
-    "website: Why labels?",
-    "Report 2"
+    "README.md (phones)",
+    "website: Why labels? (phones)"
    ],
    "claim_id": "fig-hero",
-   "min_display_px": 343,
+   "min_display_px": 310,
    "caption": "Pre-registered condition: darkness (Brokkr) s5 (H21). 9 models, 10,000 test images; bars are 95% paired intervals (one narrower than its marker is hidden behind it). H21 predicted a large extra gap (the shrinking cost under the damage minus the shrinking cost on clean images, as defined in docs/hypotheses_stage4.md) in at least 5 of the 9 models; 2 showed it; verdict FAIL. The dashed line is the label's large-cost line (whole interval more than 5 points below full size), adopted for the labels after these results existed; it is not what H21 judged.",
    "alt": "EfficientNet-B0: clean -4.8, darkness (Brokkr) s5 -43.7 points; MobileNetV3-Large: clean -2.0, darkness (Brokkr) s5 -13.6 points; ConvNeXt-Tiny: clean -1.6, darkness (Brokkr) s5 -2.8 points; ShuffleNetV2 x1.0: clean -0.5, darkness (Brokkr) s5 -2.3 points; MNASNet 1.0: clean -0.7, darkness (Brokkr) s5 -1.7 points; ResNet-50: clean -1.1, darkness (Brokkr) s5 -1.5 points; MobileNetV2: clean -0.4, darkness (Brokkr) s5 -1.5 points; RegNetY-400MF: clean -0.3, darkness (Brokkr) s5 -1.2 points; ResNet-18: clean -0.4, darkness (Brokkr) s5 -0.7 points",
    "axes": {
@@ -1030,12 +1029,1036 @@
     }
    }
   },
+  "hero-shrinking-cost-wide": {
+   "files": {
+    "light": "docs/figures/hero-shrinking-cost-wide-light.svg",
+    "dark": "docs/figures/hero-shrinking-cost-wide-dark.svg"
+   },
+   "appears_in": [
+    "README.md (wide screens)",
+    "website: Why labels?",
+    "Report 2"
+   ],
+   "claim_id": "fig-hero",
+   "min_display_px": 600,
+   "caption": "Pre-registered condition: darkness (Brokkr) s5 (H21). 9 models, 10,000 test images; bars are 95% paired intervals (one narrower than its marker is hidden behind it). H21 predicted a large extra gap (the shrinking cost under the damage minus the shrinking cost on clean images, as defined in docs/hypotheses_stage4.md) in at least 5 of the 9 models; 2 showed it; verdict FAIL. The dashed line is the label's large-cost line (whole interval more than 5 points below full size), adopted for the labels after these results existed; it is not what H21 judged.",
+   "alt": "EfficientNet-B0: clean -4.8, darkness (Brokkr) s5 -43.7 points; MobileNetV3-Large: clean -2.0, darkness (Brokkr) s5 -13.6 points; ConvNeXt-Tiny: clean -1.6, darkness (Brokkr) s5 -2.8 points; ShuffleNetV2 x1.0: clean -0.5, darkness (Brokkr) s5 -2.3 points; MNASNet 1.0: clean -0.7, darkness (Brokkr) s5 -1.7 points; ResNet-50: clean -1.1, darkness (Brokkr) s5 -1.5 points; MobileNetV2: clean -0.4, darkness (Brokkr) s5 -1.5 points; RegNetY-400MF: clean -0.3, darkness (Brokkr) s5 -1.2 points; ResNet-18: clean -0.4, darkness (Brokkr) s5 -0.7 points",
+   "axes": {
+    "x": {
+     "domain": [
+      -0.5,
+      0.05
+     ],
+     "range": [
+      196.0,
+      536.0
+     ],
+     "ticks": {
+      "-50": -0.5,
+      "-40": -0.4,
+      "-30": -0.3,
+      "-20": -0.2,
+      "-10": -0.1,
+      "0": 0.0
+     }
+    }
+   },
+   "values": {
+    "dark_label": {
+     "value": "darkness (Brokkr) s5",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "conditions",
+       2,
+       "label"
+      ]
+     }
+    },
+    "large_cost_line": {
+     "value": -0.05,
+     "fmt": "pts1",
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "envelope",
+       "rule",
+       "large_shrinking_cost_below"
+      ]
+     }
+    },
+    "large_cost_abs": {
+     "value": -0.05,
+     "fmt": "abs0",
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "envelope",
+       "rule",
+       "large_shrinking_cost_below"
+      ]
+     }
+    },
+    "ci_level": {
+     "value": 0.95,
+     "fmt": "pct0",
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "generated",
+       "ci_level"
+      ]
+     }
+    },
+    "h21_needed": {
+     "value": 5,
+     "fmt": "int",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "needed"
+      ]
+     }
+    },
+    "h21_holding": {
+     "value": 2,
+     "fmt": "int",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "holding"
+      ]
+     }
+    },
+    "h21_judged": {
+     "value": 9,
+     "fmt": "int",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "judged"
+      ]
+     }
+    },
+    "h21_verdict": {
+     "value": "FAIL",
+     "fmt": "text",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "verdict"
+      ]
+     }
+    },
+    "n_images": {
+     "value": 10000,
+     "fmt": "int",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "settings",
+       "n_images"
+      ]
+     }
+    },
+    "failed_name": {
+     "value": "MobileNetV3-Small",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/mobilenet_v3_small/label.json",
+      "sha256": "62d43e61b41fb71b58dae531dbf4872704880da7a65186e43893d280d46834af",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "mobilenet_v3_large.name": {
+     "value": "MobileNetV3-Large",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "mobilenet_v3_large.clean": {
+     "value": -0.0198,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0247025,
+      -0.0147
+     ],
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/mobilenet_v3_large@imagenet1k_v2#int8:94a55fc8a30a",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mobilenet_v3_large.dark": {
+     "value": -0.1358,
+     "fmt": "pts1",
+     "ci95": [
+      -0.1443,
+      -0.1277
+     ],
+     "source": {
+      "file": "published/labels/mobilenet_v3_large/label.json",
+      "sha256": "61aea5a27e2c137e592e348ccc4e854ccd7db47143f5d43b723028efd818e3f3",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/mobilenet_v3_large@imagenet1k_v2#int8:94a55fc8a30a",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mobilenet_v3_large.h21_gap": {
+     "value": -0.116,
+     "fmt": "pts1",
+     "ci95": [
+      -0.1253,
+      -0.1076
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "mobilenet_v3_large"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mobilenet_v3_large.h21_holds": {
+     "value": true,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "mobilenet_v3_large",
+       "holds"
+      ]
+     }
+    },
+    "mobilenet_v2.name": {
+     "value": "MobileNetV2",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/mobilenet_v2/label.json",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "mobilenet_v2.clean": {
+     "value": -0.0045,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0082,
+      -0.0011
+     ],
+     "source": {
+      "file": "published/labels/mobilenet_v2/label.json",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/mobilenet_v2@imagenet1k_v2#int8:0e36425ebe41",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mobilenet_v2.dark": {
+     "value": -0.0146,
+     "fmt": "pts1",
+     "ci95": [
+      -0.020302499999999998,
+      -0.0094
+     ],
+     "source": {
+      "file": "published/labels/mobilenet_v2/label.json",
+      "sha256": "6fce517edd9e0c25f9a2f85d36cd7f82add79992a635afe409d63f23ab305b9d",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/mobilenet_v2@imagenet1k_v2#int8:0e36425ebe41",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mobilenet_v2.h21_gap": {
+     "value": -0.0101,
+     "fmt": "pts1",
+     "ci95": [
+      -0.016302499999999998,
+      -0.0041975000000000024
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "mobilenet_v2"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mobilenet_v2.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "mobilenet_v2",
+       "holds"
+      ]
+     }
+    },
+    "efficientnet_b0.name": {
+     "value": "EfficientNet-B0",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/efficientnet_b0/label.json",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "efficientnet_b0.clean": {
+     "value": -0.0478,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0541,
+      -0.0414
+     ],
+     "source": {
+      "file": "published/labels/efficientnet_b0/label.json",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/efficientnet_b0@imagenet1k_v1#int8:0d778879aa1e",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "efficientnet_b0.dark": {
+     "value": -0.4372,
+     "fmt": "pts1",
+     "ci95": [
+      -0.4477,
+      -0.4273975
+     ],
+     "source": {
+      "file": "published/labels/efficientnet_b0/label.json",
+      "sha256": "b78d1616d14e50920cf55dff40b690f902b6544546c9a546d1ad5b7e621c7a3f",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/efficientnet_b0@imagenet1k_v1#int8:0d778879aa1e",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "efficientnet_b0.h21_gap": {
+     "value": -0.3894,
+     "fmt": "pts1",
+     "ci95": [
+      -0.4013,
+      -0.3777975
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "efficientnet_b0"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "efficientnet_b0.h21_holds": {
+     "value": true,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "efficientnet_b0",
+       "holds"
+      ]
+     }
+    },
+    "shufflenet_v2_x1_0.name": {
+     "value": "ShuffleNetV2 x1.0",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/shufflenet_v2_x1_0/label.json",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "shufflenet_v2_x1_0.clean": {
+     "value": -0.0051,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0084,
+      -0.0015975000000000023
+     ],
+     "source": {
+      "file": "published/labels/shufflenet_v2_x1_0/label.json",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/shufflenet_v2_x1_0@imagenet1k_v1#int8:7e69383eff83",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "shufflenet_v2_x1_0.dark": {
+     "value": -0.0226,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0276025,
+      -0.017497500000000003
+     ],
+     "source": {
+      "file": "published/labels/shufflenet_v2_x1_0/label.json",
+      "sha256": "e32f0e14110bcdb1804b32e3107215bb8c4d5709480cff27cadbeaa1f2ad265e",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/shufflenet_v2_x1_0@imagenet1k_v1#int8:7e69383eff83",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "shufflenet_v2_x1_0.h21_gap": {
+     "value": -0.0175,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0232,
+      -0.011497500000000003
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "shufflenet_v2_x1_0"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "shufflenet_v2_x1_0.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "shufflenet_v2_x1_0",
+       "holds"
+      ]
+     }
+    },
+    "mnasnet1_0.name": {
+     "value": "MNASNet 1.0",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/mnasnet1_0/label.json",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "mnasnet1_0.clean": {
+     "value": -0.0065,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0105025,
+      -0.0026
+     ],
+     "source": {
+      "file": "published/labels/mnasnet1_0/label.json",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/mnasnet1_0@imagenet1k_v1#int8:7fc979535a59",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mnasnet1_0.dark": {
+     "value": -0.017,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0222025,
+      -0.012
+     ],
+     "source": {
+      "file": "published/labels/mnasnet1_0/label.json",
+      "sha256": "114257be8cb2680d8cabf788eb370280ce0d7bd0498d84ad29f3312c7500e2a1",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/mnasnet1_0@imagenet1k_v1#int8:7fc979535a59",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mnasnet1_0.h21_gap": {
+     "value": -0.0105,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0167,
+      -0.004097500000000002
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "mnasnet1_0"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "mnasnet1_0.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "mnasnet1_0",
+       "holds"
+      ]
+     }
+    },
+    "regnet_y_400mf.name": {
+     "value": "RegNetY-400MF",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/regnet_y_400mf/label.json",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "regnet_y_400mf.clean": {
+     "value": -0.0031,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0070025,
+      0.0007
+     ],
+     "source": {
+      "file": "published/labels/regnet_y_400mf/label.json",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/regnet_y_400mf@imagenet1k_v2#int8:6806b091d442",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "regnet_y_400mf.dark": {
+     "value": -0.012,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0165,
+      -0.0071975000000000025
+     ],
+     "source": {
+      "file": "published/labels/regnet_y_400mf/label.json",
+      "sha256": "bd30900eccbd710405a431015ccc0cb6cfba57f87dba345dc43958c82cb63675",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/regnet_y_400mf@imagenet1k_v2#int8:6806b091d442",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "regnet_y_400mf.h21_gap": {
+     "value": -0.0089,
+     "fmt": "pts1",
+     "ci95": [
+      -0.014702499999999999,
+      -0.0033
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "regnet_y_400mf"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "regnet_y_400mf.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "regnet_y_400mf",
+       "holds"
+      ]
+     }
+    },
+    "resnet18.name": {
+     "value": "ResNet-18",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/resnet18/label.json",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "resnet18.clean": {
+     "value": -0.0045,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0074025,
+      -0.0015975000000000023
+     ],
+     "source": {
+      "file": "published/labels/resnet18/label.json",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/resnet18@imagenet1k_v1#int8:7ec6a560e7c5",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "resnet18.dark": {
+     "value": -0.0069,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0106,
+      -0.0033
+     ],
+     "source": {
+      "file": "published/labels/resnet18/label.json",
+      "sha256": "574fef5fc8ed376dc9ab6f1d19b5cd9f2185e7edbd0de3dc92efe07a86fa5156",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/resnet18@imagenet1k_v1#int8:7ec6a560e7c5",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "resnet18.h21_gap": {
+     "value": -0.0024,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0072025,
+      0.0022
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "resnet18"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "resnet18.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "resnet18",
+       "holds"
+      ]
+     }
+    },
+    "resnet50.name": {
+     "value": "ResNet-50",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/resnet50/label.json",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "resnet50.clean": {
+     "value": -0.0114,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0154025,
+      -0.007797500000000002
+     ],
+     "source": {
+      "file": "published/labels/resnet50/label.json",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/resnet50@imagenet1k_v2#int8:f3db5569eaa4",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "resnet50.dark": {
+     "value": -0.0154,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0202,
+      -0.0108
+     ],
+     "source": {
+      "file": "published/labels/resnet50/label.json",
+      "sha256": "e770f5eaf2fe38f20a111488f46984fb3d592c2b0d725dbbadfe73ee59e1d53a",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/resnet50@imagenet1k_v2#int8:f3db5569eaa4",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "resnet50.h21_gap": {
+     "value": -0.004,
+     "fmt": "pts1",
+     "ci95": [
+      -0.009,
+      0.0015
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "resnet50"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "resnet50.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "resnet50",
+       "holds"
+      ]
+     }
+    },
+    "convnext_tiny.name": {
+     "value": "ConvNeXt-Tiny",
+     "fmt": "text",
+     "source": {
+      "file": "published/labels/convnext_tiny/label.json",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
+      "field": [
+       "model",
+       "display_name"
+      ]
+     }
+    },
+    "convnext_tiny.clean": {
+     "value": -0.0162,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0203,
+      -0.0119
+     ],
+     "source": {
+      "file": "published/labels/convnext_tiny/label.json",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
+      "field": [
+       "measurements",
+       180
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/convnext_tiny@imagenet1k_v1#int8:6c80b730afff",
+       "condition_id": "clean"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "convnext_tiny.dark": {
+     "value": -0.0283,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0329025,
+      -0.023297500000000002
+     ],
+     "source": {
+      "file": "published/labels/convnext_tiny/label.json",
+      "sha256": "68e5cad928431de0a6ba2b781bae42f2187de3c5e627b721b882d7f484da7bcc",
+      "field": [
+       "measurements",
+       182
+      ],
+      "where": {
+       "metric": "shrinking_cost",
+       "build_id": "torchvision/convnext_tiny@imagenet1k_v1#int8:6c80b730afff",
+       "condition_id": "brokkr/darkness/5"
+      },
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "convnext_tiny.h21_gap": {
+     "value": -0.0121,
+     "fmt": "pts1",
+     "ci95": [
+      -0.0171,
+      -0.006697500000000002
+     ],
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "convnext_tiny"
+      ],
+      "value_key": "value",
+      "ci_key": "ci95"
+     }
+    },
+    "convnext_tiny.h21_holds": {
+     "value": false,
+     "fmt": "bool",
+     "source": {
+      "file": "results/final/breadth_4.1_verdicts.json",
+      "sha256": "2b89913374eae7c891e235d4b20653f902cff0b7a4fe890bc7eccf673c380fb5",
+      "field": [
+       "metrics",
+       "verdicts",
+       "H21",
+       "items",
+       "convnext_tiny",
+       "holds"
+      ]
+     }
+    }
+   }
+  },
   "grid-shrinking-cost": {
    "files": {
     "light": "docs/figures/grid-shrinking-cost-light.svg",
     "dark": "docs/figures/grid-shrinking-cost-dark.svg"
    },
    "appears_in": [
+    "README.md (link)",
     "website: Why labels?",
     "Report 2"
    ],

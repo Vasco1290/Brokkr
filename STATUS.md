@@ -19,8 +19,9 @@ Read this first.
     `docs/figures/`) from the released labels and records; `figures.json` names every plotted value's
     source; `--check` (also run by `scripts/40`) checks values, positions, stray numbers and the claims
     register (`docs/claims.json`, started here); `tests/test_figures.py` checks font size and contrast.
-    The README shows the hero figure (generated block between `figure-hero` markers). Plan and H's
-    decisions: `docs/label_schema.md`, notes of 4 October 2026.
+    The README shows the hero figure (generated block between `figure-hero` markers): a wide layout on
+    screens at least 768 px wide and a tall one on phones (H's option b; third note of 4 October). Plan
+    and H's decisions: `docs/label_schema.md`, notes of 4 October 2026.
   - **All ten labels released** in `published/labels/` (hard rule 4 now has two exceptions: released
     labels and the figures).
   - **One file fingerprint** (`brokkr_edge.results.sha256_of`): text files are hashed with CRLF turned

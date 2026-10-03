@@ -190,16 +190,20 @@ def hero_figure(labs: dict) -> tuple:
         f"{s('large_cost_abs')} points below full size), adopted for the labels after these results existed; "
         f"it is not what H21 judged."
     )
-    return figure_entry(
-        "hero-shrinking-cost",
-        ["README.md", "website: Why labels?", "Report 2"],
-        "fig-hero",
-        343,
-        caption,
-        svgs,
-        axes,
-        v,
-    ), svgs
+    wide, wide_axes = {}, None
+    for theme in F.THEMES:
+        wide[theme], wide_axes = F.hero_wide(rows, v, theme)
+    # Two layouts of one figure (H, 4 October 2026): the README shows the wide one on screens at least
+    # 768 px wide and the narrow one on phones.
+    narrow_uses = ["README.md (phones)", "website: Why labels? (phones)"]
+    wide_uses = ["README.md (wide screens)", "website: Why labels?", "Report 2"]
+    return [
+        (figure_entry("hero-shrinking-cost", narrow_uses, "fig-hero", 310, caption, svgs, axes, v), svgs),
+        (
+            figure_entry("hero-shrinking-cost-wide", wide_uses, "fig-hero", 600, caption, wide, wide_axes, v),
+            wide,
+        ),
+    ]
 
 
 def grid_figure(labs: dict) -> tuple:
@@ -277,7 +281,14 @@ def grid_figure(labs: dict) -> tuple:
         f"number of large costs."
     )
     return figure_entry(
-        "grid-shrinking-cost", ["website: Why labels?", "Report 2"], "fig-grid", 720, caption, svgs, {}, v
+        "grid-shrinking-cost",
+        ["README.md (link)", "website: Why labels?", "Report 2"],
+        "fig-grid",
+        720,
+        caption,
+        svgs,
+        {},
+        v,
     ), svgs
 
 
@@ -500,7 +511,10 @@ def figure_entry(name, appears_in, claim_id, min_px, caption, svgs, axes, values
 
 def render_all() -> tuple:
     labs = labels()
-    built = [f(labs) for f in (hero_figure, grid_figure, uncertainty_figure, accuracy_figure, speed_figure)]
+    built = []
+    for make in (hero_figure, grid_figure, uncertainty_figure, accuracy_figure, speed_figure):
+        made = make(labs)
+        built += made if isinstance(made, list) else [made]
     manifest = {
         "generated_by": "scripts/47_figures.py",
         "about": "Every value plotted in docs/figures/*.svg, with the file, SHA-256 and field it was read "
@@ -512,13 +526,23 @@ def render_all() -> tuple:
     for entry, theme_svgs in built:
         for theme, text in theme_svgs.items():
             svgs[entry["files"][theme]] = text
-    hero = manifest["figures"]["hero-shrinking-cost"]
+    # The wide hero on screens at least 768 px wide, the narrow one on phones; each in light and dark.
+    hero, wide = manifest["figures"]["hero-shrinking-cost"], manifest["figures"]["hero-shrinking-cost-wide"]
+    wide_screen, dark = "(min-width: 768px)", "(prefers-color-scheme: dark)"
     block = (
         "\n<picture>\n"
+        f'  <source media="{wide_screen} and {dark}" srcset="{wide["files"]["dark"]}">\n'
+        f'  <source media="{wide_screen}" srcset="{wide["files"]["light"]}">\n'
         f'  <source media="(prefers-color-scheme: dark)" srcset="{hero["files"]["dark"]}">\n'
-        f'  <img src="{hero["files"]["light"]}" alt="{html.escape(hero["alt"], quote=True)}" width="600">\n'
+        f'  <img src="{hero["files"]["light"]}" alt="{html.escape(hero["alt"], quote=True)}">\n'
         "</picture>\n\n"
         f"{wrap('*' + hero['caption'] + '*')}\n"
+    )
+    # The grid is linked, not shown: too wide to read on a phone in the README (H, 4 October 2026).
+    grid = manifest["figures"]["grid-shrinking-cost"]["files"]
+    block += (
+        f"\nEvery model in every damaged condition (exploratory, not pre-registered): "
+        f"[grid figure]({grid['light']}) ([dark version]({grid['dark']})).\n"
     )
     return manifest, svgs, block
 
@@ -695,7 +719,8 @@ def check_claims(manifest: dict) -> list:
             if not c.get(k)
         ]
         script = c.get("command", "").split()[1:2]
-        if missing or c["figure"] != name or not script or not Path(script[0]).exists():
+        figures = c["figure"] if isinstance(c.get("figure"), list) else [c.get("figure")]
+        if missing or name not in figures or not script or not Path(script[0]).exists():
             problems.append(f"{name}: claim {c['id']} is incomplete or names a missing script ({missing})")
     return problems
 
