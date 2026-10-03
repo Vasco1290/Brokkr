@@ -264,3 +264,14 @@ def test_figures_are_self_contained_with_a_title_and_description():
         text = path.read_text(encoding="utf-8")
         assert re.findall(r"https?://", text) == ["http://"], f"{path.name} refers to another site"
         assert '<title id="title">' in text and '<desc id="desc">' in text
+
+
+def test_the_readme_shows_the_wide_hero_on_wide_screens_and_the_tall_one_on_phones():
+    """H's option b (docs/label_schema.md, third note of 4 October 2026), in light and dark."""
+    readme = Path("README.md").read_text(encoding="utf-8")
+    block = readme[readme.index("figure-hero:start"):readme.index("figure-hero:end")]
+    wide, dark = "(min-width: 768px)", "(prefers-color-scheme: dark)"
+    assert f'media="{wide} and {dark}" srcset="docs/figures/hero-shrinking-cost-wide-dark.svg"' in block
+    assert f'media="{wide}" srcset="docs/figures/hero-shrinking-cost-wide-light.svg"' in block
+    assert f'media="{dark}" srcset="docs/figures/hero-shrinking-cost-dark.svg"' in block
+    assert '<img src="docs/figures/hero-shrinking-cost-light.svg"' in block

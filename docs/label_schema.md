@@ -518,3 +518,20 @@ script shows that, apart from fingerprints and the commit that made them, the la
 
 **3. LF on disk.** `.gitattributes` names every text suffix above as text with LF endings, and the label
 maker writes its files with LF on every OS (until now it wrote CRLF on Windows).
+
+## Third note added 4 October 2026: figure layouts (after H's review of the README on GitHub)
+
+Decided by H on 4 October 2026, after seeing the hero figure in the README: it was too tall (three lines
+per model). No value, rule or threshold changes; only layout.
+
+**1. The hero has two layouts of the same values.** `hero-shrinking-cost-wide` (800 wide, one line per model,
+H21 as a right-hand column, light row bands; readable at 600 px and wider) and `hero-shrinking-cost` (the
+tall layout, readable at 343 px). The README's `<picture>` shows the wide one on screens at least 768 px
+wide and the tall one on phones, each in light and dark (option b). Both are entries in `figures.json`
+with the same values, checked the same way; `tests/test_figures.py` checks each at its own smallest width.
+
+**2. The grid's key is compact.** The twelve-line list of column names is replaced by one line of
+abbreviations, generated from the conditions; H's sentence about colour and the dot is unchanged. The
+grid stays 1000 wide: on phones people scroll it sideways (H: most readers use a wide screen).
+
+**3. The coverage and speed figures are unchanged for now** (H).

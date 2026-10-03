@@ -30,6 +30,7 @@ THEMES = {
         "int8": "#0072b2",
         "second": "#d55e00",
         "floor": "#e6eaef",
+        "band": "#f6f8fa",
         "steps": ("#86b6ef", "#5598e7", "#256abf", "#184f95", "#0d366b"),
         "text_choices": ("#1f2328", "#ffffff"),
     },
@@ -42,6 +43,7 @@ THEMES = {
         "int8": "#3987e5",
         "second": "#d95926",
         "floor": "#2a313c",
+        "band": "#151b23",
         "steps": ("#184f95", "#256abf", "#3987e5", "#6da7ec", "#b7d3f6"),
         "text_choices": ("#f0f6fc", "#0d1117"),
     },
@@ -60,6 +62,35 @@ SHORT_DAMAGE = {
     "contrast": "contr",
     "gaussian_noise": "noise",
 }
+
+# What each short column name stands for, for the grid's one-line key.
+FULL_DAMAGE = {
+    "fog": "fog",
+    "darkness": "darkness",
+    "defocus_blur": "defocus blur",
+    "noise": "noise",
+    "contrast": "contrast",
+    "gaussian_noise": "gaussian noise",
+}
+
+
+def abbreviations(columns: list) -> str:
+    """'dark = darkness · blur = defocus blur · ...' for every short name that is not the full name. A short
+    name that stands for different damage in different suites names each, with its suite."""
+    meanings = {}
+    for col in columns:
+        suite = "Brokkr" if col["suite"] == "brokkr" else "ImageNet-C"
+        meanings.setdefault(SHORT_DAMAGE[col["damage"]], {}).setdefault(FULL_DAMAGE[col["damage"]], suite)
+    parts = []
+    for short, fulls in meanings.items():
+        if list(fulls) == [short]:
+            continue
+        if len(fulls) == 1:
+            parts.append(f"{short} = {next(iter(fulls))}")
+        else:
+            parts.append(f"{short} = " + ", ".join(f"{full} ({suite})" for full, suite in fulls.items()))
+    return " · ".join(parts + ["s = severity"])
+
 
 FORMATS = {
     "pts1": lambda x: f"{100 * x:+.1f}",  # shrinking cost, extra gap (points)
@@ -345,6 +376,102 @@ def hero(rows: list, v: dict, theme: str) -> tuple:
     }
 
 
+def hero_wide(rows: list, v: dict, theme: str) -> tuple:
+    """The hero for screens at least 600 px wide (H, 4 October 2026): one line per model, H21 as a column.
+    Same rows and values as hero(); the README shows this one on wide screens and hero() on phones."""
+    W, FS, ROW = 800, 16, 38
+    cv = Canvas(W, theme, FS, 600)
+    lows = [v[r[k]]["ci95"][0] for r in rows for k in ("clean", "dark")] + [v["large_cost_line"]["value"]]
+    highs = [v[r[k]]["ci95"][1] for r in rows for k in ("clean", "dark")] + [0.0]
+    d0, d1 = math.floor((min(lows) - 0.005) / 0.05) * 0.05, math.ceil((max(highs) + 0.005) / 0.05) * 0.05
+    domain, rng = (round(d0, 6), round(d1, 6)), (196.0, 536.0)
+    sc = scale(domain, rng)
+    tick_values = ticks(d0, d1, 0.1 if d1 - d0 > 0.25 else 0.05)
+    tick_labels = [f"{100 * t:.0f}" for t in tick_values]
+    dark = show(v, "dark_label")
+    band = cv.c["band"]
+
+    cv.text(16, 30, f"Shrinking cost: clean vs {dark}", size=18, bold=True)
+    cv.text(16, 54, "INT8 minus FP32 top-1, in points; left = INT8 worse", colour="muted")
+    x = legend_item(cv, 16, 88, "circle", "fp32", "clean images")
+    x = legend_item(cv, x, 88, "square", "int8", dark)
+    legend_item(
+        cv,
+        x,
+        88,
+        "line",
+        "muted",
+        f"label's large-cost line ({show(v, 'large_cost_line')} points)",
+        dash="7 6",
+    )
+    top = 140
+    bottom = top + ROW * len(rows)
+    for i in range(0, len(rows), 2):  # light bands on every other row, so a row can be followed across
+        cv.parts.append(
+            f'<rect x="8" y="{top + ROW * i}" width="{W - 16}" height="{ROW}" rx="4" fill="{band}"/>'
+        )
+    cv.axis_ticks("x", sc, tick_values, tick_labels, 128, top, bottom)
+    cv.text(566, 128, "large extra gap (H21)", bold=True)
+    line_x = sc(v["large_cost_line"]["value"])
+    cv.line(
+        line_x,
+        top,
+        line_x,
+        bottom,
+        "muted",
+        2,
+        dash="7 6",
+        attrs=' data-v="large_cost_line" data-part="line" data-axis="x"',
+    )
+
+    for i, r in enumerate(rows):
+        y = top + ROW * i + ROW / 2
+        on = band if i % 2 == 0 else None
+        name = show(v, r["name"])
+        cv.text(16, y + 6, name, bold=True, on=on)
+        xc, xd = sc(v[r["clean"]]["value"]), sc(v[r["dark"]]["value"])
+        cv.line(xc, y, xd, y, "muted", 2)
+        for vid, colour, label in ((r["dark"], "int8", dark), (r["clean"], "fp32", "clean images")):
+            lo, hi = (sc(c) for c in v[vid]["ci95"])
+            cv.interval(
+                lo, hi, y, colour, vid, "x", f"{name}, {label}: 95% interval {show_ci(v, vid)} points"
+            )
+        cv.mark(
+            "square", xd, y, "int8", r["dark"], "x", f"{name}, {dark}: {show(v, r['dark'])} points", r=6.5
+        )
+        cv.mark(
+            "circle",
+            xc,
+            y,
+            "fp32",
+            r["clean"],
+            "x",
+            f"{name}, clean images: {show(v, r['clean'])} points",
+            r=5.5,
+        )
+        yes = bool(v[r["holds"]]["value"])
+        cv.text(
+            566,
+            y + 6,
+            f"{'yes' if yes else 'no'}, {show(v, r['gap'])} {show_ci(v, r['gap'])}",
+            bold=yes,
+            colour="ink" if yes else "muted",
+            on=on,
+        )
+    cv.text(16, bottom + 28, f"{show(v, 'failed_name')} is not shown: its INT8 build failed.", colour="muted")
+    title = f"Shrinking cost of each model, clean images vs {dark}"
+    desc = "; ".join(
+        f"{show(v, r['name'])}: clean {show(v, r['clean'])}, {dark} {show(v, r['dark'])} points" for r in rows
+    )
+    return cv.svg(bottom + 44, title, desc), {
+        "x": {
+            "domain": list(domain),
+            "range": list(rng),
+            "ticks": dict(zip(tick_labels, tick_values, strict=True)),
+        }
+    }
+
+
 # ---- 2. Grid: every model in every damaged condition ----
 
 
@@ -416,7 +543,7 @@ def grid(rows: list, columns: list, v: dict, theme: str) -> tuple:
                 )
         cv.text(count_x, y + 29, show(v, r["count"]), anchor="middle")
 
-    # Key: colour steps, near floor, the dot, then each column's full name.
+    # Key (compact, H, 4 October 2026): colour steps; near floor; H's sentence; the abbreviations in one line.
     y = top + CELL_H * len(rows) + 40
     x = 16
     for k, text in enumerate(step_names()):
@@ -435,17 +562,9 @@ def grid(rows: list, columns: list, v: dict, theme: str) -> tuple:
         f"Colour: the measured cost. Dot: large cost (whole interval more than "
         f"{show(v, 'large_cost_line')} points below full size).",
     )
-    y += 40
-    half = (len(columns) + 1) // 2
-    for j, col in enumerate(columns):
-        kx, ky = (16 if j < half else 16 + W / 2), y + 24 * (j % half)
-        cv.text(
-            kx,
-            ky,
-            f"{SHORT_DAMAGE[col['damage']]} s{col['severity']}: {show(v, col['label'])}",
-            colour="muted",
-        )
-    height = y + 24 * half + 12
+    y += 32
+    cv.text(16, y, abbreviations(columns), colour="muted")
+    height = y + 20
     title = "Shrinking cost of every usable INT8 build in every damaged condition (exploratory)"
     desc = "; ".join(
         f"{show(v, r['name'])}: "

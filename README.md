@@ -99,8 +99,10 @@ predictions and outcomes: [docs/hypotheses_stage4.md](docs/hypotheses_stage4.md)
 
 <!-- figure-hero:start (written by scripts/47_figures.py; do not edit by hand) -->
 <picture>
+  <source media="(min-width: 768px) and (prefers-color-scheme: dark)" srcset="docs/figures/hero-shrinking-cost-wide-dark.svg">
+  <source media="(min-width: 768px)" srcset="docs/figures/hero-shrinking-cost-wide-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="docs/figures/hero-shrinking-cost-dark.svg">
-  <img src="docs/figures/hero-shrinking-cost-light.svg" alt="EfficientNet-B0: clean -4.8, darkness (Brokkr) s5 -43.7 points; MobileNetV3-Large: clean -2.0, darkness (Brokkr) s5 -13.6 points; ConvNeXt-Tiny: clean -1.6, darkness (Brokkr) s5 -2.8 points; ShuffleNetV2 x1.0: clean -0.5, darkness (Brokkr) s5 -2.3 points; MNASNet 1.0: clean -0.7, darkness (Brokkr) s5 -1.7 points; ResNet-50: clean -1.1, darkness (Brokkr) s5 -1.5 points; MobileNetV2: clean -0.4, darkness (Brokkr) s5 -1.5 points; RegNetY-400MF: clean -0.3, darkness (Brokkr) s5 -1.2 points; ResNet-18: clean -0.4, darkness (Brokkr) s5 -0.7 points" width="600">
+  <img src="docs/figures/hero-shrinking-cost-light.svg" alt="EfficientNet-B0: clean -4.8, darkness (Brokkr) s5 -43.7 points; MobileNetV3-Large: clean -2.0, darkness (Brokkr) s5 -13.6 points; ConvNeXt-Tiny: clean -1.6, darkness (Brokkr) s5 -2.8 points; ShuffleNetV2 x1.0: clean -0.5, darkness (Brokkr) s5 -2.3 points; MNASNet 1.0: clean -0.7, darkness (Brokkr) s5 -1.7 points; ResNet-50: clean -1.1, darkness (Brokkr) s5 -1.5 points; MobileNetV2: clean -0.4, darkness (Brokkr) s5 -1.5 points; RegNetY-400MF: clean -0.3, darkness (Brokkr) s5 -1.2 points; ResNet-18: clean -0.4, darkness (Brokkr) s5 -0.7 points">
 </picture>
 
 *Pre-registered condition: darkness (Brokkr) s5 (H21). 9 models, 10,000 test images; bars are 95% paired

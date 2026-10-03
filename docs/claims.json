@@ -3,7 +3,7 @@
  "claims": [
   {
    "id": "fig-hero",
-   "figure": "hero-shrinking-cost",
+   "figure": ["hero-shrinking-cost", "hero-shrinking-cost-wide"],
    "claim": "Under darkness (Brokkr) s5, shrinking costs some models much more than it does on clean images, while others lose about as much as on clean images; H21's prediction that at least half of the models would show a large extra gap failed.",
    "scope": {
     "models": "every usable INT8 build of the Stage 4 (task 4.1) models, percentile 99.99 recipe; MobileNetV3-Small left out (its INT8 build failed)",
