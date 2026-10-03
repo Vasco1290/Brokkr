@@ -375,3 +375,44 @@ whenever the labels are on the machine. Nobody edits the block by hand.
 `skip_symbolic_shape` (true for ConvNeXt-Tiny's INT8, false otherwise), copied from its build record
 and checked by `scripts/40`; when true, the label's Details say so. A non-default build setting is
 never left off a label.
+
+## Note added 3 October 2026: runtimes, both shrinking-cost flags, laptop speed and licences (before any code)
+
+Decided by H on 3 October 2026 (decisions in `docs/hypotheses_stage4.md`, note of 3 October 2026).
+Schema version 1 is amended, not raised: no label has been published. No threshold, state or envelope
+rule changes. The field details are Claude's (proposed).
+
+**1. Runtime has its own field on every row** (so one device can have several runtimes).
+`hardware[].runtime` is removed. A new top-level list `runtimes` holds one entry per runtime set-up:
+```
+{"runtime_id": "<name>@<version>:<provider slug>:<threads>t:spin-<on|off>",
+ "name": "onnxruntime", "version": "...", "execution_provider": "...",
+ "threads": <int>, "intra_op_threads": <int or null>, "inter_op_threads": <int or null>,
+ "spinning": "<as the record states it>", "graph_optimisation": "<as recorded, or null>",
+ "sources": [...]}
+```
+Every measurement and every measured speed row carries `runtime_id`; a "not measured" speed row has
+`"runtime_id": null`. The validator checks that each `runtime_id` names an entry. (Today's labels:
+one runtime for the accuracy records, and one each for the 1- and 4-thread latency records.)
+
+**2. Both shrinking-cost flags.** `envelope.rows[].shrinking_cost_flag` (one value) is replaced by
+`shrinking_cost_flags`: a list, in the order `["large shrinking cost", "not informative"]`, holding
+each flag that applies (empty when neither does). `summary.large_shrinking_cost` counts every row whose
+list holds "large shrinking cost".
+
+**3. Laptop speed rows.** A measured row adds, copied from its latency record: `spread_pct`, `unstable`,
+`unstable_above_pct`, `sessions`, `warmup_runs`, `timed_runs`, `discarded_sessions` (a count),
+`timed_utc` (`first_start`, `last_end`: the first timed run's start and the last one's end, from the
+record's `.npz`), `pinning` (`logical_cpus`, `physical_cores`, `core_kind`, `read_back`: false) and
+`vnni` (the record's text). The labelled build's measured rows also hold `time_vs_reference`:
+`{"ratio_p50": <INT8 p50 / FP32 p50>, "reference_p50_ms": ..., "slower": <ratio above 1>, "sources":
+[...]}`. Every number keeps its `sources`.
+
+**4. Licences.** A new top-level field `licences`, generated from the build records (decision 6 of
+the 3 October note): `brokkr_code` ("Apache-2.0", fixed), `model_code` and `model_weights` (copied
+from the build records, which must agree), `weights_trained_on` ("ImageNet-1k" when the reference
+build record's weights name says so, else null), `label_data` ("CC BY 4.0") and `sources`. The
+validator refuses an empty field; `scripts/40_check_labels.py` checks it against the build records.
+The Markdown model card adds `license_link: "#licences"`, the anchor of its "Licences" section.
+
+**5. Every rendered page states the label schema version** beside the Brokkr version and commit.

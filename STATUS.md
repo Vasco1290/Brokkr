@@ -9,7 +9,7 @@ tables script is not), and the work now follows the Platform plan: **step 1 (lab
 ## 0. Start here (a new session needs nothing else)
 
 ### Pick up here (3 October 2026)
-Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of date) wherever they differ.
+Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
 - **Branch `stage-4`**, pushed to origin; `main` is still at `be01206` (Stage 3). Working tree clean.
 - **Platform plan step 1 (labels), due 7 October** (`ROADMAP.md`, "Platform plan"):
   - **Ten labels made** at the clean commit `753cdf1`, in `labels/` (gitignored): `python

@@ -1273,3 +1273,96 @@ was redone).
   commit and state the same build settings. Record: `results/reproduction/reproduction_check.json`.
 - `scripts/22_check_results.py` afterwards: PASS, 1863 of 1863 result records (the 54 new ones
   included).
+
+## Note added 3 October 2026, before any code: H's fix list, latency on the labels, and two past decisions
+
+Decided by H on 3 October 2026 **after seeing the ten labels and the 38 latency records**, so these
+are choices made with the data known. They change wording, advice and what a label displays only: no
+verdict, threshold, envelope state or envelope rule changes, and no label has been published. Points
+marked "(proposed)" are Claude's and await H's confirmation. The label format changes they need are in
+`docs/label_schema.md`, note of 3 October 2026.
+
+**1. The suggested next step follows the line that actually failed** (replaces the choice and order of
+suggestions in `docs/label_schema.md`, note of 1 October 2026, point 2). Rule: every suggestion must
+plausibly fix the line that failed. Re-calibrating fixes coverage; a stronger model fixes accuracy;
+another recipe fixes harm caused by shrinking (either line). The cause-based advice is unchanged
+("hurt by shrinking" → "try another recipe or model"; "too hard for this model" → "consider a stronger
+model"; "cause unclear" → "try another recipe or a stronger model").
+- Fails both lines: the cause-based advice first, "re-calibrate on your own images" second.
+- Fails accuracy (damage drop) only: the cause-based advice only.
+- Fails coverage only: "re-calibrate on your own images" first; "try another recipe" second only where
+  shrinking is involved ("hurt by shrinking", "cause unclear"). Never "consider a stronger model" on a
+  coverage-only row: FP32's accuracy holds there, so it would point at the wrong problem.
+- A general rule with a test for each case on made-up rows, not a special case for the row that raised
+  it (ConvNeXt-Tiny, fog (ImageNet-C) s3). Only coverage-only rows change.
+
+**2. "Not informative" never hides a large shrinking cost.** Until now the flag was one value and "not
+informative" (FP32 top-1 below 10% in that condition) took priority. From now on both are shown when
+both apply, and the summary's "large shrinking cost" count includes such a row. The rule for each flag
+is unchanged. A test uses a made-up row where both apply. (In the ten labels made at `753cdf1` no such
+row exists.)
+
+**3. Threshold wording and a correction to the 30 September envelope note.**
+- The README and labels describe the two lines as "a line whose value was written down before these
+  results existed and adopted for the labels afterwards, unchanged" (wording approved by H).
+- **Correction** to "Where the two thresholds come from" (envelope note, revised 30 September) and to
+  the methods-page point of H's 30 September decisions, which both say the 80% coverage line was first
+  committed in `237effa`: **80% first appears in `a957652`** (24 September 2026, 22:57 +0530), the
+  Stage 2 pre-registration, in H6 ("FP32 coverage is below 80% for at least 3 of the 5 corruptions"),
+  before any Stage 2 result; `237effa` (25 September, 10:15 +0530) is where it first became the harm
+  line, with the Stage 2 results known. The −10.0-point history is unchanged. The methods page states
+  both commits.
+
+**4. Latency on the labels** (H's decisions a, b, c and e, and the speed line, 3 October 2026).
+- **Source.** Each laptop speed row is filled from its latency record,
+  `results/latency/<model>_<precision>_laptop_<threads>threads.json`, which must pass
+  `brokkr_edge.schema.check_record` and come from a clean commit, or the label is refused. p50, p95,
+  p99, the spread and the "unstable" flag are copied, never recomputed or rounded. MobileNetV3-Small's
+  INT8 rows stay "not measured: INT8 build failed"; the Raspberry Pi 5 rows stay "not measured".
+- **Spread and "unstable" on every row** (required by the 29 September method note): every laptop row
+  shows its spread; an unstable row (spread above the line its record states) also says, in plain
+  words, "unstable: speed varied a lot between repeat runs (spread X%); treat as rough", with X from
+  the record, and the label's glossary explains "Spread" and "Unstable". No claim about why a record is
+  unstable. (proposed) "spread X%" instead of H's example "up to X%": the record's spread is the
+  interquartile range of the 10 session p50s as a share of their median, not a maximum.
+- **Relative speed line** (shown, never hidden): for each thread count, N = the labelled (INT8) build's
+  p50 divided by the reference (FP32) build's p50, both the medians across sessions from the latency
+  records; "INT8 takes N× the time of FP32", with "(slower)" added when N is above 1. N is stored in
+  `label.json` and recomputed by `scripts/40_check_labels.py`. When either row is unstable the line is
+  still shown, with the flag and the plain-words note.
+- **Where INT8 is slower:** the plain sentence "INT8 is slower than FP32 on this laptop CPU (relative
+  comparison only)." Never a negative "speed-up", and no wording that assumes INT8 is faster.
+  (proposed) If INT8 is slower at only some thread counts, the sentence names them ("at 1 thread").
+- **Cores (decision c), on the label:** "Pinned to the laptop's 2 performance cores (4 hardware threads,
+  as reported by Windows). The 4-thread setting therefore runs on 2 physical cores." The counts come
+  from the record (`pinned_cpus` and `physical_core_of_each_cpu`), never typed in. A limitation: "The
+  CPU pin was not read back after it was set" (`brokkr_edge.benchmark.pin_to_cpus` stops only if
+  Windows refuses it).
+- **When the timing ran (decision e).** The run started 13:24:39 and finished 15:02:18 local time on 3
+  October 2026 (`results/latency/run_log.txt`), in the daytime rather than overnight as planned; H
+  accepted it with no rerun. Each speed row stores its own timed window (first timed run's start, last
+  timed run's end, in UTC) from its record's `.npz` wall-clock times, and the label shows the run's
+  window in UTC.
+- **No rerun and no new rerun rule** for the 7 unstable records: a rule made now would be chosen after
+  seeing the data.
+
+**5. A past decision, recorded here for the first time: labels live outside `results/`.** Decided by
+H on 30 September 2026 to fix the Checkpoint 1 failure: the label files then written to
+`results/labels/` carry `"schema_version": 1`, so the results loader (`brokkr_edge.schema`) took them
+for Stage 1–3 records and `scripts/22_check_results.py` stopped ("two schema-1 files share a name").
+Fix: labels move to the gitignored top-level `labels/` folder, and a test fails if a label appears
+under `results/` (commit `94f1b97`, `tests/test_label_location.py`). Rejected alternative: make the
+results loader skip label files.
+
+**6. The model card's licence** (decided by H, 3 October 2026; a Checkpoint 1 point never recorded
+before). The Hugging Face metadata keeps `license: other` and `license_name: see-label-licences` and
+adds `license_link`, pointing to the label's own "Licences" section. That section is generated from
+the build records, with no hand-typed licence text beyond fixed wording: Brokkr's code is Apache-2.0;
+the model's code and weights keep their original licences, copied from the build records; weights
+trained on ImageNet-1k (read from the build record's weights name) carry ImageNet's non-commercial
+terms of access; the label's own numbers and text are Brokkr output, licensed CC BY 4.0. A check fails
+if a label's licence section is empty or differs from its build records.
+
+**7. Parked** (research freeze; STATUS.md): "Add severity 1 to label conditions (Phase B severity
+menu) so labels show where models still work"; "Why is RegNetY-400MF's INT8 slower than FP32 on this
+laptop?". Suggestion parked for later: "Add a pin read-back check to the latency script."
