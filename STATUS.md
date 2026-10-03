@@ -36,8 +36,8 @@ Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of da
     assistant session, so long runs are H's.
 - **Order, set by H on 3 October 2026:**
   1. ~~H runs the laptop latency script~~ (done, above). The **website v0 plan** is drafted in
-     `scratch/website_v0_plan.md` (gitignored, not committed); its section 8 lists eight decisions
-     for H, none taken yet.
+     `scratch/website_v0_plan.md` (gitignored, not committed); H decided its eight open points on 3
+     October 2026 (plan section 9; summary under "H's website v0 decisions" below).
   2. **Next session: H's fix list and H's latency-label decisions** (both below). First one dated
      note covering both, then fixes 1–3 and 5, then the read-only check 4 with proposed wording left
      uncommitted. Wording, advice and display only: no verdict, threshold, state or rule changes.
@@ -107,6 +107,27 @@ Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of da
   - **e.** The run time (3 October 2026, 13:24–15:02 local) is recorded with the speed rows. Add to
     "Parked questions": "Why is RegNetY-400MF's INT8 slower than FP32 on this laptop?" Add to
     "Suggestions parked for later": "Add a pin read-back check to the latency script."
+- **H's website v0 decisions (3 October 2026; for step 2, after the steps above; nothing started).**
+  Full text in `scratch/website_v0_plan.md`, section 9.
+  1. A committed folder `published/labels/` holds released labels only (at release points); working
+     labels stay gitignored in `labels/`. This changes hard rule 4 for that folder only: record it in a
+     dated note. For v0 the site is built locally and pushed to a `gh-pages` branch; building on
+     GitHub comes later.
+  2. Readable addresses (`/models/<model>/<build>/`, e.g. `/models/mobilenet-v3-large/int8-percentile-99.99/`);
+     a generator test fails if two builds produce the same address; the build checksum is shown on
+     the page, not in the address.
+  3. Display words: `official` → "Brokkr study"; `user-submitted` → "User-submitted";
+     "Community-submitted" is reserved for results others send to the site later.
+  4. Evidence field: after v0.
+  5. The relative speed line is shown, never hidden: "INT8 takes N× the time of FP32", with
+     "(slower)" when INT8 is slower; N generated from the records; when either row is unstable, shown
+     with the unstable flag and the plain-words note. Which statistic N uses goes in the dated note.
+  6. Cores wording: decision c above.
+  7. The roadmap page is generated from `ROADMAP.md`: phases and Now / Next / Later plus what is
+     built; no dates on the website.
+  8. Report 1: replace the "Related work" placeholder ("To be written by H") with "Related work: not
+     yet written; planned before the next report." `docs/HANDOFF.md`: summarised read-only for H on 3
+     October 2026; H decides what to do with it.
 - **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
   keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
   commits; H writes the review notes.
