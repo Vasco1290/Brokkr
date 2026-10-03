@@ -12,7 +12,7 @@ tables script is not), and the work now follows the Platform plan: **step 1 (lab
 Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
 - **Branch `stage-4`**, pushed to origin; `main` is still at `be01206` (Stage 3). Working tree clean.
 - **Platform plan step 1 (labels), due 7 October** (`ROADMAP.md`, "Platform plan"):
-  - **Ten labels made, with laptop speed rows**, at the clean commit `1e7b054` (3 October 2026), in
+  - **Ten labels made, with laptop speed rows**, at the clean commit `f682e21` (3 October 2026), in
     `labels/` (gitignored): `python scripts/39_make_labels.py` makes them, `python
     scripts/40_check_labels.py` checks every number against its source (last result: PASS, 10 labels).
     Format: `docs/label_schema.md` and its dated notes (30 September to 3 October).
@@ -41,10 +41,17 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
      October 2026 (plan section 9; summary under "H's website v0 decisions" below).
   2. ~~H's fix list and H's latency-label decisions~~ (done 3 October 2026): dated notes at `e009759`
      (with `docs/HANDOFF.md` removed), code at `310485e` and `1e7b054`. Fixes 1–3 and 5 done; check 4
-     done read-only, its proposed wording **waits for H** (not committed). Open for H: the "(proposed)"
-     points in the 3 October notes (`docs/hypotheses_stage4.md`, `docs/label_schema.md`).
-  3. ~~Regenerate the labels with speed rows~~ (done 3 October 2026, from `1e7b054`; `scripts/40`
-     PASS, 10 labels; README updated).
+     done read-only. H confirmed the "(proposed)" points of that note on 3 October.
+     - **Later on 3 October:** next-step advice chosen line by line against FP32 (note `4ef62cf`, code
+       `f682e21`; 5 rows of the `1e7b054` labels changed, among them ConvNeXt-Tiny fog (ImageNet-C) s3).
+       New "(proposed)" points in that note wait for H: FP32 straddling a line, and saying a suggestion
+       once.
+     - **Check 4, new headline (H, 3 October): draft waits for H** in `scratch/check4_draft.md`
+       (README findings, `docs/stage4_story.md`, "Why labels?" page; every number printed from the
+       records by a scratch script; nothing committed). Verified references: `scratch/related_work.md`
+       (8 sources, each checked on its own page; 3 advisor notes narrowed, none dropped).
+  3. ~~Regenerate the labels with speed rows~~ (done 3 October 2026; last made from `f682e21`;
+     `scripts/40` PASS, 10 labels; README updated).
   4. **README and images task** (H sends it): generate the "What we have found so far" numbers from
      result records, checked locally by `scripts/40` the way label sources are; any number that cannot
      be generated becomes a link. Brand images are in `docs/assets/` (the favicon and logo are for the
@@ -134,6 +141,9 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
   8. Report 1: replace the "Related work" placeholder ("To be written by H") with "Related work: not
      yet written; planned before the next report." `docs/HANDOFF.md`: removed on 3 October 2026
      (`e009759`) after its two unrecorded items went into the dated note of that day.
+  9. **Claims register** on the pre-public checklist (H, 3 October 2026): every public claim lists its
+     scope (models, conditions, pre-registered or exploratory), its prior-work citation, and the command
+     that backs it; the checker verifies each claim against the records.
 - **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
   keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
   commits; H writes the review notes.
@@ -186,6 +196,10 @@ Read this first. (`docs/HANDOFF.md` was removed on 3 October 2026; everything in
   never because of a result; every rerun is logged with its reason.
 - **Label what came later:** analyses done after the verdicts are marked "after the verdicts" or
   "exploratory"; likely explanations are marked "likely", never stated as proven.
+- **Literature check before any new research question** (H, 3 October 2026): a time-boxed check of
+  prior work (2–3 hours), with criteria written down first for what happens if prior work exists. Every
+  research idea needs a product fallback. No claim of being "first" anywhere.
+- **Unknown values say "not recorded"**, never a guess (H, 3 October 2026).
 - **Report absolute and compression-caused weakness separately** (see below).
 
 ### Absolute weakness vs compression-caused weakness
@@ -326,6 +340,10 @@ outcome".
   plainly.)
 
 ### Suggestions parked for later (not decided)
+- **No Stage 5 research on damage-aware INT8 calibration** (decided by H, 3 October 2026): prior work
+  already tested it, mostly with negative results (Karimov et al., 2025, arXiv:2508.19600, object
+  detection; Brokkr's own H12 in Stage 3 also failed). Parked instead under Phase B: damage-aware
+  calibration as a cited recipe in `shrink --auto`.
 - Add a pin read-back check to the latency script (H, 3 October 2026; today the label states the pin
   was not read back).
 - ROADMAP "before going public": add a commercial-use check (data and model licences), and tag each
