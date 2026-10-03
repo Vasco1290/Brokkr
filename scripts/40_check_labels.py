@@ -25,8 +25,8 @@ For each label, independently of the code that made it:
 9. label.md and label.html equal a fresh render of label.json, every number a reader sees in them is a
    label.json number, and the Markdown's model-card metadata parses (huggingface_hub.ModelCard) with
    license "other" and license_link "#licences".
-Then, once: the README's label example equals a fresh render of its two labels
-(scripts/41_readme_label_example.py --check).
+Then, once: the README's label example and its Stage 4 findings equal a fresh render of their labels and
+records (scripts/41_readme_label_example.py --check, scripts/45_readme_findings.py --check).
 """
 
 import argparse
@@ -300,11 +300,10 @@ for folder in folders:
     )
     for p in problems[:20]:
         print(f"     {p}")
-readme = subprocess.run(
-    [sys.executable, "scripts/41_readme_label_example.py", "--check", "--labels", args.labels],
-    capture_output=True, text=True,
-)
-print((readme.stdout + readme.stderr).strip())
-all_ok &= readme.returncode == 0
+for script in ("scripts/41_readme_label_example.py", "scripts/45_readme_findings.py"):
+    readme = subprocess.run([sys.executable, script, "--check", "--labels", args.labels],
+                            capture_output=True, text=True)
+    print((readme.stdout + readme.stderr).strip())
+    all_ok &= readme.returncode == 0
 print(f"\n{'PASS' if all_ok else 'FAIL'}: {len(folders)} labels in {args.labels}")
 sys.exit(0 if all_ok else 1)

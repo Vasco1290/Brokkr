@@ -1,10 +1,13 @@
 """The README stays usable: every local file or image it points to exists, and old names are gone.
 
-Its label example is generated from the labels (scripts/41_readme_label_example.py) and checked here
-whenever the labels are on the machine. Its other numbers come from result files that are not in git;
-those are re-read from the result files whenever the README is updated.
+It has no hand-typed result numbers. Its label example (scripts/41_readme_label_example.py) and its Stage 4
+findings (scripts/45_readme_findings.py) are generated blocks, checked here whenever the labels and records
+are on the machine (they are not in git). Its label screenshots (scripts/46_readme_screenshots.py) must show
+the released label as it is now.
 """
 
+import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -34,12 +37,35 @@ def test_every_contents_link_points_to_a_heading():
     assert [a for a in anchors if a not in headings] == []
 
 
-@pytest.mark.skipif(not Path("labels/mobilenet_v3_large/label.json").exists(),
-                    reason="the labels are not on this machine (they are not in git)")
+@pytest.mark.skipif(not Path("labels/mobilenet_v3_small/label.json").exists(),
+                    reason="the working labels are not on this machine (they are not in git)")
 def test_the_label_example_equals_a_fresh_render_of_the_labels():
     result = subprocess.run([sys.executable, "scripts/41_readme_label_example.py", "--check"],
                             capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.skipif(not (Path("results/final/breadth_4.1_verdicts.json").exists()
+                         and Path("labels/mobilenet_v3_large/label.json").exists()),
+                    reason="the 4.1 records and labels are not on this machine (they are not in git)")
+def test_the_findings_equal_a_fresh_render_of_the_records():
+    result = subprocess.run([sys.executable, "scripts/45_readme_findings.py", "--check"],
+                            capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_the_generated_blocks_are_present_once():
+    for marker in ("label-example:start", "label-example:end", "findings:start", "findings:end"):
+        assert README.count(marker) == 1, marker
+
+
+def test_the_label_screenshots_show_the_released_label_as_it_is_now():
+    record = json.loads(Path("docs/assets/label-summary.json").read_text(encoding="utf-8"))
+    label = Path(record["label"])
+    text_hash = hashlib.sha256(label.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
+    assert record["sha256"] == text_hash, "rerun scripts/46_readme_screenshots.py: the label has changed"
+    for picture in record["pictures"]:
+        assert (Path("docs/assets") / picture).exists() and f"docs/assets/{picture}" in README
 
 
 def test_the_old_package_folder_name_is_gone():

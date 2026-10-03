@@ -1,7 +1,8 @@
 """Write the README's label example from the labels, so its numbers cannot drift from them.
 
 Usage:  python scripts/41_readme_label_example.py [--labels labels] [--check]
-Needs:  <labels>/mobilenet_v3_large/label.json and <labels>/mobilenet_v3_small/label.json
+Needs:  published/labels/mobilenet_v3_large/label.json (the released label, committed; the README's example
+        link and screenshots show the same label) and <labels>/mobilenet_v3_small/label.json
         (scripts/39_make_labels.py)
 Writes: the block between the two "label-example" markers in README.md
 
@@ -24,7 +25,7 @@ parser.add_argument("--labels", default="labels")
 parser.add_argument("--check", action="store_true")
 args = parser.parse_args()
 
-example_label = load(Path(args.labels) / "mobilenet_v3_large" / "label.json")
+example_label = load(Path("published/labels/mobilenet_v3_large/label.json"))
 broken_label = load(Path(args.labels) / "mobilenet_v3_small" / "label.json")
 example, broken = readme_example(example_label), readme_broken_example(broken_label)
 loose = unexplained_numbers(example_label, example) + unexplained_numbers(broken_label, broken)
