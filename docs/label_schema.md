@@ -424,3 +424,14 @@ not stated (`null`, and `spin-not-recorded` in its ID); it is never filled in. E
 the runtime of the record it was read or computed from; a damage drop or shrinking cost whose two
 records ran with different runtimes carries the first record's `runtime_id` and the second's in
 `settings.paired_runtime_id`. The label lists every runtime its measurements used.
+
+*Confirmed by H on 3 October 2026:* the runtime field design above.
+
+*Added 3 October 2026 (later the same day), before any code:* each envelope row gains `line_states`, its
+state on each line, read from the same intervals as `state` and `failed`:
+`{"damage drop": "fails" | "copes" | "straddles", "coverage": ...}` ("fails": whole interval below the
+line; "copes": whole interval at or above it; "straddles": neither). A row of a failed build has
+`"line_states": null`. The validator checks that the lines marked "fails" are exactly `failed`, and that
+"not harmful" means both lines cope; `scripts/40` recomputes them. The suggested next step reads the
+labelled build's `failed` and the reference build's `line_states` in the same condition
+(`docs/hypotheses_stage4.md`, note of 3 October 2026, later the same day).

@@ -1366,3 +1366,38 @@ if a label's licence section is empty or differs from its build records.
 **7. Parked** (research freeze; STATUS.md): "Add severity 1 to label conditions (Phase B severity
 menu) so labels show where models still work"; "Why is RegNetY-400MF's INT8 slower than FP32 on this
 laptop?". Suggestion parked for later: "Add a pin read-back check to the latency script."
+
+## Note added 3 October 2026 (later the same day), before any code: next-step advice line by line
+
+Decided by H on 3 October 2026 **after seeing the regenerated labels** (made at `1e7b054`), so this is
+a choice made with the data known. It changes the suggested-next-step text only; no verdict, envelope
+state, cause group, threshold or rule changes. It replaces point 1 of the note above. Points marked
+"(proposed)" are Claude's and await H's confirmation.
+
+**The case that raised it:** ConvNeXt-Tiny, fog (ImageNet-C) s3. INT8 fails both lines; FP32 is
+harmful there only because it fails the coverage line, while its accuracy holds. Advice chosen from
+the cause group ("too hard for this model") said "consider a stronger model" first, which points at
+accuracy, where FP32 copes.
+
+**The rule: advice is chosen line by line, comparing INT8 with FP32 on each line separately.** For each
+line the labelled build failed (its whole interval below the line), FP32's interval on the same line
+is read: it *fails* (whole interval below the line), *copes* (whole interval at or above it), or
+*straddles* it.
+- **INT8 fails accuracy (the damage-drop line):** FP32 also fails accuracy → "consider a stronger
+  model"; FP32 copes on accuracy → "try another recipe" (shrinking caused it). (proposed) FP32
+  straddles → "try another recipe or a stronger model".
+- **INT8 fails coverage:** "re-calibrate on your own images"; "try another recipe" is added if FP32
+  copes on coverage. (proposed) FP32 straddles coverage → nothing added (H's rule adds it only when FP32
+  copes).
+- **Order:** the accuracy advice first when accuracy failed, the coverage advice second. (proposed) A
+  suggestion is shown once: if both lines give "try another recipe", it appears once, in the first
+  place.
+- Rows that are not harmful, and rows of a failed build, get no suggestion. Tests on made-up rows for
+  each case, including the ConvNeXt-Tiny fog (ImageNet-C) s3 pattern.
+- To read FP32's state on each line, every envelope row stores its per-line states
+  (`docs/label_schema.md`, note of 3 October 2026, later addition).
+
+**H's confirmations of the "(proposed)" points of the note above (3 October 2026):** "spread X%" (with a
+plain glossary definition); naming the thread counts where INT8 is slower; the runtime field design
+(`docs/label_schema.md`). Also a standing rule: **a value a record does not hold is always shown as "not
+recorded", never guessed.**
