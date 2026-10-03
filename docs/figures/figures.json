@@ -2058,6 +2058,7 @@
     "dark": "docs/figures/grid-shrinking-cost-dark.svg"
    },
    "appears_in": [
+    "README.md (link)",
     "website: Why labels?",
     "Report 2"
    ],

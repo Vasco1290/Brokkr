@@ -111,6 +111,8 @@ shrinking cost under the damage minus the shrinking cost on clean images, as def
 docs/hypotheses_stage4.md) in at least 5 of the 9 models; 2 showed it; verdict FAIL. The dashed line is
 the label's large-cost line (whole interval more than 5 points below full size), adopted for the labels
 after these results existed; it is not what H21 judged.*
+
+Every model in every damaged condition (exploratory, not pre-registered): [grid figure](docs/figures/grid-shrinking-cost-light.svg) ([dark version](docs/figures/grid-shrinking-cost-dark.svg)).
 <!-- figure-hero:end -->
 
 <!-- findings:start (written by scripts/45_readme_findings.py; do not edit by hand) -->

@@ -275,3 +275,12 @@ def test_the_readme_shows_the_wide_hero_on_wide_screens_and_the_tall_one_on_phon
     assert f'media="{wide}" srcset="docs/figures/hero-shrinking-cost-wide-light.svg"' in block
     assert f'media="{dark}" srcset="docs/figures/hero-shrinking-cost-dark.svg"' in block
     assert '<img src="docs/figures/hero-shrinking-cost-light.svg"' in block
+
+
+def test_the_readme_links_the_grid_rather_than_showing_it():
+    """The grid is too wide to read on a phone in the README, so it is a link (H, 4 October 2026)."""
+    readme = Path("README.md").read_text(encoding="utf-8")
+    block = readme[readme.index("figure-hero:start"):readme.index("figure-hero:end")]
+    assert "[grid figure](docs/figures/grid-shrinking-cost-light.svg)" in block
+    assert "[dark version](docs/figures/grid-shrinking-cost-dark.svg)" in block
+    assert 'src="docs/figures/grid-shrinking-cost' not in readme

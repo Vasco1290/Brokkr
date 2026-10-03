@@ -281,7 +281,14 @@ def grid_figure(labs: dict) -> tuple:
         f"number of large costs."
     )
     return figure_entry(
-        "grid-shrinking-cost", ["website: Why labels?", "Report 2"], "fig-grid", 720, caption, svgs, {}, v
+        "grid-shrinking-cost",
+        ["README.md (link)", "website: Why labels?", "Report 2"],
+        "fig-grid",
+        720,
+        caption,
+        svgs,
+        {},
+        v,
     ), svgs
 
 
@@ -530,6 +537,12 @@ def render_all() -> tuple:
         f'  <img src="{hero["files"]["light"]}" alt="{html.escape(hero["alt"], quote=True)}">\n'
         "</picture>\n\n"
         f"{wrap('*' + hero['caption'] + '*')}\n"
+    )
+    # The grid is linked, not shown: too wide to read on a phone in the README (H, 4 October 2026).
+    grid = manifest["figures"]["grid-shrinking-cost"]["files"]
+    block += (
+        f"\nEvery model in every damaged condition (exploratory, not pre-registered): "
+        f"[grid figure]({grid['light']}) ([dark version]({grid['dark']})).\n"
     )
     return manifest, svgs, block
 
