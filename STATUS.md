@@ -23,28 +23,27 @@ Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of da
     records of 4.1: PASS, 28 of 28**, repeatable, every score identical bit for bit; recorded at
     `0ad9938` (`results/reproduction/reproduction_check.json`; outcome appended to
     `docs/hypotheses_stage4.md`).
-  - **Laptop latency script ready at `0aa9e0d`, not run.** `scripts/44_laptop_latency.py` (rules in
-    `brokkr_edge/latency.py`, sleep/pause rule confirmed by H on 2 October; psutil 7.2.2,
-    BSD-3-Clause, recorded). **H starts it**, overnight at the desk:
-    `.venv/Scripts/python.exe scripts/44_laptop_latency.py` (plugged in, "best performance", other
-    programs closed, no repository changes while it runs). A session never starts it; it may only run
-    `--smoke` outside `results/`. Any command longer than about 10 minutes is cut off in an assistant
-    session, so long runs are H's (the reproduction was finished that way).
+  - **Laptop latency run: done** (started by H; `scripts/44_laptop_latency.py` at the clean commit
+    `89dc9d6`, 3 October 2026, 13:24–15:02 local time, in the daytime rather than overnight: accepted
+    by H, no rerun). **38 of 38 records** in `results/latency/` (19 builds × 1 and 4 threads), all from
+    `89dc9d6` with nothing uncommitted, on mains power in "best performance" before and after every
+    model, 0 discarded sessions; `scripts/22_check_results.py` afterwards: PASS, 1901 of 1901 result
+    records. **7 of 38 are flagged "unstable"** (spread above 10%): all four ConvNeXt-Tiny records,
+    EfficientNet-B0 INT8 4 threads, ResNet-18 INT8 4 threads, ResNet-50 INT8 1 thread. Per the 29
+    September method note they are shown on the label, not hidden; no rerun and no new rerun rule
+    (that would be decided after seeing the data). A session never starts `scripts/44`; it may only
+    run `--smoke` outside `results/`. Any command longer than about 10 minutes is cut off in an
+    assistant session, so long runs are H's.
 - **Order, set by H on 3 October 2026:**
-  1. **H runs the laptop latency script** (above), overnight at the desk. No edits to tracked files
-     while it runs.
-     - *While it runs:* the **website v0 plan** (Platform plan step 2), in `scratch/` only (gitignored;
-       nothing tracked): page list (one page per model, comparison table, "Why labels?", methods), how
-       pages are generated from `label.json`, the test that fails on any number not in a label, GitHub
-       Pages setup, phone and dark-mode checks, and a pre-public checklist (licence and commercial
-       use, ImageNet terms, overclaiming re-read, git-history check for full machine paths or H's
-       username). Plan only, no code.
-  2. **Next session: H's fix list** (below). First a dated note, then fixes 1–3 and 5, then the
-     read-only check 4 with proposed wording left uncommitted. Wording and advice only: no verdict,
-     threshold, state or rule changes.
+  1. ~~H runs the laptop latency script~~ (done, above). The **website v0 plan** is drafted in
+     `scratch/website_v0_plan.md` (gitignored, not committed); its section 8 lists eight decisions
+     for H, none taken yet.
+  2. **Next session: H's fix list and H's latency-label decisions** (both below). First one dated
+     note covering both, then fixes 1–3 and 5, then the read-only check 4 with proposed wording left
+     uncommitted. Wording, advice and display only: no verdict, threshold, state or rule changes.
   3. **Regenerate the labels with speed rows:** read `results/latency/` into the labels' speed rows
-     (today they say "not measured"), regenerate the ten labels from a clean commit, run `scripts/40`,
-     update the README.
+     (today they say "not measured"), with H's latency-label decisions (below); regenerate the ten
+     labels from a clean commit, run `scripts/40`, update the README.
   4. **README and images task** (H sends it): generate the "What we have found so far" numbers from
      result records, checked locally by `scripts/40` the way label sources are; any number that cannot
      be generated becomes a link. Brand images are in `docs/assets/` (the favicon and logo are for the
@@ -84,6 +83,30 @@ Read this first; it replaces `docs/HANDOFF.md` (written 1 October, now out of da
      findings).
   5. **Add to "Parked questions" below:** "Add severity 1 to label conditions (Phase B severity menu)
      so labels show where models still work."
+- **H's latency-label decisions (3 October 2026, after seeing the latency records; nothing started).**
+  Recorded in the next session's dated note before any code:
+  - **a. Spread and "unstable" on the labels** (required by the 29 September method note; the
+    renderer shows neither today): in plain words with the spread taken from the record, e.g. "Speed
+    varied a lot between repeat runs (up to X%); treat as rough", plus a glossary entry. No claim
+    about why a record is unstable.
+  - **b. Where INT8 is slower than FP32**, a plain sentence: "INT8 is slower than FP32 on this laptop
+    CPU (relative comparison only)". Never a negative "speed-up"; no wording that assumes INT8 is
+    faster. (Checked read-only on 3 October: the label code shows only each build's own p50 / p95 /
+    p99 today, with no comparison.)
+  - **c. Methods wording for the cores:** "Pinned to the laptop's 2 performance cores (4 hardware
+    threads, as reported by Windows). The 4-thread setting therefore runs on 2 physical cores." From
+    the records: `core_types.performance` = [0, 1, 2, 3], `pinned_cpus` = [0, 1, 2, 3],
+    `physical_core_of_each_cpu` maps 0 and 1 to core 0, 2 and 3 to core 2 (identical in all 38).
+    Stated as a limitation: the pin was not read back after setting (`benchmark.pin_to_cpus` stops
+    only if Windows refuses it).
+  - **d. Schema version 1 amendment** (nothing published yet), with a dated note in
+    `docs/label_schema.md`: runtime moves to its own field on each measurement and speed row, so one
+    device can have several runtimes. Evidence level is not added now (an optional field later, when
+    community results exist). Every rendered page states the label schema version (today's
+    `label.html` shows the brokkr-edge version and commit, not the schema version).
+  - **e.** The run time (3 October 2026, 13:24–15:02 local) is recorded with the speed rows. Add to
+    "Parked questions": "Why is RegNetY-400MF's INT8 slower than FP32 on this laptop?" Add to
+    "Suggestions parked for later": "Add a pin read-back check to the latency script."
 - **Working notes:** always `.venv/Scripts/python.exe`; set `PYTHONIOENCODING=utf-8` when piping;
   keep the tree clean while anything runs (records note a dirty commit); no AI co-author lines in
   commits; H writes the review notes.
