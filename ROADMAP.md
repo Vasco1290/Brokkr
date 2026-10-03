@@ -393,6 +393,9 @@ public and the site is live.
 - How the user's images are split (INT8 calibration, conformal calibration, test; no image in two
   parts), the minimum image count and the required licence statement are fixed in a dated note before
   coding.
+- Also accept a user-supplied pair: an FP32 ONNX model and an already-shrunk ONNX build of it, made by
+  any tool, not only builds Brokkr shrinks itself (added by H, 3 October 2026; plan only, not built).
+  What is checked about such a pair before testing it is fixed in the same dated note.
 
 *Done when:* on a small made-up model and made-up images (tests only), and on one real torchvision
 model with a folder of images, the command produces a schema-valid `label.json` marked

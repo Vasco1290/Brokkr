@@ -1403,3 +1403,9 @@ is read: it *fails* (whole interval below the line), *copes* (whole interval at 
 plain glossary definition); naming the thread counts where INT8 is slower; the runtime field design
 (`docs/label_schema.md`). Also a standing rule: **a value a record does not hold is always shown as "not
 recorded", never guessed.**
+
+*Confirmed by H on 3 October 2026, after the labels made at `f682e21`:* the three "(proposed)" points
+of the line-by-line advice note above: FP32 straddling the accuracy line → "try another recipe or a
+stronger model"; FP32 straddling the coverage line → nothing added beyond "re-calibrate on your own
+images"; each suggestion shown once (including inside the straddle advice). No label changes: the
+labels at `f682e21` already follow them.
