@@ -362,6 +362,8 @@ outcome".
   plainly.)
 
 ### Suggestions parked for later (not decided)
+- **After the merge (small):** a `.gitattributes` rule forcing LF line endings for label files (H, 3 October
+  2026); the label maker writes them with Windows line endings today.
 - **No Stage 5 research on damage-aware INT8 calibration** (decided by H, 3 October 2026): prior work
   already tested it, mostly with negative results (Karimov et al., 2025, arXiv:2508.19600, object
   detection; Brokkr's own H12 in Stage 3 also failed). Parked instead under Phase B: damage-aware
