@@ -25,8 +25,9 @@ Windows laptop (Intel Core i5-1235U, CPU only), on ImageNet test images with sim
 **Not built yet**
 
 - A package on PyPI and a quick start for your own model (roadmap steps 3 and 4).
-- The catalog website online (step 2): its first pages (home, catalog, one page per label) build locally
-  with `python scripts/49_build_site.py`, but the site is not published yet. A hosted upload page (step 5).
+- The catalog website online (step 2): its pages (home, catalog, compare, why labels, methods, roadmap and
+  one page per label) build locally with `python scripts/49_build_site.py`, but the site is not published
+  yet. A hosted upload page (step 5).
 - Object detection: Brokkr tests image classifiers only.
 - Any device other than this laptop: nothing has been measured on a Raspberry Pi or another board
   (step 6).
@@ -106,11 +107,12 @@ predictions and outcomes: [docs/hypotheses_stage4.md](docs/hypotheses_stage4.md)
   <img src="docs/figures/hero-shrinking-cost-light.svg" alt="EfficientNet-B0: clean -4.8, darkness (Brokkr) s5 -43.7 points; MobileNetV3-Large: clean -2.0, darkness (Brokkr) s5 -13.6 points; ConvNeXt-Tiny: clean -1.6, darkness (Brokkr) s5 -2.8 points; ShuffleNetV2 x1.0: clean -0.5, darkness (Brokkr) s5 -2.3 points; MNASNet 1.0: clean -0.7, darkness (Brokkr) s5 -1.7 points; ResNet-50: clean -1.1, darkness (Brokkr) s5 -1.5 points; MobileNetV2: clean -0.4, darkness (Brokkr) s5 -1.5 points; RegNetY-400MF: clean -0.3, darkness (Brokkr) s5 -1.2 points; ResNet-18: clean -0.4, darkness (Brokkr) s5 -0.7 points">
 </picture>
 
-*Pre-registered condition: darkness (Brokkr) s5 (H21). 9 models, 10,000 test images; bars are 95% paired
-intervals (one narrower than its marker is hidden behind it). H21 predicted a large extra gap (the
-shrinking cost under the damage minus the shrinking cost on clean images, as defined in
-docs/hypotheses_stage4.md) in at least 5 of the 9 models; 2 showed it; verdict FAIL. The dashed line is
-the label's large-cost line (whole interval more than 5 points below full size), adopted for the labels
+*Pre-registered test H21: darkness (Brokkr) s5. 9 models, 10,000 test images; bars are 95% paired
+intervals (one narrower than its marker is hidden behind it). "Much worse in the dark?" says whether a
+model showed a large extra gap (the shrinking cost under the damage minus the shrinking cost on clean
+images, as defined in docs/hypotheses_stage4.md); the numbers are that extra gap and its interval. H21
+predicted it in at least 5 of the 9 models; 2 showed it; overall verdict FAIL. The dashed line is the
+label's large-cost line (whole interval more than 5 points below full size), adopted for the labels
 after these results existed; it is not what H21 judged.*
 
 Every model in every damaged condition (exploratory, not pre-registered): [grid figure](docs/figures/grid-shrinking-cost-light.svg) ([dark version](docs/figures/grid-shrinking-cost-dark.svg)).

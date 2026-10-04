@@ -13,7 +13,11 @@ runs them on a fresh build.
 5. no JavaScript needed: no content is hidden until a script runs, and every number the script can show is
    also on the page without it;
 6. every page states the commit it was built from, the brokkr-edge version and the label schema version;
-7. build IDs and addresses are unique; the landing finding has its claims-register entry.
+7. build IDs and addresses are unique; the landing finding has its claims-register entry; the roadmap
+   page shows no dates.
+Besides labels and figure entries, a page may quote the README's findings block word for word (its
+numbers are checked against the records by scripts/45_readme_findings.py --check, run by scripts/40), and
+may name identifiers with digits (commits, citations, step names) on its own list, each with a reason.
 """
 
 import json
@@ -23,12 +27,14 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 import site_meter as M
+import site_sources
 import themes
 from site_labels import LABELS, address, build_id, builds, measurement
 from site_pages import FEATURED, METER_CONDITIONS, count, interval
 
 from brokkr_edge import figures as F
-from brokkr_edge.label_render import FORMATS, NUMBER, WORDS_WITH_DIGITS, _leaves
+from brokkr_edge.label_render import FORMATS, WORDS_WITH_DIGITS, _leaves
+from brokkr_edge.label_schema import SCHEMA_VERSION
 
 VOID = {"area", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 SHOWN_ATTRS = (
@@ -42,6 +48,8 @@ SHOWN_ATTRS = (
     "data-label",
 )
 SCRIPT_ATTRS = ("data-cost-text", "data-interval-text", "data-verdict", "data-label")  # texts site.js shows
+# A number as a reader sees it: "10,000" is one number (not "10" and "000"), as are -1.98, 73.60% and 4.
+NUMBER = re.compile(r"(?<![\w.,])[-+]?\d{1,3}(?:,\d{3})+(?:\.\d+)?%?|(?<![\w.,])[-+]?\d+(?:\.\d+)?%?")
 EXTRA_WORDS = ("H21",)  # words with digits on the site that are not numbers (H21: a prediction's name)
 
 
@@ -108,7 +116,10 @@ def allow_list(page, labs: dict, figures: dict, commit: str, version: str) -> tu
     strings |= {s[:n] for s in strings if re.fullmatch(r"[0-9a-f]{40,64}", s) for n in (7, 12)}
     strings |= {build_id(lab, builds(lab)[1]) for lab in used} | {address(lab) for lab in used}
     strings |= {commit, f"brokkr-edge {version}"}  # the site's own commit and version (footer)
-    allowed = set(page.allowed)
+    strings |= set(page.words)  # the page's own identifiers (commits, citations, names), each with its reason
+    allowed = set(page.allowed) | {str(SCHEMA_VERSION)}  # the schema version this site reads (footer)
+    if page.findings:  # quoted word for word from the README's findings block, checked by scripts/45
+        allowed |= set(NUMBER.findall(site_sources.findings_block()))
     for lab in used:
         for v in _leaves(lab):
             if isinstance(v, (int, float)) and not isinstance(v, bool):
@@ -254,7 +265,17 @@ def check_no_js(files: dict) -> list:
     return problems
 
 
-# ---- 6 and 7. versions, IDs, the finding's claim ----
+# ---- 6 and 7. versions, IDs, the finding's claim, the roadmap's dates ----
+
+
+MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
+
+
+def check_roadmap(files: dict) -> list:
+    """No dates on the roadmap page (H, 3 October 2026)."""
+    text = " ".join(t for t, _ in parse(files["roadmap/index.html"]).texts)
+    dates = re.findall(r"\b(?:" + MONTHS + r")\b|\b20\d\d\b", text.split("Built by brokkr-edge")[0])
+    return [f"roadmap/index.html shows dates: {sorted(set(dates))}"] if dates else []
 
 
 def check_footer(pages: dict, files: dict, commit: str, version: str) -> list:
@@ -312,5 +333,5 @@ def run_all(
             "build IDs and addresses unique; the finding is in the claims register",
             check_ids(labs) + check_claim(claims),
         ),
+        ("the roadmap shows no dates", check_roadmap(files)),
     ]
-

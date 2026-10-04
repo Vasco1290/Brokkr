@@ -9,7 +9,8 @@ Adding a theme = adding one entry to THEMES; pages, CSS and the theme picker are
 Besides colours, each theme's CSS block says which version of a committed figure to show (--fig-light,
 --fig-dark), from its light or dark mode.
 check() runs the automated rules: contrast (text 4.5:1, marks and controls 3:1), a theme's accent clearly
-distinct from the INT8 blue, and no theme overriding a fixed colour.
+distinct from the INT8 blue, the meter's large zone quieter than its needle, and no theme overriding a
+fixed colour.
 """
 
 FIXED = {
@@ -26,7 +27,7 @@ FIXED = {
         "sheet-muted": "#59636e",
         "sheet-rule": "#1f2328",
         "sheet-line": "#d1d9e0",
-        "large-zone": "#b42318",
+        "large-zone": "#c0726a",  # muted, so the needle and readout carry the eye (H, 4 October 2026)
         "small-zone": "#7d8590",
     },
     "dark": {
@@ -43,7 +44,7 @@ FIXED = {
         "sheet-muted": "#a3a3a3",
         "sheet-rule": "#f2f2f2",
         "sheet-line": "#404040",
-        "large-zone": "#ff7b72",
+        "large-zone": "#a8564f",  # muted, as in light mode
         "small-zone": "#6e7681",
     },
 }
@@ -206,6 +207,8 @@ def check() -> list:
         for heat in t["heat-0"], t["heat-2"]:  # the hottest squares must stand out from the page
             if contrast(heat, t["bg"]) < 3:
                 problems.append(f"{key}: hero heat colour {heat} on bg below 3:1")
+        if contrast(t["large-zone"], t["panel"]) >= contrast(t["glow"], t["panel"]):  # the needle leads
+            problems.append(f"{key}: the meter's large zone is as loud as the needle (glow)")
         if oklab_distance(t["accent"], t["int8"]) < 15:  # e.g. a frosty blue accent next to the INT8 blue
             problems.append(
                 f"{key}: accent too close to the INT8 blue ({oklab_distance(t['accent'], t['int8']):.1f})"

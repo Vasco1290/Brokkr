@@ -86,21 +86,21 @@
   },
   {
    "id": "site-finding",
-   "where": "website landing page: the two sentences under \"What we found\" (beside the hero figure, claim fig-hero)",
-   "claim": "Under darkness (Brokkr) s5, few shrunk models lost much more to shrinking than on clean images, fewer than H21 predicted (verdict FAIL); MobileNetV3-Large's shrunk build is the example: a small shrinking cost on clean images and a much larger one under that damage.",
+   "where": "website landing page: the paragraph under \"What we found\" (beside the hero figure, claim fig-hero); the same paragraph opens the Why labels? page",
+   "claim": "Consistent with prior work on quantized models, shrunk models can pass a normal accuracy check and still collapse in dark or low-contrast images; in our small pre-registered test, clean accuracy didn't predict which; in wider exploratory checks, which models were hit varied with the condition, and fog hit some models too.",
    "scope": {
-    "models": "every usable INT8 build of the Stage 4 (task 4.1) models judged for H21; the example is MobileNetV3-Large (percentile 99.99)",
-    "conditions": "clean and darkness (Brokkr) s5",
+    "models": "the Stage 4 (task 4.1) models: every usable INT8 build (percentile 99.99); MobileNetV3-Small left out (its INT8 build failed)",
+    "conditions": "pre-registered: darkness (Brokkr) s5 (H21), contrast (ImageNet-C) s3 (H20), and H18b's judged conditions; exploratory: the twelve damaged conditions on the labels",
     "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
-    "intervals": "95% paired bootstrap (on the meter and the model page)"
+    "intervals": "95% paired bootstrap"
    },
-   "status": "pre-registered: H21 in docs/hypotheses_stage4.md (verdict unchanged); the counts are read from docs/figures/figures.json (hero figure values), the example from the released label",
+   "status": "mixed: H18b, H20 and H21 pre-registered in docs/hypotheses_stage4.md (verdicts unchanged); the wider checks exploratory. Text generated from the 4.1 records and the labels by scripts/45_readme_findings.py into README.md (approved wording, check 4 of 3 October 2026) and quoted word for word by the site",
    "prior_work": [
     "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968",
     "Yaghoubi Araghi et al., 2026, Recti-Q, arXiv:2607.18540"
    ],
-   "command": "python scripts/49_build_site.py",
-   "check": "python scripts/49_build_site.py --check"
+   "command": "python scripts/45_readme_findings.py",
+   "check": "python scripts/45_readme_findings.py --check"
   }
  ]
 }

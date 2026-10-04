@@ -181,14 +181,15 @@ def hero_figure(labs: dict) -> tuple:
         svgs[theme], axes = F.hero(rows, v, theme)
     s = lambda vid: F.show(v, vid)  # noqa: E731
     caption = (
-        f"Pre-registered condition: {s('dark_label')} (H21). {s('h21_judged')} models, {s('n_images')} test "
+        f"Pre-registered test H21: {s('dark_label')}. {s('h21_judged')} models, {s('n_images')} test "
         f"images; bars are {s('ci_level')} paired intervals (one narrower than its marker is hidden behind "
-        f"it). H21 predicted a large extra gap (the shrinking cost under the damage minus the shrinking cost "
-        f"on clean images, as defined in docs/hypotheses_stage4.md) in at least {s('h21_needed')} of the "
-        f"{s('h21_judged')} models; {s('h21_holding')} showed it; verdict "
-        f"{s('h21_verdict')}. The dashed line is the label's large-cost line (whole interval more than "
-        f"{s('large_cost_abs')} points below full size), adopted for the labels after these results existed; "
-        f"it is not what H21 judged."
+        f"it). \"Much worse in the dark?\" says whether a model showed a large extra gap (the shrinking cost "
+        f"under the damage minus the shrinking cost on clean images, as defined in "
+        f"docs/hypotheses_stage4.md); the numbers are that extra gap and its interval. H21 predicted it in "
+        f"at least {s('h21_needed')} of the {s('h21_judged')} models; {s('h21_holding')} showed it; "
+        f"overall verdict {s('h21_verdict')}. The dashed line is the label's large-cost line (whole "
+        f"interval more than {s('large_cost_abs')} points below full size), adopted for the labels after "
+        f"these results existed; it is not what H21 judged."
     )
     wide, wide_axes = {}, None
     for theme in F.THEMES:
@@ -282,7 +283,7 @@ def grid_figure(labs: dict) -> tuple:
     )
     return figure_entry(
         "grid-shrinking-cost",
-        ["README.md (link)", "website: Why labels?", "Report 2"],
+        ["README.md (link)", "website: Why labels?", "website: compare page", "Report 2"],
         "fig-grid",
         720,
         caption,

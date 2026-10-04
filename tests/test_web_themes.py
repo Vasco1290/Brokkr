@@ -35,3 +35,12 @@ def test_a_theme_whose_accent_is_close_to_the_int8_blue_is_refused():
         assert any("accent too close to the INT8 blue" in p for p in themes.check())
     finally:
         del themes.THEMES["made-up"]
+
+
+def test_the_meter_large_zone_must_stay_quieter_than_the_needle():
+    """H, 4 October 2026: the needle and readout carry the eye (made-up theme, tests only)."""
+    themes.THEMES["made-up"] = {**themes.THEMES["ember"], "name": "Made up", "glow": "#5a3a2a"}
+    try:
+        assert any("as loud as the needle" in p for p in themes.check())
+    finally:
+        del themes.THEMES["made-up"]

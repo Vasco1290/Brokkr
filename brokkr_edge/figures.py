@@ -362,7 +362,7 @@ def hero(rows: list, v: dict, theme: str) -> tuple:
         cv.text(
             16,
             y0 + 88,
-            f"large extra gap: {yes}, {show(v, r['gap'])} {show_ci(v, r['gap'])}",
+            f"Much worse in the dark? {yes}, {show(v, r['gap'])} {show_ci(v, r['gap'])}",
             colour="muted",
             halo=True,
         )
@@ -415,7 +415,7 @@ def hero_wide(rows: list, v: dict, theme: str) -> tuple:
             f'<rect x="8" y="{top + ROW * i}" width="{W - 16}" height="{ROW}" rx="4" fill="{band}"/>'
         )
     cv.axis_ticks("x", sc, tick_values, tick_labels, 128, top, bottom)
-    cv.text(566, 128, "large extra gap (H21)", bold=True)
+    cv.text(566, 128, "Much worse in the dark?", bold=True)  # H21's large extra gap (H, 4 October 2026)
     line_x = sc(v["large_cost_line"]["value"])
     cv.line(
         line_x,

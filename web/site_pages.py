@@ -1,11 +1,12 @@
 """The website's page types, one function each (docs/website_v0_plan.md, sections 5c and 12e).
 
-Each function takes the Site (web/site_build.py) and returns a list of (path, Page). It reads only the
-released labels and docs/figures/figures.json, and formats every number with brokkr_edge.label_render's
-formats, so web/site_checks.py can trace each number on a page back to the labels and figures the page
-names. Wording shared with the labels (glossary, suggested next steps, speed and licence lines) comes from
-label_render too. PAGE_TYPES lists the page types in navigation order; adding one is one new function and
-one new entry.
+Shared helpers, and the landing page, the catalog and the model pages (slice A); the other pages are in
+web/site_pages_more.py. Each page function takes the Site (web/site_build.py) and returns a list of
+(path, Page). It reads only committed sources (the released labels, docs/figures/figures.json, and the
+README findings and ROADMAP.md through web/site_sources.py) and formats every number with
+brokkr_edge.label_render's formats, so web/site_checks.py can trace each number on a page back to the
+sources the page names. Wording shared with the labels (glossary, suggested next steps, speed and licence
+lines) comes from label_render too. site_build.PAGE_TYPES lists the page types in navigation order.
 """
 
 import html
@@ -49,6 +50,8 @@ class Page:
     labels: list  # the labels (folder names) whose numbers may appear on the page
     figures: list = field(default_factory=list)  # entries of docs/figures/figures.json used on the page
     allowed: dict = field(default_factory=dict)  # other numbers shown, each with its reason
+    words: dict = field(default_factory=dict)  # identifiers with digits (e.g. commits), each with its reason
+    findings: bool = False  # quotes the README's checked findings block (web/site_sources.py)
 
 
 @dataclass
@@ -172,45 +175,43 @@ def meter_table(label: dict) -> str:
     )
 
 
-def finding(site) -> str:
-    """The two-sentence finding under the hero figure (claims register: site-finding), generated from the
-    hero figure's values (H21, from the 4.1 verdicts) and the featured label."""
-    v = site.figure(HERO[0])["values"]
-    label = site.labs[FEATURED]
-    ref, lab = builds(label)
-    dark = "brokkr/darkness/5"
-    models = [k.split(".")[0] for k in v if k.endswith(".h21_holds") and v[k]["value"] is True]
-    held = " and ".join(
-        v[f"{m}.name"]["value"] for m in sorted(models, key=lambda m: v[f"{m}.name"]["value"])
-    )
-    clean = measurement(label, "shrinking_cost", lab, "clean")
-    darkness = measurement(label, "shrinking_cost", lab, dark)
-    top1 = measurement(label, "top1", lab, "clean")
-    return (
-        f"In our pre-registered test under {esc(v['dark_label']['value'])}, "
-        f"{f(v['h21_holding']['value'], 'int')} of {f(v['h21_judged']['value'], 'int')} shrunk models lost "
-        f"much more to shrinking than on clean images ({esc(held)}); we had predicted at least "
-        f"{f(v['h21_needed']['value'], 'int')}, so the prediction (H21) is a "
-        f"{esc(v['h21_verdict']['value'])}. For example, {esc(label['model']['display_name'])}'s shrunk "
-        f"build scores {f(top1['value'], 'pct')} on clean images, a shrinking cost of "
-        f"{f(clean['value'], 'pts')} points against its full-precision build, but "
-        f"{f(darkness['value'], 'pts')} points under {esc(condition_names(label)[dark])}."
-    )
-
-
-def figure_html(site, path: str, names: tuple) -> str:
-    """A committed figure in the visitor's theme mode: wide layout on screens at least 768 px wide, tall
-    layout on phones; light and dark files swap with the theme (web/themes.py: --fig-light, --fig-dark)."""
-    wide, tall = site.figure(names[0]), site.figure(names[1])
+def figure_html(site, path: str, name: str, phone: str | None = None) -> str:
+    """A committed figure in the visitor's theme mode; light and dark files swap with the theme
+    (web/themes.py:
+    --fig-light, --fig-dark). With `phone`, that layout shows on screens narrower than 768 px."""
     out = []
     for mode in ("light", "dark"):
+        main = site.figure(name)["files"][mode]
+        w, h = site.svg_size(main)
+        if phone is None:
+            out.append(
+                f'<img class="fig-{mode}" src="{up(path)}{site.asset(main)}" width="{w}" height="{h}" '
+                f'style="max-width: {w}px" '
+                f'alt="{esc(site.figure(name)["alt"])}">'
+            )
+            continue
+        small = site.figure(phone)["files"][mode]
+        ws, hs = site.svg_size(small)
         out.append(
             f'<picture class="fig-{mode}"><source media="(min-width: 768px)" '
-            f'srcset="{up(path)}{site.asset(wide["files"][mode])}" width="800" height="526">'
-            f'<img src="{up(path)}{site.asset(tall["files"][mode])}" alt="{esc(tall["alt"])}" '
-            f'width="600" height="1148"></picture>'
+            f'srcset="{up(path)}{site.asset(main)}" width="{w}" height="{h}">'
+            f'<img src="{up(path)}{site.asset(small)}" alt="{esc(site.figure(phone)["alt"])}" '
+            f'width="{ws}" height="{hs}"></picture>'
         )
     return "".join(out)
+
+
+def figure_block(site, path: str, name: str, phone: str | None = None, scroll: bool = False) -> str:
+    """The figure on a datasheet panel, its caption collapsed under it; `scroll` keeps a wide figure at a
+    readable size on phones, inside a box that scrolls sideways."""
+    picture = figure_html(site, path, name, phone)
+    if scroll:
+        picture = f'<div class="scroll-x" tabindex="0" aria-label="Figure; scroll sideways">{picture}</div>'
+    caption = esc(site.figure(name)["caption"])
+    return (
+        f'<figure class="sheet figure{" wide-figure" if scroll else ""}">{picture}'
+        f'<details class="caption"><summary>About this figure</summary><p>{caption}</p></details></figure>'
+    )
 
 
 def landing(site) -> list:
@@ -229,7 +230,6 @@ def landing(site) -> list:
         for k in ("catalog", "why-labels")
         if k in site.page_types
     )
-    caption = site.figure(HERO[0])["caption"]
     body = f"""
 <section class="hero">
   {pixel_hero()}
@@ -265,10 +265,8 @@ def landing(site) -> list:
 </section>
 <section class="finding" aria-labelledby="finding-h">
   <h2 id="finding-h">What we found</h2>
-  <p class="finding-text">{finding(site)}</p>
-  <figure class="sheet figure">{figure_html(site, path, HERO)}
-    <details class="caption"><summary>About this figure</summary><p>{esc(caption)}</p></details>
-  </figure>
+  <p class="finding-text">{esc(site.findings["headline"])}</p>
+  {figure_block(site, path, *HERO)}
   <p class="cta">{buttons}</p>
 </section>"""
     page = Page(
@@ -276,6 +274,7 @@ def landing(site) -> list:
         body,
         labels=[FEATURED],
         figures=list(HERO),
+        findings=True,
         allowed={t: "meter tick label (the dial's scale, every 10 points)" for t in M.tick_labels(dom)},
     )
     return [(path, page)]
@@ -470,11 +469,15 @@ def envelope_groups(label: dict) -> str:
             f"{hover(term, LR.STATE_TITLE[state])}{count_html}</h3>{inner or '<p class=muted>none</p>'}</div>"
         )
     tested = f(summary["tested_conditions"], "int")
+    grid = f'<div class="groups">{"".join(groups)}</div>'
+    failed = [x for x in summary["lines"] if x["state"] == "INT8 build failed"]
+    if failed:  # H, 4 October 2026: one line, details on request; the FP32 results stay visible below
+        line = f'All <span class="mono">{f(failed[0]["count"], "int")}</span> conditions: INT8 build failed'
+        return f'<details class="more failed-env"><summary>{line}</summary>{grid}</details>'
     return (
         f'<p class="note">The {tested} tested conditions, grouped by the INT8 build\'s own state; harmful '
         "ones by cause. A condition is harmful when a whole interval is below its line (coverage or "
-        "damage drop).</p>"
-        f'<div class="groups">{"".join(groups)}</div>'
+        "damage drop).</p>" + grid
     )
 
 
@@ -496,72 +499,83 @@ def state_cell(label: dict, env: dict | None, cause: str | None) -> str:
     return out
 
 
-def conditions_table(label: dict) -> str:
-    """Every tested condition, clean first."""
+def condition_cells(label: dict, c: dict, cause: str | None) -> tuple:
+    """One condition's cells as (short label, HTML) pairs, and its one-line summary for the phone card."""
     ref, lab = builds(label)
-    failed = lab["status"] == "failed"
+    cid = c["condition_id"]
+    top1 = measurement(label, "top1", ref, cid)["value"]
+    fp32 = ("FP32 top-1", f'<span class="mono">{f(top1, "pct")}</span>')
+    if lab["status"] == "failed":
+        failed = '<span class="v-failed"><span aria-hidden="true">✕</span> INT8 build failed</span>'
+        not_measured = '<span class="muted">not measured: INT8 build failed</span>'
+        return [fp32, ("INT8", not_measured), ("INT8 state", failed)], failed
+    env = envelope_row(label, lab, cid)
+    cost, drop = measurement(label, "shrinking_cost", lab, cid), measurement(label, "damage_drop", lab, cid)
+    cov, size = measurement(label, "coverage", lab, cid), measurement(label, "mean_set_size", lab, cid)
+    flag_list = env["shrinking_cost_flags"] if env else []
+    flags = "".join(
+        f' <span class="flag-large">⚠ {esc(fl)}</span>'
+        if fl == "large shrinking cost"
+        else f' <span class="flag">{esc(fl)}</span>'
+        for fl in flag_list
+    )
+    step = LR._next_step(env, envelope_row(label, ref, cid))
+    int8 = measurement(label, "top1", lab, cid)["value"]
+    cells = [
+        fp32,
+        ("INT8 top-1", f'<span class="mono">{f(int8, "pct")}</span>'),
+        ("Shrinking cost", value_ci(cost, "pts") + flags),
+        ("INT8 damage drop", value_ci(drop, "pts") if drop else '<span class="muted">reference</span>'),
+        (
+            "INT8 coverage",
+            f'<span class="mono">{f(cov["value"], "pct")}</span>'
+            f'<span class="sub">set size <span class="mono">{f(size["value"], "size")}</span></span>',
+        ),
+        ("INT8 state", state_cell(label, env, cause)),
+        ("Next step", esc(step) if step != "—" else '<span class="muted">—</span>'),
+    ]
+    if env is None:
+        state = '<span class="muted">reference</span>'
+    else:
+        kind, icon = KIND[env["state"]], ICON[env["state"]]
+        state = f'<span class="v-{kind}"><span aria-hidden="true">{icon}</span> {esc(env["state"])}</span>'
+    large = ' <span class="flag-large">⚠ large</span>' if "large shrinking cost" in flag_list else ""
+    return cells, f'{state} · <span class="mono">{f(cost["value"], "pts")}</span>{large}'
+
+
+def conditions_table(label: dict) -> str:
+    """Every tested condition, clean first: a table on wide screens; on phones one collapsed card per
+    condition (<details>, so no JavaScript), its summary line naming the state and the shrinking cost."""
+    lab = builds(label)[1]
     level = f(label["generated"]["ci_level"], "pct0")
     cause_of = {c: x["cause"] for x in label["summary"]["lines"] if x["cause"] for c in x["conditions"]}
-    head = [
-        "Condition",
-        "FP32 top-1",
-        "INT8 top-1",
-        f"Shrinking cost (points, {level} interval)",
-        "INT8 damage drop (points)",
-        "INT8 coverage (set size)",
-        "INT8 state",
-        "Suggested next step",
-    ]
-    rows = []
+    if lab["status"] == "failed":
+        head = ["Condition", "FP32 top-1", "INT8", "INT8 state"]
+    else:
+        head = [
+            "Condition",
+            "FP32 top-1",
+            "INT8 top-1",
+            f"Shrinking cost (points, {level} interval)",
+            "INT8 damage drop (points)",
+            "INT8 coverage (set size)",
+            "INT8 state",
+            "Suggested next step",
+        ]
+    rows, cards = [], []
     for c in label["conditions"]:
-        cid = c["condition_id"]
-        cells = [
-            td(
-                "FP32 top-1",
-                f'<span class="mono">{f(measurement(label, "top1", ref, cid)["value"], "pct")}</span>',
-            )
-        ]
-        if failed:
-            cells.append('<td colspan="4" class="muted">not measured: INT8 build failed</td>')
-            cells.append(
-                td(
-                    "INT8 state",
-                    '<span class="v-failed"><span aria-hidden="true">✕</span> INT8 build failed</span>',
-                )
-            )
-            cells.append(td("Next step", '<span class="muted">—</span>'))
-            rows.append(row(c["label"], cells))
-            continue
-        env = envelope_row(label, lab, cid)
-        cost, drop = (
-            measurement(label, "shrinking_cost", lab, cid),
-            measurement(label, "damage_drop", lab, cid),
+        cells, summary = condition_cells(label, c, cause_of.get(c["condition_id"]))
+        rows.append(row(c["label"], [td(k, v) for k, v in cells]))
+        body = "".join(f"<div><dt>{esc(k)}</dt><dd>{v}</dd></div>" for k, v in cells)
+        cards.append(
+            f'<details class="cond-card"><summary><span class="cond-name">{esc(c["label"])}</span> '
+            f'<span class="cond-line">{summary}</span></summary><dl>{body}</dl></details>'
         )
-        cov, size = measurement(label, "coverage", lab, cid), measurement(label, "mean_set_size", lab, cid)
-        flags = "".join(
-            f' <span class="flag-large">⚠ {esc(fl)}</span>'
-            if fl == "large shrinking cost"
-            else f' <span class="flag">{esc(fl)}</span>'
-            for fl in (env["shrinking_cost_flags"] if env else [])
-        )
-        step = LR._next_step(env, envelope_row(label, ref, cid))
-        cells += [
-            td(
-                "INT8 top-1",
-                f'<span class="mono">{f(measurement(label, "top1", lab, cid)["value"], "pct")}</span>',
-            ),
-            td("Shrinking cost", value_ci(cost, "pts") + flags),
-            td("INT8 damage drop", value_ci(drop, "pts") if drop else '<span class="muted">reference</span>'),
-            td(
-                "INT8 coverage",
-                f'<span class="mono">{f(cov["value"], "pct")}</span>'
-                f'<span class="sub">set size <span class="mono">{f(size["value"], "size")}</span></span>',
-            ),
-            td("INT8 state", state_cell(label, env, cause_of.get(cid))),
-            td("Next step", esc(step) if step != "—" else '<span class="muted">—</span>'),
-        ]
-        rows.append(row(c["label"], cells))
-    return table([esc(h) for h in head], rows) + f'<p class="note">{esc(LR.DAMAGE_NOTE)}</p>'
+    return (
+        f'<div class="wide-only">{table([esc(h) for h in head], rows)}</div>'
+        f'<div class="phone-only sheet cond-cards">{"".join(cards)}</div>'
+        f'<p class="note">{esc(LR.DAMAGE_NOTE)}</p>'
+    )
 
 
 def speed_section(label: dict) -> str:
@@ -798,10 +812,3 @@ def model_page(site, key: str) -> tuple:
 
 def model_pages(site) -> list:
     return [model_page(site, key) for key in site.labs]
-
-
-PAGE_TYPES = [
-    PageType("landing", None, "index.html", landing),
-    PageType("catalog", "Catalog", "models/index.html", catalog),
-    PageType("model", None, "models/index.html", model_pages),  # reached from the catalog, not the nav
-]

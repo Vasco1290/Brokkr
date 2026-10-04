@@ -3,6 +3,7 @@ and each check fails when the thing it guards is broken (made-up changes, tests 
 files (published/labels/, docs/figures/), so it runs on a fresh clone."""
 
 import copy
+import html
 import re
 import sys
 from pathlib import Path
@@ -14,6 +15,7 @@ import site_build  # noqa: E402  (web/site_build.py)
 import site_checks  # noqa: E402
 import site_labels  # noqa: E402
 import site_pages  # noqa: E402
+import site_sources  # noqa: E402
 
 import brokkr_edge  # noqa: E402
 
@@ -40,9 +42,12 @@ def test_a_fresh_build_passes_every_site_check(built):
     assert {what: p for what, p in problems_of(built).items() if p} == {}
 
 
-def test_the_pages_of_slice_a_exist(built):
+def test_every_page_exists(built):
     labs, _, pages, _ = built
     assert {"index.html", "models/index.html", MNV3L, MNV3S} <= set(pages)
+    assert {"compare/index.html", "why-labels/index.html", "methods/index.html", "roadmap/index.html"} <= set(
+        pages
+    )
     assert len([p for p in pages if p.startswith("models/") and p.count("/") == 3]) == len(labs)
 
 
@@ -52,7 +57,7 @@ def test_a_new_page_type_changes_no_existing_page_except_the_navigation(built):
     def made_up(site):  # tests only
         return [("made-up/index.html", site_pages.Page("Made up", "<p>Made up.</p>", labels=[]))]
 
-    types = [*site_pages.PAGE_TYPES, site_pages.PageType("made-up", "Made up", "made-up/index.html", made_up)]
+    types = [*site_build.PAGE_TYPES, site_pages.PageType("made-up", "Made up", "made-up/index.html", made_up)]
     pages2, files2 = site_build.build(labs, figures, COMMIT, types)
     assert set(pages2) == set(pages) | {"made-up/index.html"}
 
@@ -66,8 +71,16 @@ def test_a_new_page_type_changes_no_existing_page_except_the_navigation(built):
 
 def test_the_navigation_shows_only_pages_that_exist(built):
     nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', built[3]["index.html"], re.S).group(1)
-    assert re.findall(r">([^<]+)</a>", nav) == ["Catalog", "GitHub"]
-    assert "why-labels" not in built[3]["index.html"]  # slice B
+    assert re.findall(r">([^<]+)</a>", nav) == [
+        "Catalog",
+        "Compare",
+        "Why labels?",
+        "Methods",
+        "Roadmap",
+        "GitHub",
+    ]
+    buttons = re.findall(r'class="button" href="[^"]*">([^<]+)</a>', built[3]["index.html"])
+    assert buttons == ["Catalog", "Why labels?"]  # from the page list, not typed on the landing page
 
 
 def test_a_number_not_in_the_labels_is_caught(built):
@@ -204,3 +217,81 @@ def test_the_built_files_hold_no_path_from_this_machine(built):
     for path, text in built[3].items():
         if isinstance(text, str):
             assert "C:\\" not in text and "C:/" not in text and "Users/" not in text, path
+
+
+def test_the_landing_finding_is_the_readme_headline_word_for_word(built):
+    headline = site_sources.findings()["headline"]
+    assert headline.startswith("Consistent with prior work on quantized models")
+    assert headline.endswith("and fog hit some models too.")
+    page = built[3]["index.html"]
+    assert html.escape(headline) in page
+    assert (
+        "H21" not in page.split('class="finding-text"')[1].split("</p>")[0]
+    )  # the H21 detail is on Why labels?
+
+
+def test_why_labels_holds_the_full_findings(built):
+    page = built[3]["why-labels/index.html"]
+    fx = site_sources.findings()
+    for key in ("headline", "example", "prereg", "explore", "noise_blur"):
+        assert html.escape(fx[key]) in page, key
+    assert all(h in fx["prereg"] for h in ("H18b", "H20", "H21"))
+    for name in ("hero-shrinking-cost-wide", "grid-shrinking-cost", "mnv3l-uncertainty"):
+        assert f"{name}-light.svg" in page and f"{name}-dark.svg" in page, name
+
+
+def test_a_findings_number_that_is_in_no_source_is_caught(built):
+    files = dict(built[3])
+    assert "10,000 test images" in files["why-labels/index.html"]
+    files["why-labels/index.html"] = files["why-labels/index.html"].replace(
+        "10,000 test images", "10,500 test images"
+    )
+    assert any("10,500" in p for p in problems_of(built, files)["numbers come from the labels and figures"])
+
+
+def test_phone_condition_cards_are_collapsed_with_a_summary_line(built):
+    labs, page = built[0], built[3][MNV3L]
+    cards = re.findall(r'<details class="cond-card">(.*?)</details>', page, re.S)
+    assert len(cards) == len(labs["mobilenet_v3_large"]["conditions"])
+    assert '<details class="cond-card" open' not in page
+    flagged = labs["mobilenet_v3_large"]["summary"]["large_shrinking_cost"]["count"]
+    assert sum("⚠ large" in c.split("</summary>")[0] for c in cards) == flagged
+
+
+def test_a_failed_build_collapses_where_it_holds_up_to_one_line(built):
+    page = built[3][MNV3S]
+    env = page.split('id="envelope"')[1].split("</section>")[0]
+    assert (
+        '<details class="more failed-env"><summary>All <span class="mono">12</span> conditions: '
+        "INT8 build failed" in env
+    )
+    assert '<details class="more failed-env"' not in built[3][MNV3L]
+    assert "67.61%" in page.split('id="conditions"')[1]  # FP32 results stay visible
+
+
+def test_the_compare_table_has_one_sortable_row_per_label(built):
+    labs, page = built[0], built[3]["compare/index.html"]
+    body = page.split('class="data sortable compare-table"')[1].split("</table>")[0]
+    assert body.count("<tr>") == len(labs) + 1  # header row + one per label
+    assert "speed-ratio-light.svg" in page and "grid-shrinking-cost-light.svg" in page
+
+
+def test_the_roadmap_is_generated_without_dates(built):
+    page = built[3]["roadmap/index.html"]
+    for phase in ("Built", "Now", "Next", "Later"):
+        assert f"<h2>{phase}</h2>" in page
+    plan = site_sources.roadmap()
+    assert plan["next"] and all(
+        html.escape(s[1]) in page for k in ("built", "now", "next", "later") for s in plan[k]
+    )
+    files = dict(built[3])
+    files["roadmap/index.html"] = files["roadmap/index.html"].replace(
+        "<h2>Later</h2>", "<h2>Later (by 5 November 2026)</h2>"
+    )
+    assert problems_of(built, files)["the roadmap shows no dates"]
+
+
+def test_an_identifier_not_on_the_page_list_is_caught(built):
+    files = dict(built[3])
+    files["methods/index.html"] = files["methods/index.html"].replace("commit a957652", "commit 1234567")
+    assert problems_of(built, files)["numbers come from the labels and figures"]

@@ -3,6 +3,7 @@
    1. The theme picker (choice kept in this browser only; no tracking; default follows the system).
    2. The bench's condition keys: move the needle, update the readout (and, in the prototypes, show one
       condition's table).
+   3. Sorting the compare page's table (without it, the table stays in name order).
    The script never computes a number: every text and angle it shows was written into the page from the labels. */
 (function () {
   "use strict";
@@ -17,6 +18,41 @@
       if (v === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", v);
       try { if (v === "auto") localStorage.removeItem(KEY); else localStorage.setItem(KEY, v); } catch (e) { /* no storage: fine */ }
     });
+  }
+
+  // 3. Sortable tables (the compare page): a button in each heading sorts the rows by their cells'
+  //    data-sort values (numbers as numbers, words alphabetically; empty values, e.g. a failed build, last).
+  function sortKey(cell) { var v = cell.getAttribute("data-sort"); return v === null ? cell.textContent : v; }
+  function sortBy(table, col, th) {
+    var dir = th.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending";
+    var heads = table.tHead.rows[0].cells;
+    for (var h = 0; h < heads.length; h++) heads[h].removeAttribute("aria-sort");
+    th.setAttribute("aria-sort", dir);
+    var body = table.tBodies[0];
+    var rows = Array.prototype.slice.call(body.rows);
+    rows.sort(function (a, b) {
+      var x = sortKey(a.cells[col]), y = sortKey(b.cells[col]);
+      if (x === "" || y === "") return (x === "") - (y === "");
+      var nx = parseFloat(x), ny = parseFloat(y);
+      var c = (!isNaN(nx) && !isNaN(ny)) ? nx - ny : x.localeCompare(y);
+      return dir === "ascending" ? c : -c;
+    });
+    for (var r = 0; r < rows.length; r++) body.appendChild(rows[r]);
+  }
+  var sortables = document.querySelectorAll("table.sortable");
+  for (var s = 0; s < sortables.length; s++) {
+    (function (table) {
+      var heads = table.tHead.rows[0].cells;
+      for (var c = 0; c < heads.length; c++) {
+        (function (th, col) {
+          var b = document.createElement("button");
+          b.type = "button";
+          while (th.firstChild) b.appendChild(th.firstChild);
+          th.appendChild(b);
+          b.addEventListener("click", function () { sortBy(table, col, th); });
+        })(heads[c], c);
+      }
+    })(sortables[s]);
   }
 
   var radios = document.querySelectorAll('input[name="cond"]');

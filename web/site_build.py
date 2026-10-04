@@ -1,23 +1,27 @@
 """The website generator (Platform plan step 2; docs/website_v0_plan.md, sections 2, 5 and 12).
 
 build() reads only committed files: the released labels (published/labels/), the figures and their
-manifest (docs/figures/), the themes (web/themes.py), the stylesheet, script and fonts (web/assets/,
-web/fonts/) and the favicon (docs/assets/favicon.png). It returns every file of the site as
-{path: text or source Path}; nothing is computed that is not in a label or the figure manifest.
+manifest (docs/figures/), the README's checked findings block and ROADMAP.md (web/site_sources.py), the
+claims register (docs/claims.json), the themes (web/themes.py), the stylesheet, script and fonts
+(web/assets/, web/fonts/) and the favicon (docs/assets/favicon.png). It returns every file of the site as
+{path: text or source Path}; no number is computed here.
 
-Each page type (web/site_pages.py, PAGE_TYPES) makes its pages; this file wraps them in the shared shell:
+Each page type (PAGE_TYPES below) makes its pages; this file wraps them in the shared shell:
 header with the navigation (built from the page types, so the nav shows only pages that exist), the theme
 picker, and a footer naming the commit the site was built from, the brokkr-edge version and the label
 schema version. scripts/49_build_site.py runs it, refuses a dirty working tree, checks and writes.
 """
 
 import json
+import re
 from pathlib import Path
 
-import site_pages
+import site_pages as A
+import site_pages_more as B
+import site_sources
 import themes
 from site_labels import ROOT, label_dir, label_problems, load_labels
-from site_pages import GITHUB, Page, esc, up
+from site_pages import GITHUB, Page, PageType, esc, up
 
 import brokkr_edge
 from brokkr_edge.label_schema import SCHEMA_VERSION
@@ -33,17 +37,36 @@ THEME_BOOT = (
 )
 
 
+# The page types, in navigation order (section 12e); the nav and the landing page's buttons come from it.
+PAGE_TYPES = [
+    PageType("landing", None, "index.html", A.landing),
+    PageType("catalog", "Catalog", "models/index.html", A.catalog),
+    PageType("compare", "Compare", "compare/index.html", B.compare),
+    PageType("why-labels", "Why labels?", "why-labels/index.html", B.why_labels),
+    PageType("methods", "Methods", "methods/index.html", B.methods),
+    PageType("roadmap", "Roadmap", "roadmap/index.html", B.roadmap),
+    PageType("model", None, "models/index.html", A.model_pages),  # reached from the catalog, not the nav
+]
+
+
 class Site:
     """What every page type may read: the labels, the figure manifest and the list of page types."""
 
-    def __init__(self, labs: dict, figures: dict, page_types: list):
+    def __init__(self, labs: dict, figures: dict, page_types: list, findings: dict, claims: dict):
         self.labs = labs
         self.figures = figures
         self.page_types = {pt.key: pt for pt in page_types}
+        self.findings = findings  # the README's checked findings paragraphs (web/site_sources.py)
+        self.claims = claims  # docs/claims.json, by id
         self.copies = {}  # site path -> source file, for files a page uses (figures)
 
     def figure(self, name: str) -> dict:
         return self.figures["figures"][name]
+
+    def svg_size(self, repo_path: str) -> tuple:
+        """A committed SVG's width and height, from its own attributes."""
+        head = (ROOT / repo_path).read_text(encoding="utf-8")[:400]
+        return tuple(int(re.search(rf'{k}="(\d+)"', head).group(1)) for k in ("width", "height"))
 
     def asset(self, repo_path: str) -> str:
         """Copy a committed file (e.g. 'docs/figures/x.svg') into the site; returns its site path."""
@@ -127,8 +150,9 @@ def load_inputs() -> tuple:
 
 def build(labs: dict, figures: dict, commit: str, page_types: list = None) -> tuple:
     """Every page and file of the site. Returns (pages {path: Page}, files {path: str | Path})."""
-    page_types = page_types if page_types is not None else site_pages.PAGE_TYPES
-    site = Site(labs, figures, page_types)
+    page_types = page_types if page_types is not None else PAGE_TYPES
+    claims = {c["id"]: c for c in json.loads(CLAIMS.read_text(encoding="utf-8"))["claims"]}
+    site = Site(labs, figures, page_types, site_sources.findings(), claims)
     pages = {}
     for pt in page_types:
         for path, page in pt.make(site):
