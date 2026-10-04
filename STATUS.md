@@ -46,17 +46,36 @@ Read this first.
   page), the disclosure rules and the builder rules (refuses a dirty tree), are in
   `docs/website_v0_plan.md`, section 12, which wins over the prototypes' layout. The figures' dark
   versions now use a neutral grey (`docs/label_schema.md`, fourth note of 4 October).
-- **Step 2 task 3, the site: slice A approved by H with five fixes, and slice B built (4 October 2026),
-  on `step-2-site`, waiting for H's review of the screenshots.** `scripts/49_build_site.py` builds every
-  page (landing, catalog, the ten model pages, Compare, "Why labels?", Methods, Roadmap) from committed
-  files only (`published/labels/`, `docs/figures/`, the README's checked findings block, ROADMAP.md,
-  `docs/claims.json`) into `site_v0/` (gitignored), refuses a dirty tree, and checks numbers, meter, themes,
-  links, no-JavaScript use, footers, IDs, the finding's claim and the roadmap's lack of dates (`--check`
-  runs the checks only; `--serve` previews at http://127.0.0.1:8000/). Code in `web/site_*.py`, tests in
-  `tests/test_site.py`. Choices made while building: `docs/website_v0_plan.md`, sections 13 and 14.
-- **Next in step 2:** after H's review, the pre-public checklist (overclaiming re-read, dataset
-  commercial-use tags, claims register for the README and site text, Report 1's "Related work" line) and
-  GitHub Pages.
+- **Step 2 task 3, the site: slices A and B approved by H (4 October 2026)**, built at `0707735` on
+  `step-2-site`. `scripts/49_build_site.py` builds every page (landing, catalog, the ten model pages,
+  Compare, "Why labels?", Methods, Roadmap) from committed files only (`published/labels/`,
+  `docs/figures/`, the README's checked findings block, ROADMAP.md, `docs/claims.json`) into `site_v0/`
+  (gitignored), refuses a dirty tree, and runs its checks (`--check` checks only; `--serve` previews at
+  http://127.0.0.1:8000/). Code in `web/site_*.py`, tests in `tests/test_site.py`. Choices made while
+  building: `docs/website_v0_plan.md`, sections 13 and 14.
+- **H's decision on the findings source (4 October 2026): approved, on one condition:** a site check must
+  fail if the site's findings text differs from the README's generated findings block by even one
+  character. Not built yet (it is fix 0 below).
+- **Next session: H's fix list (4 October 2026; recorded, nothing fixed yet), in this order:**
+  0. **Findings check** (the condition above): a site check fails if any findings paragraph on the site
+     differs from the README's generated block by one character.
+  1. **Overclaim in the labels' Limits:** they say the ImageNet-C conditions were "made with the official
+     corruption code". Correct the label maker's wording to the approved description (the imagecorruptions
+     package v1.1.2 with the one-line fog fix, not directly comparable to the released ImageNet-C files),
+     remake all ten labels from a clean commit, re-release them to `published/labels/`, and regenerate the
+     site, the README blocks and the screenshots. Add a check that fails if "official" appears with
+     "ImageNet-C" or "corruption code" anywhere in the labels, the site or the README.
+  2. **Roadmap:** mark Stage 4 done in ROADMAP.md. Mark each ROADMAP.md item public or internal; the site
+     shows only public items, with plain names and no stage or step numbers, in order.
+  3. **Compare table on phones:** the model-name column fixed, the other columns scroll sideways, compact
+     rows, and a visible "scroll →" hint.
+  4. **Model pages:** human-readable speed timestamps (e.g. "3 October 2026, 07:55–08:01 UTC"); the
+     calibration thresholds move into a collapsed details section.
+- **Then slice C:** claims-register entries for every "Why labels?" paragraph; move
+  `scratch/related_work.md` into a tracked docs file; run the full pre-public checklist (licences and
+  commercial-use terms, ImageNet terms, an overclaiming re-read of every page, a git-history scan for
+  machine paths and usernames, the claims register complete) and report its results.
+- **Do not publish** (no GitHub Pages, no `gh-pages` push) until H gives the go-ahead.
 
 ### Step 1 record (3 October 2026; done, kept for the record)
 (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
