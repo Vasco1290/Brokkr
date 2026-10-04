@@ -25,7 +25,8 @@ Windows laptop (Intel Core i5-1235U, CPU only), on ImageNet test images with sim
 **Not built yet**
 
 - A package on PyPI and a quick start for your own model (roadmap steps 3 and 4).
-- The catalog website (step 2) and a hosted upload page (step 5).
+- The catalog website online (step 2): its first pages (home, catalog, one page per label) build locally
+  with `python scripts/49_build_site.py`, but the site is not published yet. A hosted upload page (step 5).
 - Object detection: Brokkr tests image classifiers only.
 - Any device other than this laptop: nothing has been measured on a Raspberry Pi or another board
   (step 6).

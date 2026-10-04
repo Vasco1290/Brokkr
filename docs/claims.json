@@ -83,6 +83,24 @@
    "prior_work": ["none cited: Brokkr's own records"],
    "command": "python scripts/47_figures.py",
    "check": "python scripts/47_figures.py --check"
+  },
+  {
+   "id": "site-finding",
+   "where": "website landing page: the two sentences under \"What we found\" (beside the hero figure, claim fig-hero)",
+   "claim": "Under darkness (Brokkr) s5, few shrunk models lost much more to shrinking than on clean images, fewer than H21 predicted (verdict FAIL); MobileNetV3-Large's shrunk build is the example: a small shrinking cost on clean images and a much larger one under that damage.",
+   "scope": {
+    "models": "every usable INT8 build of the Stage 4 (task 4.1) models judged for H21; the example is MobileNetV3-Large (percentile 99.99)",
+    "conditions": "clean and darkness (Brokkr) s5",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap (on the meter and the model page)"
+   },
+   "status": "pre-registered: H21 in docs/hypotheses_stage4.md (verdict unchanged); the counts are read from docs/figures/figures.json (hero figure values), the example from the released label",
+   "prior_work": [
+    "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968",
+    "Yaghoubi Araghi et al., 2026, Recti-Q, arXiv:2607.18540"
+   ],
+   "command": "python scripts/49_build_site.py",
+   "check": "python scripts/49_build_site.py --check"
   }
  ]
 }

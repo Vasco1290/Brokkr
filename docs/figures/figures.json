@@ -14,6 +14,7 @@
    },
    "appears_in": [
     "README.md (phones)",
+    "website: landing (phones)",
     "website: Why labels? (phones)"
    ],
    "claim_id": "fig-hero",
@@ -1036,6 +1037,7 @@
    },
    "appears_in": [
     "README.md (wide screens)",
+    "website: landing",
     "website: Why labels?",
     "Report 2"
    ],

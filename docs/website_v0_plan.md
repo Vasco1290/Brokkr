@@ -371,3 +371,32 @@ this section is the reference.
   the commit it was built from, the brokkr-edge version and the label schema version.
 - Every number a reader sees is checked against the labels (and, for the figures and the finding, the
   records), as the prototype builder and `scripts/47_figures.py` already do.
+
+## 13. Slice A as built (4 October 2026; for H's review)
+
+Slice A (asked by H on 4 October 2026): the generator, the landing page, the catalog and the ten model
+pages, with their checks. Compare, "Why labels?", Methods and Roadmap come in slice B. Built by
+`scripts/49_build_site.py` (`web/site_labels.py`, `site_meter.py`, `site_pages.py`, `site_build.py`,
+`site_checks.py`; tests in `tests/test_site.py`); the prototypes now share its label lookups, meter and
+hero picture. Choices made while building, each open to H's change:
+- **Addresses.** Each model page is at `/models/<model>/<build>/` (12d). There is no `/models/<model>/` page
+  yet (one label per model today); breadcrumbs link to the catalog.
+- **Navigation and buttons** are built from the page types, so slice A shows only Catalog, GitHub and the
+  theme picker, and the landing page has only the Catalog button; "Why labels?" appears in both when its
+  page type is added (5c, 5d).
+- **Meter keys** sit in one row inside the readout panel (the suite is named in the readout and in the
+  table shown without JavaScript), to keep the landing page short on phones. Measured at 343 px wide
+  (headless Chrome, device emulation): 2,530 px tall, about 3.1 screens of an 812 px tall phone (12e asks
+  for about three).
+- **The finding** is generated from the hero figure's values (H21, in `docs/figures/figures.json`) and the
+  MobileNetV3-Large label, in the approved wording of section 11, with the label's two-decimal shrinking
+  costs to match the meter beside it. Claims register entry: `site-finding`. The hero figure's
+  `appears_in` now lists the landing page.
+- **Model pages.** Key facts show counts only (condition lists collapsed), plus clean top-1 and file size.
+  Condition details are one table on wide screens and one card per condition below 760 px (CSS only, the
+  same markup). Speed and licence lines reuse the label's own wording (`label_render`); a slower INT8 also
+  gets a callout above the speed table. A failed build opens with a "Do not use this INT8 build" panel
+  before any number, and its catalog card is outlined in the warning colour.
+- **No-JavaScript check** (automated): no element is hidden until a script runs, and every number the
+  script can show is also on the page without it (the meter's four readings are in a plain table that
+  shows only without JavaScript).

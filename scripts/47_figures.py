@@ -195,8 +195,8 @@ def hero_figure(labs: dict) -> tuple:
         wide[theme], wide_axes = F.hero_wide(rows, v, theme)
     # Two layouts of one figure (H, 4 October 2026): the README shows the wide one on screens at least
     # 768 px wide and the narrow one on phones.
-    narrow_uses = ["README.md (phones)", "website: Why labels? (phones)"]
-    wide_uses = ["README.md (wide screens)", "website: Why labels?", "Report 2"]
+    narrow_uses = ["README.md (phones)", "website: landing (phones)", "website: Why labels? (phones)"]
+    wide_uses = ["README.md (wide screens)", "website: landing", "website: Why labels?", "Report 2"]
     return [
         (figure_entry("hero-shrinking-cost", narrow_uses, "fig-hero", 310, caption, svgs, axes, v), svgs),
         (

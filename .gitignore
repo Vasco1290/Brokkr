@@ -235,3 +235,6 @@ scratch/
 
 # Website prototypes (built from published/labels/ by web/prototypes/build_prototypes.py)
 /web/prototypes/out/
+
+# The website (built from published/labels/ and docs/figures/ by scripts/49_build_site.py)
+/site_v0/

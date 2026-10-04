@@ -6,6 +6,8 @@ panels behind tables and figures are FIXED: they depend only on whether the them
 committed SVG figures (made for those two surfaces) stay valid in every theme.
 
 Adding a theme = adding one entry to THEMES; pages, CSS and the theme picker are generated from this file.
+Besides colours, each theme's CSS block says which version of a committed figure to show (--fig-light,
+--fig-dark), from its light or dark mode.
 check() runs the automated rules: contrast (text 4.5:1, marks and controls 3:1), a theme's accent clearly
 distinct from the INT8 blue, and no theme overriding a fixed colour.
 """
@@ -102,8 +104,12 @@ def css() -> str:
     """themes.css: each theme under [data-theme], and the default for each system setting."""
 
     def block(selector, key):
+        mode = THEMES[key]["mode"]
         body = "".join(f"  --{k}: {v};\n" for k, v in tokens(key).items())
-        return f"{selector} {{\n  color-scheme: {THEMES[key]['mode']};\n{body}}}\n"
+        # Which version of a committed figure (light or dark surface) shows under this theme.
+        body += f"  --fig-light: {'block' if mode == 'light' else 'none'};\n"
+        body += f"  --fig-dark: {'block' if mode == 'dark' else 'none'};\n"
+        return f"{selector} {{\n  color-scheme: {mode};\n{body}}}\n"
 
     out = ["/* Generated from web/themes.py; never edit by hand. */\n"]
     out.append(block(":root", DEFAULT_FOR_MODE["light"]))

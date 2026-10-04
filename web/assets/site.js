@@ -1,6 +1,8 @@
-/* Brokkr website v0, design prototype. Optional enhancements only: every page works without this file.
+/* Brokkr website v0 (and the design prototypes). Optional enhancements only: every page works without
+   this file (web/site_checks.py checks that nothing is hidden until it runs).
    1. The theme picker (choice kept in this browser only; no tracking; default follows the system).
-   2. The bench's condition switches: move the needle, update the readout, show one condition's table.
+   2. The bench's condition keys: move the needle, update the readout (and, in the prototypes, show one
+      condition's table).
    The script never computes a number: every text and angle it shows was written into the page from the labels. */
 (function () {
   "use strict";

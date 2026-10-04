@@ -46,10 +46,15 @@ Read this first.
   page), the disclosure rules and the builder rules (refuses a dirty tree), are in
   `docs/website_v0_plan.md`, section 12, which wins over the prototypes' layout. The figures' dark
   versions now use a neutral grey (`docs/label_schema.md`, fourth note of 4 October).
-- **Next in step 2 (a fresh session):** the site generator, following `docs/website_v0_plan.md` sections
-  2, 3 and 12: landing, catalog, model pages, compare, "Why labels?", methods, roadmap; then the
-  pre-public checklist (overclaiming re-read, dataset commercial-use tags, claims register for the README
-  and site text, Report 1's "Related work" line) and GitHub Pages.
+- **Step 2 task 3, site generator slice A: built (4 October 2026), on `step-2-site`, waiting for H's
+  review of the screenshots.** `scripts/49_build_site.py` builds the landing page, the catalog and the ten
+  model pages from `published/labels/` and `docs/figures/` into `site_v0/` (gitignored), refuses a dirty
+  tree, and checks numbers, meter, themes, links, no-JavaScript use, footers, IDs and the finding's claim
+  (`--check` runs the checks only; `--serve` previews at http://127.0.0.1:8000/). Code in `web/site_*.py`,
+  tests in `tests/test_site.py`. Choices made while building: `docs/website_v0_plan.md`, section 13.
+- **Next in step 2:** slice B (compare, "Why labels?", methods, roadmap) after H's review of slice A; then
+  the pre-public checklist (overclaiming re-read, dataset commercial-use tags, claims register for the
+  README and site text, Report 1's "Related work" line) and GitHub Pages.
 
 ### Step 1 record (3 October 2026; done, kept for the record)
 (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
