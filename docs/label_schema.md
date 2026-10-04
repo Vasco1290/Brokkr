@@ -537,3 +537,12 @@ abbreviations, generated from the conditions; H's sentence about colour and the 
 grid stays 1000 wide: on phones people scroll it sideways (H: most readers use a wide screen).
 
 **3. The coverage and speed figures are unchanged for now** (H).
+
+## Fourth note added 4 October 2026: the dark figures' surface is a neutral grey
+
+Decided by H on 4 October 2026, with the website design (`docs/website_v0_plan.md`, section 12b). The dark
+versions of the figures use a neutral grey with no hue (`#181818`, with neutral greys for text, grid lines
+and near-floor cells) instead of GitHub's bluish dark background, so a figure looks the same on the
+website's fixed datasheet panel under every theme. The colour steps and data colours are unchanged and
+still pass the palette validator on the new surface. No value changes; `scripts/47_figures.py --check`
+passes, and `tests/test_web_themes.py` keeps the website's panels equal to the figures' surfaces.

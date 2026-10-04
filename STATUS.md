@@ -37,10 +37,19 @@ Read this first.
     (labels made at `f682e21` had recorded the SHA-256 of `brokkr_edge/model_list.json` as its CRLF
     working copy; the checkout rewrote it with LF) until pull request #5 merged the fingerprint rule and
     the remade labels.
-- **Next in step 2** (`ROADMAP.md`, step 2; plan in `docs/website_v0_plan.md`): the catalog site built
-  from the labels (browse, filter, compare, label pages, methods, "Why labels?", licences, roadmap
-  pages), the pre-public checklist (overclaiming re-read, dataset commercial-use tags, claims register
-  for the README and site text, Report 1's "Related work" line), and GitHub Pages.
+- **Step 2 task 2, website design: approved by H (4 October 2026), on `step-2-site`.** Design prototypes
+  (`web/prototypes/`, built from `published/labels/`; preview with
+  `.venv/Scripts/python.exe web/prototypes/build_prototypes.py --open`) are the visual reference: Ember
+  forge and Light themes (`web/themes.py`, checked by `tests/test_web_themes.py`), Big Shoulders Display +
+  IBM Plex Sans + IBM Plex Mono (`web/fonts/`, OFL, unmodified), the pixel-cooling hero, the bench meter,
+  the tactile condition keys and the build-ID rule. All decisions, including the site map (one job per
+  page), the disclosure rules and the builder rules (refuses a dirty tree), are in
+  `docs/website_v0_plan.md`, section 12, which wins over the prototypes' layout. The figures' dark
+  versions now use a neutral grey (`docs/label_schema.md`, fourth note of 4 October).
+- **Next in step 2 (a fresh session):** the site generator, following `docs/website_v0_plan.md` sections
+  2, 3 and 12: landing, catalog, model pages, compare, "Why labels?", methods, roadmap; then the
+  pre-public checklist (overclaiming re-read, dataset commercial-use tags, claims register for the README
+  and site text, Report 1's "Related work" line) and GitHub Pages.
 
 ### Step 1 record (3 October 2026; done, kept for the record)
 (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)

@@ -232,3 +232,6 @@ __marimo__/
 
 # Scratch notes (never results)
 scratch/
+
+# Website prototypes (built from published/labels/ by web/prototypes/build_prototypes.py)
+/web/prototypes/out/

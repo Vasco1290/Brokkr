@@ -279,3 +279,95 @@ these numbers come from the labels and records through the number test, never ty
 >
 > That is why every Brokkr label shows each tested condition separately, says whether the full-precision
 > model also fails there, and marks what was not tested. The ImageNet-C conditions were generated with the imagecorruptions package v1.1.2 (Michaelis et al., 2019, arXiv:1907.07484; an extension of the ImageNet-C code of Hendrycks & Dietterich, 2019, arXiv:1903.12261), with a one-line fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. They are not directly comparable to the released ImageNet-C files.
+
+## 12. Design decisions (H, 4 October 2026; after reviewing the prototypes)
+
+Recorded as given. Where this section differs from sections 1–9, it wins. The prototypes in
+`web/prototypes/` (built by `web/prototypes/build_prototypes.py` from `published/labels/`) are the
+approved **visual** reference: theme, type, colours, the meter and the controls. Their **page layout**
+predates the site map below (the prototype landing page still has the full results table and all
+thirteen condition keys; the prototype model page lists condition names in its key facts). For layout,
+this section is the reference.
+
+### 12a. Theme: "the forge's test bench"
+- Brokkr forges the part (shrinks the model), then measures it on the bench (the label).
+- **Shell** (landing, navigation, "Why labels?"): dark-first forge, charcoal and stone with cream text and
+  an ember accent. **Evidence** (model pages, tables, methods, compare): datasheet-crisp panels inside the
+  shell.
+- **Exactly three signature elements:**
+  1. the pixel-cooling hero: a static SVG of squares cooling from ember to stone in discrete steps (a
+     quantization metaphor);
+  2. the analog bench meter on the landing page: needle, a Nixie-style readout (styled monospace text,
+     never images) and a shaded interval band. Two zones only, small and large, split at the label's
+     large-shrinking-cost line (the one threshold the rules define). The verdict comes from the whole
+     interval and the label's own flag, never from the needle. Values come from published labels only and
+     are checked like the figures. The needle overshoots slightly and settles; with
+     `prefers-reduced-motion` it jumps;
+  3. tactile controls for choosing conditions: raised = pressable, sunken = selected, always a visible
+     border, a clear pressed state and a visible focus ring.
+- Neumorphic styling only on controls, never on content cards, tables or text. Glow only on the Nixie
+  digits. Gauges only for single headline values, always beside the exact number and its interval;
+  comparisons across models stay as bars and tables. No severity knob in v0 (only severities 3 and 5
+  were tested).
+
+### 12b. Themes and colour tokens
+- Every colour is a named CSS token, generated from `web/themes.py`; adding a theme is one new entry
+  there, with no page changes. A theme changes only the shell: backgrounds, panels, accent, glow and
+  control styling.
+- **Fixed in every theme** (they depend only on light or dark mode): the data colours (INT8 blue, FP32
+  grey, as in the figures), the verdict and warning colours (always with an icon), and the datasheet
+  panels behind tables and figures. The dark datasheet panel is a **neutral grey with no hue, `#181818`**
+  (light: white); the figures' dark versions use the same surface, so a figure looks the same under every
+  theme. `tests/test_web_themes.py` keeps the panels and data colours identical to the figures'.
+- **v0 ships Ember forge** (default for dark-mode visitors) **and Light** (default for light-mode visitors,
+  datasheet style). Brass foundry, Runic frost, Deep mine and Anvil steel follow in the week after launch.
+- Automated rules for every theme (`check()` in `web/themes.py`, run by the builder and by the test): text
+  at least 4.5:1, marks and controls at least 3:1; a theme's accent at least 15 (OKLab distance x100) from
+  the INT8 blue (written for Runic frost); no theme may override a fixed colour (so Deep mine's warnings
+  always use the fixed warning colour and icon, never its green glow).
+- A theme picker in the navigation; the choice is kept in the visitor's browser only (`localStorage`
+  inside try/catch; the site works without storage); no tracking; the default follows the system
+  light/dark setting.
+
+### 12c. Typography
+- **Big Shoulders Display** (display), **IBM Plex Sans** (body), **IBM Plex Mono** (every number and ID,
+  and the Nixie readout). All SIL Open Font License 1.1, self-hosted in `web/fonts/` with their licence
+  files; nothing is loaded from other sites. The files are unmodified copies from Google's font
+  repository: IBM Plex has the Reserved Font Name "Plex", so it is not subset or converted under that name.
+
+### 12d. Build IDs and addresses
+- **Address:** `/models/<model>/<build>/`, with `<model>` the model's name with `_` turned into `-`
+  (`mobilenet-v3-large`) and `<build>` the precision and recipe split into words (`int8-percentile-99.99`;
+  FP32: `fp32`).
+- **Build ID:** `BRK-<model code>-<precision>-<recipe code>`, generated from the address, never typed.
+  Model code: the display name split at spaces, hyphens and capitals; a plain word gives its first letter,
+  a part with digits or in capitals is kept whole without dots (MobileNetV3-Large → `MNV3L`, ConvNeXt-Tiny
+  → `CNXT`, ShuffleNetV2 x1.0 → `SNV2X10`). Recipe code: the method's first letter and its digits
+  (`P9999`); FP32 builds have none. The generator fails if two builds get the same ID or address.
+
+### 12e. Site map: one job per page
+- **Landing** (under about three phone screens): the hero; the meter with **four conditions only** (clean,
+  darkness (Brokkr) s5, fog (ImageNet-C) s3, contrast (ImageNet-C) s5) and a "see all 12 conditions" link
+  (the count generated from the labels); the hero figure with a two-sentence finding (generated from the
+  records and labels, checked like the README findings); buttons to Catalog and "Why labels?". No results
+  table on the landing page.
+- **Catalog** `/models/`: one card per model: name, build ID, clean shrinking cost with its interval,
+  large-shrinking-cost count, link to the label.
+- **Model page**: key facts show **counts only** (the condition names move into collapsed `<details>`).
+  Order: key facts → envelope groups → condition details → speed → uncertainty → licences and provenance
+  → raw label JSON, with a short in-page menu at the top.
+- **Compare**: the grid figure and a sortable table. **"Why labels?"**, **Methods** and **Roadmap** as in
+  sections 1, 1a and 9 (point 7).
+- **Navigation:** Catalog · Compare · Why labels? · Methods · Roadmap · GitHub · Theme.
+
+### 12f. Progressive disclosure
+- Details are collapsed by default with `<details>` (no JavaScript needed).
+- On phones, condition details are **one card per condition**, never a wide table.
+- Usable with JavaScript off (only the optional sorting, the theme picker and the condition switches need
+  it), keyboard accessible, no external scripts, fonts or trackers.
+
+### 12g. The site builder
+- **Refuses to build from a dirty working tree**, like the measurement scripts; every page's footer names
+  the commit it was built from, the brokkr-edge version and the label schema version.
+- Every number a reader sees is checked against the labels (and, for the figures and the finding, the
+  records), as the prototype builder and `scripts/47_figures.py` already do.
