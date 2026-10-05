@@ -55,7 +55,7 @@ def test_the_listed_changes_pass_and_are_named(sets):
     ok, line, details = run(sets)
     assert ok, (line, details)
     assert f"differing fields: none; accepted listed changes: {len(CHANGES)}" in line
-    assert [d for d in details if d.startswith("     accepted: [2026-10-05]")] == [
+    assert [d for d in details if d.startswith("     accepted: [")] == [
         f"     accepted: {C.name_of(c)}" for c in CHANGES
     ]
 
