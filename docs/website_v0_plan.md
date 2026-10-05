@@ -510,3 +510,23 @@ made while building, each open to H's change:
   **Publishing plan:** `docs/publishing_plan.md` (plan only).
 - **Datasets** carry a use tag, "research only" or "commercial use allowed" (`brokkr_edge/datasets.py`):
   both are "research only".
+
+## 17. Round 3: narrowed wording and the 404 page (6 October 2026; for H's review)
+
+H approved round 2 and decided: narrow all seven listed sentences (never strengthen), keep the five commits
+with the real author name, approve the publishing plan with a 404 page added. Choices made while building,
+each open to H's change:
+- **Wording.** The before/after of all seven is in `docs/prepublic_checklist.md` (decisions of 6 October).
+  - The same "every number" narrowing was applied where the sentence recurs: the landing page and the
+    README's rules.
+  - The tagline keeps "for small hardware" (the project's aim) and drops "find out honestly".
+  - The uncertainty sentence types no number (the register's rule); a test checks its "even get smaller"
+    against the label.
+  - `docs/stage4_story.md` holds the narrowed headline too, with a dated note of what it said before.
+- **"Pinned".** The labels were remade at `625e3de` and released again. `scripts/48_compare_labels.py`
+  against the release of 5 October: PASS, each label with the one listed change.
+- **404 page.** It reuses the landing page's pixel-cooling picture and buttons: the title "Not found", one
+  line "This page doesn't exist.", and buttons Home and Catalog. Because GitHub serves it at any missing
+  address, it alone carries `<base href="/Brokkr/">`, derived from the repository name; the published
+  address is `SITE_ADDRESS` in `web/site_build.py`. A twelfth site check covers it, and the link check
+  skips the base tag.
