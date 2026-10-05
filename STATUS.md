@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **4 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **5 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -10,7 +10,7 @@ built on branch `step-2-site` (see "Pick up here"). **Research freeze** until we
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (4 October 2026)
+### Pick up here (5 October 2026)
 Read this first.
 - **Step 1 (labels) is done:** merged into `main` by pull request #4 (merge commit `0422a8c`), tagged
   `stage-4-done` (on `790c197`). The record of how it was done is under "Step 1 record" below.
@@ -56,7 +56,17 @@ Read this first.
 - **H's decision on the findings source (4 October 2026): approved, on one condition:** a site check must
   fail if the site's findings text differs from the README's generated findings block by even one
   character. Not built yet (it is fix 0 below).
-- **Next session: H's fix list (4 October 2026; recorded, nothing fixed yet), in this order:**
+- **Round 1 (5 October 2026): fixes 0–4 below are done, waiting for H's review** on `step-2-site`
+  (commits `0b02393` code, `7910790` labels released again, `0d1117f` Compare on phones). The ten labels were
+  remade at `0b02393`; `scripts/48_compare_labels.py` against the 4 October release found only the
+  ImageNet-C limit changed (beyond commit and date). Choices made while building: `docs/website_v0_plan.md`,
+  section 15; the wording note: `docs/label_schema.md`, note of 5 October 2026. Left for slice C's
+  overclaiming re-read: ROADMAP.md's 4.1 scope and `docs/hypotheses_stage4.md` still say "the official
+  corruption code" (the hypotheses file is not edited above its outcomes).
+  Checks at `0d1117f` (5 October 2026): ruff PASS; pytest 373 passed; `scripts/22` PASS (1901 of 1901
+  records); `scripts/40` PASS (10 labels, README blocks, figures, README wording); site build PASS (10
+  checks, 16 pages). Screenshots for H: `scratch/round1/` (not committed).
+- **H's fix list (4 October 2026), in this order (done in round 1, above):**
   0. **Findings check** (the condition above): a site check fails if any findings paragraph on the site
      differs from the README's generated block by one character.
   1. **Overclaim in the labels' Limits:** they say the ImageNet-C conditions were "made with the official
@@ -71,7 +81,7 @@ Read this first.
      rows, and a visible "scroll →" hint.
   4. **Model pages:** human-readable speed timestamps (e.g. "3 October 2026, 07:55–08:01 UTC"); the
      calibration thresholds move into a collapsed details section.
-- **Then slice C:** claims-register entries for every "Why labels?" paragraph; move
+- **Then slice C (only after H has reviewed round 1):** claims-register entries for every "Why labels?" paragraph; move
   `scratch/related_work.md` into a tracked docs file; run the full pre-public checklist (licences and
   commercial-use terms, ImageNet terms, an overclaiming re-read of every page, a git-history scan for
   machine paths and usernames, the claims register complete) and report its results.
