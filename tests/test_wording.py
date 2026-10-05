@@ -5,7 +5,15 @@ import json
 from pathlib import Path
 
 from brokkr_edge.label_render import TERMS
-from brokkr_edge.wording import json_overclaims, official_overclaims, sentences
+from brokkr_edge.wording import (
+    CORRECTION_NOTE,
+    QUOTING_DOCS,
+    check_docs,
+    doc_overclaims,
+    json_overclaims,
+    official_overclaims,
+    sentences,
+)
 
 # The released labels' wording before 5 October 2026 (the limit, and the glossary line), as committed at
 # 15437fd.
@@ -58,3 +66,31 @@ def test_released_labels_and_readme_pass():
         found += json_overclaims(json.loads((folder / "label.json").read_text(encoding="utf-8")))
         found += official_overclaims((folder / "label.html").read_text(encoding="utf-8"))
     assert found == []
+
+
+def test_a_claim_wrapped_across_two_lines_is_caught():
+    assert official_overclaims("We made the ImageNet-C conditions with the official\ncorruption code.") == [
+        "We made the ImageNet-C conditions with the official corruption code."
+    ]
+    assert official_overclaims("## Official label\nImageNet-C is simulated.") == []  # a heading ends there
+
+
+def test_the_docs_pass_and_the_correction_note_is_reported():
+    problems, report = check_docs()
+    assert problems == []
+    assert report[0] == (
+        "docs/hypotheses_stage4.md: correction note of 6 October 2026 found; 1 sentence(s) above it "
+        "(pre-registered text, not edited) are not read"
+    )
+    assert all(any(line.startswith(name) for line in report) for name in QUOTING_DOCS)
+
+
+def test_only_text_above_the_correction_note_is_ignored():
+    old = "ImageNet-C conditions are made with the official corruption code."
+    note = (
+        f"{CORRECTION_NOTE}\n\nThe description quoted above, the official corruption code, is inaccurate.\n"
+    )
+    assert doc_overclaims(f"{old}\n\n{note}") == ([], True, 1)
+    below = f"{old}\n\n{note}\n## A later note\n\n{old}\n"
+    assert doc_overclaims(below) == ([old], True, 1)
+    assert doc_overclaims(old) == ([old], False, 0)  # without the note, nothing is ignored

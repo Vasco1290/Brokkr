@@ -9,7 +9,9 @@ from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
 
-# Every dataset Brokkr uses, with its licence recorded (hard rule 8).
+# Every dataset Brokkr uses, with its licence recorded (hard rule 8) and its use tagged "research only" or
+# "commercial use allowed" (ROADMAP step 2's commercial-use check, 6 October 2026).
+USES = ("research only", "commercial use allowed")
 DATASETS = {
     "imagenet-1k-val": {
         "source": "https://huggingface.co/datasets/ILSVRC/imagenet-1k (validation split)",
@@ -19,6 +21,7 @@ DATASETS = {
             "ImageNet Terms of Access: non-commercial research and educational use only. "
             "Gated download; each user must accept the terms themselves."
         ),
+        "use": "research only",  # the terms of access allow non-commercial research and education only
     },
     # Recht et al., "Do ImageNet Classifiers Generalize to ImageNet?", ICML 2019. Cite it with any result.
     "imagenetv2-matched-frequency": {
@@ -35,6 +38,8 @@ DATASETS = {
             'information." Brokkr uses the images for evaluation only; they are never shown, committed or '
             "redistributed."
         ),
+        # The images keep their Flickr owners' licences, which Brokkr has not checked one by one.
+        "use": "research only",
     },
 }
 

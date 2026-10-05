@@ -367,18 +367,59 @@ def check_ids(labs: dict) -> list:
     return [f"build IDs or addresses used twice: {sorted(dup)}"] if dup else []
 
 
-def check_claim(claims_path: Path) -> list:
+CLAIM_FIELDS = ("claim", "where", "scope", "status", "prior_work", "command", "check")
+ARXIV = re.compile(r"arXiv:(\d{4}\.\d{4,5})")
+
+
+def claim_problems(c: dict, root: Path, verified: str) -> list:
+    """What is missing from one claims-register entry: a field, a script its commands name, or a verified
+    reference (every arXiv number it cites must be in docs/related_work.md)."""
+    problems = [f"claim {c['id']}: no {k}" for k in CLAIM_FIELDS if not c.get(k)]
+    for k in ("command", "check"):
+        for token in (c.get(k) or "").split():
+            if token.endswith(".py") and not (root / token).exists():
+                problems.append(f"claim {c['id']}: its {k} names a missing script {token}")
+    for ref in c.get("prior_work") or []:
+        for number in ARXIV.findall(ref):
+            if f"arXiv:{number}" not in verified:
+                problems.append(
+                    f"claim {c['id']}: cites arXiv:{number}, which is not in docs/related_work.md"
+                )
+    return problems
+
+
+def check_claims(files: dict, claims_path: Path) -> list:
+    """The claims register covers the site (H, 6 October 2026): every findings paragraph quoted on any page
+    has an entry with its findings key, and every paragraph of the Why labels? page outside its figures and
+    notes names an entry (data-claim); each entry used is complete."""
+    root = claims_path.parents[1]
     claims = {c["id"]: c for c in json.loads(claims_path.read_text(encoding="utf-8"))["claims"]}
-    c = claims.get("site-finding")
-    if c is None:
-        return ["docs/claims.json has no entry site-finding for the landing page's finding"]
-    missing = [
-        k for k in ("claim", "where", "scope", "status", "prior_work", "command", "check") if not c.get(k)
-    ]
-    script = (c.get("command") or "").split()[1:2]
-    if missing or not script or not (claims_path.parents[1] / script[0]).exists():
-        return [f"claim site-finding is incomplete or names a missing script ({missing})"]
-    return []
+    by_findings = {c["findings"]: c for c in claims.values() if c.get("findings")}
+    verified = (root / "docs" / "related_work.md").read_text(encoding="utf-8")
+    problems, used = [], set()
+    for path, text in files.items():
+        if not (is_page(path) and isinstance(text, str)):
+            continue
+        for key, _ in QUOTE.findall(text):
+            if key not in by_findings:
+                problems.append(f"{path}: findings paragraph {key!r} has no claims-register entry")
+            else:
+                used.add(by_findings[key]["id"])
+    why = re.sub(r"<figure\b.*?</figure>", "", files["why-labels/index.html"], flags=re.S)
+    why = why.split("<article", 1)[1].split("</article>", 1)[0]
+    for tag in re.findall(r"<p\b[^>]*>", why):
+        if 'class="note"' in tag:
+            continue
+        m = re.search(r'data-claim="([^"]+)"', tag)
+        if m is None:
+            problems.append(f"why-labels/index.html: a paragraph names no claims-register entry: {tag}")
+        elif m.group(1) not in claims:
+            problems.append(f"why-labels/index.html: data-claim {m.group(1)!r} is not in docs/claims.json")
+        else:
+            used.add(m.group(1))
+    for cid in sorted(used):
+        problems += claim_problems(claims[cid], root, verified)
+    return problems
 
 
 def run_all(
@@ -398,9 +439,10 @@ def run_all(
             "every page names commit, brokkr-edge version and schema version",
             check_footer(pages, files, commit, version),
         ),
+        ("build IDs and addresses unique", check_ids(labs)),
         (
-            "build IDs and addresses unique; the finding is in the claims register",
-            check_ids(labs) + check_claim(claims),
+            "claims register: every findings paragraph and every Why labels? paragraph has a complete entry",
+            check_claims(files, claims),
         ),
         ("the roadmap shows no dates and no stage or step numbers", check_roadmap(files)),
         (

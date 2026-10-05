@@ -4,7 +4,9 @@ files (published/labels/, docs/figures/), so it runs on a fresh clone."""
 
 import copy
 import html
+import json
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -405,3 +407,82 @@ def test_an_identifier_not_on_the_page_list_is_caught(built):
     files = dict(built[3])
     files["methods/index.html"] = files["methods/index.html"].replace("commit a957652", "commit 1234567")
     assert problems_of(built, files)["numbers come from the labels and figures"]
+
+
+CLAIMS_CHECK = (
+    "claims register: every findings paragraph and every Why labels? paragraph has a complete entry"
+)
+
+
+def test_every_why_labels_paragraph_names_a_claim(built):
+    page = built[3]["why-labels/index.html"]
+    named = re.findall(r'<p\b[^>]*data-claim="([^"]+)"', page)
+    assert named == [
+        "site-finding",
+        "why-example",
+        "why-prereg",
+        "why-explore",
+        "why-noise-blur",
+        "fig-uncertainty",
+        "why-label-design",
+        "imagenet-c-method",
+    ]
+
+
+def test_a_findings_paragraph_without_a_claims_entry_is_caught(built, tmp_path):
+    labs, figures, pages, files = built
+    claims = json.loads(site_build.CLAIMS.read_text(encoding="utf-8"))
+    for c in claims["claims"]:
+        if c.get("findings") == "prereg":
+            del c["findings"]
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "claims.json").write_text(json.dumps(claims), encoding="utf-8")
+    shutil.copy(Path("docs/related_work.md"), tmp_path / "docs" / "related_work.md")
+    for script in (
+        "scripts/45_readme_findings.py",
+        "scripts/47_figures.py",
+        "scripts/39_make_labels.py",
+        "scripts/28_breadth_sweep.py",
+    ):
+        (tmp_path / script).parent.mkdir(exist_ok=True)
+        (tmp_path / script).write_text("", encoding="utf-8")
+    problems = site_checks.check_claims(files, tmp_path / "docs" / "claims.json")
+    assert [p for p in problems if "findings paragraph" in p] == [
+        "why-labels/index.html: findings paragraph 'prereg' has no claims-register entry"
+    ]
+
+
+def test_a_why_labels_paragraph_without_a_claim_is_caught(built):
+    files = dict(built[3])
+    files["why-labels/index.html"] = files["why-labels/index.html"].replace(
+        '<p data-claim="why-label-design">', "<p>"
+    )
+    assert any("names no claims-register entry" in p for p in problems_of(built, files)[CLAIMS_CHECK])
+
+
+def test_a_claim_citing_an_unverified_source_is_caught():
+    claim = {k: "x" for k in site_checks.CLAIM_FIELDS} | {
+        "id": "made-up",
+        "prior_work": ["Someone, arXiv:9999.99999"],
+    }
+    verified = Path("docs/related_work.md").read_text(encoding="utf-8")
+    assert site_checks.claim_problems(claim, Path("."), verified) == [
+        "claim made-up: cites arXiv:9999.99999, which is not in docs/related_work.md"
+    ]
+
+
+def test_the_related_work_list_comes_from_the_tracked_doc(built):
+    refs = site_sources.related_work()
+    assert [c[0] for c in refs["cited"]] == ["xiao", "recti", "kasa", "hendrycks", "michaelis"]
+    assert [c[0] for c in refs["also read"]] == ["karimov", "kasa2024", "mitchell"]
+    page = built[3]["why-labels/index.html"]
+    for key, authors, year, title, where, link in refs["cited"] + refs["also read"]:
+        entry = (
+            f'<li id="ref-{key}"><a href="{link}">{html.escape(title)}</a>. {html.escape(authors)}. {year} '
+        )
+        assert entry + f'<span class="muted">({html.escape(where)})</span>.</li>' in page
+    assert "EfficientNet-Lite" not in page  # "Site: not shown"
+    text = site_sources.RELATED_WORK.read_text(encoding="utf-8")
+    broken = text.replace("   Site: key mitchell", "   Notes: key mitchell", 1)
+    with pytest.raises(SystemExit, match="has no Site: line"):
+        site_sources.related_work(broken)

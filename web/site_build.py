@@ -1,10 +1,10 @@
 """The website generator (Platform plan step 2; docs/website_v0_plan.md, sections 2, 5 and 12).
 
 build() reads only committed files: the released labels (published/labels/), the figures and their
-manifest (docs/figures/), the README's checked findings block and ROADMAP.md (web/site_sources.py), the
-claims register (docs/claims.json), the themes (web/themes.py), the stylesheet, script and fonts
-(web/assets/, web/fonts/) and the favicon (docs/assets/favicon.png). It returns every file of the site as
-{path: text or source Path}; no number is computed here.
+manifest (docs/figures/), the README's checked findings block, ROADMAP.md and docs/related_work.md
+(web/site_sources.py), the claims register (docs/claims.json), the themes (web/themes.py), the stylesheet,
+script and fonts (web/assets/, web/fonts/) and the favicon (docs/assets/favicon.png). It returns every file
+of the site as {path: text or source Path}; no number is computed here.
 
 Each page type (PAGE_TYPES below) makes its pages; this file wraps them in the shared shell:
 header with the navigation (built from the page types, so the nav shows only pages that exist), the theme

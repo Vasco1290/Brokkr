@@ -179,36 +179,38 @@ def citation(c: tuple) -> str:
 def why_labels(site) -> list:
     path = "why-labels/index.html"
     claim = site.claims["fig-uncertainty"]["claim"]
+    refs = S.related_work()  # docs/related_work.md
     body = f"""
 <article class="prose-page">
 <header class="page-head"><h1>Why labels?</h1></header>
-<p class="lead"><strong>A normal accuracy check is not enough.</strong> {quote(site, "headline")}</p>
-<p>{quote(site, "example")}</p>
+<p class="lead" data-claim="site-finding"><strong>A normal accuracy check is not enough.</strong>
+{quote(site, "headline")}</p>
+<p data-claim="why-example">{quote(site, "example")}</p>
 {figure_block(site, path, *HERO)}
 <section aria-labelledby="prereg-h"><h2 id="prereg-h">What we predicted, and what happened</h2>
-  <p>{quote(site, "prereg")}</p></section>
+  <p data-claim="why-prereg">{quote(site, "prereg")}</p></section>
 <section aria-labelledby="explore-h"><h2 id="explore-h">Wider checks</h2>
-  <p>{quote(site, "explore")}</p>
+  <p data-claim="why-explore">{quote(site, "explore")}</p>
   {figure_block(site, path, "grid-shrinking-cost", scroll=True)}
-  <p>{quote(site, "noise_blur")}</p></section>
+  <p data-claim="why-noise-blur">{quote(site, "noise_blur")}</p></section>
 <section aria-labelledby="unc-h"><h2 id="unc-h">The "I'm not sure" signal</h2>
-  <p>{esc(claim)}</p>
+  <p data-claim="fig-uncertainty">{esc(claim)}</p>
   {figure_block(site, path, "mnv3l-uncertainty")}</section>
 <section aria-labelledby="label-h"><h2 id="label-h">What a label does about it</h2>
-  <p>That is why every Brokkr label shows each tested condition separately, says whether the
-  full-precision model also fails there, and marks what was not tested. See the
+  <p data-claim="why-label-design">That is why every Brokkr label shows each tested condition separately,
+  says whether the full-precision model also fails there, and marks what was not tested. See the
   <a href="{up(path)}models/index.html">catalog</a>, and how each number is measured on the
   <a href="{up(path)}methods/index.html">methods page</a>.</p>
-  <p>{esc(IMAGENET_C)}</p></section>
+  <p data-claim="imagenet-c-method">{esc(IMAGENET_C)}</p></section>
 <section aria-labelledby="refs-h"><h2 id="refs-h">Related work</h2>
   <p class="note">Cited on this page; each checked on its own page (title, authors, year) on
   3 October 2026.</p>
-  <ul class="refs">{"".join(citation(c) for c in S.CITATIONS)}</ul>
+  <ul class="refs">{"".join(citation(c) for c in refs["cited"])}</ul>
   <p class="note">Also read, not cited above:</p>
-  <ul class="refs">{"".join(citation(c) for c in S.FURTHER)}</ul></section>
+  <ul class="refs">{"".join(citation(c) for c in refs["also read"])}</ul></section>
 </article>"""
     words = dict(IMAGENET_C_WORDS)
-    for c in S.CITATIONS + S.FURTHER:
+    for c in refs["cited"] + refs["also read"]:
         words.update({c[2]: "citation year", c[4]: "citation (arXiv number, venue)", c[5]: "citation link"})
     words["3 October 2026"] = "the date the citations were checked"
     page = Page(

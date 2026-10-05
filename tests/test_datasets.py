@@ -157,3 +157,11 @@ def test_every_dataset_has_a_licence():
     from brokkr_edge.datasets import DATASETS
 
     assert all(spec.get("licence") for spec in DATASETS.values())  # hard rule 8
+
+
+def test_every_dataset_has_a_licence_and_a_use_tag():
+    from brokkr_edge.datasets import DATASETS, USES
+
+    for name, spec in DATASETS.items():
+        assert spec["licence"] and spec["use"] in USES, name
+    assert DATASETS["imagenet-1k-val"]["use"] == "research only"

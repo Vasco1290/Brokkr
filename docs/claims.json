@@ -1,9 +1,12 @@
 {
- "about": "Brokkr's claims register (decided by H, 3 October 2026; started 4 October 2026 with the figures). Every public claim lists its scope, whether it was pre-registered or exploratory, the prior work it is consistent with (verified references only), the command that produces it and the command that checks it. Numbers are never typed here: they live in the generated figures and docs/figures/figures.json, which the check command verifies against the records. No claim of being first.",
+ "about": "Brokkr's claims register (decided by H, 3 October 2026; started 4 October 2026 with the figures). Every public claim lists its scope, whether it was pre-registered or exploratory, the prior work it is consistent with (verified references only), the command that produces it and the command that checks it. Numbers are never typed here: they live in the generated figures and docs/figures/figures.json, and in the README's generated findings block, which the check commands verify against the records. No claim of being first. Every paragraph of the website's Why labels? page names its entry (data-claim on the page), and every findings paragraph quoted on the site has an entry with its findings key; web/site_checks.py fails otherwise (H, 6 October 2026).",
  "claims": [
   {
    "id": "fig-hero",
-   "figure": ["hero-shrinking-cost", "hero-shrinking-cost-wide"],
+   "figure": [
+    "hero-shrinking-cost",
+    "hero-shrinking-cost-wide"
+   ],
    "claim": "Under darkness (Brokkr) s5, shrinking costs some models much more than it does on clean images, while others lose about as much as on clean images; H21's prediction that at least half of the models would show a large extra gap failed.",
    "scope": {
     "models": "every usable INT8 build of the Stage 4 (task 4.1) models, percentile 99.99 recipe; MobileNetV3-Small left out (its INT8 build failed)",
@@ -52,7 +55,8 @@
     "Kasa and Taylor, 2023, Empirically Validating Conformal Prediction on Modern Vision Architectures Under Distribution Shift and Long-tailed Data, arXiv:2307.01088"
    ],
    "command": "python scripts/47_figures.py",
-   "check": "python scripts/47_figures.py --check"
+   "check": "python scripts/47_figures.py --check",
+   "where": "Why labels? page: the paragraph under \"The 'I'm not sure' signal\", above its figure"
   },
   {
    "id": "fig-clean-accuracy",
@@ -65,7 +69,9 @@
     "intervals": "95% bootstrap, each build on its own (not paired)"
    },
    "status": "Stage 1 and Stage 3 records; the percentile recipe was chosen on the tuning split and judged on the test split (H10, docs/hypotheses_stage3.md)",
-   "prior_work": ["none cited: Brokkr's own records"],
+   "prior_work": [
+    "none cited: Brokkr's own records"
+   ],
    "command": "python scripts/47_figures.py",
    "check": "python scripts/47_figures.py --check"
   },
@@ -80,7 +86,9 @@
     "intervals": "none; spread across sessions is shown as the unstable mark"
    },
    "status": "measured by the latency method fixed in dated notes before measuring; a relative comparison on one laptop CPU only",
-   "prior_work": ["none cited: Brokkr's own records"],
+   "prior_work": [
+    "none cited: Brokkr's own records"
+   ],
    "command": "python scripts/47_figures.py",
    "check": "python scripts/47_figures.py --check"
   },
@@ -100,7 +108,117 @@
     "Yaghoubi Araghi et al., 2026, Recti-Q, arXiv:2607.18540"
    ],
    "command": "python scripts/45_readme_findings.py",
+   "check": "python scripts/45_readme_findings.py --check",
+   "findings": "headline"
+  },
+  {
+   "id": "why-example",
+   "findings": "example",
+   "where": "Why labels? page: the second paragraph (README findings, \"For example\")",
+   "claim": "MobileNetV3-Large's shrunk build loses little to shrinking on clean images but much more under darkness (Brokkr) s5.",
+   "scope": {
+    "models": "MobileNetV3-Large, FP32 and INT8 (percentile 99.99)",
+    "conditions": "clean and darkness (Brokkr) s5",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap (on the label; the paragraph gives the values only)"
+   },
+   "status": "measured, an illustration: the model is picked by a fixed rule in scripts/45_readme_findings.py (of the two models with a large extra gap in H20 and H21, the one with the smaller clean shrinking cost); its numbers are the label's. Text generated from the 4.1 records and the labels by scripts/45_readme_findings.py into README.md (approved wording, check 4 of 3 October 2026) and quoted word for word by the site",
+   "prior_work": [
+    "none cited: Brokkr's own records"
+   ],
+   "command": "python scripts/45_readme_findings.py",
    "check": "python scripts/45_readme_findings.py --check"
+  },
+  {
+   "id": "why-prereg",
+   "findings": "prereg",
+   "where": "Why labels? page: \"What we predicted, and what happened\"",
+   "claim": "The two pre-registered collapse predictions (H20 at contrast (ImageNet-C) s3, H21 at darkness (Brokkr) s5) failed: fewer models than predicted lost much more to shrinking under the damage than on clean images; clean accuracy and the shrinking cost under damage showed no strong relation (H18b passed; a weak test with few models).",
+   "scope": {
+    "models": "the Stage 4 (task 4.1) models: every usable INT8 build (percentile 99.99); MobileNetV3-Small left out (its INT8 build failed)",
+    "conditions": "darkness (Brokkr) s5 (H21), contrast (ImageNet-C) s3 (H20), H18b's judged conditions",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap; rank correlation with a bootstrap interval over models (H18b)"
+   },
+   "status": "pre-registered: H18b, H20 and H21 in docs/hypotheses_stage4.md (verdicts unchanged). Text generated from the 4.1 records and the labels by scripts/45_readme_findings.py into README.md (approved wording, check 4 of 3 October 2026) and quoted word for word by the site",
+   "prior_work": [
+    "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968",
+    "Yaghoubi Araghi et al., 2026, Recti-Q, arXiv:2607.18540"
+   ],
+   "command": "python scripts/45_readme_findings.py",
+   "check": "python scripts/45_readme_findings.py --check"
+  },
+  {
+   "id": "why-explore",
+   "findings": "explore",
+   "where": "Why labels? page: \"Wider checks\", first paragraph",
+   "claim": "Across the damaged conditions on the labels, most usable shrunk builds have at least one condition with a large shrinking cost, including models beyond the two the pre-registered tests named; contrast (ImageNet-C) s5 hits the most models.",
+   "scope": {
+    "models": "the Stage 4 (task 4.1) models: every usable INT8 build (percentile 99.99); MobileNetV3-Small left out (its INT8 build failed)",
+    "conditions": "the damaged conditions on the labels (Brokkr's own and ImageNet-C, named separately)",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap; large = the whole interval below the label's large-cost line (adopted after the results existed)"
+   },
+   "status": "exploratory, not pre-registered. Text generated from the 4.1 records and the labels by scripts/45_readme_findings.py into README.md (approved wording, check 4 of 3 October 2026) and quoted word for word by the site",
+   "prior_work": [
+    "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968",
+    "Hendrycks and Dietterich, 2019, Benchmarking Neural Network Robustness to Common Corruptions and Perturbations, arXiv:1903.12261"
+   ],
+   "command": "python scripts/45_readme_findings.py",
+   "check": "python scripts/45_readme_findings.py --check"
+  },
+  {
+   "id": "why-noise-blur",
+   "findings": "noise_blur",
+   "where": "Why labels? page: \"Wider checks\", second paragraph (below the grid figure)",
+   "claim": "Large shrinking costs were much more common under darkness, fog and low contrast than under noise and blur; the median build's extra loss stayed under the large-cost line in every condition but contrast (ImageNet-C) s5; impulse noise, which prior work found hit quantized models most, was not tested.",
+   "scope": {
+    "models": "the Stage 4 (task 4.1) models: every usable INT8 build (percentile 99.99); MobileNetV3-Small left out (its INT8 build failed)",
+    "conditions": "the damaged conditions on the labels, grouped as darkness, fog and low contrast vs noise and blur; near-floor cells left out (as in 4.1)",
+    "data": "ImageNet-1k validation, test split; one laptop CPU (ONNX Runtime)",
+    "intervals": "95% paired bootstrap (the extra gap of task 4.1)"
+   },
+   "status": "exploratory, not pre-registered. Text generated from the 4.1 records and the labels by scripts/45_readme_findings.py into README.md (approved wording, check 4 of 3 October 2026) and quoted word for word by the site",
+   "prior_work": [
+    "Xiao et al., 2023, Benchmarking the Robustness of Quantized Models, arXiv:2304.03968"
+   ],
+   "command": "python scripts/45_readme_findings.py",
+   "check": "python scripts/45_readme_findings.py --check"
+  },
+  {
+   "id": "why-label-design",
+   "where": "Why labels? page: \"What a label does about it\", first paragraph",
+   "claim": "Every Brokkr label shows each tested condition separately, says whether the full-precision model also fails there, and marks what was not tested.",
+   "scope": {
+    "models": "every label in published/labels",
+    "conditions": "every condition on each label",
+    "data": "the label format, docs/label_schema.md (schema version 1)",
+    "intervals": "not applicable (a description of the label format)"
+   },
+   "status": "a description of the label format; the schema validator checks every released label (per-condition envelope rows for both builds, FP32's state beside INT8's, \"not tested\" for conditions not run)",
+   "prior_work": [
+    "Mitchell et al., 2019, Model Cards for Model Reporting, arXiv:1810.03993"
+   ],
+   "command": "python scripts/39_make_labels.py",
+   "check": "python -m pytest tests/test_published_labels.py"
+  },
+  {
+   "id": "imagenet-c-method",
+   "where": "Why labels? page: \"What a label does about it\", second paragraph; the Methods page, \"Test conditions\"",
+   "claim": "The ImageNet-C conditions were generated with the imagecorruptions package v1.1.2 with a one-line fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog; they are not directly comparable to the released ImageNet-C files.",
+   "scope": {
+    "models": "all (a method statement)",
+    "conditions": "the eight ImageNet-C conditions (fog, contrast, defocus blur, Gaussian noise at severities 3 and 5)",
+    "data": "the 224x224 test pictures after each model's own resize and crop",
+    "intervals": "not applicable"
+   },
+   "status": "a method statement; corrected on 5 October 2026 (docs/label_schema.md, note of 5 October 2026); the vendored copy and its one-line diff are in brokkr_edge/third_party/imagecorruptions",
+   "prior_work": [
+    "Michaelis et al., 2019, Benchmarking Robustness in Object Detection: Autonomous Driving when Winter is Coming, arXiv:1907.07484",
+    "Hendrycks and Dietterich, 2019, Benchmarking Neural Network Robustness to Common Corruptions and Perturbations, arXiv:1903.12261"
+   ],
+   "command": "python scripts/28_breadth_sweep.py",
+   "check": "python -m pytest tests/test_imagenet_c.py"
   }
  ]
 }

@@ -7,8 +7,9 @@
 - roadmap(): ROADMAP.md's public stages and Platform plan steps with their status marks, and its public
   "Later versions" items, under plain names without stage or step numbers or dates (H, 3 and 4 October
   2026). Each item is marked public or internal in ROADMAP.md; an unmarked item stops the build.
-- CITATIONS: the related work cited on the site, as verified on each source's own page on 3 October 2026
-  (scratch/related_work.md; not committed yet). Bibliographic facts only, no claims about the papers.
+- related_work(): the related work shown on the site, read from docs/related_work.md (verified on each
+  source's own page on 3 October 2026; tracked since 6 October 2026): title, authors and year from each
+  entry's first line, key, venue and link from its "Site:" line. Bibliographic facts only, no claims.
 """
 
 import re
@@ -124,75 +125,31 @@ def roadmap(text: str | None = None) -> dict:
 
 # ---- related work ----
 
-CITATIONS = [  # (key, authors, year, title, where, link)
-    (
-        "xiao",
-        "Yisong Xiao, Tianyuan Zhang, Shunchang Liu, Haotong Qin",
-        "2023",
-        "Benchmarking the Robustness of Quantized Models",
-        "arXiv:2304.03968; CVPR 2023 workshop",
-        "https://arxiv.org/abs/2304.03968",
-    ),
-    (
-        "recti",
-        "Hamidreza Yaghoubi Araghi, Parastoo Pilevar, Ming C. Lin",
-        "2026",
-        "Recti-Q: Feature-Space Rectification for Out-of-Distribution-Robust Quantized Perception in Edge "
-        "Robotics",
-        "arXiv:2607.18540",
-        "https://arxiv.org/abs/2607.18540",
-    ),
-    (
-        "kasa",
-        "Kevin Kasa, Graham W. Taylor",
-        "2023",
-        "Empirically Validating Conformal Prediction on Modern Vision Architectures Under Distribution Shift "
-        "and Long-tailed Data",
-        "arXiv:2307.01088",
-        "https://arxiv.org/abs/2307.01088",
-    ),
-    (
-        "hendrycks",
-        "Dan Hendrycks, Thomas Dietterich",
-        "2019",
-        "Benchmarking Neural Network Robustness to Common Corruptions and Perturbations",
-        "arXiv:1903.12261; ICLR 2019",
-        "https://arxiv.org/abs/1903.12261",
-    ),
-    (
-        "michaelis",
-        "Claudio Michaelis, Benjamin Mitzkus, Robert Geirhos, Evgenia Rusak, Oliver Bringmann, "
-        "Alexander S. Ecker, Matthias Bethge, Wieland Brendel",
-        "2019",
-        "Benchmarking Robustness in Object Detection: Autonomous Driving when Winter is Coming",
-        "arXiv:1907.07484",
-        "https://arxiv.org/abs/1907.07484",
-    ),
-]
-FURTHER = [  # verified too, not cited in the text: listed by title only
-    (
-        "karimov",
-        "Toghrul Karimov, Hassan Imani, Allan Kazakov",
-        "2025",
-        "Quantization Robustness to Input Degradations for Object Detection",
-        "arXiv:2508.19600",
-        "https://arxiv.org/abs/2508.19600",
-    ),
-    (
-        "kasa2024",
-        "Kevin Kasa, Zhiyu Zhang, Heng Yang, Graham W. Taylor",
-        "2024",
-        "Adapting Prediction Sets to Distribution Shifts Without Labels",
-        "arXiv:2406.01416; UAI 2025",
-        "https://arxiv.org/abs/2406.01416",
-    ),
-    (
-        "mitchell",
-        "Margaret Mitchell, Simone Wu, Andrew Zaldivar, Parker Barnes, Lucy Vasserman, Ben "
-        "Hutchinson, Elena Spitzer, Inioluwa Deborah Raji, Timnit Gebru",
-        "2019",
-        "Model Cards for Model Reporting",
-        "arXiv:1810.03993; FAT* 2019",
-        "https://arxiv.org/abs/1810.03993",
-    ),
-]
+RELATED_WORK = ROOT / "docs" / "related_work.md"
+ENTRY = re.compile(r"^\d+\. \*\*(?P<title>.+?)\.\*\* (?P<authors>.+?)\. (?P<year>\d{4}) \(")
+SITE_LINE = re.compile(
+    r"Site: key (?P<key>\S+) · (?P<shown>cited|also read) · where (?P<where>.+?) · link (?P<link>\S+)$"
+)
+
+
+def related_work(text: str | None = None) -> dict:
+    """{"cited": [...], "also read": [...]}: (key, authors, year, title, where, link) for every entry of
+    docs/related_work.md that the site shows, in the file's order. Title, authors and year come from the
+    entry's first line, the rest from its "Site:" line; an entry without a readable "Site:" line stops the
+    build ("Site: not shown" leaves it off the site)."""
+    text = RELATED_WORK.read_text(encoding="utf-8") if text is None else text
+    out = {"cited": [], "also read": []}
+    for block in re.split(r"\n(?=\d+\. \*\*)", text)[1:]:
+        lines = [x.strip() for x in block.split("\n\n")[0].splitlines()]
+        site = next((x for x in lines if x.startswith("Site:")), None)
+        if site is None:
+            raise SystemExit(f"FAIL: docs/related_work.md entry has no Site: line: {lines[0]!r}")
+        if site.startswith("Site: not shown"):
+            continue
+        entry, s = ENTRY.match(" ".join(x for x in lines if not x.startswith("Site:"))), SITE_LINE.match(site)
+        if entry is None or s is None:
+            raise SystemExit(f"FAIL: docs/related_work.md entry cannot be read: {lines[0]!r}")
+        out[s["shown"]].append(
+            (s["key"], entry["authors"], entry["year"], entry["title"], s["where"], s["link"])
+        )
+    return out

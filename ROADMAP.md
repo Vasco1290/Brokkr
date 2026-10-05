@@ -193,8 +193,9 @@ tuning images, two models, three conditions).
 - **Conditions** (test split, 10,000 images, 13 in all): clean; Brokkr's own fog 3, darkness 5,
   defocus blur 3, noise 3; ImageNet-C fog, contrast, defocus blur and Gaussian noise at severities 3
   and 5.
-- **ImageNet-C option:** generated on our test split with the official corruption code (the
-  `imagecorruptions` package). The 8 conditions are listed in the hypotheses file. **Before 4.1
+- **ImageNet-C option:** generated on our test split with the `imagecorruptions` package (v1.1.2, an
+  extension of the ImageNet-C code, with a one-line fix so that fog runs on NumPy 2; wording corrected on
+  6 October 2026, see `docs/label_schema.md`, note of 5 October 2026). The 8 conditions are listed in the hypotheses file. **Before 4.1
   starts:** confirm the package's licence (and its dependencies'), that it installs cleanly with our
   numpy / scikit-image versions, and that its outputs look correct on 5 sample images. Any difference
   from the released ImageNet-C files (for example how they were saved) is recorded, and our numbers

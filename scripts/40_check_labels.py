@@ -30,7 +30,9 @@ For each label, independently of the code that made it:
 Then, once: the README's label example and its Stage 4 findings equal a fresh render of their labels and
 records (scripts/41_readme_label_example.py --check, scripts/45_readme_findings.py --check), and the figures
 in docs/figures/ pass scripts/47_figures.py --check (up to date, values, positions, stray numbers, claims),
-and no README sentence says "official" with ImageNet-C or corruption code.
+and no sentence in the README or the docs says "official" with ImageNet-C or corruption code
+(brokkr_edge.wording.check_docs: the text above docs/hypotheses_stage4.md's correction note of 6 October 2026
+is pre-registered and not read, and the note is reported).
 """
 
 import argparse
@@ -57,7 +59,7 @@ from brokkr_edge.label_schema import check_label
 from brokkr_edge.model_list import load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
 from brokkr_edge.schema import MIN_AGREEMENT_WITH_FP32, check_build_record
-from brokkr_edge.wording import json_overclaims, official_overclaims
+from brokkr_edge.wording import check_docs, json_overclaims, official_overclaims
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--labels", default="labels")
@@ -321,10 +323,10 @@ for command in (
     readme = subprocess.run([sys.executable, *command], capture_output=True, text=True)
     print((readme.stdout + readme.stderr).strip())
     all_ok &= readme.returncode == 0
-overclaims = official_overclaims(Path("README.md").read_text(encoding="utf-8"))
+overclaims, report = check_docs()
 print(
-    f"{'PASS' if not overclaims else 'FAIL'}: README.md: no sentence says \"official\" with ImageNet-C or "
-    "corruption code" + "".join(f"\n     {s!r}" for s in overclaims)
+    f"{'PASS' if not overclaims else 'FAIL'}: README.md and the docs: no sentence says \"official\" with "
+    "ImageNet-C or corruption code" + "".join(f"\n     {line}" for line in report + overclaims)
 )
 all_ok &= not overclaims
 print(f"\n{'PASS' if all_ok else 'FAIL'}: {len(folders)} labels in {args.labels}")
