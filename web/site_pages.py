@@ -774,7 +774,7 @@ def provenance_section(label: dict) -> str:
         + "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
         + "</dl>"
         + table(["Build", "Role", "File size", "SHA-256", "Status"], build_rows)
-        + f"<h3>Limits</h3>{bullets(label['limits'])}"
+        + f'<h3 id="limits">Limits</h3>{bullets(label["limits"])}'
         + '<details class="more"><summary>Source files and their fingerprints</summary>'
         f'<ul class="notes">{sources}</ul></details>'
     )

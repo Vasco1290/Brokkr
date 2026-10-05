@@ -9,9 +9,9 @@
   },
   "generated": {
     "by": "brokkr-edge 0.0.1",
-    "commit": "6a6ac0ddf54afc7091b4bafd2d0416384968138e",
+    "commit": "0b0239354e439a6456739c84b2c05430fa211f50",
     "dirty": false,
-    "date_utc": "2026-10-03T20:07:24+00:00",
+    "date_utc": "2026-10-05T09:41:13+00:00",
     "ci_level": 0.95,
     "label_licence": "CC BY 4.0",
     "envelope_rule": "reliability envelope, version 1"
@@ -3445,7 +3445,7 @@
   },
   "limits": [
     "The damage is simulated (Brokkr's own and ImageNet-C corruptions); real fog, darkness or noise may affect the model differently.",
-    "The ImageNet-C conditions were made with the official corruption code on these test images, with fixed seeds and each model's own preprocessing, so they are not directly comparable to published ImageNet-C results.",
+    "The ImageNet-C conditions were made on these test images with the imagecorruptions package v1.1.2 (an extension of the ImageNet-C code), with a one-line fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and each model's own preprocessing were used, so the results are not directly comparable to the released ImageNet-C files or to published ImageNet-C results.",
     "Measured on one machine: 12th Gen Intel(R) Core(TM) i5-1235U, Windows 11.",
     "With 12 conditions, an occasional result may cross a line by chance.",
     "Coverage is for prediction sets tuned on clean calibration images; under damage there is no coverage promise, and the label shows what was measured.",

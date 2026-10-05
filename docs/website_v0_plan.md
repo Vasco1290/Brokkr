@@ -442,3 +442,44 @@ asked for slice B. Built on `step-2-site`; choices made while building, each ope
 - **Number check tightened:** a number with thousands separators ("10,000") is one number, so a changed
   "10,500" is caught (before, its two parts were each allowed). Identifiers with digits on a page
   (commits, citations, step names) are listed per page, each with its reason.
+
+## 15. Round 1 of the next session: H's fixes 0–4 (5 October 2026; for H's review)
+
+H's fix list of 4 October 2026, done in this order on `step-2-site`; choices made while building, each open
+to H's change:
+- **0. Findings check.** Every findings paragraph a page quotes sits in a marked element
+  (`<span class="quote" data-findings="<key>">`). A new site check reads README.md on its own (not through
+  `web/site_sources.py`, which the pages use) and fails if a marked paragraph is not exactly one paragraph of
+  the generated findings block. Only line breaks and repeated spaces are read as one space (neither Markdown
+  nor HTML shows them); every other character must match. It also fails if a page that quotes the findings
+  shows no marked paragraph, or a page that does not quote them shows one. Tests: one changed character,
+  one changed digit, one missing letter, a changed README and a missing marker are each caught.
+- **1. ImageNet-C wording.** The labels' limit and the label glossary no longer say "official" (dated note
+  of 5 October 2026 in `docs/label_schema.md`). The ten labels were remade at the clean commit `0b02393`,
+  passed `scripts/40_check_labels.py`, and were released again. `scripts/48_compare_labels.py` against the
+  4 October release found one difference per label beyond the commit and date: `limits/1`, the ImageNet-C
+  sentence. `brokkr_edge.wording` holds the check. It is run by `scripts/40` (labels and README), the site
+  build (every page and raw label) and `tests/test_wording.py`. A sentence ends at ". ", a line break or an
+  HTML tag, so "Official label" in one list item and "ImageNet-C" in another are not one sentence. The same
+  wording was also corrected in two code notes and the vendored package's `CHANGES.md`.
+  Left for slice C's overclaiming re-read (not changed here): ROADMAP.md's 4.1 scope says "the official
+  corruption code", and `docs/hypotheses_stage4.md` (pre-registered, never edited above its outcomes) says
+  the same.
+- **2. Roadmap.** Stage 4 is marked done, with a note naming what stays open and where it moved. Every
+  stage, Platform plan step and "Later versions" item in ROADMAP.md ends with a hidden mark,
+  `<!-- public -->` or `<!-- internal -->`. A public mark may carry a plain name
+  (`<!-- public: A minimal EEG/EMG pack -->`); without one, the name is the heading without its number. The
+  site shows public items only, in file order, with no "Step N" labels. The build stops on an unmarked item,
+  or on a public name holding a stage, step or task number or a plan code; the roadmap page check also fails
+  on such a number. Marked internal: Stages 5–7 (their content is in "Later versions"), 4.1's summary tables
+  script, Report 1's related work, the Stage 3 cache rebuild and the parked research questions. Stage 4's
+  public name is "The study across ten models", because its "recommendations" were not built.
+- **3. Compare on phones.** The model column stays fixed while the other columns scroll under it, with a
+  thin line at its edge. Below 760 px, rows are one line each (intervals and sub-lines inline, smaller text
+  and padding) and headings wrap. A "scroll →" hint shows above the table on screens under 960 px.
+- **4. Model pages.** The speed timing note reads "Timed on 3 October 2026, 07:55–08:01 UTC", to the minute,
+  with the exact times from `label.json` on hover. A window that crosses midnight names both dates. The
+  number check allows the window only as `web/site_labels.readable_window` writes it from that label's own
+  times. The conformal thresholds moved out of the coverage table into a collapsed "Calibration thresholds
+  (conformal)" section, with their calibration image counts. The model page's Limits heading has an anchor
+  (`#limits`).
