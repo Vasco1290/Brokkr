@@ -15,6 +15,7 @@ from site_pages import (
     f,
     figure_block,
     hover,
+    quote,
     table,
     up,
     value_ci,
@@ -145,6 +146,7 @@ def compare(site) -> list:
   laptop latency ({esc(hw["cpu_model"])}, {esc(hw["os"])}), never the speed of an edge device. Select a
   column heading to sort; without JavaScript the table stays in name order.</p>
 </header>
+<p class="scroll-hint" aria-hidden="true">scroll →</p>
 <div class="sheet scroll compare-wrap">
   <table class="data sortable compare-table"><thead><tr>
   {"".join(f'<th scope="col">{h}</th>' for h in head)}</tr>
@@ -176,20 +178,19 @@ def citation(c: tuple) -> str:
 
 def why_labels(site) -> list:
     path = "why-labels/index.html"
-    fx = site.findings
     claim = site.claims["fig-uncertainty"]["claim"]
     body = f"""
 <article class="prose-page">
 <header class="page-head"><h1>Why labels?</h1></header>
-<p class="lead"><strong>A normal accuracy check is not enough.</strong> {esc(fx["headline"])}</p>
-<p>{esc(fx["example"])}</p>
+<p class="lead"><strong>A normal accuracy check is not enough.</strong> {quote(site, "headline")}</p>
+<p>{quote(site, "example")}</p>
 {figure_block(site, path, *HERO)}
 <section aria-labelledby="prereg-h"><h2 id="prereg-h">What we predicted, and what happened</h2>
-  <p>{esc(fx["prereg"])}</p></section>
+  <p>{quote(site, "prereg")}</p></section>
 <section aria-labelledby="explore-h"><h2 id="explore-h">Wider checks</h2>
-  <p>{esc(fx["explore"])}</p>
+  <p>{quote(site, "explore")}</p>
   {figure_block(site, path, "grid-shrinking-cost", scroll=True)}
-  <p>{esc(fx["noise_blur"])}</p></section>
+  <p>{quote(site, "noise_blur")}</p></section>
 <section aria-labelledby="unc-h"><h2 id="unc-h">The "I'm not sure" signal</h2>
   <p>{esc(claim)}</p>
   {figure_block(site, path, "mnv3l-uncertainty")}</section>
@@ -347,38 +348,26 @@ def roadmap(site) -> list:
     path = "roadmap/index.html"
     plan = S.roadmap()
 
-    def item(step):
-        number, title, _ = step
-        return f"<li>{f'<span class=step>Step {esc(number)}</span> ' if number else ''}{esc(title)}</li>"
-
     def block(key, title, note):
-        items = "".join(item(s) for s in plan[key])
+        items = "".join(f"<li>{esc(name)}</li>" for name in plan[key])
         head = f'<section class="phase phase-{key}"><h2>{title}</h2><p class="note">{note}</p>'
         return f"{head}<ul>{items}</ul></section>"
 
     body = f"""
 <article class="prose-page">
 <header class="page-head"><h1>Roadmap</h1>
-<p class="lead">What exists, what is being built, and what comes after. Generated from ROADMAP.md, without
-dates; the platform steps are built in order, each finished before the next starts.</p></header>
+<p class="lead">What exists, what is being built, and what comes after, in order. Generated from the items
+ROADMAP.md marks public, without dates; each step is finished before the next starts.</p></header>
 <div class="phases">
 {block("built", "Built", "Marked done in ROADMAP.md.")}
 {block("now", "Now", "In progress.")}
-{block("next", "Next", "The next platform step.")}
-{block("later", "Later", "The remaining platform steps, in order.")}
+{block("next", "Next", "The next step.")}
+{block("later", "Later", "The remaining steps, in order.")}
 </div>
 <section aria-labelledby="lv-h"><h2 id="lv-h">Later versions</h2>
   <p class="note">Planned, not scheduled.</p>
   <ul class="notes">{"".join(f"<li>{esc(x)}</li>" for x in plan["later_versions"])}</ul></section>
 </article>"""
-    words = {
-        f"Step {s[0]}": "a platform step's number"
-        for k in ("built", "now", "next", "later")
-        for s in plan[k]
-        if s[0]
-    }
-    words.update(
-        {s[1]: "a title from ROADMAP.md" for k in ("built", "now", "next", "later") for s in plan[k]}
-    )
+    words = {name: "a name from ROADMAP.md" for k in ("built", "now", "next", "later") for name in plan[k]}
     words.update({x: "an item from ROADMAP.md" for x in plan["later_versions"]})
     return [(path, Page("Roadmap · Brokkr", body, labels=[], words=words))]

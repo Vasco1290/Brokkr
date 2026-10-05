@@ -338,7 +338,6 @@ abbr[title] { text-decoration: underline dotted 1px; text-underline-offset: 3px;
 .phase ul { padding-left: 1.1rem; }
 .phase li { margin: 5px 0; }
 .phase-now { border-top-color: var(--accent); }
-.step { font: 600 0.8rem var(--mono); color: var(--sheet-muted); margin-right: 4px; }
 
 /* navigation on phones: brand and theme on one row, the page links on a row that scrolls sideways */
 @media (max-width: 600px) {
@@ -347,3 +346,18 @@ abbr[title] { text-decoration: underline dotted 1px; text-underline-offset: 3px;
 }
 .figure .fig-light { display: var(--fig-light); } .figure .fig-dark { display: var(--fig-dark); }
 .compare-table td, .compare-table tbody th { white-space: nowrap; }
+
+/* compare on phones (H's fix list, 4 October 2026, item 3): the model column stays put, the other columns
+   scroll sideways under it, rows are one line each, and a visible hint says the table scrolls */
+.scroll-hint { display: none; margin: 0 0 6px; font: 600 0.85rem var(--mono); color: var(--accent); }
+.compare-table tbody th, .compare-table thead th:first-child { box-shadow: inset -1px 0 0 var(--sheet-line); }
+@media (max-width: 960px) {
+  .scroll-hint { display: block; text-align: right; }
+}
+@media (max-width: 760px) {
+  .compare-table { min-width: 0; width: max-content; font-size: 0.82rem; }
+  .compare-table th, .compare-table td { padding: 5px 7px; }
+  .compare-table thead th { font-size: 0.66rem; letter-spacing: 0.03em; white-space: normal; min-width: 6.5em; vertical-align: bottom; }
+  .compare-table tbody th, .compare-table thead th:first-child { white-space: normal; width: 7.2em; min-width: 7.2em; max-width: 7.2em; z-index: 2; }
+  .compare-table .ci, .compare-table .sub { display: inline; margin: 0 0 0 4px; font-size: 0.74rem; }
+}

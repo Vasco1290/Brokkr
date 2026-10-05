@@ -22,6 +22,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -79,6 +80,12 @@ SANITY_TOLERANCE = 0.010  # FP32 clean top-1 within 1.0 point of torchvision's p
 THREAD_COUNTS = (1, 4)  # the laptop latency method's thread counts (note of 29 September 2026)
 BROKKR_CODE_LICENCE = "Apache-2.0"
 LABEL_DATA_LICENCE = "CC BY 4.0"
+# The vendored imagecorruptions copy's version, read from the first line of its notes ("# Vendored copy of
+# imagecorruptions 1.1.2"), for the ImageNet-C limit (H's fix list, 4 October 2026, item 1).
+IMAGECORRUPTIONS_VERSION = re.match(
+    r"# Vendored copy of imagecorruptions (\d+\.\d+\.\d+)\n",
+    Path("brokkr_edge/third_party/imagecorruptions/CHANGES.md").read_text(encoding="utf-8"),
+).group(1)
 RELIABILITY = {
     "coverage": ("conformal", "coverage"),
     "mean_set_size": ("conformal", "mean_set_size"),
@@ -597,11 +604,11 @@ def make_label(model: str) -> dict:
             "The damage is simulated (Brokkr's own and ImageNet-C corruptions); real fog, darkness "
             "or noise may "
             "affect the model differently.",
-            "The ImageNet-C conditions were made with the official corruption code on these test "
-            "images, with "
-            "fixed seeds and each model's own preprocessing, so they are not directly comparable to "
-            "published "
-            "ImageNet-C results.",
+            "The ImageNet-C conditions were made on these test images with the imagecorruptions package "
+            f"v{IMAGECORRUPTIONS_VERSION} (an extension of the ImageNet-C code), with a one-line fix so that "
+            "fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and "
+            "each model's own preprocessing were used, so the results are not directly comparable to the "
+            "released ImageNet-C files or to published ImageNet-C results.",
             f"Measured on one machine: {fp['cpu_model']}, {fp['os']} {fp['os_release']}.",
             f"With {n_damaged} conditions, an occasional result may cross a line by chance.",
             "Coverage is for prediction sets tuned on clean calibration images; under damage there is no "

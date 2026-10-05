@@ -1,7 +1,7 @@
 # Vendored copy of imagecorruptions 1.1.2
 
-- **Source:** the `imagecorruptions` 1.1.2 wheel on PyPI (github.com/bethgelab/imagecorruptions), the
-  official ImageNet-C corruption code packaged for any image size.
+- **Source:** the `imagecorruptions` 1.1.2 wheel on PyPI (github.com/bethgelab/imagecorruptions), an
+  extension of the ImageNet-C corruption code of Hendrycks & Dietterich, packaged for any image size.
 - **Licence:** Apache-2.0, `LICENSE` in this folder (copied from the wheel).
 - **Copied on 26 September 2026.** SHA-256 of the original files:
   - `corruptions.py`: `adb5944eccfafe0118e777e3300c94420eab486556ca805ea101d3374d130cbb`

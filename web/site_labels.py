@@ -4,6 +4,7 @@ Used by the site generator (web/site_build.py) and the design prototypes. Reads 
 computes no number. Build IDs and addresses follow docs/website_v0_plan.md, section 12d (H, 4 October 2026).
 """
 
+import datetime
 import json
 import re
 from pathlib import Path
@@ -30,6 +31,31 @@ def label_problems(labs: dict) -> list:
             continue
         problems += [f"{name}: {p}" for p in check_label(lab)]
     return problems
+
+
+def readable_window(start_iso: str, end_iso: str) -> str:
+    """Two UTC times from a label as a reader writes them (H, 4 October 2026), to the minute:
+    '3 October 2026, 07:55–08:01 UTC', or with both dates when the window crosses midnight."""
+    start, end = (
+        datetime.datetime.fromisoformat(x).astimezone(datetime.timezone.utc) for x in (start_iso, end_iso)
+    )
+
+    def day(d):
+        return f"{d.day} {d:%B %Y}"
+
+    if start.date() == end.date():
+        return f"{day(start)}, {start:%H:%M}–{end:%H:%M} UTC"
+    return f"{day(start)}, {start:%H:%M} – {day(end)}, {end:%H:%M} UTC"
+
+
+def timing_window(label: dict) -> tuple | None:
+    """(first timed run's start, last timed run's end) over the label's measured speed rows, or None."""
+    measured = [s for s in label["speed"] if s["status"] == "measured"]
+    if not measured:
+        return None
+    return min(s["timed_utc"]["first_start"] for s in measured), max(
+        s["timed_utc"]["last_end"] for s in measured
+    )
 
 
 def builds(label: dict) -> tuple:

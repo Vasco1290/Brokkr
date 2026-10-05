@@ -276,19 +276,129 @@ def test_the_compare_table_has_one_sortable_row_per_label(built):
     assert "speed-ratio-light.svg" in page and "grid-shrinking-cost-light.svg" in page
 
 
+ROADMAP_CHECK = "the roadmap shows no dates and no stage or step numbers"
+FINDINGS_CHECK = "every findings paragraph equals the README's, character for character"
+OFFICIAL_CHECK = 'no sentence says "official" with ImageNet-C or corruption code'
+
+
 def test_the_roadmap_is_generated_without_dates(built):
     page = built[3]["roadmap/index.html"]
     for phase in ("Built", "Now", "Next", "Later"):
         assert f"<h2>{phase}</h2>" in page
     plan = site_sources.roadmap()
     assert plan["next"] and all(
-        html.escape(s[1]) in page for k in ("built", "now", "next", "later") for s in plan[k]
+        html.escape(name) in page for k in ("built", "now", "next", "later") for name in plan[k]
     )
     files = dict(built[3])
     files["roadmap/index.html"] = files["roadmap/index.html"].replace(
         "<h2>Later</h2>", "<h2>Later (by 5 November 2026)</h2>"
     )
-    assert problems_of(built, files)["the roadmap shows no dates"]
+    assert problems_of(built, files)[ROADMAP_CHECK]
+
+
+def test_the_roadmap_shows_only_public_items_with_plain_names(built):
+    page = built[3]["roadmap/index.html"]
+    plan = site_sources.roadmap()
+    assert "The study across ten models" in plan["built"]  # Stage 4, marked done, under its public name
+    assert "Core measurement" in plan["built"] and "Stage 1" not in page
+    assert "Step " not in page and "summary tables" not in page  # an internal item is left out
+    assert "Related work" not in page and "parked research" not in page
+    files = dict(built[3])
+    files["roadmap/index.html"] = page.replace("<li>Labels</li>", "<li>Step 1 Labels</li>")
+    assert problems_of(built, files)[ROADMAP_CHECK]
+
+
+def test_a_roadmap_item_without_a_mark_or_with_a_numbered_name_stops_the_build():
+    text = site_sources.ROADMAP.read_text(encoding="utf-8")
+    item = "- The GitHub Action. <!-- public: A GitHub Action that tests a model and attaches its label -->"
+    assert item in text
+    with pytest.raises(SystemExit, match="no <!-- public -->"):
+        site_sources.roadmap(text.replace(item, "- The GitHub Action."))
+    mark = "<!-- public: A minimal EEG/EMG pack -->"
+    assert mark in text
+    with pytest.raises(SystemExit, match="stage, step or task number"):
+        site_sources.roadmap(text.replace(mark, "<!-- public: Step 7 EEG/EMG pack -->"))
+    assert (
+        "A minimal EEG/EMG pack" not in site_sources.roadmap(text.replace(mark, "<!-- internal -->"))["later"]
+    )
+
+
+def test_every_findings_paragraph_on_the_site_is_marked_and_checked(built):
+    pages, files = built[2], built[3]
+    quoted = {p: [k for k, _ in site_checks.QUOTE.findall(files[p])] for p in pages}
+    assert quoted["index.html"] == ["headline"]
+    assert quoted["why-labels/index.html"] == ["headline", "example", "prereg", "explore", "noise_blur"]
+    assert all(not q for p, q in quoted.items() if p not in ("index.html", "why-labels/index.html"))
+
+
+@pytest.mark.parametrize(
+    "page, old, new",
+    [
+        ("index.html", "and fog hit some models too.", "and fog hit some models too!"),  # one character
+        ("why-labels/index.html", "s5 (H21)", "s5 (H22)"),  # one digit
+        ("why-labels/index.html", "which models were hit", "which model were hit"),  # one letter less
+    ],
+)
+def test_a_findings_paragraph_one_character_off_the_readme_is_caught(built, page, old, new):
+    files = dict(built[3])
+    assert old in files[page]
+    files[page] = files[page].replace(old, new, 1)
+    problems = problems_of(built, files)[FINDINGS_CHECK]
+    assert problems and problems[0].startswith(page) and "differs from the README at character" in problems[0]
+
+
+def test_a_readme_findings_block_that_changed_is_caught(built):
+    pages, files = built[2], built[3]
+    readme = site_sources.README.read_text(encoding="utf-8")
+    changed = readme.replace("2 of 9 models lost much more", "2 of 9 models lost far more", 1)
+    assert changed != readme
+    assert site_checks.check_findings(pages, files, readme) == []
+    assert any("'prereg'" in p for p in site_checks.check_findings(pages, files, changed))
+
+
+def test_a_findings_paragraph_without_its_marker_is_caught(built):
+    files = dict(built[3])
+    files["index.html"] = files["index.html"].replace(
+        '<span class="quote" data-findings="headline">', "<span>"
+    )
+    assert any("shows no marked paragraph" in p for p in problems_of(built, files)[FINDINGS_CHECK])
+
+
+def test_the_old_official_imagenet_c_wording_is_caught_on_the_site(built):
+    old = (
+        "The ImageNet-C conditions were made with the official corruption code on these test images, with "
+        "fixed seeds and each model's own preprocessing, so they are not directly comparable to published "
+        "ImageNet-C results."
+    )
+    files = dict(built[3])
+    files["methods/index.html"] = files["methods/index.html"].replace("</article>", f"<p>{old}</p></article>")
+    problems = problems_of(built, files)[OFFICIAL_CHECK]
+    assert problems == [f'methods/index.html: "official" with ImageNet-C or corruption code: {old!r}']
+
+
+def test_speed_times_are_written_as_a_reader_writes_them(built):
+    speed = built[3][MNV3L].split('id="speed"')[1].split("</section>")[0]
+    assert "Timed on <time" in speed and "3 October 2026, 07:55–08:01 UTC</time>" in speed
+    assert "Timed between" not in speed
+    assert site_labels.readable_window("2026-10-03T23:58:10+00:00", "2026-10-04T00:03:00+00:00") == (
+        "3 October 2026, 23:58 – 4 October 2026, 00:03 UTC"
+    )
+
+
+def test_calibration_thresholds_are_collapsed(built):
+    label = built[0]["mobilenet_v3_large"]
+    unc = built[3][MNV3L].split('id="uncertainty"')[1].split("</section>")[0]
+    shown, collapsed = unc.split("<summary>Calibration thresholds (conformal)</summary>")
+    for b in label["builds"]:
+        threshold = site_pages.f(label["details"]["conformal"][b["build_id"]]["threshold"], "thr")
+        assert threshold not in shown and threshold in collapsed.split("</details>")[0]
+
+
+def test_the_compare_table_says_it_scrolls_and_keeps_the_model_column(built):
+    page = built[3]["compare/index.html"]
+    assert '<p class="scroll-hint" aria-hidden="true">scroll →</p>' in page
+    css = Path("web/assets/site.css").read_text(encoding="utf-8")
+    assert ".compare-table tbody th, .compare-table thead th:first-child { position: sticky; left: 0;" in css
 
 
 def test_an_identifier_not_on_the_page_list_is_caught(built):

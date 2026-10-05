@@ -25,9 +25,12 @@ For each label, independently of the code that made it:
 9. label.md and label.html equal a fresh render of label.json, every number a reader sees in them is a
    label.json number, and the Markdown's model-card metadata parses (huggingface_hub.ModelCard) with
    license "other" and license_link "#licences".
+10. No sentence in label.json, label.md or label.html says "official" together with "ImageNet-C" or
+   "corruption code" (brokkr_edge.wording; H's fix list of 4 October 2026, item 1).
 Then, once: the README's label example and its Stage 4 findings equal a fresh render of their labels and
 records (scripts/41_readme_label_example.py --check, scripts/45_readme_findings.py --check), and the figures
-in docs/figures/ pass scripts/47_figures.py --check (up to date, values, positions, stray numbers, claims).
+in docs/figures/ pass scripts/47_figures.py --check (up to date, values, positions, stray numbers, claims),
+and no README sentence says "official" with ImageNet-C or corruption code.
 """
 
 import argparse
@@ -54,6 +57,7 @@ from brokkr_edge.label_schema import check_label
 from brokkr_edge.model_list import load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
 from brokkr_edge.schema import MIN_AGREEMENT_WITH_FP32, check_build_record
+from brokkr_edge.wording import json_overclaims, official_overclaims
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--labels", default="labels")
@@ -284,6 +288,14 @@ def check(folder: Path) -> list:
     licence_meta = (card.get("license"), card.get("license_link"))
     if licence_meta != ("other", "#licences") or "\n## Licences\n" not in md:
         problems.append("the model card's licence metadata is not as expected, or its link has no section")
+
+    # 10. No sentence calls the ImageNet-C code "official" (brokkr_edge.wording).
+    for name, found in (
+        ("label.json", json_overclaims(label)),
+        ("label.md", official_overclaims(md)),
+        ("label.html", official_overclaims(page)),
+    ):
+        problems += [f'{name}: "official" with ImageNet-C or corruption code: {s!r}' for s in found]
     return problems
 
 
@@ -309,5 +321,11 @@ for command in (
     readme = subprocess.run([sys.executable, *command], capture_output=True, text=True)
     print((readme.stdout + readme.stderr).strip())
     all_ok &= readme.returncode == 0
+overclaims = official_overclaims(Path("README.md").read_text(encoding="utf-8"))
+print(
+    f"{'PASS' if not overclaims else 'FAIL'}: README.md: no sentence says \"official\" with ImageNet-C or "
+    "corruption code" + "".join(f"\n     {s!r}" for s in overclaims)
+)
+all_ok &= not overclaims
 print(f"\n{'PASS' if all_ok else 'FAIL'}: {len(folders)} labels in {args.labels}")
 sys.exit(0 if all_ok else 1)

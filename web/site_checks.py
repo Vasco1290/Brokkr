@@ -14,13 +14,18 @@ runs them on a fresh build.
    also on the page without it;
 6. every page states the commit it was built from, the brokkr-edge version and the label schema version;
 7. build IDs and addresses are unique; the landing finding has its claims-register entry; the roadmap
-   page shows no dates.
+   page shows no dates and no stage or step numbers;
+8. every findings paragraph on the site equals a paragraph of the README's generated findings block,
+   character for character (H's condition, 4 October 2026);
+9. no sentence anywhere on the site says "official" with "ImageNet-C" or "corruption code".
 Besides labels and figure entries, a page may quote the README's findings block word for word (its
 numbers are checked against the records by scripts/45_readme_findings.py --check, run by scripts/40), and
 may name identifiers with digits (commits, citations, step names) on its own list, each with a reason.
 """
 
+import html
 import json
+import os
 import posixpath
 import re
 from html.parser import HTMLParser
@@ -29,12 +34,13 @@ from pathlib import Path
 import site_meter as M
 import site_sources
 import themes
-from site_labels import LABELS, address, build_id, builds, measurement
+from site_labels import LABELS, address, build_id, builds, measurement, readable_window, timing_window
 from site_pages import FEATURED, METER_CONDITIONS, count, interval
 
 from brokkr_edge import figures as F
 from brokkr_edge.label_render import FORMATS, WORDS_WITH_DIGITS, _leaves
 from brokkr_edge.label_schema import SCHEMA_VERSION
+from brokkr_edge.wording import json_overclaims, official_overclaims
 
 VOID = {"area", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 SHOWN_ATTRS = (
@@ -115,6 +121,8 @@ def allow_list(page, labs: dict, figures: dict, commit: str, version: str) -> tu
     strings = {s for lab in used for s in _leaves(lab) if isinstance(s, str) and re.search(r"\d", s)}
     strings |= {s[:n] for s in strings if re.fullmatch(r"[0-9a-f]{40,64}", s) for n in (7, 12)}
     strings |= {build_id(lab, builds(lab)[1]) for lab in used} | {address(lab) for lab in used}
+    # The speed timing window as a reader writes it (web/site_labels.readable_window), from the label's times.
+    strings |= {readable_window(*w) for lab in used if (w := timing_window(lab))}
     strings |= {commit, f"brokkr-edge {version}"}  # the site's own commit and version (footer)
     strings |= set(page.words)  # the page's own identifiers (commits, citations, names), each with its reason
     allowed = set(page.allowed) | {str(SCHEMA_VERSION)}  # the schema version this site reads (footer)
@@ -265,17 +273,78 @@ def check_no_js(files: dict) -> list:
     return problems
 
 
-# ---- 6 and 7. versions, IDs, the finding's claim, the roadmap's dates ----
+# ---- 6. the findings, word for word ----
+
+QUOTE = re.compile(r'<span class="quote" data-findings="([a-z_]+)">(.*?)</span>', re.S)
+
+
+def readme_paragraphs(readme_text: str) -> list:
+    """The paragraphs of the README's generated findings block, read here on their own (not through
+    web/site_sources.py, which the pages use): the text between the markers, one paragraph per "- " bullet,
+    line breaks and runs of spaces read as one space (as both Markdown and HTML show them)."""
+    start = readme_text.index(site_sources.FINDINGS_START)
+    block = readme_text[readme_text.index("-->", start) + 3 : readme_text.index(site_sources.FINDINGS_END)]
+    return [" ".join(b.split()) for b in re.split(r"^- ", block, flags=re.M)[1:]]
+
+
+def check_findings(pages: dict, files: dict, readme_text: str | None = None) -> list:
+    """H's condition of 4 October 2026: every findings paragraph on the site equals one paragraph of the
+    README's generated findings block, character for character (only line breaks and repeated spaces,
+    which no reader sees, are read as one space). A page that says it quotes the findings must show at
+    least one marked paragraph; a page that does not may show none."""
+    readme_text = site_sources.README.read_text(encoding="utf-8") if readme_text is None else readme_text
+    paragraphs = readme_paragraphs(readme_text)
+    problems = []
+    for path, page in pages.items():
+        quotes = QUOTE.findall(files[path])
+        if page.findings and not quotes:
+            problems.append(f"{path}: says it quotes the README findings but shows no marked paragraph")
+        if quotes and not page.findings:
+            problems.append(f"{path}: shows findings paragraphs but its number check does not expect them")
+        for key, text in quotes:
+            shown = " ".join(html.unescape(text).split())
+            if shown not in paragraphs:
+                near = max(paragraphs, key=lambda p: len(os.path.commonprefix([p, shown])))
+                at = len(os.path.commonprefix([near, shown]))
+                problems.append(
+                    f"{path}: findings paragraph {key!r} differs from the README at character {at}: "
+                    f"site {shown[max(0, at - 20) : at + 20]!r}, README {near[max(0, at - 20) : at + 20]!r}"
+                )
+    return problems
+
+
+# ---- 7. no "official" ImageNet-C code ----
+
+
+def check_wording(files: dict) -> list:
+    """No sentence on any page, raw label or label page says "official" together with "ImageNet-C" or
+    "corruption code" (brokkr_edge.wording; H's fix list of 4 October 2026, item 1)."""
+    problems = []
+    for path, content in files.items():
+        if not path.endswith((".html", ".json")):
+            continue
+        text = content.read_text(encoding="utf-8") if isinstance(content, Path) else content
+        found = json_overclaims(json.loads(text)) if path.endswith(".json") else official_overclaims(text)
+        problems += [f'{path}: "official" with ImageNet-C or corruption code: {s!r}' for s in found]
+    return problems
+
+
+# ---- 8 and 9. versions, IDs, the finding's claim, the roadmap's dates ----
 
 
 MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 
 
 def check_roadmap(files: dict) -> list:
-    """No dates on the roadmap page (H, 3 October 2026)."""
-    text = " ".join(t for t, _ in parse(files["roadmap/index.html"]).texts)
-    dates = re.findall(r"\b(?:" + MONTHS + r")\b|\b20\d\d\b", text.split("Built by brokkr-edge")[0])
-    return [f"roadmap/index.html shows dates: {sorted(set(dates))}"] if dates else []
+    """No dates (H, 3 October 2026) and no stage, step or task numbers (H, 4 October 2026) on the roadmap
+    page, above its footer."""
+    texts = [t.strip() for t, _ in parse(files["roadmap/index.html"]).texts]
+    texts = texts[: next(i for i, t in enumerate(texts) if t.startswith("Built by brokkr-edge"))]
+    dates = re.findall(r"\b(?:" + MONTHS + r")\b|\b20\d\d\b", " ".join(texts))
+    numbered = [t for t in texts if site_sources.NUMBERED.search(t)]
+    return ([f"roadmap/index.html shows dates: {sorted(set(dates))}"] if dates else []) + (
+        [f"roadmap/index.html shows stage or step numbers: {numbered[:5]}"] if numbered else []
+    )
 
 
 def check_footer(pages: dict, files: dict, commit: str, version: str) -> list:
@@ -333,5 +402,10 @@ def run_all(
             "build IDs and addresses unique; the finding is in the claims register",
             check_ids(labs) + check_claim(claims),
         ),
-        ("the roadmap shows no dates", check_roadmap(files)),
+        ("the roadmap shows no dates and no stage or step numbers", check_roadmap(files)),
+        (
+            "every findings paragraph equals the README's, character for character",
+            check_findings(pages, files),
+        ),
+        ('no sentence says "official" with ImageNet-C or corruption code', check_wording(files)),
     ]

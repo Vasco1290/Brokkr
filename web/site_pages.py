@@ -23,7 +23,9 @@ from site_labels import (
     envelope_row,
     label_dir,
     measurement,
+    readable_window,
     the_test_split,
+    timing_window,
 )
 
 from brokkr_edge import label_render as LR
@@ -68,6 +70,12 @@ def esc(x) -> str:
 
 def f(value, kind: str) -> str:
     return LR.fmt(value, kind)
+
+
+def quote(site, key: str) -> str:
+    """A findings paragraph, word for word from the README's checked block, marked so that
+    web/site_checks.check_findings can compare it with the README character by character."""
+    return f'<span class="quote" data-findings="{key}">{esc(site.findings[key])}</span>'
 
 
 def count(n: int) -> str:
@@ -265,7 +273,7 @@ def landing(site) -> list:
 </section>
 <section class="finding" aria-labelledby="finding-h">
   <h2 id="finding-h">What we found</h2>
-  <p class="finding-text">{esc(site.findings["headline"])}</p>
+  <p class="finding-text">{quote(site, "headline")}</p>
   {figure_block(site, path, *HERO)}
   <p class="cta">{buttons}</p>
 </section>"""
@@ -597,9 +605,24 @@ def speed_section(label: dict) -> str:
         trs.append(row(r[0], cells))
     slower = [n for n in notes if n.startswith(LR.SLOWER.split(" (")[0])]
     callout = f'<p class="callout"><span aria-hidden="true">⚠</span> {esc(slower[0])}</p>' if slower else ""
-    rest = "".join(f"<li>{esc(n)}</li>" for n in notes if n not in slower)
+    rest = "".join(f"<li>{timed_note(label, n)}</li>" for n in notes if n not in slower)
     head_html = [hover(LR.HOVER[h], h) if h in LR.HOVER else esc(h) for h in head]
     return callout + table(head_html, trs) + f'<ul class="notes">{rest}</ul>'
+
+
+def timed_note(label: dict, note: str) -> str:
+    """A speed note, with the label's "Timed between <ISO> and <ISO> (UTC)." written as a reader writes a
+    time (H, 4 October 2026): "Timed on 3 October 2026, 07:55–08:01 UTC", the exact times on hover."""
+    if not note.startswith("Timed between "):
+        return esc(note)
+    start, end = timing_window(label)
+    head = f"Timed between {start} and {end} (UTC). "
+    if not note.startswith(head):
+        raise SystemExit(f"FAIL: the label's timing note is not in the expected form: {note!r}")
+    return (
+        f'Timed on <time datetime="{esc(start)}" title="{esc(start)} to {esc(end)}">'
+        f"{esc(readable_window(start, end))}</time>. {esc(note[len(head) :])}"
+    )
 
 
 def uncertainty_section(label: dict) -> str:
@@ -607,11 +630,11 @@ def uncertainty_section(label: dict) -> str:
     ref, lab = builds(label)
     rule, summary = label["envelope"]["rule"], label["summary"]
     conformal = label["details"]["conformal"]
-    rows, more = [], []
+    rows, more, thresholds = [], [], []
     for b in (ref, lab):
         name = b["precision"].upper()
         if b["status"] == "failed":
-            rows.append(row(name, ['<td colspan="3" class="v-failed">INT8 build failed: not measured</td>']))
+            rows.append(row(name, ['<td colspan="2" class="v-failed">INT8 build failed: not measured</td>']))
             continue
         cov, size = (
             measurement(label, "coverage", b, "clean"),
@@ -623,10 +646,18 @@ def uncertainty_section(label: dict) -> str:
                 [
                     td("Coverage, clean", value_ci(cov, "pct")),
                     td("Set size", f'<span class="mono">{f(size["value"], "size")}</span>'),
+                ],
+            )
+        )
+        thresholds.append(
+            row(
+                name,
+                [
                     td(
                         "Threshold",
                         f'<span class="mono">{f(conformal[b["build_id"]]["threshold"], "thr")}</span>',
                     ),
+                    td("Calibration images", count(conformal[b["build_id"]]["calibration_items"])),
                 ],
             )
         )
@@ -647,12 +678,7 @@ def uncertainty_section(label: dict) -> str:
         f"{count(conf['calibration_items'])} clean calibration images for a {f(conf['target'], 'pct0')} "
         "coverage target. On clean test images:</p>"
     )
-    head = [
-        "Build",
-        hover("Coverage", "Coverage, clean"),
-        hover("Set size", "Set size"),
-        hover("Conformal threshold", "Threshold"),
-    ]
+    head = ["Build", hover("Coverage", "Coverage, clean"), hover("Set size", "Set size")]
     if lab["status"] == "failed":
         damage = "<p>Under damage: not measured for INT8 (the build failed).</p>"
     else:
@@ -677,7 +703,13 @@ def uncertainty_section(label: dict) -> str:
             '<details class="more"><summary>More measures on clean images (ECE, E-AURC, top-5)</summary>'
             f"{table(more_head, more)}</details>"
         )
-    return intro + table(head, rows) + damage + details
+    # H, 4 October 2026: the thresholds are set-up values, so they sit collapsed under the results.
+    threshold_details = (
+        '<details class="more"><summary>Calibration thresholds (conformal)</summary>'
+        f"{table(['Build', hover('Conformal threshold', 'Threshold'), 'Calibration images'], thresholds)}"
+        "</details>"
+    )
+    return intro + table(head, rows) + damage + details + threshold_details
 
 
 def provenance_section(label: dict) -> str:

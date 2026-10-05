@@ -546,3 +546,32 @@ and near-floor cells) instead of GitHub's bluish dark background, so a figure lo
 website's fixed datasheet panel under every theme. The colour steps and data colours are unchanged and
 still pass the palette validator on the new surface. No value changes; `scripts/47_figures.py --check`
 passes, and `tests/test_web_themes.py` keeps the website's panels equal to the figures' surfaces.
+
+## Note added 5 October 2026: the ImageNet-C limit no longer says "official" (before the labels are remade)
+
+H's fix list of 4 October 2026, item 1. Every label's limits said the ImageNet-C conditions were "made with
+the official corruption code". That overclaims: they were made with the imagecorruptions package v1.1.2 (an
+extension of the ImageNet-C code) with a one-line fix so that fog runs on NumPy 2, and they are not
+directly comparable to the released ImageNet-C files. No value, threshold, state or rule changes; schema
+version 1 stays.
+
+**1. The limit sentence is now** (made by `scripts/39_make_labels.py`; the version is read from the first
+line of `brokkr_edge/third_party/imagecorruptions/CHANGES.md`): "The ImageNet-C conditions were made on these
+test images with the imagecorruptions package v1.1.2 (an extension of the ImageNet-C code), with a one-line
+fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and each
+model's own preprocessing were used, so the results are not directly comparable to the released ImageNet-C
+files or to published ImageNet-C results."
+
+**2. The glossary line** "Brokkr and ImageNet-C" (fixed text in `brokkr_edge/label_render.py`, so it is in
+`label.md` and `label.html`, not `label.json`) no longer says "made here with its official code"; it says
+the damage types were made with the imagecorruptions package, not taken from the released ImageNet-C files.
+
+**3. A check:** `brokkr_edge.wording.official_overclaims` finds every sentence that says "official"
+together with "ImageNet-C" or "corruption code". It is run by `scripts/40_check_labels.py` (each label's
+`label.json` strings, `label.md`, `label.html`, and the README), by the site build (every page and raw
+label) and by `tests/test_wording.py` (the released labels and the README; and it fails on the old
+wording). The source kind `"official"` is a separate JSON string and is not a sentence about ImageNet-C.
+
+**4. The labels are remade** from a clean commit with this wording, checked by `scripts/40`, compared with
+the release of 4 October by `scripts/48_compare_labels.py`, and released again in `published/labels/`; the
+README blocks, screenshots and figures are made again from them.
