@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **6 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **6 October 2026** (round 3). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -80,7 +80,7 @@ Read this first.
      rows, and a visible "scroll →" hint.
   4. **Model pages:** human-readable speed timestamps (e.g. "3 October 2026, 07:55–08:01 UTC"); the
      calibration thresholds move into a collapsed details section.
-- **Round 2 (6 October 2026): done, waiting for H's review** on `step-2-site` (commits `00dfdd4` code,
+- **Round 2 (6 October 2026): done and approved by H** on `step-2-site` (commits `00dfdd4` code,
   `64d76e6` docs, then this STATUS update). Asked by H: (1) `scripts/48_compare_labels.py` accepts only the
   dated changes listed in `docs/label_changes.json` and names each (note of 6 October 2026 in
   `docs/label_schema.md`); (2) ROADMAP.md's 4.1 wording corrected; (3) a dated correction note at the end of
@@ -93,9 +93,20 @@ Read this first.
   records); `scripts/40` PASS (10 labels, README blocks, figures, docs wording); `scripts/48` against the
   4 October release PASS (10 labels, 2 listed changes each); site build PASS (11 checks, 16 pages); fresh
   clone of `00dfdd4` from GitHub: site build PASS, 60 of 60 files byte-identical to the local build.
-- **For H (round 2):** the overclaim list (`docs/prepublic_checklist.md`, section 2: seven sentences, none
-  changed); keep or rewrite the five GitHub-made commits with the real author name (section 3); the
-  publishing plan, including whether to add a `404.html` first.
+- **Round 3 (6 October 2026): done, waiting for H's review** on `step-2-site` (commits `625e3de` wording, 404
+  page and code; `4ea86ea` labels remade at `625e3de` and released again, with the docs; `bd45f30` a test fix;
+  then this STATUS update). H's decisions: (1) the seven listed sentences narrowed, never strengthened
+  (before and after: `docs/prepublic_checklist.md`, decisions of 6 October); "Pinned" listed in
+  `docs/label_changes.json`, labels remade and re-released; (2) the five commits with the real author name
+  kept, no history rewrite; (3) publishing plan approved, an on-brand `404.html` added with a site check;
+  (4) **the README AI-assistance line: H's message left both options open ("Choose one"), so nothing was
+  changed.** The README already ends with "Built with AI coding assistance (Claude Code). Research design,
+  decisions and reviews by H." (not under Status). Waiting for H's choice.
+  Checks: at `bd45f30`, ruff PASS, pytest 393 passed, `scripts/22` PASS (1901 of 1901 records), site build
+  PASS (12 checks, 17 pages, 61 files); `scripts/40` PASS at `4ea86ea` (the later commit changed one test
+  line); `scripts/48` PASS against the release of 5 October (one listed change per label) and of 4 October
+  (three); fresh clone of `bd45f30` from GitHub: site build PASS, 61 of 61 files byte-identical to the local
+  build. Screenshots of the 404 page: `scratch/round3/shots/` (not committed).
 - **Do not publish** (no GitHub Pages, no `gh-pages` push) until H gives the go-ahead.
 
 ### Step 1 record (3 October 2026; done, kept for the record)
