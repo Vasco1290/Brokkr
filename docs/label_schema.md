@@ -575,3 +575,21 @@ wording). The source kind `"official"` is a separate JSON string and is not a se
 **4. The labels are remade** from a clean commit with this wording, checked by `scripts/40`, compared with
 the release of 4 October by `scripts/48_compare_labels.py`, and released again in `published/labels/`; the
 README blocks, screenshots and figures are made again from them.
+
+## Note added 6 October 2026: comparing two releases accepts only listed changes
+
+Asked by H on 6 October 2026. `scripts/48_compare_labels.py` compares two sets of labels. Besides the
+differences any remake causes (source fingerprints, and the commit and time that made a label), it now
+accepts only the changes listed in `docs/label_changes.json`. Each entry there is dated, points to the note
+that decided it, and names one `label.json` field, or one piece of text the label renderer writes into
+`label.html`, with its exact old and new text. Entries are added, never edited or removed.
+
+- The first two entries are the changes of the note of 5 October 2026: the ImageNet-C limit sentence
+  (`limits/1`) and the glossary line "Brokkr and ImageNet-C".
+- For `label.html`, the old label rendered by today's renderer must equal the old page with only the listed
+  renderer changes applied, so the renderer changed in no other way. The new page must be today's render of
+  the new label.
+- The script prints PASS and names each accepted change. Any change not on the list still fails, as
+  `tests/test_compare_labels.py` shows with made-up changes (tests only).
+- Run against the release of 4 October 2026 (`15437fd`) and today's `published/labels/`: PASS for all ten
+  labels, each with the two listed changes and the commit and time differences, and no other difference.

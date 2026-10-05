@@ -483,3 +483,30 @@ to H's change:
   times. The conformal thresholds moved out of the coverage table into a collapsed "Calibration thresholds
   (conformal)" section, with their calibration image counts. The model page's Limits heading has an anchor
   (`#limits`).
+
+## 16. Round 2: slice C (6 October 2026; for H's review)
+
+H approved round 1 on 6 October 2026, including the public/internal choices, and asked for round 2. Choices
+made while building, each open to H's change:
+- **Claims register.** Every paragraph of the Why labels? page names its entry in `docs/claims.json`
+  (`data-claim`), and every quoted findings paragraph has an entry with its findings key. The new entries
+  are `why-example`, `why-prereg`, `why-explore`, `why-noise-blur`, `why-label-design` and
+  `imagenet-c-method`; `site-finding` and `fig-uncertainty` already existed. As the register's rule says,
+  no result number is typed in an entry: the numbers stay in the checked paragraphs. A site check fails on
+  a missing entry or field, a script that does not exist, or an arXiv number that is not in
+  `docs/related_work.md`.
+- **Related work.** `scratch/related_work.md` is now `docs/related_work.md` (unchanged apart from its
+  opening paragraph, the word "advisor" and one `Site:` line per entry). The site reads its citations from
+  it (`web/site_sources.related_work()`); the typed list in `web/site_sources.py` is gone. The Why labels?
+  page's visible text is unchanged (compared with the build of `0d1117f`; no other page changed).
+- **Wording check, docs.** `brokkr_edge.wording.check_docs` reads the README and the public docs. It skips
+  the text above the correction note of 6 October 2026 in `docs/hypotheses_stage4.md`, and the note's own
+  section, and reports that the note exists. Four docs that record the fix or this check are listed as
+  "not read", with their reasons. Every Markdown file git tracks must be in one of the two lists.
+  - The sentence splitter changed: a single line break inside a paragraph no longer ends a sentence, so a
+    claim wrapped across two lines is caught. Blank lines, headings, list items and HTML tags still end
+    one.
+- **Pre-public checklist:** `docs/prepublic_checklist.md`, with its evidence and the list for H.
+  **Publishing plan:** `docs/publishing_plan.md` (plan only).
+- **Datasets** carry a use tag, "research only" or "commercial use allowed" (`brokkr_edge/datasets.py`):
+  both are "research only".

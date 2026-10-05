@@ -18,6 +18,7 @@ docs are not read, because they record the fix and quote the old wording (QUOTIN
 
 import html
 import re
+import subprocess
 from pathlib import Path
 
 OFFICIAL = re.compile(r"\bofficial\b", re.I)
@@ -35,11 +36,16 @@ PUBLIC_DOCS = (
     "docs/stage4_story.md",
     "docs/writeup.md",
     "docs/related_work.md",
+    "docs/publishing_plan.md",
+    "brokkr_edge/third_party/imagecorruptions/CHANGES.md",
+    "web/fonts/README.md",
+    "web/prototypes/README.md",
 )
 QUOTING_DOCS = {
     "STATUS.md": "the project log: it records H's fix list, which quotes the old wording",
     "docs/label_schema.md": "its note of 5 October 2026 quotes the old wording it replaced",
     "docs/website_v0_plan.md": "its section 15 records the fix and names the old wording",
+    "docs/prepublic_checklist.md": "it reports this check's results in the check's own words",
 }
 
 
@@ -81,8 +87,15 @@ def doc_overclaims(text: str) -> tuple:
 
 
 def check_docs(root: Path = Path(".")) -> tuple:
-    """(problems, report lines) for PUBLIC_DOCS."""
-    problems, report = [], []
+    """(problems, report lines) for PUBLIC_DOCS. Every Markdown file git tracks must be in PUBLIC_DOCS or
+    QUOTING_DOCS, so a new doc is never skipped without a reason."""
+    listed = subprocess.run(["git", "ls-files", "*.md"], cwd=root, capture_output=True, text=True, check=True)
+    found_docs = set(listed.stdout.split())
+    problems = [
+        f"{name}: a Markdown file the wording check neither reads nor lists with a reason"
+        for name in sorted(found_docs - set(PUBLIC_DOCS) - set(QUOTING_DOCS))
+    ]
+    report = []
     for name in PUBLIC_DOCS:
         found, note, ignored = doc_overclaims((root / name).read_text(encoding="utf-8"))
         problems += [f'{name}: "official" with ImageNet-C or corruption code: {s!r}' for s in found]

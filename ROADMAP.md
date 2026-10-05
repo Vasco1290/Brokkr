@@ -51,12 +51,19 @@ finished; its open items are now checks done after the fact, in step 2.*
 
 - [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
   contain the personal email
-- [ ] Publish the results page to GitHub Pages
-- [ ] Re-read README and ROADMAP for anything that overclaims
+- [ ] Publish the results page to GitHub Pages (plan written 6 October 2026: `docs/publishing_plan.md`;
+  waiting for H's go-ahead)
+- [ ] Re-read README and ROADMAP for anything that overclaims. Done for every site page and the README on
+  6 October 2026, with a list of sentences for H (`docs/prepublic_checklist.md`, section 2); ROADMAP.md's 4.1
+  scope was corrected where the wording check found the old ImageNet-C wording, but the file was not
+  re-read line by line. Ticked
+  when H has decided on the list.
 - [x] Git-history scan (3 October 2026, after the repository became public; read-only, nothing rewritten):
   all 180 commits on every branch and tag use the GitHub noreply email; no machine paths, Windows
   usernames, personal email addresses or tokens in any commit's contents (matches were test data, a
-  redacted commit message and checklist text)
+  redacted commit message and checklist text). Run again on 6 October 2026 (199 commits, 15 refs): same
+  result; five commits made in GitHub's web interface carry H's real name as author name, with the noreply
+  email (`docs/prepublic_checklist.md`, section 3)
 
 ## Stage 2 — Stress test `[x]` <!-- public -->
 
