@@ -171,8 +171,7 @@ TERMS = {
     "and thread count. Below one means INT8 took less time; above one means it was slower. It compares "
     "the two builds on this machine only.",
     "Threads": "how many CPU workers the model may use at once.",
-    "Pinned": "the timing was only allowed to run on the named CPU cores, so the operating system could "
-    "not move it to slower ones.",
+    "Pinned": "the timing was set to run only on the named cores; this was not read back to confirm.",
     "Hardware threads": "one physical CPU core can run two streams of work at once; each stream is a "
     "hardware thread, and the operating system counts it as a CPU of its own.",
     "FP32 sanity check": "our FP32 top-1 on clean images compared with the figure torchvision publishes, to "

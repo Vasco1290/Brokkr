@@ -486,3 +486,63 @@ def test_the_related_work_list_comes_from_the_tracked_doc(built):
     broken = text.replace("   Site: key mitchell", "   Notes: key mitchell", 1)
     with pytest.raises(SystemExit, match="has no Site: line"):
         site_sources.related_work(broken)
+
+
+NOT_FOUND_CHECK = (
+    "the not-found page exists, links home and to the catalog, and resolves from the site's root"
+)
+
+
+def test_the_not_found_page_says_so_and_links_home_and_to_the_catalog(built):
+    page = built[3]["404.html"]
+    assert '<base href="/Brokkr/">' in page.split("</head>")[0]
+    assert "<h1>Not found</h1>" in page and "This page doesn't exist." in page
+    assert '<a class="button" href="index.html">Home</a>' in page
+    assert '<a class="button" href="models/index.html">Catalog</a>' in page
+    assert site_build.SITE_ADDRESS == "https://vasco1290.github.io/Brokkr/"
+
+
+def test_a_not_found_page_without_its_base_or_links_is_caught(built):
+    files = dict(built[3])
+    files["404.html"] = files["404.html"].replace('<base href="/Brokkr/">', "")
+    assert any("<base href" in p for p in problems_of(built, files)[NOT_FOUND_CHECK])
+    files = dict(built[3])
+    files["404.html"] = files["404.html"].replace('href="models/index.html">Catalog', 'href="#">Catalog')
+    assert any("no link to models/index.html" in p for p in problems_of(built, files)[NOT_FOUND_CHECK])
+    files = dict(built[3])
+    del files["404.html"]
+    assert site_checks.check_not_found(files) == ["404.html is missing"]
+
+
+def test_the_narrowed_wording_is_on_the_site(built):
+    files = built[3]
+    landing, methods = files["index.html"], files["methods/index.html"]
+    assert "<h1>Shrink AI models for small hardware, and measure what you lost.</h1>" in landing
+    assert "Every measured number comes from a checked result file" in landing
+    assert "we found no strong relation between clean accuracy and which models collapsed" in landing
+    assert "Every measured number on a label and on this site" in methods
+    assert (
+        "Nothing is guessed:" in methods
+        and "Reasons for these values that do not depend on the results" in methods
+    )
+    for old in (
+        "find out honestly",
+        "didn&#x27;t predict which",
+        "Nothing is estimated",
+        "without looking at the data",
+    ):
+        assert all(old not in text for text in files.values() if isinstance(text, str)), old
+
+
+def test_the_uncertainty_sentence_holds_on_the_label(built):
+    """fig-uncertainty: the INT8 sets get smaller under contrast (ImageNet-C) s5 than on clean images."""
+    label = built[0]["mobilenet_v3_large"]
+    lab = site_labels.builds(label)[1]
+    size = {
+        cid: site_labels.measurement(label, "mean_set_size", lab, cid)["value"]
+        for cid in ("clean", "imagenet-c/contrast/5")
+    }
+    assert size["imagenet-c/contrast/5"] < size["clean"]
+    claim = json.loads(site_build.CLAIMS.read_text(encoding="utf-8"))["claims"]
+    text = next(c["claim"] for c in claim if c["id"] == "fig-uncertainty")
+    assert "the INT8 sets even get smaller" in text and html.escape(text) in built[3]["why-labels/index.html"]

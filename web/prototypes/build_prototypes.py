@@ -280,7 +280,7 @@ def landing(labs: dict, checks: dict) -> str:
   {pixel_hero()}
   <div class="hero-text">
     <p class="kicker mono">THE FORGE'S TEST BENCH</p>
-    <h1>Shrink AI models for small hardware, and find out honestly what you lost.</h1>
+    <h1>Shrink AI models for small hardware, and measure what you lost.</h1>
     <p>Brokkr forges the part (shrinks a model to INT8), then measures it on the bench: accuracy,
     uncertainty and speed under fog, darkness, blur, noise and low contrast. Every number on a label
     comes from a checked result file, measured on one laptop CPU with simulated damage.</p>

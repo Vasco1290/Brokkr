@@ -4,7 +4,7 @@
 
 # Brokkr
 
-**Shrink AI models for small hardware, and find out honestly what you lost.**
+**Shrink AI models for small hardware, and measure what you lost.**
 
 ## Status
 
@@ -124,9 +124,9 @@ Every model in every damaged condition (exploratory, not pre-registered): [grid 
   MobileNetV3-Small broke.
 - Consistent with prior work on quantized models (Xiao et al., 2023, arXiv:2304.03968; Yaghoubi Araghi
   et al., 2026, 4-bit, arXiv:2607.18540), we found that shrunk models can pass a normal accuracy check
-  and still collapse in dark or low-contrast images, and in our small pre-registered test, clean
-  accuracy didn't predict which. In wider exploratory checks, which models were hit varied with the
-  condition, and fog hit some models too.
+  and still collapse in dark or low-contrast images, and in our small pre-registered test (9 models), we
+  found no strong relation between clean accuracy and which models collapsed. In wider exploratory
+  checks, which models were hit varied with the condition, and fog hit some models too.
 - Pre-registered (Stage 4, 9 models, 10,000 test images; verdicts unchanged): the two predictions about
   collapse were judged at two conditions only, darkness (Brokkr) s5 (H21) and contrast (ImageNet-C) s3
   (H20). In each, 2 of 9 models lost much more to shrinking under the damage than on clean images
@@ -211,7 +211,7 @@ comes in roadmap step 3.
 
 **The honesty rules**
 
-- **No made-up numbers.** Every number comes from running the code, is saved as JSON first, and names
+- **No made-up numbers.** Every measured number comes from running the code, is saved as JSON first, and names
   the machine, library versions and git commit it came from. Labels, pages and this README's results
   are generated from that JSON.
 - **Predictions first.** Hypotheses and pass rules are committed before measuring; outcomes are

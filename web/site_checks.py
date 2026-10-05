@@ -17,7 +17,9 @@ runs them on a fresh build.
    page shows no dates and no stage or step numbers;
 8. every findings paragraph on the site equals a paragraph of the README's generated findings block,
    character for character (H's condition, 4 October 2026);
-9. no sentence anywhere on the site says "official" with "ImageNet-C" or "corruption code".
+9. no sentence anywhere on the site says "official" with "ImageNet-C" or "corruption code";
+10. 404.html exists, links to the landing page and the catalog, and resolves its links from the published
+   address's path (<base href>).
 Besides labels and figure entries, a page may quote the README's findings block word for word (its
 numbers are checked against the records by scripts/45_readme_findings.py --check, run by scripts/40), and
 may name identifiers with digits (commits, citations, step names) on its own list, each with a reason.
@@ -30,10 +32,12 @@ import posixpath
 import re
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlparse
 
 import site_meter as M
 import site_sources
 import themes
+from site_build import SITE_ADDRESS, SITE_BASE
 from site_labels import LABELS, address, build_id, builds, measurement, readable_window, timing_window
 from site_pages import FEATURED, METER_CONDITIONS, count, interval
 
@@ -225,6 +229,8 @@ def check_links(files: dict) -> list:
         if not (path.endswith(".html") and isinstance(text, str)):
             continue
         for tag, a in parse(text).elements:
+            if tag == "base":  # the not-found page's <base href> (check_not_found), not a link
+                continue
             targets = [a[k] for k in ("href", "src") if a.get(k)] + [
                 s.strip().split(" ")[0] for s in (a.get("srcset") or "").split(",") if s.strip()
             ]
@@ -422,6 +428,35 @@ def check_claims(files: dict, claims_path: Path) -> list:
     return problems
 
 
+# ---- 10. the not-found page ----
+
+
+def check_not_found(files: dict) -> list:
+    """404.html exists (GitHub Pages shows it for any missing address), says the page doesn't exist, links to
+    the landing page and the catalog, and carries <base href> with the published address's path, so its links
+    and stylesheets work at any depth; no other page has a <base>."""
+    page = files.get("404.html")
+    if not isinstance(page, str):
+        return ["404.html is missing"]
+    problems = []
+    if urlparse(SITE_ADDRESS).path != SITE_BASE:
+        problems.append(f"SITE_BASE {SITE_BASE} is not the path of the published address {SITE_ADDRESS}")
+    head = page.split("</head>")[0]
+    if head.count("<base ") != 1 or f'<base href="{SITE_BASE}">' not in head:
+        problems.append(f'404.html: no single <base href="{SITE_BASE}"> in its head')
+    if "This page doesn't exist." not in page:
+        problems.append("404.html does not say the page doesn't exist")
+    for target in ("index.html", "models/index.html"):
+        if f'href="{target}"' not in page.split('<main id="main">')[1]:
+            problems.append(f"404.html: no link to {target} in its content")
+    problems += [
+        f"{path}: has a <base> (only 404.html may)"
+        for path, text in files.items()
+        if path != "404.html" and path.endswith(".html") and isinstance(text, str) and "<base " in text
+    ]
+    return problems
+
+
 def run_all(
     pages: dict, files: dict, labs: dict, figures: dict, commit: str, version: str, claims: Path
 ) -> list:
@@ -450,4 +485,8 @@ def run_all(
             check_findings(pages, files),
         ),
         ('no sentence says "official" with ImageNet-C or corruption code', check_wording(files)),
+        (
+            "the not-found page exists, links home and to the catalog, and resolves from the site's root",
+            check_not_found(files),
+        ),
     ]

@@ -593,3 +593,15 @@ that decided it, and names one `label.json` field, or one piece of text the labe
   `tests/test_compare_labels.py` shows with made-up changes (tests only).
 - Run against the release of 4 October 2026 (`15437fd`) and today's `published/labels/`: PASS for all ten
   labels, each with the two listed changes and the commit and time differences, and no other difference.
+
+## Note added 6 October 2026 on narrowed wording: the "Pinned" glossary line (before the labels are remade)
+
+H's round 3 decision 1c (6 October 2026), from the overclaim list in `docs/prepublic_checklist.md`. The
+glossary line "Pinned" said the timing "was only allowed to run on the named CPU cores, so the operating
+system could not move it to slower ones". The pin was set but never read back, so that was not shown. It
+now reads: "the timing was set to run only on the named cores; this was not read back to confirm." The line
+is fixed text in `brokkr_edge/label_render.py`, so it changes every `label.md` and `label.html` and no
+`label.json`. It is the third entry in `docs/label_changes.json`. The labels are remade from a clean commit,
+checked by `scripts/40_check_labels.py`, released again, and compared with the release of 5 October 2026
+by `scripts/48_compare_labels.py`, which must pass with this listed change only. No value, threshold, state
+or rule changes; schema version 1 stays.

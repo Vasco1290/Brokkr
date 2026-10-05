@@ -243,9 +243,9 @@ def landing(site) -> list:
   {pixel_hero()}
   <div class="hero-text">
     <p class="kicker mono">THE FORGE'S TEST BENCH</p>
-    <h1>Shrink AI models for small hardware, and find out honestly what you lost.</h1>
+    <h1>Shrink AI models for small hardware, and measure what you lost.</h1>
     <p>Brokkr shrinks a model to INT8, then measures what it lost under fog, darkness, blur, noise and low
-    contrast. Every number comes from a checked result file: one laptop CPU, simulated damage.</p>
+    contrast. Every measured number comes from a checked result file: one laptop CPU, simulated damage.</p>
   </div>
 </section>
 <section class="bench" id="bench" aria-labelledby="bench-h">

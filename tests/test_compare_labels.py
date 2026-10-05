@@ -54,7 +54,7 @@ def edit_json(folder: Path, change) -> None:
 def test_the_listed_changes_pass_and_are_named(sets):
     ok, line, details = run(sets)
     assert ok, (line, details)
-    assert "differing fields: none; accepted listed changes: 2" in line
+    assert f"differing fields: none; accepted listed changes: {len(CHANGES)}" in line
     assert [d for d in details if d.startswith("     accepted: [2026-10-05]")] == [
         f"     accepted: {C.name_of(c)}" for c in CHANGES
     ]

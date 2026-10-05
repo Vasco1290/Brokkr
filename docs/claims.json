@@ -43,14 +43,14 @@
   {
    "id": "fig-uncertainty",
    "figure": "mnv3l-uncertainty",
-   "claim": "For MobileNetV3-Large, prediction sets calibrated on clean images keep their coverage target on clean images but fall below it under several kinds of damage, while their average size changes little.",
+   "claim": "For MobileNetV3-Large, prediction sets calibrated on clean images keep their coverage target on clean images but fall below it under several kinds of damage, while the average set size doesn't grow to compensate; under strong low contrast (contrast (ImageNet-C) s5) the INT8 sets even get smaller.",
    "scope": {
     "models": "MobileNetV3-Large, FP32 and INT8 (percentile 99.99)",
     "conditions": "clean and the twelve damaged conditions on its label",
     "data": "ImageNet-1k validation, test split; prediction sets calibrated on the clean conformal-calibration split",
     "intervals": "95% bootstrap"
    },
-   "status": "measured and reported (Stage 4 records); not a pre-registered verdict",
+   "status": "measured and reported (Stage 4 records); not a pre-registered verdict; wording narrowed by H on 6 October 2026 (it said the average size \"changes little\"), and tests/test_site.py checks against the label that the INT8 sets are smaller under contrast (ImageNet-C) s5 than on clean images",
    "prior_work": [
     "Kasa and Taylor, 2023, Empirically Validating Conformal Prediction on Modern Vision Architectures Under Distribution Shift and Long-tailed Data, arXiv:2307.01088"
    ],
@@ -95,7 +95,7 @@
   {
    "id": "site-finding",
    "where": "website landing page: the paragraph under \"What we found\" (beside the hero figure, claim fig-hero); the same paragraph opens the Why labels? page",
-   "claim": "Consistent with prior work on quantized models, shrunk models can pass a normal accuracy check and still collapse in dark or low-contrast images; in our small pre-registered test, clean accuracy didn't predict which; in wider exploratory checks, which models were hit varied with the condition, and fog hit some models too.",
+   "claim": "Consistent with prior work on quantized models, shrunk models can pass a normal accuracy check and still collapse in dark or low-contrast images; in our small pre-registered test, we found no strong relation between clean accuracy and which models collapsed (a weak test with few models); in wider exploratory checks, which models were hit varied with the condition, and fog hit some models too.",
    "scope": {
     "models": "the Stage 4 (task 4.1) models: every usable INT8 build (percentile 99.99); MobileNetV3-Small left out (its INT8 build failed)",
     "conditions": "pre-registered: darkness (Brokkr) s5 (H21), contrast (ImageNet-C) s3 (H20), and H18b's judged conditions; exploratory: the twelve damaged conditions on the labels",

@@ -46,7 +46,12 @@ PAGE_TYPES = [
     PageType("methods", "Methods", "methods/index.html", B.methods),
     PageType("roadmap", "Roadmap", "roadmap/index.html", B.roadmap),
     PageType("model", None, "models/index.html", A.model_pages),  # reached from the catalog, not the nav
+    PageType("not-found", None, "404.html", B.not_found),  # GitHub Pages shows it for a missing address
 ]
+# The published address (docs/publishing_plan.md): GitHub serves 404.html at any missing address under it, so
+# that page's links resolve from SITE_BASE (a <base href>), not from the address asked for.
+SITE_ADDRESS = "https://vasco1290.github.io/Brokkr/"
+SITE_BASE = "/" + GITHUB.rstrip("/").split("/")[-1] + "/"
 
 
 class Site:
@@ -98,10 +103,11 @@ def shell(path: str, page: Page, page_types: list, labs: dict, commit: str) -> s
     )
     options = "".join(f'<option value="{k}">{esc(t["name"])}</option>' for k, t in themes.THEMES.items())
     used = {k: labs[k] for k in page.labels}
+    base = f'\n<base href="{SITE_BASE}">' if path == "404.html" else ""  # see SITE_BASE
     return f"""<!doctype html>
 <html lang="en" class="no-js">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8">{base}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(page.title)}</title>
 {THEME_BOOT % json.dumps(list(themes.THEMES))}

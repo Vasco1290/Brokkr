@@ -21,6 +21,15 @@
       "path": null,
       "old": "the two sets of damage: Brokkr's own, and ImageNet-C, a widely used public benchmark (made here with its official code).",
       "new": "the two sets of damage: Brokkr's own, and ImageNet-C, a widely used public benchmark. Its damage types were made here with the imagecorruptions package (an extension of the ImageNet-C code), not taken from the released ImageNet-C files; see the limits."
+    },
+    {
+      "date": "2026-10-06",
+      "note": "docs/label_schema.md, note of 6 October 2026 on narrowed wording (H's round 3 decision 1c)",
+      "what": "glossary line \"Pinned\": no longer says the operating system could not move the timing (the pin was not read back)",
+      "in": "label.html",
+      "path": null,
+      "old": "the timing was only allowed to run on the named CPU cores, so the operating system could not move it to slower ones.",
+      "new": "the timing was set to run only on the named cores; this was not read back to confirm."
     }
   ]
 }

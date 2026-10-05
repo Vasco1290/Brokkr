@@ -15,6 +15,7 @@ from site_pages import (
     f,
     figure_block,
     hover,
+    pixel_hero,
     quote,
     table,
     up,
@@ -231,9 +232,10 @@ SPLIT_USE = {
     "conformal_calibration": "setting the prediction-set threshold (clean images only)",
 }
 HONESTY = [
-    "Every number on a label and on this site comes from a checked result file; the site is not built if a "
-    "page shows a number that is not in a label, a checked figure or the checked findings.",
-    'Nothing is estimated: what was not measured says "not measured", what was not run says "not tested".',
+    "Every measured number on a label and on this site comes from a checked result file; the site is not "
+    "built if a page shows a number that is not in a label, a checked figure, the checked findings or the "
+    "page's reviewed list of other numbers (such as scales, dates and versions).",
+    'Nothing is guessed: what was not measured says "not measured", what was not run says "not tested".',
     'Laptop latency is always called laptop latency. "Raspberry Pi 5" appears only for results measured on '
     'one; cloud ARM results are labelled "cloud ARM".',
     "Predictions are written down and committed before measuring; outcomes are added, never edited; analyses "
@@ -293,7 +295,8 @@ def methods(site) -> list:
         "predictions' "
         "extra gap, and adopted it after the results of task 4.1 existed. Each line is recorded in "
         "docs/hypotheses_stage4.md.</p>"
-        f"<p>Why these values, without looking at the data: the prediction sets are tuned for {target} "
+        f"<p>Reasons for these values that do not depend on the results: the prediction sets are tuned for "
+        f"{target} "
         f"coverage, so below {cov} they miss at least twice as many images as they are built to; a fall of "
         "ten points means at least one image in ten that was right on clean images is now wrong; and a cost "
         "of five points is large enough to change which model a user should pick.</p>"
@@ -373,3 +376,26 @@ ROADMAP.md marks public, without dates; each step is finished before the next st
     words = {name: "a name from ROADMAP.md" for k in ("built", "now", "next", "later") for name in plan[k]}
     words.update({x: "an item from ROADMAP.md" for x in plan["later_versions"]})
     return [(path, Page("Roadmap · Brokkr", body, labels=[], words=words))]
+
+
+# ---- Not found ----
+
+
+def not_found(site) -> list:
+    """The page GitHub Pages shows for an address that does not exist (H, 6 October 2026). GitHub serves it at
+    whatever address was asked for, so its shell carries <base href> (web/site_build.py) and every link below
+    resolves from the site's root."""
+    links = "".join(
+        f'<a class="button" href="{site.page_types[k].path}">{esc(site.page_types[k].nav or "Home")}</a>'
+        for k in ("landing", "catalog")
+    )
+    body = f"""
+<section class="hero notfound">
+  {pixel_hero()}
+  <div class="hero-text">
+    <h1>Not found</h1>
+    <p class="lead">This page doesn't exist.</p>
+    <p class="cta">{links}</p>
+  </div>
+</section>"""
+    return [("404.html", Page("Not found · Brokkr", body, labels=[]))]
