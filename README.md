@@ -8,7 +8,7 @@
 
 ## Status
 
-*3 October 2026.* Brokkr is a research project becoming a tool. Everything below was measured on one
+*6 October 2026.* Brokkr is a research project becoming a tool. Everything below was measured on one
 Windows laptop (Intel Core i5-1235U, CPU only), on ImageNet test images with simulated damage.
 
 **Works today**
@@ -21,13 +21,13 @@ Windows laptop (Intel Core i5-1235U, CPU only), on ImageNet test images with sim
   repeat runs.
 - A label for every model in the study, each number checked against the result file it came from; all
   of them released in [`published/labels/`](published/labels/).
+- The catalog website, live at **https://vasco1290.github.io/Brokkr/**: the catalog, one page per label, compare, why labels,
+  methods and roadmap, generated from the released labels (`python scripts/49_build_site.py`).
 
 **Not built yet**
 
 - A package on PyPI and a quick start for your own model (roadmap steps 3 and 4).
-- The catalog website online (step 2): its pages (home, catalog, compare, why labels, methods, roadmap and
-  one page per label) build locally with `python scripts/49_build_site.py`, but the site is not published
-  yet. A hosted upload page (step 5).
+- A hosted upload page (step 5).
 - Object detection: Brokkr tests image classifiers only.
 - Any device other than this laptop: nothing has been measured on a Raspberry Pi or another board
   (step 6).
@@ -282,7 +282,7 @@ started by hand with the laptop plugged in and other programs closed.
 
 ## Roadmap
 
-Next: the catalog website, then testing your own model. The full plan, in order and with dates:
+Next: testing your own model (step 3). The full plan, in order and with dates:
 [ROADMAP.md](ROADMAP.md).
 
 ---

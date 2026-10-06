@@ -1,17 +1,41 @@
 # Brokkr status
 
-Snapshot as of **6 October 2026** (round 3). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **6 October 2026** (step 2 done). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
-(catalog site and going public) is in progress**: task 1 (figures) merged into `main`; the site is
-built on branch `step-2-site` (see "Pick up here"). **Research freeze** until website v0 ships (see
-"Research freeze" below).
+(catalog site and going public) is done** (6 October 2026): merged into `main` by pull request #7 (merge
+commit `45b8c07`, tag `site-v0`) and live at https://vasco1290.github.io/Brokkr/. **Next: step 3, testing a user's model.** The
+research freeze was "until website v0 ships" (see "Research freeze" below): whether it now ends is H's
+decision.
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (6 October 2026)
+### Pick up here (6 October 2026, after publishing)
 Read this first.
+- **Step 2 (catalog site and going public) is done (6 October 2026).** H merged pull request #7
+  (`step-2-site` into `main`, merge commit `45b8c07`, tagged `site-v0`). On that clean commit: ruff PASS;
+  pytest 393 passed; `scripts/22` PASS (1901 of 1901 records); `scripts/40` PASS (10 labels, README blocks,
+  figures, docs wording); site build PASS (12 checks, 17 pages, 61 files). The built site was pushed as the
+  single commit `230b63b` of the new `gh-pages` branch, and H switched GitHub Pages on (Deploy from a branch,
+  `gh-pages`, root). **Live at https://vasco1290.github.io/Brokkr/.** `scripts/50_check_live_site.py`: PASS (landing, a model page and
+  Compare answer 200; a missing address answers 404 with the site's own 404 page; all 61 files
+  byte-identical to the build). ROADMAP.md: step 2 and the two remaining checklist items ticked with their
+  dates. **One gap in step 2's "done when":** no catalog filter was built (H's site map of 4 October,
+  `docs/website_v0_plan.md` section 12e, has catalog cards and a sortable Compare table instead).
+- **Next: Platform plan step 3, testing a user's model (due 16 October).** Work is on branch `step-3`
+  (from `main` at `45b8c07`; this STATUS, ROADMAP and README update is its first commit, so `main` gets it
+  when `step-3` is merged). ROADMAP.md says that before any code a dated note fixes: how the user's images are split
+  (INT8 calibration, conformal calibration, test; no image in two parts), the minimum image count, the
+  required licence statement, and what is checked about a user-supplied FP32 + already-shrunk ONNX pair.
+- **For H:** CLAUDE.md's research freeze runs "until website v0 ships"; website v0 shipped on 6 October.
+  Whether the freeze ends, and what replaces it, is H's decision (CLAUDE.md is not changed here).
+- **Updating the live site:** follow `docs/publishing_plan.md`, "Updating the site later" (a new clean,
+  tagged commit; a new commit on `gh-pages`, never a force-push; then `scripts/50_check_live_site.py`). The
+  live site was built from `45b8c07`, so later commits on `main` (this STATUS update among them) are not on
+  it until the next update.
+
+**The record of step 2 follows** (kept as it was written during the work).
 - **Step 1 (labels) is done:** merged into `main` by pull request #4 (merge commit `0422a8c`), tagged
   `stage-4-done` (on `790c197`). The record of how it was done is under "Step 1 record" below.
 - **Step 2 (catalog site and going public), due 10 October, is in progress.** Task 1 is merged into
@@ -93,21 +117,19 @@ Read this first.
   records); `scripts/40` PASS (10 labels, README blocks, figures, docs wording); `scripts/48` against the
   4 October release PASS (10 labels, 2 listed changes each); site build PASS (11 checks, 16 pages); fresh
   clone of `00dfdd4` from GitHub: site build PASS, 60 of 60 files byte-identical to the local build.
-- **Round 3 (6 October 2026): done, waiting for H's review** on `step-2-site` (commits `625e3de` wording, 404
+- **Round 3 (6 October 2026): done and approved by H** on `step-2-site` (commits `625e3de` wording, 404
   page and code; `4ea86ea` labels remade at `625e3de` and released again, with the docs; `bd45f30` a test fix;
   then this STATUS update). H's decisions: (1) the seven listed sentences narrowed, never strengthened
   (before and after: `docs/prepublic_checklist.md`, decisions of 6 October); "Pinned" listed in
   `docs/label_changes.json`, labels remade and re-released; (2) the five commits with the real author name
   kept, no history rewrite; (3) publishing plan approved, an on-brand `404.html` added with a site check;
-  (4) **the README AI-assistance line: H's message left both options open ("Choose one"), so nothing was
-  changed.** The README already ends with "Built with AI coding assistance (Claude Code). Research design,
-  decisions and reviews by H." (not under Status). Waiting for H's choice.
+  (4) the README AI-assistance line stays at the bottom of the README (H, 6 October 2026).
   Checks: at `bd45f30`, ruff PASS, pytest 393 passed, `scripts/22` PASS (1901 of 1901 records), site build
   PASS (12 checks, 17 pages, 61 files); `scripts/40` PASS at `4ea86ea` (the later commit changed one test
   line); `scripts/48` PASS against the release of 5 October (one listed change per label) and of 4 October
   (three); fresh clone of `bd45f30` from GitHub: site build PASS, 61 of 61 files byte-identical to the local
   build. Screenshots of the 404 page: `scratch/round3/shots/` (not committed).
-- **Do not publish** (no GitHub Pages, no `gh-pages` push) until H gives the go-ahead.
+- **Published on 6 October 2026** with H's go-ahead (https://vasco1290.github.io/Brokkr/; see the top of "Pick up here").
 
 ### Step 1 record (3 October 2026; done, kept for the record)
 (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)
