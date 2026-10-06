@@ -1,0 +1,3857 @@
+{
+  "schema_version": 1,
+  "label_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+  "source": {
+    "kind": "official",
+    "verified": true,
+    "submitted_by": null,
+    "how_made": "scripts/39_make_labels.py, from the 4.1 records"
+  },
+  "generated": {
+    "by": "brokkr-edge 0.0.1",
+    "commit": "625e3de3851996c5884e49ec8d145e4631edd7ff",
+    "dirty": false,
+    "date_utc": "2026-10-05T19:50:37+00:00",
+    "ci_level": 0.95,
+    "label_licence": "CC BY 4.0",
+    "envelope_rule": "reliability envelope, version 1"
+  },
+  "model": {
+    "model_id": "torchvision/mobilenet_v3_small@imagenet1k_v1",
+    "name": "mobilenet_v3_small",
+    "display_name": "MobileNetV3-Small",
+    "publisher": "torchvision",
+    "weights": "MobileNet_V3_Small_Weights.IMAGENET1K_V1",
+    "task": "classification",
+    "modality": "image",
+    "input": {
+      "shape": [
+        3,
+        224,
+        224
+      ],
+      "preprocessing": {
+        "resize": 256,
+        "crop": 224,
+        "interpolation": "bilinear",
+        "mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "std": [
+          0.229,
+          0.224,
+          0.225
+        ]
+      }
+    },
+    "outputs": {
+      "n_classes": 1000,
+      "class_set": "imagenet-1k"
+    },
+    "licence": {
+      "code": "BSD-3-Clause (torchvision)",
+      "weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing."
+    }
+  },
+  "builds": [
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "role": "reference",
+      "display_name": "FP32 (full precision)",
+      "precision": "fp32",
+      "recipe": {
+        "method": "fp32 export (torch.onnx), not quantized"
+      },
+      "file": {
+        "sha256": "e3c1f0e2a4027c5f75a3d88bc404a53b94b0587856a97d0ba8b91ed5d1a15860",
+        "size_bytes": 10436777
+      },
+      "status": "usable",
+      "failure": null
+    },
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+      "role": "labelled",
+      "display_name": "INT8 (percentile calibration, 99.99%)",
+      "precision": "int8",
+      "recipe": {
+        "method": "percentile99.99",
+        "detail": "range = 99.99th percentile of absolute values (2048 bins), clipped to the smallest/largest value seen",
+        "format": "QDQ",
+        "weights": "int8, per-channel",
+        "activations": "uint8, per-tensor",
+        "calibration": {
+          "dataset_id": "imagenet/imagenet-1k-val:int8-calibration",
+          "n_items": 512,
+          "group_items": 128
+        },
+        "kept_float": null,
+        "skip_symbolic_shape": false
+      },
+      "file": {
+        "sha256": "7992b90383b2f23207a6338fd64146fc541568f971a9386eb6fa74e27d1ddcf4",
+        "size_bytes": 2834608
+      },
+      "status": "failed",
+      "failure": {
+        "check": "top-1 agreement with FP32 >= 20%",
+        "value": 0.02734375,
+        "limit": 0.2,
+        "n_items": 256,
+        "split": "tuning",
+        "sources": [
+          {
+            "file": "models/mobilenet_v3_small_int8_percentile99.99.json",
+            "sha256": "0051ab8643d324b4c9130eab237b2c8d5b66b00e9c1751f88f6a7452d17e7f83",
+            "field": "sanity_check.top1_agreement_with_fp32"
+          },
+          {
+            "file": "models/mobilenet_v3_small_int8_percentile99.99.json",
+            "sha256": "0051ab8643d324b4c9130eab237b2c8d5b66b00e9c1751f88f6a7452d17e7f83",
+            "field": "sanity_check.n_images"
+          },
+          {
+            "file": "models/mobilenet_v3_small_int8_percentile99.99.json",
+            "sha256": "0051ab8643d324b4c9130eab237b2c8d5b66b00e9c1751f88f6a7452d17e7f83",
+            "field": "sanity_check.split"
+          }
+        ]
+      }
+    }
+  ],
+  "hardware": [
+    {
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "kind": "laptop",
+      "cpu_model": "12th Gen Intel(R) Core(TM) i5-1235U",
+      "os": "Windows 11",
+      "architecture": "AMD64",
+      "cores": {
+        "types": {
+          "performance": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "efficiency": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        "map": null
+      },
+      "features": {
+        "avx": true,
+        "avx2": true,
+        "avx512f": false,
+        "avx512_vnni": null,
+        "avx_vnni": null,
+        "asimd": false,
+        "asimddp": false,
+        "i8mm": false
+      },
+      "fingerprint_source": {
+        "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.json",
+        "sha256": "88c8e02c0e77caa520c7b08711a69149316d1b3b958f42aeb3433835c5e5500b",
+        "field": "device.fingerprint"
+      }
+    }
+  ],
+  "runtimes": [
+    {
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "name": "onnxruntime",
+      "version": "1.23.2",
+      "execution_provider": "CPUExecutionProvider",
+      "threads": 8,
+      "intra_op_threads": null,
+      "inter_op_threads": null,
+      "spinning": null,
+      "graph_optimisation": null,
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.json",
+          "sha256": "88c8e02c0e77caa520c7b08711a69149316d1b3b958f42aeb3433835c5e5500b",
+          "field": "runtime"
+        }
+      ]
+    },
+    {
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "name": "onnxruntime",
+      "version": "1.23.2",
+      "execution_provider": "CPUExecutionProvider",
+      "threads": 8,
+      "intra_op_threads": null,
+      "inter_op_threads": null,
+      "spinning": "off",
+      "graph_optimisation": null,
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
+          "sha256": "9cda259805c2e28f8455e23d1473f59a15d6b25d17f00927c3f441ce037ee4b1",
+          "field": "runtime"
+        }
+      ]
+    },
+    {
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:1t:spin-on",
+      "name": "onnxruntime",
+      "version": "1.23.2",
+      "execution_provider": "CPUExecutionProvider",
+      "threads": 1,
+      "intra_op_threads": 1,
+      "inter_op_threads": 1,
+      "spinning": "on (ONNX Runtime's default)",
+      "graph_optimisation": "ORT_ENABLE_ALL",
+      "sources": [
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "runtime"
+        }
+      ]
+    },
+    {
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:4t:spin-on",
+      "name": "onnxruntime",
+      "version": "1.23.2",
+      "execution_provider": "CPUExecutionProvider",
+      "threads": 4,
+      "intra_op_threads": 4,
+      "inter_op_threads": 1,
+      "spinning": "on (ONNX Runtime's default)",
+      "graph_optimisation": "ORT_ENABLE_ALL",
+      "sources": [
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "runtime"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "name": "ImageNet-1k validation",
+      "split": "test",
+      "n_items": 10000,
+      "item_kind": "image",
+      "licence": "ImageNet Terms of Access: non-commercial research and educational use only. Gated download; each user must accept the terms themselves.",
+      "disjoint_from": [
+        "imagenet/imagenet-1k-val:conformal-calibration"
+      ]
+    },
+    {
+      "dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+      "name": "ImageNet-1k validation",
+      "split": "conformal_calibration",
+      "n_items": 5000,
+      "item_kind": "image",
+      "licence": "ImageNet Terms of Access: non-commercial research and educational use only. Gated download; each user must accept the terms themselves.",
+      "disjoint_from": [
+        "imagenet/imagenet-1k-val:test"
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "condition_id": "clean",
+      "suite": null,
+      "damage": "clean",
+      "severity": null,
+      "modality": "image",
+      "label": "clean"
+    },
+    {
+      "condition_id": "brokkr/fog/3",
+      "suite": "brokkr",
+      "damage": "fog",
+      "severity": 3,
+      "modality": "image",
+      "label": "fog (Brokkr) s3"
+    },
+    {
+      "condition_id": "brokkr/darkness/5",
+      "suite": "brokkr",
+      "damage": "darkness",
+      "severity": 5,
+      "modality": "image",
+      "label": "darkness (Brokkr) s5"
+    },
+    {
+      "condition_id": "brokkr/defocus-blur/3",
+      "suite": "brokkr",
+      "damage": "defocus_blur",
+      "severity": 3,
+      "modality": "image",
+      "label": "defocus blur (Brokkr) s3"
+    },
+    {
+      "condition_id": "brokkr/noise/3",
+      "suite": "brokkr",
+      "damage": "noise",
+      "severity": 3,
+      "modality": "image",
+      "label": "noise (Brokkr) s3"
+    },
+    {
+      "condition_id": "imagenet-c/fog/3",
+      "suite": "imagenet-c",
+      "damage": "fog",
+      "severity": 3,
+      "modality": "image",
+      "label": "fog (ImageNet-C) s3"
+    },
+    {
+      "condition_id": "imagenet-c/fog/5",
+      "suite": "imagenet-c",
+      "damage": "fog",
+      "severity": 5,
+      "modality": "image",
+      "label": "fog (ImageNet-C) s5"
+    },
+    {
+      "condition_id": "imagenet-c/contrast/3",
+      "suite": "imagenet-c",
+      "damage": "contrast",
+      "severity": 3,
+      "modality": "image",
+      "label": "contrast (ImageNet-C) s3"
+    },
+    {
+      "condition_id": "imagenet-c/contrast/5",
+      "suite": "imagenet-c",
+      "damage": "contrast",
+      "severity": 5,
+      "modality": "image",
+      "label": "contrast (ImageNet-C) s5"
+    },
+    {
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "suite": "imagenet-c",
+      "damage": "defocus_blur",
+      "severity": 3,
+      "modality": "image",
+      "label": "defocus blur (ImageNet-C) s3"
+    },
+    {
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "suite": "imagenet-c",
+      "damage": "defocus_blur",
+      "severity": 5,
+      "modality": "image",
+      "label": "defocus blur (ImageNet-C) s5"
+    },
+    {
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "suite": "imagenet-c",
+      "damage": "gaussian_noise",
+      "severity": 3,
+      "modality": "image",
+      "label": "gaussian noise (ImageNet-C) s3"
+    },
+    {
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "suite": "imagenet-c",
+      "damage": "gaussian_noise",
+      "severity": 5,
+      "modality": "image",
+      "label": "gaussian noise (ImageNet-C) s5"
+    }
+  ],
+  "checks": {
+    "fp32_sanity": {
+      "measured": 0.6761,
+      "published": 0.6766800000000001,
+      "tolerance": 0.01,
+      "pass": true,
+      "published_source": "torchvision weights metadata (brokkr_edge/model_list.json)",
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.json",
+          "sha256": "88c8e02c0e77caa520c7b08711a69149316d1b3b958f42aeb3433835c5e5500b",
+          "field": "metrics.top1"
+        },
+        {
+          "file": "brokkr_edge/model_list.json",
+          "sha256": "8d6a237935d82ac70c9be7aef70d36c48394016831e8c5b7c2b906e4a14bf5a2",
+          "field": "models.mobilenet_v3_small.published.top1"
+        }
+      ]
+    }
+  },
+  "measurements": [
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "clean",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.6761,
+      "ci95": [
+        0.6671975,
+        0.6851
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.json",
+          "sha256": "88c8e02c0e77caa520c7b08711a69149316d1b3b958f42aeb3433835c5e5500b",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "clean",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.8787,
+      "ci95": [
+        0.8720975,
+        0.8852
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.json",
+          "sha256": "88c8e02c0e77caa520c7b08711a69149316d1b3b958f42aeb3433835c5e5500b",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "clean",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.9011,
+      "ci95": [
+        0.8952975,
+        0.9071025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_conformal.json",
+          "sha256": "f21bb99caa6b2a9ed5b53ee16ed620279d261b38863db8661c98fb6db1f51289",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "clean",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 4.4192,
+      "ci95": [
+        4.3460624999999995,
+        4.4994125
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_conformal.json",
+          "sha256": "f21bb99caa6b2a9ed5b53ee16ed620279d261b38863db8661c98fb6db1f51289",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "clean",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.027282198531192608,
+      "ci95": [
+        0.024208354813987445,
+        0.036178179002346156
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_calibration.json",
+          "sha256": "b5365aa604b74c6add19a37a9438af9b5f3ab8d5acfd45bd14b14d198b83f54f",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "clean",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.05343438833344896,
+      "ci95": [
+        0.05009680341414129,
+        0.057035273698085316
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_selective.json",
+          "sha256": "d7110d2bbcbad3ed9cd9d7352678bedbf2542c087af9d568d3c1e081194ca34e",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.5773,
+      "ci95": [
+        0.5677949999999999,
+        0.5875025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3.json",
+          "sha256": "e1671f2851c9bc6a010b481e0d89efce44d65fa875b0e541c24fff0beec3a7db",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.8057,
+      "ci95": [
+        0.7981975,
+        0.8134025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3.json",
+          "sha256": "e1671f2851c9bc6a010b481e0d89efce44d65fa875b0e541c24fff0beec3a7db",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.8446,
+      "ci95": [
+        0.8374,
+        0.8519
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
+          "sha256": "75bbcc6e7907b115c44bab21fc468ba7e8605a489186ddfe22de617e60f7490a",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 5.5666,
+      "ci95": [
+        5.4835825,
+        5.649205
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
+          "sha256": "75bbcc6e7907b115c44bab21fc468ba7e8605a489186ddfe22de617e60f7490a",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.03934702532518626,
+      "ci95": [
+        0.03322708958420456,
+        0.04770214651208031
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_calibration.json",
+          "sha256": "078fe48fc45003e07e6c7703745b7cc915739f0ca0a2459dbd64052b22c68d0e",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.07160911005464235,
+      "ci95": [
+        0.06751974158145202,
+        0.07577953833218118
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_selective.json",
+          "sha256": "6ce08acc2a12e2d7c4af0694df602d1a73e6525d7aa0925b4d7f0acc21fe34af",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.5746,
+      "ci95": [
+        0.564695,
+        0.5839025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5.json",
+          "sha256": "953c9fdad6ad794867e72a5731b4b8355a00c9bcfa3a1885b6ea958c69c6de3e",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.8119,
+      "ci95": [
+        0.8042975,
+        0.8195025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5.json",
+          "sha256": "953c9fdad6ad794867e72a5731b4b8355a00c9bcfa3a1885b6ea958c69c6de3e",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.8597,
+      "ci95": [
+        0.8524,
+        0.8665025000000001
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
+          "sha256": "c167e2a6c5b690fc1e7ea5f3d528549a6fac5b1d389287707827538348b348a5",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 5.8375,
+      "ci95": [
+        5.7541825,
+        5.9190024999999995
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
+          "sha256": "c167e2a6c5b690fc1e7ea5f3d528549a6fac5b1d389287707827538348b348a5",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.01828757336442027,
+      "ci95": [
+        0.01672903773137458,
+        0.029088297610289318
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_calibration.json",
+          "sha256": "e0beedfe964a3dd52cb76cd039592649753e6203b9f9b2f1a77b523991988556",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.07235854124172435,
+      "ci95": [
+        0.06809135412703238,
+        0.07648696205414827
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_selective.json",
+          "sha256": "01c50aa81e8ec61a6e4c40b02319c67677d682357d858c84b42c9865b2fde03f",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.4104,
+      "ci95": [
+        0.4013,
+        0.4203025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
+          "sha256": "d46d693bfdb7f439fa0277785f006e2c6d345aebce6a5957042192c55dd7bd50",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.6641,
+      "ci95": [
+        0.655095,
+        0.6734025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
+          "sha256": "d46d693bfdb7f439fa0277785f006e2c6d345aebce6a5957042192c55dd7bd50",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.7257,
+      "ci95": [
+        0.7174975,
+        0.7345025000000001
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
+          "sha256": "aba49fe57ae140e2e3f8acd2c9f7a2f8952c9bfb3048bd46f31f9e2c94994554",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 6.9607,
+      "ci95": [
+        6.880082499999999,
+        7.04322
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
+          "sha256": "aba49fe57ae140e2e3f8acd2c9f7a2f8952c9bfb3048bd46f31f9e2c94994554",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.09241575882469517,
+      "ci95": [
+        0.08486332794351223,
+        0.10045699635966257
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_calibration.json",
+          "sha256": "91e5ccb9b396e3de387679326f50f68808dc5d6d1763e505a924b801bffa5bdd",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.11670990201787668,
+      "ci95": [
+        0.11049936625775378,
+        0.12227034870547074
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_selective.json",
+          "sha256": "8b638704a6d96700160e210c37574a74ff1c3ffaf0a6a921d69210db2b48d031",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.3956,
+      "ci95": [
+        0.386795,
+        0.4059
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3.json",
+          "sha256": "19882ee59fffb7bfbdb036ca63b1e6a6b93ac666e59c55e0696ab594794961fe",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.6376,
+      "ci95": [
+        0.6286975,
+        0.647305
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3.json",
+          "sha256": "19882ee59fffb7bfbdb036ca63b1e6a6b93ac666e59c55e0696ab594794961fe",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.7192,
+      "ci95": [
+        0.7102,
+        0.7277025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
+          "sha256": "b9e850d1bc225019521f6c54c7f4631bdefc1407216f269d8d8e3271ed15704e",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 8.0249,
+      "ci95": [
+        7.9372475,
+        8.1096225
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
+          "sha256": "b9e850d1bc225019521f6c54c7f4631bdefc1407216f269d8d8e3271ed15704e",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.022619600716374484,
+      "ci95": [
+        0.018052554968070518,
+        0.03233259854717208
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_calibration.json",
+          "sha256": "c4f60e46f41f53ac70b85b33968233cab40931563334a7c3133262f449207a61",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.10580263863519349,
+      "ci95": [
+        0.10035341164576529,
+        0.11148001222724982
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_selective.json",
+          "sha256": "9e7b765a1001d393e83387e26bab04f006b7869085f397fdf88bb267f56d9b40",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.3856,
+      "ci95": [
+        0.3759975,
+        0.3954
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.json",
+          "sha256": "d424d10cb1151c718bd05b050b44ce21d78420f933c4cad75782de271f1ec1a2",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.6348,
+      "ci95": [
+        0.625895,
+        0.6447
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.json",
+          "sha256": "d424d10cb1151c718bd05b050b44ce21d78420f933c4cad75782de271f1ec1a2",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.7005,
+      "ci95": [
+        0.6921975,
+        0.7098025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
+          "sha256": "c020e2136d470a2ac26cd9c8f49987f7c20f79690337b472c622702aff8c9146",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 7.3876,
+      "ci95": [
+        7.3003599999999995,
+        7.471125
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
+          "sha256": "c020e2136d470a2ac26cd9c8f49987f7c20f79690337b472c622702aff8c9146",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.09919702418346231,
+      "ci95": [
+        0.0909856489628408,
+        0.10744843376811575
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_calibration.json",
+          "sha256": "ad6e022465dfa8c27d088e5407dd06c4b24033ebce084779feb349bb96044b99",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": 0.10825930940937833,
+      "ci95": [
+        0.10250306724575176,
+        0.11332550451440564
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_selective.json",
+          "sha256": "d4e7f7ff189c1a9f56b5f14f1f356fe0f0b423d97149910ca4b5b92ec9a3b3f7",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.1573,
+      "ci95": [
+        0.1506,
+        0.1646
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
+          "sha256": "9cda259805c2e28f8455e23d1473f59a15d6b25d17f00927c3f441ce037ee4b1",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.3254,
+      "ci95": [
+        0.3166,
+        0.3347
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
+          "sha256": "9cda259805c2e28f8455e23d1473f59a15d6b25d17f00927c3f441ce037ee4b1",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.404,
+      "ci95": [
+        0.39509500000000003,
+        0.41310250000000004
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
+          "sha256": "88f55b6259c14bf685ba8569b8f1db4eca62ee9c637e0ca20c80bbeca80aafe8",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 8.8399,
+      "ci95": [
+        8.76129,
+        8.9131125
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
+          "sha256": "88f55b6259c14bf685ba8569b8f1db4eca62ee9c637e0ca20c80bbeca80aafe8",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.18165471475882652,
+      "ci95": [
+        0.17483966246155508,
+        0.18835632375039413
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_calibration.json",
+          "sha256": "b3dc5ec0bfeabf5130e328160265c8cd996a6d3e7a94320cc4cde85d86c70542",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.13294694223008086,
+      "ci95": [
+        0.12554796358021683,
+        0.1403163720718783
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_selective.json",
+          "sha256": "4ab75f6662c7eff0872ea4384600587906e858a4d2ecc07b29c91ea74b1f65c5",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.5751,
+      "ci95": [
+        0.566,
+        0.5853050000000001
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
+          "sha256": "59d816e882eef80286e3c9bd5fb146000f4f4415c836ba78ced4d18815367a07",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.8065,
+      "ci95": [
+        0.7995,
+        0.8146025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
+          "sha256": "59d816e882eef80286e3c9bd5fb146000f4f4415c836ba78ced4d18815367a07",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.8474,
+      "ci95": [
+        0.8405,
+        0.8547
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
+          "sha256": "ef60919463c8f4f886d2b0a41de22d4356d4b123e82424a6cd3b1042759eb155",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 5.6078,
+      "ci95": [
+        5.5228874999999995,
+        5.6898025
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
+          "sha256": "ef60919463c8f4f886d2b0a41de22d4356d4b123e82424a6cd3b1042759eb155",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.03744605963896741,
+      "ci95": [
+        0.03167079530046979,
+        0.04600497981907586
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_calibration.json",
+          "sha256": "a9dea37717c618b8bc583ee58d7cae71d2c11d17ad74b6f4d534ef37f61db0fc",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.07374817709218648,
+      "ci95": [
+        0.06923879089197528,
+        0.07808844975188102
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_selective.json",
+          "sha256": "8288a080c965779f1bb3376e2d114ee1e5a3c3230208ef6fb98281eb2fc46b2a",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.1325,
+      "ci95": [
+        0.12639750000000002,
+        0.139305
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
+          "sha256": "1528a8e726330431d09314a1ea20c0a618164f962214201106d66d1f8334ac57",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.2826,
+      "ci95": [
+        0.2745,
+        0.2914
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
+          "sha256": "1528a8e726330431d09314a1ea20c0a618164f962214201106d66d1f8334ac57",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.3526,
+      "ci95": [
+        0.3439925,
+        0.36200499999999997
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
+          "sha256": "8b40700f6f0dbffdf1ac7cb2ab4909209c8369d5c99267f506d75550e536c2c2",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 9.0354,
+      "ci95": [
+        8.9549475,
+        9.1104
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
+          "sha256": "8b40700f6f0dbffdf1ac7cb2ab4909209c8369d5c99267f506d75550e536c2c2",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.16469788072382424,
+      "ci95": [
+        0.15803257170037832,
+        0.1712313956178091
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_calibration.json",
+          "sha256": "56aa57869851ce1018b3e49bd2385f85d258f0268f7c130d00dbf6a27b7b9e55",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.12344932831763089,
+      "ci95": [
+        0.1169391608869941,
+        0.13043397709453255
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_selective.json",
+          "sha256": "abdddfd044fd34722d312d5a79bcbc292f0ccd7f39514d1fbfc6a491b5c1ca0e",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.2682,
+      "ci95": [
+        0.26029749999999996,
+        0.27750250000000004
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
+          "sha256": "064ab54f95f9c072bb70ad2b82f0121a6f26e2cd03da75dd0187fc5188fb76a4",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.4984,
+      "ci95": [
+        0.4887,
+        0.5081025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
+          "sha256": "064ab54f95f9c072bb70ad2b82f0121a6f26e2cd03da75dd0187fc5188fb76a4",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.5728,
+      "ci95": [
+        0.5626,
+        0.5826
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
+          "sha256": "a6e0b091d3ff308848a873cef0f5032bbe587c361681df7c45c1adf488012967",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 8.3588,
+      "ci95": [
+        8.27764,
+        8.4385025
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
+          "sha256": "a6e0b091d3ff308848a873cef0f5032bbe587c361681df7c45c1adf488012967",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.12262341233721334,
+      "ci95": [
+        0.11463537780905232,
+        0.13030434708795544
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_calibration.json",
+          "sha256": "d44018610dfe62a1a0469846c0d0c10f2a02f1b1b6dc85dbf0a5689b398d8fd8",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.1368948082215094,
+      "ci95": [
+        0.1299789292279146,
+        0.14365405820608823
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_selective.json",
+          "sha256": "4828a8625170814d71a759765c5d6390dc55a5691655ae88be5fd9228dcadf33",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.115,
+      "ci95": [
+        0.109595,
+        0.1216
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
+          "sha256": "37b3319815c92c55b2d4c66194daa7ea79641fda24535cad90a4bdf5c4ac4791",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.2545,
+      "ci95": [
+        0.2464,
+        0.2632
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
+          "sha256": "37b3319815c92c55b2d4c66194daa7ea79641fda24535cad90a4bdf5c4ac4791",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.3261,
+      "ci95": [
+        0.3169,
+        0.3350075
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
+          "sha256": "6f16a9518ad9d0711e1540c412b8eb2685f6068a288c572f2d21e7dd1addcd29",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 9.9795,
+      "ci95": [
+        9.903995,
+        10.04961
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
+          "sha256": "6f16a9518ad9d0711e1540c412b8eb2685f6068a288c572f2d21e7dd1addcd29",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.12336959059425578,
+      "ci95": [
+        0.11697456598535785,
+        0.1291868659563578
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_calibration.json",
+          "sha256": "b46c117e2f190d8fedbd3b5b2d0d7a78ea5bddf096143d2c08828e0abc3f453e",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.12834958603065394,
+      "ci95": [
+        0.12074387819090342,
+        0.1364070111861868
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_selective.json",
+          "sha256": "67ee5faf214fac42da8a87837e32031ed30067ffdd2b1320d4ad1963f82a9659",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.2242,
+      "ci95": [
+        0.2159,
+        0.2325025
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
+          "sha256": "6de22008a3538239963fcccc1db8e1a5e77176492105c9e08e9bfc8c0471ab33",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.4284,
+      "ci95": [
+        0.41949749999999997,
+        0.4377
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
+          "sha256": "6de22008a3538239963fcccc1db8e1a5e77176492105c9e08e9bfc8c0471ab33",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.5204,
+      "ci95": [
+        0.5109,
+        0.5294
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
+          "sha256": "9a4dd4a57dc067d2189ec2eb34d6879872beadc38c48394b67c12b9954989e02",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 9.1646,
+      "ci95": [
+        9.086195,
+        9.238245000000001
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
+          "sha256": "9a4dd4a57dc067d2189ec2eb34d6879872beadc38c48394b67c12b9954989e02",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.05766826302544064,
+      "ci95": [
+        0.05099743385904142,
+        0.0641319552045411
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_calibration.json",
+          "sha256": "d1e13ad1b820712a71f37a9253c3751c2688e0f34023f5804e4653f3702e958d",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.11927606498395532,
+      "ci95": [
+        0.11249194225530518,
+        0.12572295326830832
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_selective.json",
+          "sha256": "30d70ad9b006e57a92d7dda118bed3a8515871f72cf342c0224396fe56f910b3",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "top1",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.0219,
+      "ci95": [
+        0.019,
+        0.0249
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
+          "sha256": "600c7506a2cc0f51ee71df2491e281e0b0396b87cee28c0096c2ddd8fa6b9be1",
+          "field": "metrics.top1"
+        }
+      ]
+    },
+    {
+      "metric": "top5",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.0715,
+      "ci95": [
+        0.0665,
+        0.0767
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
+          "sha256": "600c7506a2cc0f51ee71df2491e281e0b0396b87cee28c0096c2ddd8fa6b9be1",
+          "field": "metrics.top5"
+        }
+      ]
+    },
+    {
+      "metric": "coverage",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.0971,
+      "ci95": [
+        0.0913,
+        0.1032
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
+          "sha256": "880b550e17207199bbe6aadcfefcd766757455fa4f24cac5d84a2447517eb516",
+          "field": "metrics.coverage"
+        }
+      ]
+    },
+    {
+      "metric": "mean_set_size",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 7.3492,
+      "ci95": [
+        7.292,
+        7.4125024999999996
+      ],
+      "n_items": 10000,
+      "unit": "classes",
+      "settings": {
+        "target_coverage": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_dataset_id": "imagenet/imagenet-1k-val:conformal-calibration",
+        "calibration_items": 5000,
+        "method": "LAC"
+      },
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
+          "sha256": "880b550e17207199bbe6aadcfefcd766757455fa4f24cac5d84a2447517eb516",
+          "field": "metrics.mean_set_size"
+        }
+      ]
+    },
+    {
+      "metric": "ece",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.1749115297998475,
+      "ci95": [
+        0.17082600003394505,
+        0.1789010330334083
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_calibration.json",
+          "sha256": "d26fa00ff6635321718dcbab74f71c4b8ab5a85eb43694aba2030ee04ecf5ad5",
+          "field": "metrics.ece"
+        }
+      ]
+    },
+    {
+      "metric": "e_aurc",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": 0.06067816650149804,
+      "ci95": [
+        0.053255800210954114,
+        0.06795641636160905
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {},
+      "sources": [
+        {
+          "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_selective.json",
+          "sha256": "2ad16ab7baa2764e6fab456545d0cd4fb87ffa8c8dca4e2afd3b3881bd3dcaf5",
+          "field": "metrics.e_aurc"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": -0.0988,
+      "ci95": [
+        -0.1067,
+        -0.091
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        }
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3.npz",
+          "sha256": "8624e8e832e837b62a9774313322969ef9de602984a8fccf9c410d78138338a6",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/darkness/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": -0.1015,
+      "ci95": [
+        -0.1093,
+        -0.0938925
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        }
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5.npz",
+          "sha256": "ca6792c9e9b51ece62d288525bacd372142649e7163f8d19e155b6492a69beb8",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": -0.2657,
+      "ci95": [
+        -0.2758025,
+        -0.2555975
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        }
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.npz",
+          "sha256": "9c59832fc869cbfb43d7a1436c4b9a322c725d711d5e445761e84a5feec85b41",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "brokkr/noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": -0.2805,
+      "ci95": [
+        -0.29020250000000003,
+        -0.2701975
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        }
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3.npz",
+          "sha256": "8c77a4ff4350275419eb6bd4532d320f8582428e1007fd042b0743b7bd7dee46",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded",
+      "value": -0.2905,
+      "ci95": [
+        -0.299905,
+        -0.2808
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        }
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.npz",
+          "sha256": "d2e61bb39b1691f0a5a73abae9c10cdf2d06c6170c1790ab23a5856f950585dd",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/fog/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.5188,
+      "ci95": [
+        -0.5287025,
+        -0.5089
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.npz",
+          "sha256": "dfbd7b878ee424212d55748b406db67def43fd32295cb43962f4d60b036574cc",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.101,
+      "ci95": [
+        -0.1087,
+        -0.093395
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.npz",
+          "sha256": "86264eaf48f1860afc0cfb535629e5ca2712de94cea9de34c215fbcb5b5c72ab",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/contrast/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.5436,
+      "ci95": [
+        -0.5539025,
+        -0.5336974999999999
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.npz",
+          "sha256": "327ce2623f200a2f9c0e6efd27035e0f151693c2c866ade3d1272be3a82bd373",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.4079,
+      "ci95": [
+        -0.41840499999999997,
+        -0.3975
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.npz",
+          "sha256": "2a9b22b609d654e6bc550d3d04a7fc9548f11cf13731ed79150d0a8580f0a93f",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/defocus-blur/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.5611,
+      "ci95": [
+        -0.571,
+        -0.5513975
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.npz",
+          "sha256": "5eba93c66e04e211719392cc99b03c4e866682f83e048c7331b1223a2d30644b",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/3",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.4519,
+      "ci95": [
+        -0.46230499999999997,
+        -0.4423975
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.npz",
+          "sha256": "d57409d69ceabf7ea2a2b2e18ac5e018d9e7678a7bec81898a5e9d0e9fbdd668",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    },
+    {
+      "metric": "damage_drop",
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "dataset_id": "imagenet/imagenet-1k-val:test",
+      "condition_id": "imagenet-c/gaussian-noise/5",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-off",
+      "value": -0.6542,
+      "ci95": [
+        -0.6632025,
+        -0.6454
+      ],
+      "n_items": 10000,
+      "unit": "fraction",
+      "settings": {
+        "paired_with": "clean",
+        "bootstrap": {
+          "resamples": 1000,
+          "seed": 0,
+          "paired": true
+        },
+        "paired_runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:8t:spin-not-recorded"
+      },
+      "sources": [
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.npz",
+          "sha256": "b88d45f285c5846126933e179ad69de65d607247f4be180238a28fef1617c8be",
+          "field": "logits, labels"
+        },
+        {
+          "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+          "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+          "field": "logits, labels"
+        }
+      ]
+    }
+  ],
+  "envelope": {
+    "rule": {
+      "name": "reliability envelope, version 1",
+      "fixed_in": "docs/hypotheses_stage4.md, notes of 29 and 30 September 2026",
+      "harm_definition": "the harm definition of 621cc43 (3.9 note), applied to the test split",
+      "coverage_min": 0.8,
+      "damage_drop_min": -0.1,
+      "large_shrinking_cost_below": -0.05,
+      "near_floor_fp32_top1_below": 0.1
+    },
+    "rows": [
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "brokkr/fog/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "borderline",
+        "why": [
+          "damage drop interval straddles its line"
+        ],
+        "failed": [],
+        "line_states": {
+          "damage drop": "straddles",
+          "coverage": "copes"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "brokkr/darkness/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "borderline",
+        "why": [
+          "damage drop interval straddles its line"
+        ],
+        "failed": [],
+        "line_states": {
+          "damage drop": "straddles",
+          "coverage": "copes"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "brokkr/defocus-blur/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "brokkr/noise/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/fog/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/fog/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/contrast/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "borderline",
+        "why": [
+          "damage drop interval straddles its line"
+        ],
+        "failed": [],
+        "line_states": {
+          "damage drop": "straddles",
+          "coverage": "copes"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/contrast/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/defocus-blur/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/defocus-blur/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/gaussian-noise/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+        "condition_id": "imagenet-c/gaussian-noise/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "harmful",
+        "why": [
+          "whole damage-drop interval below the damage-drop line",
+          "whole coverage interval below the coverage line"
+        ],
+        "failed": [
+          "damage drop",
+          "coverage"
+        ],
+        "line_states": {
+          "damage drop": "fails",
+          "coverage": "fails"
+        },
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "brokkr/fog/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "brokkr/darkness/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "brokkr/defocus-blur/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "brokkr/noise/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/fog/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/fog/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/contrast/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/contrast/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/defocus-blur/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/defocus-blur/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/gaussian-noise/3",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      },
+      {
+        "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+        "condition_id": "imagenet-c/gaussian-noise/5",
+        "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+        "state": "INT8 build failed",
+        "why": [
+          "build check failed: top-1 agreement with FP32 >= 20%"
+        ],
+        "failed": [],
+        "line_states": null,
+        "shrinking_cost_flags": []
+      }
+    ]
+  },
+  "summary": {
+    "describes": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+    "tested_conditions": 12,
+    "lines": [
+      {
+        "state": "INT8 build failed",
+        "cause": null,
+        "count": 12,
+        "conditions": [
+          "brokkr/fog/3",
+          "brokkr/darkness/5",
+          "brokkr/defocus-blur/3",
+          "brokkr/noise/3",
+          "imagenet-c/fog/3",
+          "imagenet-c/fog/5",
+          "imagenet-c/contrast/3",
+          "imagenet-c/contrast/5",
+          "imagenet-c/defocus-blur/3",
+          "imagenet-c/defocus-blur/5",
+          "imagenet-c/gaussian-noise/3",
+          "imagenet-c/gaussian-noise/5"
+        ]
+      },
+      {
+        "state": "not tested",
+        "cause": null,
+        "count": null,
+        "conditions": []
+      }
+    ],
+    "large_shrinking_cost": {
+      "count": 0,
+      "conditions": []
+    },
+    "reference_harmful": {
+      "count": 9,
+      "conditions": [
+        "brokkr/defocus-blur/3",
+        "brokkr/noise/3",
+        "imagenet-c/fog/3",
+        "imagenet-c/fog/5",
+        "imagenet-c/contrast/5",
+        "imagenet-c/defocus-blur/3",
+        "imagenet-c/defocus-blur/5",
+        "imagenet-c/gaussian-noise/3",
+        "imagenet-c/gaussian-noise/5"
+      ]
+    },
+    "coverage_failed": {
+      "count": 0,
+      "conditions": []
+    }
+  },
+  "speed": [
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "hardware_kind": "laptop",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:1t:spin-on",
+      "status": "measured",
+      "reason": null,
+      "settings": {
+        "threads": 1,
+        "batch": 1,
+        "input": "random, seed 0",
+        "what_is_timed": "model only; excludes loading and pre-processing"
+      },
+      "p50_ms": 2.4541,
+      "p95_ms": 2.81157,
+      "p99_ms": 3.3232994999999983,
+      "spread_pct": 1.8357035165641276,
+      "unstable": false,
+      "unstable_above_pct": 10.0,
+      "sessions": 10,
+      "warmup_runs": 20,
+      "timed_runs": 300,
+      "discarded_sessions": 0,
+      "timed_utc": {
+        "first_start": "2026-10-03T08:02:41+00:00",
+        "last_end": "2026-10-03T08:07:25+00:00"
+      },
+      "pinning": {
+        "logical_cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "physical_cores": [
+          0,
+          2
+        ],
+        "n_logical": 4,
+        "n_physical": 2,
+        "core_kind": "performance",
+        "reported_by": "Windows",
+        "read_back": false
+      },
+      "vnni": "AVX512-VNNI: no; AVX-VNNI: unknown (not reported by py-cpuinfo)",
+      "sources": [
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "metrics.p50_ms.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "metrics.p95_ms.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "metrics.p99_ms.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "metrics.spread_pct.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "settings.unstable"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "settings.unstable_above_pct"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "settings.pinned_cpus"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "settings.physical_core_of_each_cpu"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+          "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+          "field": "settings.discarded_sessions"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.npz",
+          "sha256": "d0ec499e5b12baee0daff26518af8dd86899b9f4e303322303fe2860973017c2",
+          "field": "run_starts, run_ends"
+        }
+      ]
+    },
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "hardware_kind": "laptop",
+      "runtime_id": "onnxruntime@1.23.2:cpuexecutionprovider:4t:spin-on",
+      "status": "measured",
+      "reason": null,
+      "settings": {
+        "threads": 4,
+        "batch": 1,
+        "input": "random, seed 0",
+        "what_is_timed": "model only; excludes loading and pre-processing"
+      },
+      "p50_ms": 1.81095,
+      "p95_ms": 2.0575,
+      "p99_ms": 2.172133999999999,
+      "spread_pct": 1.6296695104779289,
+      "unstable": false,
+      "unstable_above_pct": 10.0,
+      "sessions": 10,
+      "warmup_runs": 20,
+      "timed_runs": 300,
+      "discarded_sessions": 0,
+      "timed_utc": {
+        "first_start": "2026-10-03T08:02:42+00:00",
+        "last_end": "2026-10-03T08:07:25+00:00"
+      },
+      "pinning": {
+        "logical_cpus": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "physical_cores": [
+          0,
+          2
+        ],
+        "n_logical": 4,
+        "n_physical": 2,
+        "core_kind": "performance",
+        "reported_by": "Windows",
+        "read_back": false
+      },
+      "vnni": "AVX512-VNNI: no; AVX-VNNI: unknown (not reported by py-cpuinfo)",
+      "sources": [
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "metrics.p50_ms.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "metrics.p95_ms.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "metrics.p99_ms.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "metrics.spread_pct.value"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "settings.unstable"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "settings.unstable_above_pct"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "settings.pinned_cpus"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "settings.physical_core_of_each_cpu"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+          "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+          "field": "settings.discarded_sessions"
+        },
+        {
+          "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.npz",
+          "sha256": "988e61e6d7672e050e5a04e8b818f9521ed5d54c99430aa5980af879aa8ce726",
+          "field": "run_starts, run_ends"
+        }
+      ]
+    },
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "hardware_kind": "laptop",
+      "runtime_id": null,
+      "status": "not measured",
+      "reason": "INT8 build failed",
+      "settings": {
+        "threads": 1
+      }
+    },
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+      "hardware_id": "laptop:12th-gen-intel-r-core-tm-i5-1235u:windows-11",
+      "hardware_kind": "laptop",
+      "runtime_id": null,
+      "status": "not measured",
+      "reason": "INT8 build failed",
+      "settings": {
+        "threads": 4
+      }
+    },
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402",
+      "hardware_id": null,
+      "hardware_kind": "raspberry-pi-5",
+      "runtime_id": null,
+      "status": "not measured",
+      "reason": "no Raspberry Pi 5 yet (Platform plan step 6)",
+      "settings": {}
+    },
+    {
+      "build_id": "torchvision/mobilenet_v3_small@imagenet1k_v1#int8:7992b90383b2",
+      "hardware_id": null,
+      "hardware_kind": "raspberry-pi-5",
+      "runtime_id": null,
+      "status": "not measured",
+      "reason": "no Raspberry Pi 5 yet (Platform plan step 6)",
+      "settings": {}
+    }
+  ],
+  "details": {
+    "conformal": {
+      "torchvision/mobilenet_v3_small@imagenet1k_v1#fp32:e3c1f0e2a402": {
+        "target": 0.9,
+        "threshold": 0.984855654239224,
+        "calibration_items": 5000
+      }
+    }
+  },
+  "limits": [
+    "The damage is simulated (Brokkr's own and ImageNet-C corruptions); real fog, darkness or noise may affect the model differently.",
+    "The ImageNet-C conditions were made on these test images with the imagecorruptions package v1.1.2 (an extension of the ImageNet-C code), with a one-line fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and each model's own preprocessing were used, so the results are not directly comparable to the released ImageNet-C files or to published ImageNet-C results.",
+    "Measured on one machine: 12th Gen Intel(R) Core(TM) i5-1235U, Windows 11.",
+    "With 12 conditions, an occasional result may cross a line by chance.",
+    "Coverage is for prediction sets tuned on clean calibration images; under damage there is no coverage promise, and the label shows what was measured.",
+    "Accuracy was measured on the laptop; it has not been checked on other hardware.",
+    "The suggested next steps are general suggestions; they were not tested for this model.",
+    "Latency is laptop latency from one run on one machine; the CPU pin was not read back after it was set."
+  ],
+  "licences": {
+    "brokkr_code": "Apache-2.0",
+    "model_code": "BSD-3-Clause (torchvision)",
+    "model_weights": "Published by torchvision, trained on ImageNet-1k. torchvision states no separate licence for the weights, and ImageNet's terms of access are for non-commercial research. Check before redistributing.",
+    "weights_trained_on": "ImageNet-1k",
+    "label_data": "CC BY 4.0",
+    "sources": [
+      {
+        "file": "models/mobilenet_v3_small_int8_percentile99.99.json",
+        "sha256": "0051ab8643d324b4c9130eab237b2c8d5b66b00e9c1751f88f6a7452d17e7f83",
+        "field": "licence.code"
+      },
+      {
+        "file": "models/mobilenet_v3_small_int8_percentile99.99.json",
+        "sha256": "0051ab8643d324b4c9130eab237b2c8d5b66b00e9c1751f88f6a7452d17e7f83",
+        "field": "licence.weights"
+      },
+      {
+        "file": "models/mobilenet_v3_small_fp32.json",
+        "sha256": "ec6fa95e56068609f195e21dc588b97be679591bd7f88969cc7d5c83e9f7e112",
+        "field": "licence"
+      },
+      {
+        "file": "models/mobilenet_v3_small_fp32.json",
+        "sha256": "ec6fa95e56068609f195e21dc588b97be679591bd7f88969cc7d5c83e9f7e112",
+        "field": "weights"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "file": "brokkr_edge/model_list.json",
+      "sha256": "8d6a237935d82ac70c9be7aef70d36c48394016831e8c5b7c2b906e4a14bf5a2",
+      "check": "generated from torchvision metadata; tests/test_model_list.py"
+    },
+    {
+      "file": "models/mobilenet_v3_small_fp32.json",
+      "sha256": "ec6fa95e56068609f195e21dc588b97be679591bd7f88969cc7d5c83e9f7e112",
+      "check": "brokkr_edge.schema.check_build_record"
+    },
+    {
+      "file": "models/mobilenet_v3_small_int8_percentile99.99.json",
+      "sha256": "0051ab8643d324b4c9130eab237b2c8d5b66b00e9c1751f88f6a7452d17e7f83",
+      "check": "brokkr_edge.schema.check_build_record"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_conformal_calibration_none_clean_s0.json",
+      "sha256": "ade4abc898573dee09e0f072a6d3d438666d7d6e944b94ec4b63bf0c360a1bfc",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_conformal_calibration_none_clean_s0.npz",
+      "sha256": "15f07f35047b16ad53637779566d7bf5f845570d1a963be8e25ebc0bd9594a00",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5.json",
+      "sha256": "953c9fdad6ad794867e72a5731b4b8355a00c9bcfa3a1885b6ea958c69c6de3e",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5.npz",
+      "sha256": "ca6792c9e9b51ece62d288525bacd372142649e7163f8d19e155b6492a69beb8",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.json",
+      "sha256": "d46d693bfdb7f439fa0277785f006e2c6d345aebce6a5957042192c55dd7bd50",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3.npz",
+      "sha256": "9c59832fc869cbfb43d7a1436c4b9a322c725d711d5e445761e84a5feec85b41",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3.json",
+      "sha256": "e1671f2851c9bc6a010b481e0d89efce44d65fa875b0e541c24fff0beec3a7db",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3.npz",
+      "sha256": "8624e8e832e837b62a9774313322969ef9de602984a8fccf9c410d78138338a6",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3.json",
+      "sha256": "19882ee59fffb7bfbdb036ca63b1e6a6b93ac666e59c55e0696ab594794961fe",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3.npz",
+      "sha256": "8c77a4ff4350275419eb6bd4532d320f8582428e1007fd042b0743b7bd7dee46",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.json",
+      "sha256": "59d816e882eef80286e3c9bd5fb146000f4f4415c836ba78ced4d18815367a07",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3.npz",
+      "sha256": "86264eaf48f1860afc0cfb535629e5ca2712de94cea9de34c215fbcb5b5c72ab",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.json",
+      "sha256": "1528a8e726330431d09314a1ea20c0a618164f962214201106d66d1f8334ac57",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5.npz",
+      "sha256": "327ce2623f200a2f9c0e6efd27035e0f151693c2c866ade3d1272be3a82bd373",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.json",
+      "sha256": "064ab54f95f9c072bb70ad2b82f0121a6f26e2cd03da75dd0187fc5188fb76a4",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3.npz",
+      "sha256": "2a9b22b609d654e6bc550d3d04a7fc9548f11cf13731ed79150d0a8580f0a93f",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.json",
+      "sha256": "37b3319815c92c55b2d4c66194daa7ea79641fda24535cad90a4bdf5c4ac4791",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5.npz",
+      "sha256": "5eba93c66e04e211719392cc99b03c4e866682f83e048c7331b1223a2d30644b",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.json",
+      "sha256": "d424d10cb1151c718bd05b050b44ce21d78420f933c4cad75782de271f1ec1a2",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3.npz",
+      "sha256": "d2e61bb39b1691f0a5a73abae9c10cdf2d06c6170c1790ab23a5856f950585dd",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.json",
+      "sha256": "9cda259805c2e28f8455e23d1473f59a15d6b25d17f00927c3f441ce037ee4b1",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5.npz",
+      "sha256": "dfbd7b878ee424212d55748b406db67def43fd32295cb43962f4d60b036574cc",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.json",
+      "sha256": "6de22008a3538239963fcccc1db8e1a5e77176492105c9e08e9bfc8c0471ab33",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3.npz",
+      "sha256": "d57409d69ceabf7ea2a2b2e18ac5e018d9e7678a7bec81898a5e9d0e9fbdd668",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.json",
+      "sha256": "600c7506a2cc0f51ee71df2491e281e0b0396b87cee28c0096c2ddd8fa6b9be1",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5.npz",
+      "sha256": "b88d45f285c5846126933e179ad69de65d607247f4be180238a28fef1617c8be",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.json",
+      "sha256": "88c8e02c0e77caa520c7b08711a69149316d1b3b958f42aeb3433835c5e5500b",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0.npz",
+      "sha256": "a0ed8f1da4e30b8a9f89c80267459b22c371231164957c7179066185b3593338",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_calibration.json",
+      "sha256": "e0beedfe964a3dd52cb76cd039592649753e6203b9f9b2f1a77b523991988556",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_conformal.json",
+      "sha256": "c167e2a6c5b690fc1e7ea5f3d528549a6fac5b1d389287707827538348b348a5",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_darkness_s5_selective.json",
+      "sha256": "01c50aa81e8ec61a6e4c40b02319c67677d682357d858c84b42c9865b2fde03f",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_calibration.json",
+      "sha256": "91e5ccb9b396e3de387679326f50f68808dc5d6d1763e505a924b801bffa5bdd",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_conformal.json",
+      "sha256": "aba49fe57ae140e2e3f8acd2c9f7a2f8952c9bfb3048bd46f31f9e2c94994554",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_defocus_blur_s3_selective.json",
+      "sha256": "8b638704a6d96700160e210c37574a74ff1c3ffaf0a6a921d69210db2b48d031",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_calibration.json",
+      "sha256": "078fe48fc45003e07e6c7703745b7cc915739f0ca0a2459dbd64052b22c68d0e",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_conformal.json",
+      "sha256": "75bbcc6e7907b115c44bab21fc468ba7e8605a489186ddfe22de617e60f7490a",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_fog_s3_selective.json",
+      "sha256": "6ce08acc2a12e2d7c4af0694df602d1a73e6525d7aa0925b4d7f0acc21fe34af",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_calibration.json",
+      "sha256": "c4f60e46f41f53ac70b85b33968233cab40931563334a7c3133262f449207a61",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_conformal.json",
+      "sha256": "b9e850d1bc225019521f6c54c7f4631bdefc1407216f269d8d8e3271ed15704e",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_brokkr_noise_s3_selective.json",
+      "sha256": "9e7b765a1001d393e83387e26bab04f006b7869085f397fdf88bb267f56d9b40",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_calibration.json",
+      "sha256": "a9dea37717c618b8bc583ee58d7cae71d2c11d17ad74b6f4d534ef37f61db0fc",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_conformal.json",
+      "sha256": "ef60919463c8f4f886d2b0a41de22d4356d4b123e82424a6cd3b1042759eb155",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s3_selective.json",
+      "sha256": "8288a080c965779f1bb3376e2d114ee1e5a3c3230208ef6fb98281eb2fc46b2a",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_calibration.json",
+      "sha256": "56aa57869851ce1018b3e49bd2385f85d258f0268f7c130d00dbf6a27b7b9e55",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_conformal.json",
+      "sha256": "8b40700f6f0dbffdf1ac7cb2ab4909209c8369d5c99267f506d75550e536c2c2",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_contrast_s5_selective.json",
+      "sha256": "abdddfd044fd34722d312d5a79bcbc292f0ccd7f39514d1fbfc6a491b5c1ca0e",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_calibration.json",
+      "sha256": "d44018610dfe62a1a0469846c0d0c10f2a02f1b1b6dc85dbf0a5689b398d8fd8",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_conformal.json",
+      "sha256": "a6e0b091d3ff308848a873cef0f5032bbe587c361681df7c45c1adf488012967",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s3_selective.json",
+      "sha256": "4828a8625170814d71a759765c5d6390dc55a5691655ae88be5fd9228dcadf33",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_calibration.json",
+      "sha256": "b46c117e2f190d8fedbd3b5b2d0d7a78ea5bddf096143d2c08828e0abc3f453e",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_conformal.json",
+      "sha256": "6f16a9518ad9d0711e1540c412b8eb2685f6068a288c572f2d21e7dd1addcd29",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_defocus_blur_s5_selective.json",
+      "sha256": "67ee5faf214fac42da8a87837e32031ed30067ffdd2b1320d4ad1963f82a9659",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_calibration.json",
+      "sha256": "ad6e022465dfa8c27d088e5407dd06c4b24033ebce084779feb349bb96044b99",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_conformal.json",
+      "sha256": "c020e2136d470a2ac26cd9c8f49987f7c20f79690337b472c622702aff8c9146",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s3_selective.json",
+      "sha256": "d4e7f7ff189c1a9f56b5f14f1f356fe0f0b423d97149910ca4b5b92ec9a3b3f7",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_calibration.json",
+      "sha256": "b3dc5ec0bfeabf5130e328160265c8cd996a6d3e7a94320cc4cde85d86c70542",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_conformal.json",
+      "sha256": "88f55b6259c14bf685ba8569b8f1db4eca62ee9c637e0ca20c80bbeca80aafe8",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_fog_s5_selective.json",
+      "sha256": "4ab75f6662c7eff0872ea4384600587906e858a4d2ecc07b29c91ea74b1f65c5",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_calibration.json",
+      "sha256": "d1e13ad1b820712a71f37a9253c3751c2688e0f34023f5804e4653f3702e958d",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_conformal.json",
+      "sha256": "9a4dd4a57dc067d2189ec2eb34d6879872beadc38c48394b67c12b9954989e02",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s3_selective.json",
+      "sha256": "30d70ad9b006e57a92d7dda118bed3a8515871f72cf342c0224396fe56f910b3",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_calibration.json",
+      "sha256": "d26fa00ff6635321718dcbab74f71c4b8ab5a85eb43694aba2030ee04ecf5ad5",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_conformal.json",
+      "sha256": "880b550e17207199bbe6aadcfefcd766757455fa4f24cac5d84a2447517eb516",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_imagenet-c_gaussian_noise_s5_selective.json",
+      "sha256": "2ad16ab7baa2764e6fab456545d0cd4fb87ffa8c8dca4e2afd3b3881bd3dcaf5",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_calibration.json",
+      "sha256": "b5365aa604b74c6add19a37a9438af9b5f3ab8d5acfd45bd14b14d198b83f54f",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_conformal.json",
+      "sha256": "f21bb99caa6b2a9ed5b53ee16ed620279d261b38863db8661c98fb6db1f51289",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/breadth_reliability/mobilenet_v3_small_fp32_imagenet-1k-val_test_none_clean_s0_selective.json",
+      "sha256": "d7110d2bbcbad3ed9cd9d7352678bedbf2542c087af9d568d3c1e081194ca34e",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.json",
+      "sha256": "932801efd459755f6863a0885491cb1f47565351449690b57190dd1854b4e290",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/latency/mobilenet_v3_small_fp32_laptop_1threads.npz",
+      "sha256": "d0ec499e5b12baee0daff26518af8dd86899b9f4e303322303fe2860973017c2",
+      "check": "checksum equal to its record's"
+    },
+    {
+      "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.json",
+      "sha256": "664b72c3c6b9b0be071eee43129c245dabfe65fc73cdbdf49b2b95b82df2c28f",
+      "check": "brokkr_edge.schema.check_record (the rules of scripts/22_check_results.py), clean commit"
+    },
+    {
+      "file": "results/latency/mobilenet_v3_small_fp32_laptop_4threads.npz",
+      "sha256": "988e61e6d7672e050e5a04e8b818f9521ed5d54c99430aa5980af879aa8ce726",
+      "check": "checksum equal to its record's"
+    }
+  ]
+}
