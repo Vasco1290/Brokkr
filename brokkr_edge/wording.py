@@ -37,6 +37,7 @@ PUBLIC_DOCS = (
     "docs/writeup.md",
     "docs/related_work.md",
     "docs/publishing_plan.md",
+    "docs/user_models.md",
     "brokkr_edge/third_party/imagecorruptions/CHANGES.md",
     "web/fonts/README.md",
     "web/prototypes/README.md",

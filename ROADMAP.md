@@ -418,7 +418,12 @@ difference from the line above: there is **no filter**. H's site map of 4 Octobe
 (`docs/website_v0_plan.md`, section 12e) gave the catalog one card per model and Compare a sortable table
 of all ten labels; a filter was not built.
 
-### 3. Testing a user's model `[ ]`, done by 16 October <!-- public -->
+### 3. Testing a user's model `[~]`, done by 16 October <!-- public -->
+*Design fixed on 6 October 2026, before any code: `docs/user_models.md` (H's decisions D1–D17), label-format
+additions in `docs/label_schema.md` (note of 6 October 2026). Decided by H the same day: step 3 is ONNX only
+(PyTorch input moves to after step 4, "Later versions"); user labels show speed as "not measured" (a known
+product gap, with a speed bench after step 4); built in slices, the checks first.*
+
 - A user's ONNX image classifier and a folder of their own labelled images -> INT8 build -> damage
   tests -> `label.json`, run locally. Then PyTorch model input.
 - How the user's images are split (INT8 calibration, conformal calibration, test; no image in two
@@ -430,7 +435,8 @@ of all ten labels; a filter was not built.
 
 *Done when:* on a small made-up model and made-up images (tests only), and on one real torchvision
 model with a folder of images, the command produces a schema-valid `label.json` marked
-`source: user-submitted`; the same for PyTorch input.
+`source: user-submitted`; the same for PyTorch input (moved to after step 4 by H, 6 October 2026). The full
+list is in `docs/user_models.md`, section 7.
 
 ### 4. Label submission, PyPI and quick start `[ ]`, done by 19 October <!-- public -->
 - A GitHub pull-request template for submitting a `label.json`, with an automatic check (schema
@@ -489,6 +495,8 @@ labels show Pi rows.
 - 4.2 (two more models, full pipeline; allowed overnight under the research rule of 6 October 2026). <!-- public: The full study pipeline on two more models -->
 - 4.5 `brokkr recommend`. <!-- public: A recommend command: choose a build for a device, speed, size and condition -->
 - Fast mode, and the menu of conditions and severities (P4). <!-- public -->
+- Testing a user's PyTorch model (moved out of step 3 by H, 6 October 2026; after step 4). <!-- public: Testing your own PyTorch model -->
+- A speed bench for user labels on the user's own machine (a known gap of step 3: user labels say "not measured"; after step 4). <!-- public: Speed measurements for labels of your own model -->
 - `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe. <!-- public: Automatic shrinking: try several recipes and recommend one -->
 - The GitHub Action. <!-- public: A GitHub Action that tests a model and attaches its label -->
 - Stage 5 (energy and heat on the Pi with a USB power meter). <!-- public: Energy and heat on the Raspberry Pi 5, with a USB power meter -->

@@ -1,0 +1,352 @@
+# Testing a user's own model (Platform plan step 3)
+
+*Design note of 6 October 2026, written and committed before any step 3 code. Drafted by Claude and decided
+by H on 6 October 2026 (decisions D1–D17, listed at the end with what H chose). Details decided later go in
+dated notes at the end of this file; nothing above them is edited. The label-format additions are in
+`docs/label_schema.md`, note of 6 October 2026.*
+
+The only numbers below are design settings (counts, lines, seeds) and a few interval widths **worked out from
+formulas, not measured**. Nothing in this note has been built or measured yet.
+
+## 0. Scope, and what stays the same
+
+Step 3 turns a user's ONNX image classifier and a folder of the user's own labelled images into a
+`label.json`, on the user's own machine. **ONNX only** (H, D15): PyTorch model input moves to after step 4.
+
+What stays exactly as in the study:
+- the INT8 recipe (Percentile 99.99, 512 calibration images in groups of 128);
+- the 12 damaged conditions plus clean (`brokkr_edge/test_run.py`, the 13 conditions of task 4.1);
+- the reliability envelope, version 1 (coverage line 80%, damage-drop line −10 points, large shrinking cost
+  below −5 points, near floor when FP32 top-1 is below 10%);
+- the bootstrap settings (1,000 resamples, seed 0);
+- label schema version 1. The label-format changes are new optional fields only.
+
+Not in step 3: choosing conditions (P4, later versions), trying several recipes (P5), submitting labels and
+PyPI (step 4), images without labels (step 4b), any upload (step 5), PyTorch input (after step 4), speed on
+user labels (after step 4, section 6).
+
+## 1. Inputs, and what is checked about a supplied pair
+
+**What the user gives.**
+- An FP32 ONNX model.
+- A folder of labelled images: one subfolder per class, the subfolder name being the class name. Images may
+  sit in nested folders inside a class folder.
+- Optionally, a folder of **unlabelled** representative images for INT8 calibration (`--calib-images`,
+  section 2).
+- Optionally, an already-shrunk **INT8** ONNX build of the FP32 model, made by any tool (H, D1: INT8 only.
+  The envelope state for a broken shrunk build is named "INT8 build failed"; an FP16 build would need a new
+  state, which a reader of the current schema could misread. FP16 pairs are parked).
+- A small settings file (JSON, which needs no extra package on Python 3.10).
+
+**The settings file** (`settings_version` 1). Paths in it are relative to the settings file.
+
+| Field | What it holds |
+|---|---|
+| `name` | the model's name, lowercase letters, digits, `-`, `_`, `.` (used in its IDs) |
+| `fp32_model` | the FP32 ONNX file |
+| `shrunk_model` | `null`, or `{"file", "precision": "int8", "made_by": "<tool and version>"}` |
+| `classes` | the class names, in the model's output order |
+| `outputs` | `"logits"` or `"probabilities"` (section 3) |
+| `preprocessing` | section 3 |
+| `split` | `"brokkr"` (Brokkr splits the folder) or `"own"` (the user's own split, section 2) |
+| `expected_accuracy` | `{"top1", "n_images", "measured_on"}`: the FP32 accuracy the user measured themselves (section 3) |
+| `reference_predictions` | optional: 8 to 32 `{"file", "top1"}` pairs (section 3) |
+| `licences` | `model_code`, `model_weights`, `images`, `images_source` (section 5) |
+| `declarations` | `{"images_not_used_to_train_the_model": true}` (section 5) |
+| `device_kind` | laptop, desktop, server, raspberry-pi-5, cloud-arm or other (section 6) |
+| `submitted_by` | optional name the user chooses, or `null` |
+
+The command is `brokkr-edge test --config <settings file> --images <folder> [--calib-images <folder>]
+--out <folder>`, beside today's `brokkr-edge test --model <name>` for the study's models.
+
+**Checks on every model, before any image is tested.** A failure stops the run with a plain message; no label
+is made.
+- It loads in ONNX Runtime (CPU).
+- Exactly one input and one output; the input is float32.
+- The input is 4-dimensional, with 3 channels and the stated crop as its height and width, in the stated
+  layout (NCHW or NHWC). Its name is read from the model, never assumed.
+- The batch size is either free (any number) or fixed at 1; a model with a fixed batch of 1 is run one image
+  at a time. Any other fixed batch size stops the run.
+- The output has as many classes as `classes` lists.
+- The "FP32" model contains no quantized operations and no FP16 weights (if it does, it is not an FP32 model).
+
+**Checks on a supplied pair** (FP32 + a shrunk build made by another tool):
+1. **Same inputs and outputs:** the same input name, type and shape, and the same output shape (a dimension
+   left free in one counts as matching any size in the other). They must be different files (different
+   SHA-256).
+2. **Same preprocessing:** there is one preprocessing block, used for both builds, so the two cannot disagree;
+   the label states the pair was declared to share it.
+3. **Declared precision matches the file:** Brokkr reads the shrunk file and records what it finds (quantized
+   operations, 8-bit weight tensors); a file declared INT8 with no quantized operations stops the run.
+4. **Plausible agreement:** top-1 agreement with FP32 on the first 256 conformal-calibration images (all of
+   them if there are fewer; never test images), with the study's lines:
+   - below 20%: the build is marked failed. The label is still made, with the FP32 rows and the
+     "INT8 build failed" state with its value, as for MobileNetV3-Small. Its sentence says the build may be
+     broken **or not made from this FP32 model** (Brokkr cannot tell which);
+   - below 90%: a warning (section 2, `summary.warnings`).
+5. When Brokkr builds the INT8 file itself, the same agreement check runs on it. If ONNX Runtime's preparation
+   step crashes, Brokkr retries once with `skip_symbolic_shape` and records it in the build's recipe (H, D2;
+   the label's Details already show this setting).
+
+## 2. How the user's images are split, minimum counts, and too few images
+
+**No tuning part in step 3** (H, D4). Step 3 chooses no setting (one recipe, no temperature, no method choice),
+so a tuning part would only take images from the test. It comes with P5 (`shrink --auto`).
+
+**Listing the folder.**
+- Image files are those ending in .jpg, .jpeg, .png, .bmp, .webp, .tif or .tiff (any letter case). Other files
+  are not used; their count is reported, never silently dropped.
+- The canonical order is the sorted list of relative paths (with `/`). Each image's damage seed is its
+  position in that order (the study's rule: the seed is the image's dataset position).
+- **Unreadable images stop the run**, listed by name; they are never skipped.
+- **Exact duplicates** (identical file bytes, by SHA-256) anywhere in the labelled folder stop the run, listed
+  by name, so no image can be in two parts under two names. Near-duplicates (burst shots of one scene) are not
+  detected; the label says so (`limits`), and a user's own split (below) is the remedy.
+- The folder's subfolders must be exactly the classes in `classes` (in a user's own split: in each part).
+
+**Two ways to split.**
+- **Brokkr's split** (`"split": "brokkr"`): the labelled folder is split, stratified by class (each class keeps
+  its share) with fixed seeds: first the INT8 calibration images if they come from this folder (below), then
+  the rest: **one third conformal calibration, two thirds test**, per class (a third rounded down).
+- **The user's own split** (`"split": "own"`, H, D5): the folder holds exactly two subfolders,
+  `calibration/<class>/...` and `test/<class>/...`. The user's test images are always the test part; the
+  conformal calibration images come from `calibration/`. This is the remedy when photos come in groups, and
+  it makes the exact cross-check of section 7 possible. The duplicate check runs across both parts.
+
+**INT8 calibration images** (H, 6 October 2026, changing the draft's D3). INT8 calibration needs no labels:
+- With `--calib-images <folder>`: a folder of unlabelled representative images, **at least 512**. If it holds
+  more, 512 are chosen with a fixed seed; if exactly 512, all of them, in canonical order. No calibration image
+  may also be in the labelled folder (compared by SHA-256): an overlap stops the run, listing the files.
+- Without it: the 512 come from the labelled images, stratified and seeded: from the whole folder in Brokkr's
+  split, from `calibration/` only in the user's own split (the user's test images are never used for anything
+  but testing).
+- When the user supplies the shrunk build, there is no INT8 calibration; giving `--calib-images` then stops the
+  run (it would not be used).
+
+**Caps:** at most 5,000 conformal-calibration and 10,000 test images (the study's sizes); extra images are left
+unused, chosen stratified and seeded, and their count is reported.
+
+**Floors and recommended sizes** (H, 6 October 2026):
+
+| Part | Floor: below it, the run stops | Recommended: below it, the label warns |
+|---|---|---|
+| Conformal calibration | 200 | 1,000 |
+| Test | 200 | 2,000 |
+| INT8 calibration (when Brokkr builds INT8) | 512 | 512 |
+
+- Every class needs at least one image in the conformal-calibration part and one in the test part, or the run
+  stops.
+- Classes with fewer than 20 test images are named in a warning.
+
+**How wide the intervals are at the floor** (worked out, not measured). From the normal approximation to the
+binomial, the worst-case 95% half-width of an accuracy (at 50%) is ±6.93 points on 200 test images, ±2.19 on
+2,000; for a coverage near 80% it is ±5.54 points on 200 images, ±1.75 on 2,000. And with 200
+conformal-calibration images, the coverage the threshold actually gives on new clean images varies from one
+calibration draw to another with a standard deviation of 2.11 points (0.95 with 1,000), from the Beta
+distribution of split-conformal coverage (target 90%; k = 181 of 200). So on a small test, a row clears or
+fails the −10-point line only when it is far from it; most rows come out "borderline", which is the honest
+answer.
+
+**What the label says when there are few images** (never a silent pass):
+- The intervals are computed as always, from the real counts; wide intervals make rows "borderline" by the
+  existing rule.
+- `summary.warnings` (a new optional field) has one entry per part below its recommended size, one naming the
+  classes with fewer than 20 test images, and one for agreement with FP32 below 90%. It is rendered at the top
+  of the label, before the summary lines (e.g. "Few images: N test images (recommended at least 2,000);
+  intervals are wide"), with every count taken from `label.json`.
+- `limits` gets the same sentences.
+- Below a floor there is no label: a message names each count and its floor.
+
+## 3. Preprocessing: how it is stated, and how a mistake shows up
+
+**How it is stated.** Step 3 supports torchvision's standard evaluation pipeline only: `resize` (the shorter
+side, in pixels), `crop` (a square centre crop, at most `resize`), `interpolation` (bilinear, bicubic or
+nearest), `mean` and `std` (three numbers each, on pixel values 0 to 1, in RGB order), `channel_order` (RGB or
+BGR: the order the model receives) and `layout` (NCHW or NHWC). Greyscale and other colour modes are turned
+into RGB, as in the study. The photo-rotation tag (EXIF orientation) is not applied; the label says so.
+Anything else (letterboxing, non-square inputs, no resize) is not supported yet and stops the run. Damage keeps
+the study's place: after resize and crop, before normalisation.
+
+**How a mistake shows up, instead of a quietly wrong label:**
+1. **Shape check** (section 1): the stated crop and layout must match the model's input.
+2. **Expected accuracy, required** (H, D6). The user states the FP32 top-1 they measured on their own
+   validation images, and on how many. Brokkr's clean FP32 top-1 on the test part must be within **5 points**
+   of it (compared in whole images: |correct − stated × n| ≤ 0.05 × n), and the lower end of its 95% interval
+   must be above chance (1 ÷ the number of classes). Otherwise the run stops: "clean accuracy X% against your
+   stated Y%: check the class order, mean and std, channel order and resize". The stated value is recorded as
+   `published` in the label's `checks.fp32_sanity`, with the source "stated by the submitter". It is meant to
+   catch large mistakes (a wrong class order gives about chance accuracy); a small mismatch (bilinear instead of
+   bicubic) may pass it, and `limits` says so.
+3. **Logits or probabilities.** If a model already applies softmax and Brokkr applies it again, top-1 is
+   unchanged but coverage and ECE come out quietly wrong. Read on the agreement images (section 1):
+   - with `"probabilities"`, every FP32 output must be non-negative and every row must sum to 1 (within
+     0.001), or the run stops. Probabilities are turned back into logits with log(p) (zero is clipped to the
+     smallest float32 number), so softmax gives p back. A shrunk build's outputs are checked only to be finite
+     and non-negative: a quantized output's rows need not sum to exactly 1;
+   - with `"logits"`, if every FP32 row is non-negative and sums to 1 (within 0.001), the run stops ("these
+     look like probabilities").
+4. **Class list:** `classes` must name exactly the class folders. A missing or extra folder stops the run;
+   a wrong order is caught by check 2.
+5. **Reference predictions, optional** (H, D7): 8 to 32 files of the labelled folder with the top-1 class the
+   user's own code gave them. Brokkr's FP32 must give the same top-1 on every one, or the run stops.
+
+## 4. Damage conditions, and "not tested"
+
+**The study's 12 damaged conditions plus clean**, with no choice in step 3, so user labels have the same
+layout as study labels: fog (Brokkr) s3, darkness (Brokkr) s5, defocus blur (Brokkr) s3, noise (Brokkr) s3, and
+fog, contrast, defocus blur and Gaussian noise (ImageNet-C) at s3 and s5. The ImageNet-C conditions need the
+optional `imagenet-c` extra; without it the run stops with the install command (no partial runs in step 3).
+
+**Not tested:** everything else (other damage types and severities) is on the summary's "Not tested" line, as
+on study labels. Choosing conditions is P4 (later versions).
+
+**Inputs other than 224×224** (H, D8): Brokkr's damage is measured in pixels (blur radius, noise pattern), so
+the same severity is relatively stronger on a smaller picture. Damage is applied at the model's own input size,
+and when that is not 224×224 a generated `limits` sentence says the severities were designed for 224×224
+pictures and are not comparable with Brokkr study labels. Before the damage code is written, a test checks that
+each of the 8 ImageNet-C conditions runs on small and large pictures (for example 64×64 and 320×320); this is
+not assumed.
+
+## 5. Licences and declarations; nothing leaves the machine
+
+**Required in the settings file** (hard rule 8; an empty value, or "unknown", "none", "n/a" or "?", stops the
+run): `licences.model_code`, `licences.model_weights`, `licences.images`, `licences.images_source`, and the
+declaration `images_not_used_to_train_the_model: true` (H, D10). Brokkr cannot check the declaration; images
+seen in training would make every number look better than it is.
+
+They are recorded verbatim in the label (`licences`, `datasets`), marked "declared by the submitter, not
+checked by Brokkr". `brokkr_code` stays "Apache-2.0". `label_data` (H, D9): "chosen by the submitter; labels
+submitted to Brokkr's catalog are CC BY 4.0 (step 4)".
+
+**Nothing is uploaded.**
+- The command opens no network connection, not even a version check. For the whole run, every connection
+  through Python's `socket` module is blocked (it raises an error), and ONNX Runtime's telemetry events are
+  switched off at the start (`onnxruntime.disable_telemetry_events()`). A test runs the full check of a
+  made-up model under the block and counts connection attempts (none allowed). The block covers Python's
+  `socket` module; native code that bypasses it is not intercepted, so the docs say "Brokkr opens no network
+  connection", backed by this test, not that it is sandboxed.
+- Records and the label go only to `--out`.
+- Neither the label nor the run's records hold image file names or absolute paths: only counts, class names,
+  and **folder fingerprints** (the SHA-256 of the sorted list of each image's relative path and SHA-256), which
+  identify the folder without naming a file. The split is remade from the folder itself (it is fixed by the
+  seeds), and the fingerprints show it is the same folder. Class names are printed on the label, and the docs
+  say so.
+
+## 6. How user labels are marked and kept apart
+
+- `source.kind` is `"user-submitted"`, `verified` is `false` (the validator already requires this pairing),
+  `how_made` is `"brokkr-edge test <version>"`, `submitted_by` is the settings file's (or `null`). The renderer
+  already shows "User-submitted label — UNVERIFIED"; the site's display word is "User-submitted".
+- **IDs cannot collide** with study labels: the publisher in `model_id` is always `user`:
+  `user/<name>@<first 12 hex characters of the FP32 file's SHA-256>`.
+- **Storage:** user records and labels are written only to `--out`. The command refuses an `--out` inside this
+  repository's `published/labels/`, `labels/` or `results/` folders (released labels, working study labels and
+  study records).
+- **Not on the site in step 3:** the site, figures, README blocks and Compare read `published/labels/` only.
+  User labels reach the catalog only through step 4's submission flow.
+- **Hardware:** the user's machine fingerprint, with `device_kind` as the user states it (H, D11): laptop,
+  desktop, server, raspberry-pi-5, cloud-arm or other. "raspberry-pi-5" is accepted only on a machine that
+  reports itself as a Raspberry Pi 5 (`/proc/device-tree/model`) (hard rule 2).
+- **Speed** (H, D12): every speed row of a user label is "not measured", with the reason "speed is not measured
+  in step 3 user runs". This is a **known product gap**: the study's latency method relies on checks (power
+  mode, pinned cores) Brokkr has only on its Windows laptop. A speed bench for users' machines is planned after
+  step 4 (ROADMAP, "Later versions").
+
+## 7. What "done" means for step 3 (each item a test or a script that prints PASS or FAIL)
+
+1. This note and the `docs/label_schema.md` note are committed before any code.
+2. **Made-up model and made-up images** (tests only; a tiny ONNX model built in the test, no PyTorch):
+   - the split: deterministic, stratified, no image in two parts; the user's own split; the unlabelled
+     calibration folder and its overlap check; duplicates and unreadable images stop the run;
+   - floors: refusal below a floor; warnings between floor and recommended; classes with fewer than 20 test
+     images named;
+   - the settings file: a missing licence or declaration stops the run; a class list that does not match the
+     folders stops it;
+   - pair checks: an input or output mismatch, an identical file and a wrong declared precision each stop the
+     run; agreement below 20% gives the failed state, below 90% a warning;
+   - outputs and preprocessing: the probabilities-or-logits check; a wrong class order or channel order is
+     caught by the expected-accuracy check; reference predictions;
+   - privacy: no network (blocked, and no attempts counted); no file names or absolute paths in what is
+     written;
+   - the label itself: `check_label` passes; `user-submitted` and unverified; the HTML shows the UNVERIFIED
+     badge; every rendered number is in `label.json`.
+3. **The test user model (section 8), Brokkr shrinks it:** one command gives a schema-valid `label.json` marked
+   user-submitted.
+4. **The test user model as a supplied pair:** its INT8 build made outside Brokkr's pipeline (a separate script
+   calling ONNX Runtime directly, MinMax); the pair passes its checks and gives a valid label. Wording: "a build
+   made outside Brokkr's pipeline", not "works with any tool".
+5. **One real torchvision model with a folder of images, and the exact cross-check** (H, D14): MobileNetV3-Large
+   with folders written from the study's own ImageNet images (original JPEG bytes; local only, never
+   committed): `test/` from the test split, `calibration/` from `conformal_calibration`, and `--calib-images`
+   from `int8_calibration`, named so the canonical order is the study's order. The user path's top-1 must equal
+   the 4.1 records image for image where the pictures are the same (see open point D18 below).
+6. Ruff, pytest, `scripts/22`, `scripts/40` and the site build pass, and the site is unchanged; ROADMAP, STATUS
+   and the README are updated.
+
+Items 3–5 are long runs, started by H (assistant sessions are cut off after about 10 minutes), after a short
+dry run.
+
+**Slices** (H, 6 October 2026): slice 1, the checks (settings file, model and pair checks, split rules with the
+user's own split and the unlabelled calibration folder, floors and warnings, the logits-or-probabilities check,
+the expected-accuracy check, reference predictions, the no-network block) with their made-up-data tests from
+item 2; it writes a run-plan record and runs no damage. Running the conditions and making the user label are a
+slice of their own, after H's review of slice 1; the label tests of item 2 ("the label itself") come with it.
+Slice 2: the test user model (section 8). Slice 3: the end-to-end runs (items 3–5).
+
+## 8. The test "user" model
+
+**Dataset: EuroSAT, RGB version** (H, D16). Sentinel-2 satellite pictures of 10 land-use classes, 27,000
+images. Licence, read on 6 October 2026 from github.com/phelber/EuroSAT: "The dataset is licensed under the MIT
+license"; the same page points to the Copernicus Sentinel data terms for the underlying satellite data.
+**Before any use** (H): read and record the Copernicus terms (and whether they allow commercial use), confirm
+the RGB images' size, and record the download URL, size and SHA-256, all in `brokkr_edge/datasets.py` with its
+"use" tag. Not ImageNet, and the model is trained from scratch, so ImageNet's terms appear nowhere in the
+chain. It exercises what the study's models never do: a non-224 input and non-ImageNet mean and std.
+
+**The model** (`scripts/51_train_test_user_model.py`, slice 2):
+- a seeded, stratified 40% of EuroSAT trains the model (part of it kept back as the training script's own
+  validation set); the other 60% is the user's labelled folder for Brokkr;
+- torchvision's ResNet-18 architecture (BSD-3-Clause code), random start (`weights=None`), 10 classes, its
+  input at the images' own size, seed 0, a fixed thread count; ResNet-18's INT8 build passed every check in
+  4.1, so the main path is likely to run end to end (a failed build would still be handled);
+- a fixed number of epochs, set before training; nothing is tuned on the 60% given to Brokkr;
+- **one timed epoch first** (H); if the whole training is estimated above about 2 hours, H chooses again
+  before it runs;
+- mean and std computed from the training images and written into the settings file; the training script's
+  validation accuracy is the settings file's expected accuracy;
+- the model is named `eurosat-resnet18-test`, publisher `user`; its files are never committed (rule 4).
+
+iBean is not used (H, D17).
+
+## Decisions of 6 October 2026 (H)
+
+| | Decision |
+|---|---|
+| D1 | A supplied shrunk build must be INT8; FP16 pairs parked |
+| D2 | Automatic `skip_symbolic_shape` retry, recorded |
+| D3 | Changed by H: optional unlabelled `--calib-images` (at least 512, no overlap with the labelled folder); floors 200 test and 200 conformal calibration; recommended 2,000 and 1,000; one image per class per part; fewer than 20 test images per class named |
+| D4 | No tuning part in step 3 |
+| D5 | Users may bring their own split |
+| D6 | Expected accuracy required, 5-point tolerance |
+| D7 | Reference predictions optional |
+| D8 | Damage at the model's own input size, with a limit sentence when it is not 224×224 |
+| D9 | `label_data`: "chosen by the submitter; labels submitted to Brokkr's catalog are CC BY 4.0 (step 4)" |
+| D10 | The "not used to train the model" declaration is required |
+| D11 | Device kinds: laptop, desktop, server, raspberry-pi-5, cloud-arm, other |
+| D12 | Speed on user labels "not measured"; a known product gap, with a bench planned after step 4 |
+| D13 | This file, plus a dated note in `docs/label_schema.md` |
+| D14 | The exact cross-check is included |
+| D15 | PyTorch input deferred until after step 4; step 3 is ONNX only |
+| D16 | EuroSAT + ResNet-18 from scratch, after the licence, size and checksum checks and a one-epoch timing |
+| D17 | iBean not used |
+
+## Open point for H, found while writing this note
+
+- **D18. The exact cross-check and random damage.** Six of the 12 damaged conditions use random numbers: fog and
+  noise (Brokkr) and fog and Gaussian noise (ImageNet-C) at both severities; the other six (darkness and defocus
+  blur (Brokkr); contrast and defocus blur (ImageNet-C), both severities) do not. A picture's random pattern
+  comes from its seed: in the study, the image's ImageNet dataset position; on the user path, its position in
+  the user's folder, which cannot equal it. So item 5 can be exact only for clean, the conformal threshold, the
+  INT8 build and the six conditions without random numbers. Claude's proposal: those must match image for
+  image (PASS / FAIL); for the six random conditions the difference in top-1 is reported with its paired
+  interval (same images, different patterns), not judged. Decide before slice 3.

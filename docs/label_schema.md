@@ -605,3 +605,54 @@ is fixed text in `brokkr_edge/label_render.py`, so it changes every `label.md` a
 checked by `scripts/40_check_labels.py`, released again, and compared with the release of 5 October 2026
 by `scripts/48_compare_labels.py`, which must pass with this listed change only. No value, threshold, state
 or rule changes; schema version 1 stays.
+
+## Note added 6 October 2026: labels of a user's own model (step 3), before any step 3 code
+
+Decided by H on 6 October 2026 with the step 3 design (`docs/user_models.md`, which holds the reasons).
+Schema version 1 stays: every change below is a new optional field or a new allowed value, read the same way
+by a reader that ignores it. The validator (`brokkr_edge/label_schema.py`) is changed with the slice that makes
+user labels, not before; no label is made by step 3's first slice.
+
+**1. Who made it.** `source.kind` is `"user-submitted"`, `verified` is `false`, `how_made` is
+`"brokkr-edge test <version>"`, `submitted_by` is the submitter's chosen name or `null`. `model.publisher` is
+always `"user"`, so `model_id` is `user/<name>@<first 12 hex characters of the FP32 file's SHA-256>` and can
+never equal a Brokkr study label's ID.
+
+**2. `summary.warnings`** (optional; a list, empty when nothing applies), rendered at the top of the label
+before the summary lines, each entry with its counts (all `label.json` numbers):
+- `{"kind": "few images", "part": "test" | "conformal_calibration", "n_items", "recommended"}` for a part below
+  its recommended size (2,000 test, 1,000 conformal calibration);
+- `{"kind": "classes with few test images", "classes": [...], "below": 20}`;
+- `{"kind": "low agreement with FP32", "agreement", "n_items", "warn_below": 0.90}`.
+Each warning also gives a generated `limits` sentence.
+
+**3. `checks`.** `fp32_sanity.published` holds the submitter's stated accuracy, with
+`{"source": "stated by the submitter", "n_images", "measured_on"}` and `tolerance` 0.05; `pass` also needs the
+lower end of the measured interval above chance (1 ÷ the number of classes). New optional entries:
+`outputs` (`"logits"` or `"probabilities"`, and the check's result), `reference_predictions` (count checked and
+matched, when given), and `agreement_with_fp32` (value, images, the 20% and 90% lines) for the labelled build.
+
+**4. `builds`.** A build the submitter supplied has `recipe` `{"method": "supplied by the submitter",
+"made_by": "<as declared>", "found": {<quantized operations and 8-bit weight tensors counted in the file>}}`.
+A build Brokkr made keeps the study's recipe fields (with `skip_symbolic_shape` true when the automatic retry
+was used). A supplied build below the 20% agreement line has status `failed` and the state "INT8 build failed",
+and its failure sentence says it may be broken or not made from this FP32 model.
+
+**5. `datasets`.** Each user dataset has `dataset_id` `user/<name>:<part>`, the declared `licence` and
+`source`, `split_mode` (`"brokkr"` or `"own"`), `folder_fingerprint` (the SHA-256 of the sorted list of each
+image's relative path and SHA-256; no file name appears in the label) and, for the INT8 calibration part,
+`labelled: false` when it came from `--calib-images`.
+
+**6. `licences`.** `model_code`, `model_weights` and a new `images` field hold the submitter's declarations
+verbatim, with `declared_by_submitter: true` ("not checked by Brokkr" when rendered); `brokkr_code` stays
+"Apache-2.0"; `label_data` is "chosen by the submitter; labels submitted to Brokkr's catalog are CC BY 4.0
+(step 4)". A new top-level optional field `declarations` holds `images_not_used_to_train_the_model: true`.
+
+**7. `hardware`.** `kind` may also be `desktop`, `server` or `other`, as the submitter states it;
+`raspberry-pi-5` only on a machine that reports itself as one. Every `speed` row of a user label has
+`"status": "not measured"` and the reason "speed is not measured in step 3 user runs".
+
+**8. New generated `limits` sentences** (only when they apply): few images; input not 224×224 (severities
+designed for 224×224 pictures, not comparable with Brokkr study labels); licences and declarations not checked
+by Brokkr; near-duplicate images not detected; the photo-rotation tag not applied; the expected-accuracy check
+catches large preprocessing mistakes but may pass a small one.
