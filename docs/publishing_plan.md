@@ -1,8 +1,12 @@
 # Publishing plan: the website on GitHub Pages (plan only)
 
 *Written 6 October 2026 at H's request (round 2, slice C, item d); approved by H the same day (round 3),
-with a 404 page added. **A plan only: nothing here has been done.** No `gh-pages` branch exists, nothing has been pushed to one, and GitHub Pages is not switched on.
-Every step waits for H's go-ahead (STATUS.md: "Do not publish until H gives the go-ahead").*
+with a 404 page added. **Carried out on 6 October 2026** with H's go-ahead: pull request #7 merged by H
+(merge commit `45b8c07`, tagged `site-v0`); every check passed on that commit; the 61 built files pushed as
+the single commit `230b63b` of the new `gh-pages` branch (its worktree was made in Claude's scratch folder
+rather than `../brokkr-gh-pages`); H switched Pages on; `scripts/50_check_live_site.py` (step 5): PASS, every
+file at https://vasco1290.github.io/Brokkr/ byte-identical to the build. The steps below are kept as the record and for later
+updates.*
 
 ## What gets published, and where
 
@@ -73,7 +77,8 @@ needs no paid plan. HTTPS is on by default for `github.io` addresses. No custom 
 `https://vasco1290.github.io/Brokkr/`.
 
 **5. Check the live site against the local build.** A small script, to be written when publishing
-(proposed: `scripts/50_check_live_site.py`; not built yet), fetches every file of the build from the
+(`scripts/50_check_live_site.py`, written
+when publishing), fetches every file of the build from the
 live address and compares it byte for byte with `site_v0/`, printing PASS or FAIL (plan section 4). Then
 check by hand: landing, catalog, one model page, Compare, Methods and Roadmap on a phone and a desktop, in
 both themes, and the theme picker; and an address that does not exist, at the root and a few folders deep

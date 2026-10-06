@@ -51,13 +51,12 @@ finished; its open items are now checks done after the fact, in step 2.*
 
 - [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
   contain the personal email
-- [ ] Publish the results page to GitHub Pages (plan written 6 October 2026: `docs/publishing_plan.md`;
-  waiting for H's go-ahead)
-- [ ] Re-read README and ROADMAP for anything that overclaims. Done for every site page and the README on
-  6 October 2026, with a list of sentences for H (`docs/prepublic_checklist.md`, section 2); ROADMAP.md's 4.1
-  scope was corrected where the wording check found the old ImageNet-C wording, but the file was not
-  re-read line by line. Ticked
-  when H has decided on the list.
+- [x] Publish the results page to GitHub Pages (6 October 2026, with H's go-ahead): https://vasco1290.github.io/Brokkr/, from the
+  `gh-pages` branch, built from `main` at `45b8c07` (tag `site-v0`); `scripts/50_check_live_site.py`: PASS
+- [x] Re-read README and ROADMAP for anything that overclaims (6 October 2026): every site page and the
+  README re-read, and the seven sentences found narrowed after H's decision (`docs/prepublic_checklist.md`,
+  section 2 and the decisions of 6 October); ROADMAP.md's 4.1 scope was corrected where the wording check
+  found the old ImageNet-C wording, but the file was not re-read line by line.
 - [x] Git-history scan (3 October 2026, after the repository became public; read-only, nothing rewritten):
   all 180 commits on every branch and tag use the GitHub noreply email; no machine paths, Windows
   usernames, personal email addresses or tokens in any commit's contents (matches were test data, a
@@ -397,7 +396,7 @@ Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published
 *Done when:* the P1 "done when" line (Product plan, below) holds, and every `label.json` passes a
 validator for `docs/label_schema.md` version 1.
 
-### 2. Catalog site and going public `[~]`, done by 10 October <!-- public -->
+### 2. Catalog site and going public `[x]`, done by 10 October (done 6 October 2026) <!-- public -->
 - GitHub Pages, generated only from `label.json` files: browse, filter, compare, one page per label,
   and a methods page (harm definition and threshold history as recorded in
   `docs/hypotheses_stage4.md`, the "12 conditions" sentence). User-submitted labels are clearly marked
@@ -413,6 +412,11 @@ validator for `docs/label_schema.md` version 1.
 a `label.json`; filter and compare work on the 10 labels; a user-submitted test label shows
 "unverified"; every checklist item is ticked with its date; the README is current; the repository is
 public and the site is live.
+
+*Done 6 October 2026* (pull request #7, merge commit `45b8c07`, tag `site-v0`): live at https://vasco1290.github.io/Brokkr/. One
+difference from the line above: there is **no filter**. H's site map of 4 October 2026
+(`docs/website_v0_plan.md`, section 12e) gave the catalog one card per model and Compare a sortable table
+of all ten labels; a filter was not built.
 
 ### 3. Testing a user's model `[ ]`, done by 16 October <!-- public -->
 - A user's ONNX image classifier and a folder of their own labelled images -> INT8 build -> damage
@@ -482,7 +486,7 @@ labels show Pi rows.
 
 ### Later versions (not scheduled; kept, not deleted)
 - 4.1's summary tables script. <!-- internal -->
-- 4.2 (two more models, full pipeline; allowed overnight under the research freeze). <!-- public: The full study pipeline on two more models -->
+- 4.2 (two more models, full pipeline; allowed overnight under the research rule of 6 October 2026). <!-- public: The full study pipeline on two more models -->
 - 4.5 `brokkr recommend`. <!-- public: A recommend command: choose a build for a device, speed, size and condition -->
 - Fast mode, and the menu of conditions and severities (P4). <!-- public -->
 - `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe. <!-- public: Automatic shrinking: try several recipes and recommend one -->

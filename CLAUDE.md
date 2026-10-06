@@ -69,12 +69,19 @@ else is built on its measurements.
   run in the current session. If a number wasn't just measured, say so or don't state it. (Added
   26 September 2026, after a Stage 4 report stated "210 tests" that no command had produced.)
 
-## Research freeze (from 27 September 2026, until website v0 ships)
+## Research rule (from 6 October 2026; replaces the research freeze of 27 September 2026)
 
-* No new research questions, diagnostics or hypotheses until website v0 ships. If a result raises a
-  new question, add it to the "Parked questions" list in STATUS.md and move on.
+Website v0 shipped on 6 October 2026, which ended the research freeze (it ran "until website v0
+ships"). Decided by H, 6 October 2026:
+
+* Research is allowed **only** for the EEG/EMG preliminary result for the MS proposal, and only after a
+  time-boxed literature check (2–3 hours) whose criteria for what happens if prior work exists are
+  written down before the check starts.
+* All other parked research questions (STATUS.md, "Parked questions") stay parked until Platform plan
+  step 4 (label submission, PyPI and quick start: `pip install`) ships. If a result raises a new
+  question, add it to that list and move on.
 * Task 4.2 may still run, overnight only, and only as pre-registered (in `docs/hypotheses_stage4.md`)
-  before it starts. H23 is parked (in STATUS.md) and is not run during the freeze.
+  before it starts. H23 stays parked (in STATUS.md).
 * Work follows the Platform plan in `ROADMAP.md` (set by H, 30 September 2026), strictly in this order:
   1 labels (by 7 Oct), 2 catalog site and going public (10 Oct), 3 testing a user's model (16 Oct),
   4 label submission, PyPI and quick start (19 Oct), 4b unlabelled mode (23 Oct),
