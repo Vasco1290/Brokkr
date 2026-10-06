@@ -91,8 +91,9 @@ collapse is still unknown.
 
 Consistent with prior work on quantized models (Xiao et al., 2023, arXiv:2304.03968; Yaghoubi Araghi et
 al., 2026, 4-bit, arXiv:2607.18540), we found that shrunk models can pass a normal accuracy check and
-still collapse in dark or low-contrast images, and in our small pre-registered test, clean accuracy
-didn't predict which. In wider exploratory checks, which models were hit varied with the condition, and
+still collapse in dark or low-contrast images, and in our small pre-registered test (9 models), we found
+no strong relation between clean accuracy and which models collapsed (wording narrowed by H on 6 October
+2026; it said "clean accuracy didn't predict which"). In wider exploratory checks, which models were hit varied with the condition, and
 fog hit some models too. How much a model loses when shrunk, measured on clean photos, does go together
 with how much it loses under damage, but mostly because of the two collapsing models: without them the
 link almost disappears. So it is not an established warning sign, and each model has to be tested under

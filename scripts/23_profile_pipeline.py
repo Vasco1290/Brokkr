@@ -83,7 +83,7 @@ if not args.skip_corruptions:
 
     for name, severity in BROKKR:
         timed(f"{name} (Brokkr) s{severity}", N_IMAGES, run_brokkr, name, severity)
-    from brokkr_edge.imagenet_c import damage as imagenet_c_damage  # vendored official code, seeded per image
+    from brokkr_edge.imagenet_c import damage as imagenet_c_damage  # imagecorruptions, seeded per image
 
     def run_imagenet_c(name, severity):
         return [imagenet_c_damage(c, name, severity, seed=int(p))

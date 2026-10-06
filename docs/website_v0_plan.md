@@ -279,3 +279,254 @@ these numbers come from the labels and records through the number test, never ty
 >
 > That is why every Brokkr label shows each tested condition separately, says whether the full-precision
 > model also fails there, and marks what was not tested. The ImageNet-C conditions were generated with the imagecorruptions package v1.1.2 (Michaelis et al., 2019, arXiv:1907.07484; an extension of the ImageNet-C code of Hendrycks & Dietterich, 2019, arXiv:1903.12261), with a one-line fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. They are not directly comparable to the released ImageNet-C files.
+
+## 12. Design decisions (H, 4 October 2026; after reviewing the prototypes)
+
+Recorded as given. Where this section differs from sections 1–9, it wins. The prototypes in
+`web/prototypes/` (built by `web/prototypes/build_prototypes.py` from `published/labels/`) are the
+approved **visual** reference: theme, type, colours, the meter and the controls. Their **page layout**
+predates the site map below (the prototype landing page still has the full results table and all
+thirteen condition keys; the prototype model page lists condition names in its key facts). For layout,
+this section is the reference.
+
+### 12a. Theme: "the forge's test bench"
+- Brokkr forges the part (shrinks the model), then measures it on the bench (the label).
+- **Shell** (landing, navigation, "Why labels?"): dark-first forge, charcoal and stone with cream text and
+  an ember accent. **Evidence** (model pages, tables, methods, compare): datasheet-crisp panels inside the
+  shell.
+- **Exactly three signature elements:**
+  1. the pixel-cooling hero: a static SVG of squares cooling from ember to stone in discrete steps (a
+     quantization metaphor);
+  2. the analog bench meter on the landing page: needle, a Nixie-style readout (styled monospace text,
+     never images) and a shaded interval band. Two zones only, small and large, split at the label's
+     large-shrinking-cost line (the one threshold the rules define). The verdict comes from the whole
+     interval and the label's own flag, never from the needle. Values come from published labels only and
+     are checked like the figures. The needle overshoots slightly and settles; with
+     `prefers-reduced-motion` it jumps;
+  3. tactile controls for choosing conditions: raised = pressable, sunken = selected, always a visible
+     border, a clear pressed state and a visible focus ring.
+- Neumorphic styling only on controls, never on content cards, tables or text. Glow only on the Nixie
+  digits. Gauges only for single headline values, always beside the exact number and its interval;
+  comparisons across models stay as bars and tables. No severity knob in v0 (only severities 3 and 5
+  were tested).
+
+### 12b. Themes and colour tokens
+- Every colour is a named CSS token, generated from `web/themes.py`; adding a theme is one new entry
+  there, with no page changes. A theme changes only the shell: backgrounds, panels, accent, glow and
+  control styling.
+- **Fixed in every theme** (they depend only on light or dark mode): the data colours (INT8 blue, FP32
+  grey, as in the figures), the verdict and warning colours (always with an icon), and the datasheet
+  panels behind tables and figures. The dark datasheet panel is a **neutral grey with no hue, `#181818`**
+  (light: white); the figures' dark versions use the same surface, so a figure looks the same under every
+  theme. `tests/test_web_themes.py` keeps the panels and data colours identical to the figures'.
+- **v0 ships Ember forge** (default for dark-mode visitors) **and Light** (default for light-mode visitors,
+  datasheet style). Brass foundry, Runic frost, Deep mine and Anvil steel follow in the week after launch.
+- Automated rules for every theme (`check()` in `web/themes.py`, run by the builder and by the test): text
+  at least 4.5:1, marks and controls at least 3:1; a theme's accent at least 15 (OKLab distance x100) from
+  the INT8 blue (written for Runic frost); no theme may override a fixed colour (so Deep mine's warnings
+  always use the fixed warning colour and icon, never its green glow).
+- A theme picker in the navigation; the choice is kept in the visitor's browser only (`localStorage`
+  inside try/catch; the site works without storage); no tracking; the default follows the system
+  light/dark setting.
+
+### 12c. Typography
+- **Big Shoulders Display** (display), **IBM Plex Sans** (body), **IBM Plex Mono** (every number and ID,
+  and the Nixie readout). All SIL Open Font License 1.1, self-hosted in `web/fonts/` with their licence
+  files; nothing is loaded from other sites. The files are unmodified copies from Google's font
+  repository: IBM Plex has the Reserved Font Name "Plex", so it is not subset or converted under that name.
+
+### 12d. Build IDs and addresses
+- **Address:** `/models/<model>/<build>/`, with `<model>` the model's name with `_` turned into `-`
+  (`mobilenet-v3-large`) and `<build>` the precision and recipe split into words (`int8-percentile-99.99`;
+  FP32: `fp32`).
+- **Build ID:** `BRK-<model code>-<precision>-<recipe code>`, generated from the address, never typed.
+  Model code: the display name split at spaces, hyphens and capitals; a plain word gives its first letter,
+  a part with digits or in capitals is kept whole without dots (MobileNetV3-Large → `MNV3L`, ConvNeXt-Tiny
+  → `CNXT`, ShuffleNetV2 x1.0 → `SNV2X10`). Recipe code: the method's first letter and its digits
+  (`P9999`); FP32 builds have none. The generator fails if two builds get the same ID or address.
+
+### 12e. Site map: one job per page
+- **Landing** (under about three phone screens): the hero; the meter with **four conditions only** (clean,
+  darkness (Brokkr) s5, fog (ImageNet-C) s3, contrast (ImageNet-C) s5) and a "see all 12 conditions" link
+  (the count generated from the labels); the hero figure with a two-sentence finding (generated from the
+  records and labels, checked like the README findings); buttons to Catalog and "Why labels?". No results
+  table on the landing page.
+- **Catalog** `/models/`: one card per model: name, build ID, clean shrinking cost with its interval,
+  large-shrinking-cost count, link to the label.
+- **Model page**: key facts show **counts only** (the condition names move into collapsed `<details>`).
+  Order: key facts → envelope groups → condition details → speed → uncertainty → licences and provenance
+  → raw label JSON, with a short in-page menu at the top.
+- **Compare**: the grid figure and a sortable table. **"Why labels?"**, **Methods** and **Roadmap** as in
+  sections 1, 1a and 9 (point 7).
+- **Navigation:** Catalog · Compare · Why labels? · Methods · Roadmap · GitHub · Theme.
+
+### 12f. Progressive disclosure
+- Details are collapsed by default with `<details>` (no JavaScript needed).
+- On phones, condition details are **one card per condition**, never a wide table.
+- Usable with JavaScript off (only the optional sorting, the theme picker and the condition switches need
+  it), keyboard accessible, no external scripts, fonts or trackers.
+
+### 12g. The site builder
+- **Refuses to build from a dirty working tree**, like the measurement scripts; every page's footer names
+  the commit it was built from, the brokkr-edge version and the label schema version.
+- Every number a reader sees is checked against the labels (and, for the figures and the finding, the
+  records), as the prototype builder and `scripts/47_figures.py` already do.
+
+## 13. Slice A as built (4 October 2026; for H's review)
+
+Slice A (asked by H on 4 October 2026): the generator, the landing page, the catalog and the ten model
+pages, with their checks. Compare, "Why labels?", Methods and Roadmap come in slice B. Built by
+`scripts/49_build_site.py` (`web/site_labels.py`, `site_meter.py`, `site_pages.py`, `site_build.py`,
+`site_checks.py`; tests in `tests/test_site.py`); the prototypes now share its label lookups, meter and
+hero picture. Choices made while building, each open to H's change:
+- **Addresses.** Each model page is at `/models/<model>/<build>/` (12d). There is no `/models/<model>/` page
+  yet (one label per model today); breadcrumbs link to the catalog.
+- **Navigation and buttons** are built from the page types, so slice A shows only Catalog, GitHub and the
+  theme picker, and the landing page has only the Catalog button; "Why labels?" appears in both when its
+  page type is added (5c, 5d).
+- **Meter keys** sit in one row inside the readout panel (the suite is named in the readout and in the
+  table shown without JavaScript), to keep the landing page short on phones. Measured at 343 px wide
+  (headless Chrome, device emulation): 2,530 px tall, about 3.1 screens of an 812 px tall phone (12e asks
+  for about three).
+- **The finding** is generated from the hero figure's values (H21, in `docs/figures/figures.json`) and the
+  MobileNetV3-Large label, in the approved wording of section 11, with the label's two-decimal shrinking
+  costs to match the meter beside it. Claims register entry: `site-finding`. The hero figure's
+  `appears_in` now lists the landing page.
+- **Model pages.** Key facts show counts only (condition lists collapsed), plus clean top-1 and file size.
+  Condition details are one table on wide screens and one card per condition below 760 px (CSS only, the
+  same markup). Speed and licence lines reuse the label's own wording (`label_render`); a slower INT8 also
+  gets a callout above the speed table. A failed build opens with a "Do not use this INT8 build" panel
+  before any number, and its catalog card is outlined in the warning colour.
+- **No-JavaScript check** (automated): no element is hidden until a script runs, and every number the
+  script can show is also on the page without it (the meter's four readings are in a plain table that
+  shows only without JavaScript).
+
+## 14. Slice A fixes and slice B (4 October 2026)
+
+H approved slice A on 4 October 2026 with five fixes (accepted: the landing page at 3.1 phone screens), then
+asked for slice B. Built on `step-2-site`; choices made while building, each open to H's change:
+- **Fixes.** (1) The landing finding is the approved headline of section 11, quoted word for word from the
+  README's findings block; the H21 detail is on "Why labels?". (2) The hero figure's column is headed
+  "Much worse in the dark?" (each phone row says the same), and its caption names "Pre-registered test H21"
+  and the overall verdict (regenerated by `scripts/47_figures.py`; the README picked it up). (3) The meter's
+  large zone is a muted red (light `#c0726a`, dark `#a8564f`); a new theme rule fails if it is as loud as
+  the needle, and the contrast rules still pass. (4) On phones each condition is a collapsed `<details>`
+  card whose summary line is condition · INT8 state · shrinking cost (with "⚠ large" when flagged); wide
+  screens keep the table. (5) A failed build's "Where it holds up" is one line ("All 12 conditions: INT8
+  build failed") that expands to the groups; its FP32 results stay visible.
+- **Where the findings text comes from.** The full findings (headline, the pre-registered paragraph with
+  H18b, H20 and H21, the two exploratory paragraphs) are computed from the 4.1 records, which are not
+  committed. The site therefore quotes them word for word from the generated block between the "findings"
+  markers in README.md (`web/site_sources.py`); `scripts/45_readme_findings.py --check`, run by
+  `scripts/40_check_labels.py`, fails if that block differs from a fresh render of the records and labels.
+  A page that quotes it may show its numbers. No new committed results file was needed.
+- **Compare.** A table of every label, sortable by any column with JavaScript (rows stay in name order
+  without it), the grid figure in a box that scrolls sideways on phones, and the speed figure.
+- **Why labels?** The approved text of section 11 (the order of section 11; the README's sentences), the
+  hero, grid and uncertainty figures, the uncertainty figure's sentence from the claims register
+  (`fig-uncertainty`), and the related work: the five sources cited on the page and the three others
+  verified on 3 October 2026, as bibliographic entries only (typed in `web/site_sources.py` from
+  `scratch/related_work.md`, which is not committed).
+- **Methods.** Images and their uses, the test conditions, the imagecorruptions sentence, the envelope
+  rules (the label's own wording), the threshold history as recorded in `docs/hypotheses_stage4.md`
+  (`a957652`, `237effa`, `621cc43`, with their data-independent reasons), "With 12 conditions, an
+  occasional result may cross a line by chance", how speed was measured (the label's notes, with the cores
+  wording and the pin limitation), the honesty rules and the label's limits.
+- **Roadmap.** Generated from ROADMAP.md's status marks: Built (marked done), Now (in progress, which
+  includes Stage 4 as ROADMAP.md marks it), Next (the next platform step), Later (the other platform
+  steps, then "Later versions" without bracketed dates, people or plan codes). A check fails on any month
+  name or year on the page.
+- **Navigation** now shows Catalog · Compare · Why labels? · Methods · Roadmap · GitHub, and the landing
+  page has both buttons, all from the page list. On phones the links sit on their own row that scrolls
+  sideways.
+- **Number check tightened:** a number with thousands separators ("10,000") is one number, so a changed
+  "10,500" is caught (before, its two parts were each allowed). Identifiers with digits on a page
+  (commits, citations, step names) are listed per page, each with its reason.
+
+## 15. Round 1 of the next session: H's fixes 0–4 (5 October 2026; for H's review)
+
+H's fix list of 4 October 2026, done in this order on `step-2-site`; choices made while building, each open
+to H's change:
+- **0. Findings check.** Every findings paragraph a page quotes sits in a marked element
+  (`<span class="quote" data-findings="<key>">`). A new site check reads README.md on its own (not through
+  `web/site_sources.py`, which the pages use) and fails if a marked paragraph is not exactly one paragraph of
+  the generated findings block. Only line breaks and repeated spaces are read as one space (neither Markdown
+  nor HTML shows them); every other character must match. It also fails if a page that quotes the findings
+  shows no marked paragraph, or a page that does not quote them shows one. Tests: one changed character,
+  one changed digit, one missing letter, a changed README and a missing marker are each caught.
+- **1. ImageNet-C wording.** The labels' limit and the label glossary no longer say "official" (dated note
+  of 5 October 2026 in `docs/label_schema.md`). The ten labels were remade at the clean commit `0b02393`,
+  passed `scripts/40_check_labels.py`, and were released again. `scripts/48_compare_labels.py` against the
+  4 October release found one difference per label beyond the commit and date: `limits/1`, the ImageNet-C
+  sentence. `brokkr_edge.wording` holds the check. It is run by `scripts/40` (labels and README), the site
+  build (every page and raw label) and `tests/test_wording.py`. A sentence ends at ". ", a line break or an
+  HTML tag, so "Official label" in one list item and "ImageNet-C" in another are not one sentence. The same
+  wording was also corrected in two code notes and the vendored package's `CHANGES.md`.
+  Left for slice C's overclaiming re-read (not changed here): ROADMAP.md's 4.1 scope says "the official
+  corruption code", and `docs/hypotheses_stage4.md` (pre-registered, never edited above its outcomes) says
+  the same.
+- **2. Roadmap.** Stage 4 is marked done, with a note naming what stays open and where it moved. Every
+  stage, Platform plan step and "Later versions" item in ROADMAP.md ends with a hidden mark,
+  `<!-- public -->` or `<!-- internal -->`. A public mark may carry a plain name
+  (`<!-- public: A minimal EEG/EMG pack -->`); without one, the name is the heading without its number. The
+  site shows public items only, in file order, with no "Step N" labels. The build stops on an unmarked item,
+  or on a public name holding a stage, step or task number or a plan code; the roadmap page check also fails
+  on such a number. Marked internal: Stages 5–7 (their content is in "Later versions"), 4.1's summary tables
+  script, Report 1's related work, the Stage 3 cache rebuild and the parked research questions. Stage 4's
+  public name is "The study across ten models", because its "recommendations" were not built.
+- **3. Compare on phones.** The model column stays fixed while the other columns scroll under it, with a
+  thin line at its edge. Below 760 px, rows are one line each (intervals and sub-lines inline, smaller text
+  and padding) and headings wrap. A "scroll →" hint shows above the table on screens under 960 px.
+- **4. Model pages.** The speed timing note reads "Timed on 3 October 2026, 07:55–08:01 UTC", to the minute,
+  with the exact times from `label.json` on hover. A window that crosses midnight names both dates. The
+  number check allows the window only as `web/site_labels.readable_window` writes it from that label's own
+  times. The conformal thresholds moved out of the coverage table into a collapsed "Calibration thresholds
+  (conformal)" section, with their calibration image counts. The model page's Limits heading has an anchor
+  (`#limits`).
+
+## 16. Round 2: slice C (6 October 2026; for H's review)
+
+H approved round 1 on 6 October 2026, including the public/internal choices, and asked for round 2. Choices
+made while building, each open to H's change:
+- **Claims register.** Every paragraph of the Why labels? page names its entry in `docs/claims.json`
+  (`data-claim`), and every quoted findings paragraph has an entry with its findings key. The new entries
+  are `why-example`, `why-prereg`, `why-explore`, `why-noise-blur`, `why-label-design` and
+  `imagenet-c-method`; `site-finding` and `fig-uncertainty` already existed. As the register's rule says,
+  no result number is typed in an entry: the numbers stay in the checked paragraphs. A site check fails on
+  a missing entry or field, a script that does not exist, or an arXiv number that is not in
+  `docs/related_work.md`.
+- **Related work.** `scratch/related_work.md` is now `docs/related_work.md` (unchanged apart from its
+  opening paragraph, the word "advisor" and one `Site:` line per entry). The site reads its citations from
+  it (`web/site_sources.related_work()`); the typed list in `web/site_sources.py` is gone. The Why labels?
+  page's visible text is unchanged (compared with the build of `0d1117f`; no other page changed).
+- **Wording check, docs.** `brokkr_edge.wording.check_docs` reads the README and the public docs. It skips
+  the text above the correction note of 6 October 2026 in `docs/hypotheses_stage4.md`, and the note's own
+  section, and reports that the note exists. Four docs that record the fix or this check are listed as
+  "not read", with their reasons. Every Markdown file git tracks must be in one of the two lists.
+  - The sentence splitter changed: a single line break inside a paragraph no longer ends a sentence, so a
+    claim wrapped across two lines is caught. Blank lines, headings, list items and HTML tags still end
+    one.
+- **Pre-public checklist:** `docs/prepublic_checklist.md`, with its evidence and the list for H.
+  **Publishing plan:** `docs/publishing_plan.md` (plan only).
+- **Datasets** carry a use tag, "research only" or "commercial use allowed" (`brokkr_edge/datasets.py`):
+  both are "research only".
+
+## 17. Round 3: narrowed wording and the 404 page (6 October 2026; for H's review)
+
+H approved round 2 and decided: narrow all seven listed sentences (never strengthen), keep the five commits
+with the real author name, approve the publishing plan with a 404 page added. Choices made while building,
+each open to H's change:
+- **Wording.** The before/after of all seven is in `docs/prepublic_checklist.md` (decisions of 6 October).
+  - The same "every number" narrowing was applied where the sentence recurs: the landing page and the
+    README's rules.
+  - The tagline keeps "for small hardware" (the project's aim) and drops "find out honestly".
+  - The uncertainty sentence types no number (the register's rule); a test checks its "even get smaller"
+    against the label.
+  - `docs/stage4_story.md` holds the narrowed headline too, with a dated note of what it said before.
+- **"Pinned".** The labels were remade at `625e3de` and released again. `scripts/48_compare_labels.py`
+  against the release of 5 October: PASS, each label with the one listed change.
+- **404 page.** It reuses the landing page's pixel-cooling picture and buttons: the title "Not found", one
+  line "This page doesn't exist.", and buttons Home and Catalog. Because GitHub serves it at any missing
+  address, it alone carries `<base href="/Brokkr/">`, derived from the repository name; the published
+  address is `SITE_ADDRESS` in `web/site_build.py`. A twelfth site check covers it, and the link check
+  skips the base tag.

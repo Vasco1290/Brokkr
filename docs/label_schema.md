@@ -537,3 +537,71 @@ abbreviations, generated from the conditions; H's sentence about colour and the 
 grid stays 1000 wide: on phones people scroll it sideways (H: most readers use a wide screen).
 
 **3. The coverage and speed figures are unchanged for now** (H).
+
+## Fourth note added 4 October 2026: the dark figures' surface is a neutral grey
+
+Decided by H on 4 October 2026, with the website design (`docs/website_v0_plan.md`, section 12b). The dark
+versions of the figures use a neutral grey with no hue (`#181818`, with neutral greys for text, grid lines
+and near-floor cells) instead of GitHub's bluish dark background, so a figure looks the same on the
+website's fixed datasheet panel under every theme. The colour steps and data colours are unchanged and
+still pass the palette validator on the new surface. No value changes; `scripts/47_figures.py --check`
+passes, and `tests/test_web_themes.py` keeps the website's panels equal to the figures' surfaces.
+
+## Note added 5 October 2026: the ImageNet-C limit no longer says "official" (before the labels are remade)
+
+H's fix list of 4 October 2026, item 1. Every label's limits said the ImageNet-C conditions were "made with
+the official corruption code". That overclaims: they were made with the imagecorruptions package v1.1.2 (an
+extension of the ImageNet-C code) with a one-line fix so that fog runs on NumPy 2, and they are not
+directly comparable to the released ImageNet-C files. No value, threshold, state or rule changes; schema
+version 1 stays.
+
+**1. The limit sentence is now** (made by `scripts/39_make_labels.py`; the version is read from the first
+line of `brokkr_edge/third_party/imagecorruptions/CHANGES.md`): "The ImageNet-C conditions were made on these
+test images with the imagecorruptions package v1.1.2 (an extension of the ImageNet-C code), with a one-line
+fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and each
+model's own preprocessing were used, so the results are not directly comparable to the released ImageNet-C
+files or to published ImageNet-C results."
+
+**2. The glossary line** "Brokkr and ImageNet-C" (fixed text in `brokkr_edge/label_render.py`, so it is in
+`label.md` and `label.html`, not `label.json`) no longer says "made here with its official code"; it says
+the damage types were made with the imagecorruptions package, not taken from the released ImageNet-C files.
+
+**3. A check:** `brokkr_edge.wording.official_overclaims` finds every sentence that says "official"
+together with "ImageNet-C" or "corruption code". It is run by `scripts/40_check_labels.py` (each label's
+`label.json` strings, `label.md`, `label.html`, and the README), by the site build (every page and raw
+label) and by `tests/test_wording.py` (the released labels and the README; and it fails on the old
+wording). The source kind `"official"` is a separate JSON string and is not a sentence about ImageNet-C.
+
+**4. The labels are remade** from a clean commit with this wording, checked by `scripts/40`, compared with
+the release of 4 October by `scripts/48_compare_labels.py`, and released again in `published/labels/`; the
+README blocks, screenshots and figures are made again from them.
+
+## Note added 6 October 2026: comparing two releases accepts only listed changes
+
+Asked by H on 6 October 2026. `scripts/48_compare_labels.py` compares two sets of labels. Besides the
+differences any remake causes (source fingerprints, and the commit and time that made a label), it now
+accepts only the changes listed in `docs/label_changes.json`. Each entry there is dated, points to the note
+that decided it, and names one `label.json` field, or one piece of text the label renderer writes into
+`label.html`, with its exact old and new text. Entries are added, never edited or removed.
+
+- The first two entries are the changes of the note of 5 October 2026: the ImageNet-C limit sentence
+  (`limits/1`) and the glossary line "Brokkr and ImageNet-C".
+- For `label.html`, the old label rendered by today's renderer must equal the old page with only the listed
+  renderer changes applied, so the renderer changed in no other way. The new page must be today's render of
+  the new label.
+- The script prints PASS and names each accepted change. Any change not on the list still fails, as
+  `tests/test_compare_labels.py` shows with made-up changes (tests only).
+- Run against the release of 4 October 2026 (`15437fd`) and today's `published/labels/`: PASS for all ten
+  labels, each with the two listed changes and the commit and time differences, and no other difference.
+
+## Note added 6 October 2026 on narrowed wording: the "Pinned" glossary line (before the labels are remade)
+
+H's round 3 decision 1c (6 October 2026), from the overclaim list in `docs/prepublic_checklist.md`. The
+glossary line "Pinned" said the timing "was only allowed to run on the named CPU cores, so the operating
+system could not move it to slower ones". The pin was set but never read back, so that was not shown. It
+now reads: "the timing was set to run only on the named cores; this was not read back to confirm." The line
+is fixed text in `brokkr_edge/label_render.py`, so it changes every `label.md` and `label.html` and no
+`label.json`. It is the third entry in `docs/label_changes.json`. The labels are remade from a clean commit,
+checked by `scripts/40_check_labels.py`, released again, and compared with the release of 5 October 2026
+by `scripts/48_compare_labels.py`, which must pass with this listed change only. No value, threshold, state
+or rule changes; schema version 1 stays.

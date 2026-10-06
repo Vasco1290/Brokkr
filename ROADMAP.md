@@ -5,6 +5,12 @@ so stopping at any stage still leaves something finished.
 
 Status key: `[ ]` not started, `[~]` in progress, `[x]` done.
 
+Website key (H's fix list, 4 October 2026): every stage, Platform plan step and "Later versions" item ends
+with a hidden mark, `<!-- public -->` or `<!-- internal -->` (view this file's source to see them). The
+website's roadmap page shows only public items, in this file's order, with plain names and no stage or step
+numbers: the name after `public:` when one is given, otherwise the heading without its number. The site
+build fails on an item with no mark.
+
 The website grows with every stage as a **walking skeleton**: the thinnest end-to-end version
 (results JSON -> HTML page) exists from Stage 1, and each stage adds only what it actually measured.
 
@@ -12,7 +18,7 @@ Languages: Python for the factory, test lab, and site builder; HTML/CSS (+ a lit
 search) for the website; a shell script for the installer. The device runner starts in Python and moves
 to C++ only if measurements show Python overhead matters.
 
-## Stage 1 — Core measurement `[x]`
+## Stage 1 — Core measurement `[x]` <!-- public -->
 
 One model, three precisions, measured honestly on the laptop.
 
@@ -45,14 +51,21 @@ finished; its open items are now checks done after the fact, in step 2.*
 
 - [x] Switch local git author email to the GitHub noreply address and rewrite unmerged commits that
   contain the personal email
-- [ ] Publish the results page to GitHub Pages
-- [ ] Re-read README and ROADMAP for anything that overclaims
+- [ ] Publish the results page to GitHub Pages (plan written 6 October 2026: `docs/publishing_plan.md`;
+  waiting for H's go-ahead)
+- [ ] Re-read README and ROADMAP for anything that overclaims. Done for every site page and the README on
+  6 October 2026, with a list of sentences for H (`docs/prepublic_checklist.md`, section 2); ROADMAP.md's 4.1
+  scope was corrected where the wording check found the old ImageNet-C wording, but the file was not
+  re-read line by line. Ticked
+  when H has decided on the list.
 - [x] Git-history scan (3 October 2026, after the repository became public; read-only, nothing rewritten):
   all 180 commits on every branch and tag use the GitHub noreply email; no machine paths, Windows
   usernames, personal email addresses or tokens in any commit's contents (matches were test data, a
-  redacted commit message and checklist text)
+  redacted commit message and checklist text). Run again on 6 October 2026 (199 commits, 15 refs): same
+  result; five commits made in GitHub's web interface carry H's real name as author name, with the noreply
+  email (`docs/prepublic_checklist.md`, section 3)
 
-## Stage 2 — Stress test `[x]`
+## Stage 2 — Stress test `[x]` <!-- public -->
 
 How much worse does each precision get on damaged photos, and does it still know when it's wrong?
 
@@ -76,7 +89,7 @@ Bootstrap confidence intervals on every accuracy/reliability number.
 
 **Done when:** the headline chart (precision × corruption × reliability) is generated from JSON.
 
-## Stage 3 — Fixes and the study `[x]`
+## Stage 3 — Fixes and the study `[x]` <!-- public -->
 
 Can each Stage 2 problem be fixed, and at what cost? No Stage 3 setting is tuned on the test split;
 the test split was used for Stage 2 baselines. Settings are chosen on the tuning and calibration splits. Fixes that learn from damaged images are judged
@@ -103,7 +116,12 @@ leave-one-corruption-out: tuned on four corruption types, tested on the fifth.
 **Done when:** one finding can be explained in two minutes, with the numbers behind it, and the
 write-up exists.
 
-## Stage 4 — Breadth, depth, labels and recommendations `[~]`
+## Stage 4 — Breadth, depth, labels and recommendations `[x]` <!-- public: The study across ten models -->
+
+*Marked done on 5 October 2026 (H's fix list of 4 October 2026, item 2): the research is finished and
+tagged `stage-4-done` (4.0; 4.1's sweep, reliability and verdicts; M2; SE1), and 4.3's labels were built as
+Platform plan step 1. The items still open below are not part of this mark: 4.1's summary tables script, 4.2
+and 4.5 moved to "Later versions", and 4.4 is Platform plan step 6.*
 
 Stage 3 studied one model on one laptop. Stage 4 asks whether its findings hold across models, tests
 the likely explanation for INT8's darkness collapse, and turns results files into labels and
@@ -182,8 +200,9 @@ tuning images, two models, three conditions).
 - **Conditions** (test split, 10,000 images, 13 in all): clean; Brokkr's own fog 3, darkness 5,
   defocus blur 3, noise 3; ImageNet-C fog, contrast, defocus blur and Gaussian noise at severities 3
   and 5.
-- **ImageNet-C option:** generated on our test split with the official corruption code (the
-  `imagecorruptions` package). The 8 conditions are listed in the hypotheses file. **Before 4.1
+- **ImageNet-C option:** generated on our test split with the `imagecorruptions` package (v1.1.2, an
+  extension of the ImageNet-C code, with a one-line fix so that fog runs on NumPy 2; wording corrected on
+  6 October 2026, see `docs/label_schema.md`, note of 5 October 2026). The 8 conditions are listed in the hypotheses file. **Before 4.1
   starts:** confirm the package's licence (and its dependencies'), that it installs cleanly with our
   numpy / scikit-image versions, and that its outputs look correct on 5 sample images. Any difference
   from the released ImageNet-C files (for example how they were saved) is recorded, and our numbers
@@ -367,7 +386,7 @@ installs a `brokkr` command, so ours is **`brokkr-edge`** (e.g. `brokkr-edge tes
 
 Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published labels**.
 
-### 1. Labels (P1) `[x]`, done by 7 October (done 3 October 2026; merged 4 October)
+### 1. Labels (P1) `[x]`, done by 7 October (done 3 October 2026; merged 4 October) <!-- public -->
 - `docs/label_schema.md` first (written: `label.json`, schema version 1). The label builder is made
   general enough for EEG/EMG signals (step 7), not image-only.
 - Then P1 as fixed in `docs/hypotheses_stage4.md` (notes of 29–30 September): 10 labels, the check
@@ -378,7 +397,7 @@ Licences (30 September 2026): Apache-2.0 for the code; **CC BY 4.0 for published
 *Done when:* the P1 "done when" line (Product plan, below) holds, and every `label.json` passes a
 validator for `docs/label_schema.md` version 1.
 
-### 2. Catalog site and going public `[~]`, done by 10 October
+### 2. Catalog site and going public `[~]`, done by 10 October <!-- public -->
 - GitHub Pages, generated only from `label.json` files: browse, filter, compare, one page per label,
   and a methods page (harm definition and threshold history as recorded in
   `docs/hypotheses_stage4.md`, the "12 conditions" sentence). User-submitted labels are clearly marked
@@ -395,7 +414,7 @@ a `label.json`; filter and compare work on the 10 labels; a user-submitted test 
 "unverified"; every checklist item is ticked with its date; the README is current; the repository is
 public and the site is live.
 
-### 3. Testing a user's model `[ ]`, done by 16 October
+### 3. Testing a user's model `[ ]`, done by 16 October <!-- public -->
 - A user's ONNX image classifier and a folder of their own labelled images -> INT8 build -> damage
   tests -> `label.json`, run locally. Then PyTorch model input.
 - How the user's images are split (INT8 calibration, conformal calibration, test; no image in two
@@ -409,7 +428,7 @@ public and the site is live.
 model with a folder of images, the command produces a schema-valid `label.json` marked
 `source: user-submitted`; the same for PyTorch input.
 
-### 4. Label submission, PyPI and quick start `[ ]`, done by 19 October
+### 4. Label submission, PyPI and quick start `[ ]`, done by 19 October <!-- public -->
 - A GitHub pull-request template for submitting a `label.json`, with an automatic check (schema
   validation; the label is marked "user-submitted, unverified"). The template says submitters license
   their labels under CC BY 4.0.
@@ -418,7 +437,7 @@ model with a folder of images, the command produces a schema-valid `label.json` 
 *Done when:* a test pull request with a valid label passes the check and one with an invalid label
 fails it; in a fresh environment, installing from PyPI and following the quick start produces a label.
 
-### 4b. Unlabelled mode for a user's images `[ ]`, done by 23 October
+### 4b. Unlabelled mode for a user's images `[ ]`, done by 23 October <!-- public -->
 - Added by H on 30 September 2026 (Checkpoint 1), moved here from "Later versions"; estimated 6–10
   hours. A user's ONNX image classifier and a folder of their own images **without** class labels ->
   INT8 build -> how often INT8's top-1 answer agrees with FP32's, clean and under each damage type,
@@ -431,7 +450,7 @@ fails it; in a fresh environment, installing from PyPI and following the quick s
 schema-valid `label.json` marked `source: user-submitted` that shows agreement and says accuracy
 and coverage were not measured.
 
-### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 29 October
+### 5. Hosted upload on Hugging Face Spaces `[ ]`, done by 29 October <!-- public -->
 - Free CPU Space: accepts the user's ONNX model and a folder of their labelled images, runs one job at
   a time, with a queue and status page; returns the label, marked as a user-submitted run.
 - **The Space never publishes users' models or images, only the resulting labels.** Upload limits,
@@ -442,14 +461,14 @@ and coverage were not measured.
 *Done when:* two jobs submitted together run one after the other, the status page shows both, each
 returns a schema-valid label, and no uploaded model or image is reachable from outside after its job.
 
-### 7. EEG/EMG pack, minimal `[ ]`, done by 5 November
+### 7. EEG/EMG pack, minimal `[ ]`, done by 5 November <!-- public: A minimal EEG/EMG pack -->
 - One public dataset and one model (licences checked and recorded before use), three damage types
   (electrode dropout, motion noise, power-line noise), an INT8 build, and a label in the same schema.
 
 *Done when:* the three damage types have tests; one EEG/EMG `label.json` passes the schema validator
 and appears in the catalog.
 
-### 6. Raspberry Pi 5 latency and labels `[ ]`, when the board arrives (no fixed date)
+### 6. Raspberry Pi 5 latency and labels `[ ]`, when the board arrives (no fixed date) <!-- public -->
 - The Pi 5 as a target over SSH (4.4), its fingerprint, latency for the 19 builds by the latency
   method adapted in a dated note before measuring, and labels regenerated with Pi rows. Results are
   labelled "Raspberry Pi 5" only when measured on one.
@@ -462,19 +481,19 @@ and appears in the catalog.
 labels show Pi rows.
 
 ### Later versions (not scheduled; kept, not deleted)
-- 4.1's summary tables script.
-- 4.2 (two more models, full pipeline; allowed overnight under the research freeze).
-- 4.5 `brokkr recommend`.
-- Fast mode, and the menu of conditions and severities (P4).
-- `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe.
-- The GitHub Action.
-- Stage 5 (energy and heat on the Pi with a USB power meter).
-- Stage 6's installer script and camera demo.
-- Stage 7's niche collections (e.g. factory defects, road scenes, farm pests).
-- Object detection, runtime monitoring, adaptation.
-- Technical Report 1's "Related work" section (to be written by H).
-- Stage 3 scripts 12, 14 and 15 need their tuning cache rebuilt (STATUS known gaps).
-- The parked research questions (STATUS).
+- 4.1's summary tables script. <!-- internal -->
+- 4.2 (two more models, full pipeline; allowed overnight under the research freeze). <!-- public: The full study pipeline on two more models -->
+- 4.5 `brokkr recommend`. <!-- public: A recommend command: choose a build for a device, speed, size and condition -->
+- Fast mode, and the menu of conditions and severities (P4). <!-- public -->
+- `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe. <!-- public: Automatic shrinking: try several recipes and recommend one -->
+- The GitHub Action. <!-- public: A GitHub Action that tests a model and attaches its label -->
+- Stage 5 (energy and heat on the Pi with a USB power meter). <!-- public: Energy and heat on the Raspberry Pi 5, with a USB power meter -->
+- Stage 6's installer script and camera demo. <!-- public: An installer script and a camera demo -->
+- Stage 7's niche collections (e.g. factory defects, road scenes, farm pests). <!-- public: Niche collections (e.g. factory defects, road scenes, farm pests) -->
+- Object detection, runtime monitoring, adaptation. <!-- public -->
+- Technical Report 1's "Related work" section (to be written by H). <!-- internal -->
+- Stage 3 scripts 12, 14 and 15 need their tuning cache rebuilt (STATUS known gaps). <!-- internal -->
+- The parked research questions (STATUS). <!-- internal -->
 
 ## Product plan (P1–P6), added 29 September 2026
 
@@ -563,7 +582,7 @@ start ends with a label, checked by a script. Publishing to PyPI only with H's g
 - A GitHub Action that runs `brokkr test` on a model file in a repository and attaches its label.
   *Done when:* an example workflow runs it on a small model and uploads the label.
 
-## Stage 5 — Energy and heat on real devices `[ ]`
+## Stage 5 — Energy and heat on real devices `[ ]` <!-- internal -->
 
 The Raspberry Pi 5 SSH target moved to task 4.4.
 
@@ -572,7 +591,7 @@ The Raspberry Pi 5 SSH target moved to task 4.4.
 
 **Done when:** energy and sustained-run results for the Pi come from the same testing code as 4.4.
 
-## Stage 6 — Website + installer `[ ]`
+## Stage 6 — Website + installer `[ ]` <!-- internal -->
 
 *29 September 2026: website v0 is brought forward as P2 of the Product plan above.*
 
@@ -581,7 +600,7 @@ The Raspberry Pi 5 SSH target moved to task 4.4.
 
 **Done when:** a stranger can go from search to a running camera demo.
 
-## Stage 7 — Community lab + collections `[ ]`
+## Stage 7 — Community lab + collections `[ ]` <!-- internal -->
 
 - Public benchmark script; results submitted as pull requests with automatic checks
 - Community results always labelled "community-submitted"

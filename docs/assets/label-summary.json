@@ -1,6 +1,6 @@
 {
   "label": "published/labels/mobilenet_v3_large/label.html",
-  "sha256": "3b7da1405c03ca3f12ccac15ed2e2adf5756bafa058e011768195244b0415e48",
+  "sha256": "15e1e49bd1617f4b6b542bd2b613cd571a8e8416132c3ab6f349064317df83c7",
   "pictures": [
     "label-summary-light.png",
     "label-summary-dark.png"

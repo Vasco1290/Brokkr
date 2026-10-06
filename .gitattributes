@@ -22,3 +22,5 @@
 *.npz binary
 *.png binary
 *.jpg binary
+*.ttf binary
+*.woff2 binary

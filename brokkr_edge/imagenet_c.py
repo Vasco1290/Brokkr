@@ -1,7 +1,8 @@
 """ImageNet-C corruptions with a fixed seed per image.
 
-The corruption code is the official ImageNet-C code (the imagecorruptions package, vendored in
-brokkr_edge/third_party/imagecorruptions with a one-line NumPy 2 fix). That code draws its random numbers
+The corruption code is the imagecorruptions package v1.1.2 (an extension of the ImageNet-C code of
+Hendrycks & Dietterich), vendored in brokkr_edge/third_party/imagecorruptions with a one-line NumPy 2 fix;
+its pictures are not directly comparable to the released ImageNet-C files. That code draws its random numbers
 from NumPy's global generator (np.random.normal and friends). A result must never depend on whatever
 state that generator happens to be in, so damage() seeds it for this one call from the given seed and
 then puts the previous state back. The same (picture, corruption, severity, seed) therefore always

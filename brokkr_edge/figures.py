@@ -20,7 +20,7 @@ import math
 FONT = "system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
 
 THEMES = {
-    # Surfaces match GitHub's light and dark page backgrounds, so the README figure blends in.
+    # Light: white, like GitHub's light page.
     "light": {
         "surface": "#ffffff",
         "ink": "#1f2328",
@@ -34,18 +34,20 @@ THEMES = {
         "steps": ("#86b6ef", "#5598e7", "#256abf", "#184f95", "#0d366b"),
         "text_choices": ("#1f2328", "#ffffff"),
     },
+    # Dark: a neutral grey with no hue (H, 4 October 2026), the same as the website's fixed datasheet panel,
+    # so a figure looks the same under every site theme.
     "dark": {
-        "surface": "#0d1117",
-        "ink": "#f0f6fc",
-        "muted": "#9198a1",
-        "grid": "#3d444d",
+        "surface": "#181818",
+        "ink": "#f2f2f2",
+        "muted": "#a3a3a3",
+        "grid": "#404040",
         "fp32": "#8b949e",
         "int8": "#3987e5",
         "second": "#d95926",
-        "floor": "#2a313c",
-        "band": "#151b23",
+        "floor": "#2e2e2e",
+        "band": "#222222",
         "steps": ("#184f95", "#256abf", "#3987e5", "#6da7ec", "#b7d3f6"),
-        "text_choices": ("#f0f6fc", "#0d1117"),
+        "text_choices": ("#f2f2f2", "#181818"),
     },
 }
 
@@ -360,7 +362,7 @@ def hero(rows: list, v: dict, theme: str) -> tuple:
         cv.text(
             16,
             y0 + 88,
-            f"large extra gap: {yes}, {show(v, r['gap'])} {show_ci(v, r['gap'])}",
+            f"Much worse in the dark? {yes}, {show(v, r['gap'])} {show_ci(v, r['gap'])}",
             colour="muted",
             halo=True,
         )
@@ -413,7 +415,7 @@ def hero_wide(rows: list, v: dict, theme: str) -> tuple:
             f'<rect x="8" y="{top + ROW * i}" width="{W - 16}" height="{ROW}" rx="4" fill="{band}"/>'
         )
     cv.axis_ticks("x", sc, tick_values, tick_labels, 128, top, bottom)
-    cv.text(566, 128, "large extra gap (H21)", bold=True)
+    cv.text(566, 128, "Much worse in the dark?", bold=True)  # H21's large extra gap (H, 4 October 2026)
     line_x = sc(v["large_cost_line"]["value"])
     cv.line(
         line_x,

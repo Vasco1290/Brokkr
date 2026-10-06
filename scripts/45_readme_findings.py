@@ -5,7 +5,9 @@ Needs:  results/final/breadth_4.1_verdicts.json (the 4.1 verdicts and summary ta
         <labels>/*/label.json (scripts/39_make_labels.py)
 Writes: the block between the two "findings" markers in README.md
 
-The wording was approved by H on 3 October 2026 (check 4; docs/stage4_story.md holds the same text).
+The wording was approved by H on 3 October 2026 (check 4; docs/stage4_story.md holds the same text); the
+headline's last clause was narrowed by H on 6 October 2026 ("we found no strong relation between clean
+accuracy and which models collapsed", with the number of models).
 Pre-registered verdicts (H18b, H20, H21) are stated with the conditions they judged; wider checks are
 marked "exploratory, not pre-registered". Every number is read from the records or labels here.
 
@@ -60,8 +62,8 @@ def findings(v: dict, labels: dict) -> list:
     headline = (
         f"Consistent with prior work on quantized models ({XIAO}; {RECTI}), we found that shrunk models can "
         f"pass a normal accuracy check and still collapse in dark or low-contrast images, and in our small "
-        f"pre-registered test, clean accuracy didn't predict which. In wider exploratory "
-        f"checks, which models "
+        f"pre-registered test ({len(judged)} models), we found no strong relation between clean accuracy and "
+        f"which models collapsed. In wider exploratory checks, which models "
         f"were hit varied with the condition, and fog hit some models too."
     )
     prereg = (

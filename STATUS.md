@@ -1,27 +1,31 @@
 # Brokkr status
 
-Snapshot as of **4 October 2026**. **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **6 October 2026** (round 3). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
-(catalog site and going public) is in progress** on branch `step-2` (see "Pick up here"). **Research
-freeze** until website v0 ships (see "Research freeze" below).
+(catalog site and going public) is in progress**: task 1 (figures) merged into `main`; the site is
+built on branch `step-2-site` (see "Pick up here"). **Research freeze** until website v0 ships (see
+"Research freeze" below).
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (4 October 2026)
+### Pick up here (6 October 2026)
 Read this first.
 - **Step 1 (labels) is done:** merged into `main` by pull request #4 (merge commit `0422a8c`), tagged
   `stage-4-done` (on `790c197`). The record of how it was done is under "Step 1 record" below.
-- **Step 2 (catalog site and going public), due 10 October, is in progress on branch `step-2`**
-  (pushed to origin; not merged; H reviews the figures before anything merges). Done so far:
-  - **Task 1, figures:** `scripts/47_figures.py` draws five figures (light and dark SVGs in
-    `docs/figures/`) from the released labels and records; `figures.json` names every plotted value's
-    source; `--check` (also run by `scripts/40`) checks values, positions, stray numbers and the claims
-    register (`docs/claims.json`, started here); `tests/test_figures.py` checks font size and contrast.
-    The README shows the hero figure (generated block between `figure-hero` markers): a wide layout on
-    screens at least 768 px wide and a tall one on phones (H's option b; third note of 4 October). Plan
-    and H's decisions: `docs/label_schema.md`, notes of 4 October 2026.
+- **Step 2 (catalog site and going public), due 10 October, is in progress.** Task 1 is merged into
+  `main` (pull requests #5 and #6, merge commits `f48afa7` and `1448e98`); `scripts/40_check_labels.py`
+  on `main` at `1448e98`: PASS, 10 labels, with `scripts/47_figures.py --check` PASS (4 October 2026).
+  **Work continues on branch `step-2-site`** (from `main` at `1448e98`). Task 1 delivered:
+  - **Figures:** `scripts/47_figures.py` draws the figures (light and dark SVGs in `docs/figures/`) from
+    the released labels and records; `figures.json` names every plotted value's source; `--check` (also
+    run by `scripts/40`) checks values, positions, stray numbers and the claims register
+    (`docs/claims.json`, started here); `tests/test_figures.py` checks font size and contrast. The README
+    shows the hero (generated block between `figure-hero` markers): a wide layout on screens at least
+    768 px wide and a tall one on phones (H's option b, checked on GitHub: phones show it 310 px wide),
+    and links to the grid (exploratory) rather than showing it. Coverage and speed figures keep their
+    first layout for now (H). Plan and H's decisions: `docs/label_schema.md`, notes of 4 October 2026.
   - **All ten labels released** in `published/labels/` (hard rule 4 now has two exceptions: released
     labels and the figures).
   - **One file fingerprint** (`brokkr_edge.results.sha256_of`): text files are hashed with CRLF turned
@@ -29,15 +33,81 @@ Read this first.
     suffixes as LF. The labels were remade from the clean commit `6a6ac0d` and released again;
     `scripts/48_compare_labels.py` showed them equal to the earlier release apart from source
     fingerprints and the commit that made them (PASS, 10 labels).
-- **Honest note: `main`'s `scripts/40_check_labels.py` has failed since the 4 October checkout of
-  `main`.** The labels made at `f682e21` recorded the SHA-256 of `brokkr_edge/model_list.json` as its
-  Windows (CRLF) working copy; that checkout rewrote the file with LF, so its bytes changed though its
-  text did not. Fixed on `step-2` by the fingerprint rule and the remade labels (second note of 4
-  October 2026 in `docs/label_schema.md`); `main` stays failing until `step-2` merges.
-- **Next in step 2** (`ROADMAP.md`, step 2; plan in `docs/website_v0_plan.md`): the catalog site built
-  from the labels (browse, filter, compare, label pages, methods, "Why labels?", licences, roadmap
-  pages), the pre-public checklist (overclaiming re-read, dataset commercial-use tags, claims register
-  for the README and site text, Report 1's "Related work" line), and GitHub Pages.
+  - **Line endings, for the record:** `main`'s `scripts/40` failed from the 4 October checkout of `main`
+    (labels made at `f682e21` had recorded the SHA-256 of `brokkr_edge/model_list.json` as its CRLF
+    working copy; the checkout rewrote it with LF) until pull request #5 merged the fingerprint rule and
+    the remade labels.
+- **Step 2 task 2, website design: approved by H (4 October 2026), on `step-2-site`.** Design prototypes
+  (`web/prototypes/`, built from `published/labels/`; preview with
+  `.venv/Scripts/python.exe web/prototypes/build_prototypes.py --open`) are the visual reference: Ember
+  forge and Light themes (`web/themes.py`, checked by `tests/test_web_themes.py`), Big Shoulders Display +
+  IBM Plex Sans + IBM Plex Mono (`web/fonts/`, OFL, unmodified), the pixel-cooling hero, the bench meter,
+  the tactile condition keys and the build-ID rule. All decisions, including the site map (one job per
+  page), the disclosure rules and the builder rules (refuses a dirty tree), are in
+  `docs/website_v0_plan.md`, section 12, which wins over the prototypes' layout. The figures' dark
+  versions now use a neutral grey (`docs/label_schema.md`, fourth note of 4 October).
+- **Step 2 task 3, the site: slices A and B approved by H (4 October 2026)**, built at `0707735` on
+  `step-2-site`. `scripts/49_build_site.py` builds every page (landing, catalog, the ten model pages,
+  Compare, "Why labels?", Methods, Roadmap) from committed files only (`published/labels/`,
+  `docs/figures/`, the README's checked findings block, ROADMAP.md, `docs/claims.json`) into `site_v0/`
+  (gitignored), refuses a dirty tree, and runs its checks (`--check` checks only; `--serve` previews at
+  http://127.0.0.1:8000/). Code in `web/site_*.py`, tests in `tests/test_site.py`. Choices made while
+  building: `docs/website_v0_plan.md`, sections 13 and 14.
+- **H's decision on the findings source (4 October 2026): approved, on one condition:** a site check must
+  fail if the site's findings text differs from the README's generated findings block by even one
+  character. Built in round 1 (fix 0 below).
+- **Round 1 (5 October 2026): fixes 0–4 below are done and approved by H (6 October 2026)** on `step-2-site`
+  (commits `0b02393` code, `7910790` labels released again, `0d1117f` Compare on phones). The ten labels were
+  remade at `0b02393`; `scripts/48_compare_labels.py` against the 4 October release found only the
+  ImageNet-C limit changed (beyond commit and date). Choices made while building: `docs/website_v0_plan.md`,
+  section 15; the wording note: `docs/label_schema.md`, note of 5 October 2026. (ROADMAP.md's 4.1 scope and
+  `docs/hypotheses_stage4.md` were dealt with in round 2.)
+  Checks at `0d1117f` (5 October 2026): ruff PASS; pytest 373 passed; `scripts/22` PASS (1901 of 1901
+  records); `scripts/40` PASS (10 labels, README blocks, figures, README wording); site build PASS (10
+  checks, 16 pages). Screenshots for H: `scratch/round1/` (not committed).
+- **H's fix list (4 October 2026), in this order (done in round 1, above):**
+  0. **Findings check** (the condition above): a site check fails if any findings paragraph on the site
+     differs from the README's generated block by one character.
+  1. **Overclaim in the labels' Limits:** they say the ImageNet-C conditions were "made with the official
+     corruption code". Correct the label maker's wording to the approved description (the imagecorruptions
+     package v1.1.2 with the one-line fog fix, not directly comparable to the released ImageNet-C files),
+     remake all ten labels from a clean commit, re-release them to `published/labels/`, and regenerate the
+     site, the README blocks and the screenshots. Add a check that fails if "official" appears with
+     "ImageNet-C" or "corruption code" anywhere in the labels, the site or the README.
+  2. **Roadmap:** mark Stage 4 done in ROADMAP.md. Mark each ROADMAP.md item public or internal; the site
+     shows only public items, with plain names and no stage or step numbers, in order.
+  3. **Compare table on phones:** the model-name column fixed, the other columns scroll sideways, compact
+     rows, and a visible "scroll →" hint.
+  4. **Model pages:** human-readable speed timestamps (e.g. "3 October 2026, 07:55–08:01 UTC"); the
+     calibration thresholds move into a collapsed details section.
+- **Round 2 (6 October 2026): done and approved by H** on `step-2-site` (commits `00dfdd4` code,
+  `64d76e6` docs, then this STATUS update). Asked by H: (1) `scripts/48_compare_labels.py` accepts only the
+  dated changes listed in `docs/label_changes.json` and names each (note of 6 October 2026 in
+  `docs/label_schema.md`); (2) ROADMAP.md's 4.1 wording corrected; (3) a dated correction note at the end of
+  `docs/hypotheses_stage4.md` (text above it not edited); the wording check skips the text above it, reports
+  the note, and now reads the README and every public doc; (4) slice C: claims entries for every Why labels?
+  paragraph with a site check, `docs/related_work.md` tracked and read by the site, the pre-public
+  checklist (`docs/prepublic_checklist.md`), the publishing plan (`docs/publishing_plan.md`, plan only).
+  Choices made while building: `docs/website_v0_plan.md`, section 16.
+  Checks at `64d76e6` (6 October 2026): ruff PASS; pytest 389 passed; `scripts/22` PASS (1901 of 1901
+  records); `scripts/40` PASS (10 labels, README blocks, figures, docs wording); `scripts/48` against the
+  4 October release PASS (10 labels, 2 listed changes each); site build PASS (11 checks, 16 pages); fresh
+  clone of `00dfdd4` from GitHub: site build PASS, 60 of 60 files byte-identical to the local build.
+- **Round 3 (6 October 2026): done, waiting for H's review** on `step-2-site` (commits `625e3de` wording, 404
+  page and code; `4ea86ea` labels remade at `625e3de` and released again, with the docs; `bd45f30` a test fix;
+  then this STATUS update). H's decisions: (1) the seven listed sentences narrowed, never strengthened
+  (before and after: `docs/prepublic_checklist.md`, decisions of 6 October); "Pinned" listed in
+  `docs/label_changes.json`, labels remade and re-released; (2) the five commits with the real author name
+  kept, no history rewrite; (3) publishing plan approved, an on-brand `404.html` added with a site check;
+  (4) **the README AI-assistance line: H's message left both options open ("Choose one"), so nothing was
+  changed.** The README already ends with "Built with AI coding assistance (Claude Code). Research design,
+  decisions and reviews by H." (not under Status). Waiting for H's choice.
+  Checks: at `bd45f30`, ruff PASS, pytest 393 passed, `scripts/22` PASS (1901 of 1901 records), site build
+  PASS (12 checks, 17 pages, 61 files); `scripts/40` PASS at `4ea86ea` (the later commit changed one test
+  line); `scripts/48` PASS against the release of 5 October (one listed change per label) and of 4 October
+  (three); fresh clone of `bd45f30` from GitHub: site build PASS, 61 of 61 files byte-identical to the local
+  build. Screenshots of the 404 page: `scratch/round3/shots/` (not committed).
+- **Do not publish** (no GitHub Pages, no `gh-pages` push) until H gives the go-ahead.
 
 ### Step 1 record (3 October 2026; done, kept for the record)
 (`docs/HANDOFF.md` was removed on 3 October 2026; everything in it is in dated notes.)

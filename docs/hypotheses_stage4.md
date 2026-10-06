@@ -1409,3 +1409,14 @@ of the line-by-line advice note above: FP32 straddling the accuracy line → "tr
 stronger model"; FP32 straddling the coverage line → nothing added beyond "re-calibrate on your own
 images"; each suggestion shown once (including inside the straddle advice). No label changes: the
 labels at `f682e21` already follow them.
+
+## Correction note added 6 October 2026: the ImageNet-C code was not "official"
+
+Asked by H on 6 October 2026. The text above is pre-registered and is not edited. Its description of how
+the ImageNet-C conditions were made ("made with the official corruption code", in the 4.1 condition list)
+is inaccurate. The conditions were made with the imagecorruptions package v1.1.2, an extension of the
+ImageNet-C code of Hendrycks & Dietterich, vendored with a one-line fix so that fog runs on NumPy 2 (tested
+pixel-identical to the unmodified package's fog). They are not directly comparable to the released
+ImageNet-C files. No condition, setting, result or verdict changes. See `docs/label_schema.md`, note of
+5 October 2026, for the corrected label wording; `brokkr_edge/wording.py` reads only the text below this
+note when it checks this file.

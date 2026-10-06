@@ -1,0 +1,35 @@
+{
+  "about": "Expected changes between two releases of the labels, for scripts/48_compare_labels.py. Each entry is dated and points to the dated note that decided it. A difference between two label sets passes only if it is a remake difference the script always allows (source fingerprints, the commit and time that made the label) or exactly one of these changes: the same field or rendered text, from exactly the old text to exactly the new text. Entries are added, never edited or removed.",
+  "changes": [
+    {
+      "date": "2026-10-05",
+      "note": "docs/label_schema.md, note of 5 October 2026 (H's fix list of 4 October 2026, item 1)",
+      "what": "ImageNet-C limit sentence: no longer says the conditions were made with the official corruption code",
+      "in": "label.json",
+      "path": [
+        "limits",
+        1
+      ],
+      "old": "The ImageNet-C conditions were made with the official corruption code on these test images, with fixed seeds and each model's own preprocessing, so they are not directly comparable to published ImageNet-C results.",
+      "new": "The ImageNet-C conditions were made on these test images with the imagecorruptions package v1.1.2 (an extension of the ImageNet-C code), with a one-line fix so that fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and each model's own preprocessing were used, so the results are not directly comparable to the released ImageNet-C files or to published ImageNet-C results."
+    },
+    {
+      "date": "2026-10-05",
+      "note": "docs/label_schema.md, note of 5 October 2026 (H's fix list of 4 October 2026, item 1)",
+      "what": "glossary line \"Brokkr and ImageNet-C\": no longer says the damage was made with ImageNet-C's official code",
+      "in": "label.html",
+      "path": null,
+      "old": "the two sets of damage: Brokkr's own, and ImageNet-C, a widely used public benchmark (made here with its official code).",
+      "new": "the two sets of damage: Brokkr's own, and ImageNet-C, a widely used public benchmark. Its damage types were made here with the imagecorruptions package (an extension of the ImageNet-C code), not taken from the released ImageNet-C files; see the limits."
+    },
+    {
+      "date": "2026-10-06",
+      "note": "docs/label_schema.md, note of 6 October 2026 on narrowed wording (H's round 3 decision 1c)",
+      "what": "glossary line \"Pinned\": no longer says the operating system could not move the timing (the pin was not read back)",
+      "in": "label.html",
+      "path": null,
+      "old": "the timing was only allowed to run on the named CPU cores, so the operating system could not move it to slower ones.",
+      "new": "the timing was set to run only on the named cores; this was not read back to confirm."
+    }
+  ]
+}
