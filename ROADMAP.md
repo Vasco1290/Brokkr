@@ -486,7 +486,7 @@ labels show Pi rows.
 
 ### Later versions (not scheduled; kept, not deleted)
 - 4.1's summary tables script. <!-- internal -->
-- 4.2 (two more models, full pipeline; allowed overnight under the research freeze). <!-- public: The full study pipeline on two more models -->
+- 4.2 (two more models, full pipeline; allowed overnight under the research rule of 6 October 2026). <!-- public: The full study pipeline on two more models -->
 - 4.5 `brokkr recommend`. <!-- public: A recommend command: choose a build for a device, speed, size and condition -->
 - Fast mode, and the menu of conditions and severities (P4). <!-- public -->
 - `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe. <!-- public: Automatic shrinking: try several recipes and recommend one -->
