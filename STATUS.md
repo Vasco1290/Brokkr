@@ -11,8 +11,19 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (7 October 2026, step 3: slice 1 reviewed; waiting for H on the D18 method)
+### Pick up here (7 October 2026, step 3: seed-sensitivity M = 2.0 points, above 1.5: waiting for H)
 Read this first.
+- **H's second review (7 October 2026), done:** note `67b8de6` (D18's proposed points approved, with "M above 1.5
+  points stops for review"; reference predictions use non-test images only, fewer than 20 usable warn; the
+  expected-accuracy check stops only past both 5 points and the 99% binomial half-width; the scripts/43 rule
+  added to `CLAUDE.md`). Code `d764125` (ruff PASS; pytest 481 passed). The `content-v1` seed rule
+  (`brokkr_edge/seeds.py`) and `scripts/52_seed_sensitivity.py`: `c8d7c3c`.
+- **Seed-sensitivity run at `c8d7c3c`:** largest absolute interval end 1.96 points, so **M = 2.0 points, above
+  1.5: not adopted; stopped for H's review.** Table and exploratory notes: `docs/user_models.md`, "Seed-sensitivity
+  outcome" (`31c1d46`). Records: `results/seed_sensitivity/`, `results/checks/seed_sensitivity.json`;
+  `scripts/22` afterwards PASS (1913 of 1913). Slice 3 does not start until H decides.
+- **Reproduction re-run of 7 October 2026** (verdict, commit and folder below): PASS, 28 of 28, at `6418b71`, in
+  `data/checks/reproduction_2026-10-07`.
 - **H reviewed slice 1 on 7 October 2026.** Dated note `40c357b` in `docs/user_models.md`, committed before the
   code: the expected-accuracy check now reads the conformal-calibration images, never the test images; a failed
   supplied INT8 build means FP32 numbers only, and the command's last line says so; the network wording is
