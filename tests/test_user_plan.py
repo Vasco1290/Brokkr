@@ -184,23 +184,89 @@ def test_expected_accuracy_reads_the_conformal_calibration_images_never_the_test
           split="own", **shrunk())
 
 
-def test_expected_accuracy_rule_in_whole_images():
-    correct = np.array([1] * 90 + [0] * 10)
-    stated = {"top1": 0.95, "n_images": 500, "measured_on": "own validation"}
-    assert expected_accuracy(correct, stated, 3)["pass"]  # 90 of 100 against 95: exactly 5 points
-    assert not expected_accuracy(correct, {**stated, "top1": 0.951}, 3)["within_tolerance"]
-    low = expected_accuracy(np.array([1] * 34 + [0] * 66), {**stated, "top1": 0.34}, 3)
+def correct_answers(n, n_correct, seed=0):
+    """A made-up 0/1 array: n_correct right answers among n images, in a random order."""
+    answers = np.array([1] * n_correct + [0] * (n - n_correct))
+    return np.random.default_rng(seed).permutation(answers)
+
+
+STATED = {"top1": 0.90, "n_images": 500, "measured_on": "own validation"}
+
+
+def test_a_correct_model_at_200_images_with_a_4_point_chance_gap_passes():
+    check = expected_accuracy(correct_answers(200, 172), STATED, 3)  # 86% against a stated 90%
+    assert check["pass"] and check["n_items"] == 200
+    assert check["allowed_gap"] == max(0.05, check["half_width_99"]) and check["half_width_99"] > 0.05
+
+
+def test_the_gap_must_exceed_both_5_points_and_the_99_percent_half_width():
+    # Stated 80% on 200 images: the 99% half-width is 2.576 x sqrt(0.8 x 0.2 / 200), about 7.3 points.
+    stated = {**STATED, "top1": 0.80}
+    assert expected_accuracy(correct_answers(200, 146), stated, 3)["within_tolerance"]  # 7 points: chance
+    assert not expected_accuracy(correct_answers(200, 144), stated, 3)["within_tolerance"]  # 8 points
+    # Stated 95% on 5,000 images: the half-width is under 1 point, so the 5-point line decides.
+    stated = {**STATED, "top1": 0.95}
+    assert expected_accuracy(correct_answers(5000, 4500), stated, 3)["within_tolerance"]  # exactly 5 points
+    assert not expected_accuracy(correct_answers(5000, 4499), stated, 3)["within_tolerance"]
+
+
+def test_a_low_accuracy_must_still_be_above_chance():
+    low = expected_accuracy(correct_answers(100, 34), {**STATED, "top1": 0.34}, 3)
     assert low["within_tolerance"] and not low["above_chance"] and not low["pass"]
 
 
-def test_reference_predictions_must_match_brokkrs_fp32(made):
-    refs = [{"file": f"{c}/{i:05d}.png", "top1": c} for c in CLASSES for i in range(3)]
-    plan = check(made, reference_predictions=refs)
-    assert plan["checks"]["reference_predictions"] == {"checked": 9, "matched": 9}
-    wrong = refs[:8] + [{"file": "red/00009.png", "top1": "blue"}]
-    stops(made, "red/00009.png: Brokkr's FP32 says 'red', your code said 'blue'", reference_predictions=wrong)
-    missing = refs[:8] + [{"file": "red/no_such_file.png", "top1": "red"}]
-    stops(made, "red/no_such_file.png is not an image of the labelled folder", reference_predictions=missing)
+def test_a_shuffled_class_order_stops_the_run_at_about_200_images(made, tmp_path):
+    images = tmp_path / "images"
+    write_images(images / "calibration", {c: 70 for c in CLASSES}, seed=31)
+    write_images(images / "test", {c: 70 for c in CLASSES}, seed=32)
+    right_order = check(made, images=images, split="own", **shrunk())["checks"]["expected_accuracy"]
+    assert right_order["pass"] and right_order["n_items"] == 210
+    stops(made, "clean FP32 top-1 0.0% on 210 conformal-calibration images", "check the class order",
+          images=images, split="own", classes=["green", "blue", "red"], **shrunk())
+
+
+@pytest.fixture(scope="module")
+def own(made):
+    """An own-split folder: calibration/ (all conformal calibration, with a supplied build) and test/."""
+    images = made / "own"
+    write_images(images / "calibration", {c: 70 for c in CLASSES}, seed=41)
+    write_images(images / "test", {c: 70 for c in CLASSES}, seed=42)
+    return images
+
+
+def refs_in(part, n, wrong=()):
+    """n reference predictions from one part (spread over the classes); the numbers in `wrong` say blue."""
+    files = [f"{part}/{c}/{i:05d}.png" for i in range(11) for c in CLASSES][:n]
+    return [{"file": f, "top1": "blue" if k in wrong else f.split("/")[1]} for k, f in enumerate(files)]
+
+
+def test_reference_predictions_naming_test_images_are_ignored_and_never_stop_the_run(made, own):
+    every_one_wrong = [{"file": r["file"], "top1": "green" if r["top1"] != "green" else "red"}
+                       for r in refs_in("test", 32)]
+    plan = check(made, images=own, split="own", reference_predictions=every_one_wrong, **shrunk())
+    assert plan["checks"]["reference_predictions"] == {
+        "given": 32, "ignored_test_images": 32, "checked": 0, "matched": 0, "mismatched": 0,
+        "can_stop_the_run": False}
+    assert {"kind": "few usable reference predictions", "usable": 0, "ignored_test_images": 32,
+            "mismatched": 0, "below": 20} in plan["warnings"]
+    mixed = refs_in("calibration", 20) + every_one_wrong[:12]  # 20 usable and right, 12 test images wrong
+    result = check(made, images=own, split="own", reference_predictions=mixed, **shrunk())
+    assert result["checks"]["reference_predictions"]["ignored_test_images"] == 12
+    assert result["checks"]["reference_predictions"]["can_stop_the_run"]
+
+
+def test_twenty_usable_reference_predictions_can_stop_the_run_fewer_only_warn(made, own):
+    stops(made, "Brokkr's FP32 says 'red', your code said 'blue'", images=own, split="own",
+          reference_predictions=refs_in("calibration", 20, wrong=[0]), **shrunk())
+    plan = check(made, images=own, split="own", reference_predictions=refs_in("calibration", 19, wrong=[0]),
+                 **shrunk())
+    assert plan["checks"]["reference_predictions"]["mismatched"] == 1
+    assert any(w["kind"] == "few usable reference predictions" and w["mismatched"] == 1
+               for w in plan["warnings"])
+    assert not any("red/00000.png" in json.dumps(w) for w in plan["warnings"])  # counts only, no file names
+    missing = refs_in("calibration", 8) + [{"file": "calibration/red/no_such_file.png", "top1": "red"}]
+    stops(made, "calibration/red/no_such_file.png is not an image of the labelled folder", images=own,
+          split="own", reference_predictions=missing, **shrunk())
 
 
 def test_own_split_with_few_images_warns_and_names_small_classes(made, tmp_path):

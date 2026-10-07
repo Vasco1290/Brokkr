@@ -59,6 +59,7 @@ from brokkr_edge.user_settings import UserInputError, load_settings
 
 PLAN_VERSION = 1
 AGREEMENT_IMAGES = 256  # the first 256 conformal-calibration images (never test images)
+REFERENCES_TO_STOP = 20  # fewer usable reference predictions than this only warn (note of 7 October 2026)
 REPOSITORY = Path(__file__).resolve().parent.parent
 PROTECTED = ("published/labels", "labels", "results")  # released labels, working study labels, study records
 NETWORK_WORDING = "Python-level network connections blocked and counted; ONNX Runtime telemetry switched off"
@@ -168,15 +169,31 @@ def _check(settings_path: Path, images: Path, calib_images: Path | None, log) ->
     refs = settings.get("reference_predictions")
     checks["reference_predictions"] = None
     if refs:
-        by_rel = {e["rel"]: e for e in entries}
+        # Only non-test images are used: an entry naming a test image is ignored and counted, never run, so a
+        # test image can never stop the run (docs/user_models.md, second note of 7 October 2026).
+        by_rel = {e["rel"]: i for i, e in enumerate(entries)}
         missing = [r["file"] for r in refs if r["file"] not in by_rel]
         _stop_if([f"reference_predictions: {f} is not an image of the labelled folder" for f in missing])
-        top1 = run(sessions["fp32"], [images / r["file"] for r in refs], prep, batch).argmax(axis=1)
-        wrong = [f"{r['file']}: Brokkr's FP32 says {classes[t]!r}, your code said {r['top1']!r}"
-                 for r, t in zip(refs, top1, strict=True) if classes[t] != r["top1"]]
-        _stop_if([f"reference prediction differs (check the preprocessing): {w}" for w in wrong])
-        checks["reference_predictions"] = {"checked": len(refs), "matched": len(refs)}
-        log(f"reference predictions: PASS ({len(refs)} of {len(refs)})")
+        in_test = set(split["test"])
+        usable = [r for r in refs if by_rel[r["file"]] not in in_test]
+        wrong = []
+        if usable:
+            top1 = run(sessions["fp32"], [images / r["file"] for r in usable], prep, batch).argmax(axis=1)
+            wrong = [f"{r['file']}: Brokkr's FP32 says {classes[t]!r}, your code said {r['top1']!r}"
+                     for r, t in zip(usable, top1, strict=True) if classes[t] != r["top1"]]
+        can_stop = len(usable) >= REFERENCES_TO_STOP
+        if can_stop:
+            _stop_if([f"reference prediction differs (check the preprocessing): {w}" for w in wrong])
+        else:  # too few to stop the run: a warning, with counts only (no file names in the run plan)
+            warnings.append({"kind": "few usable reference predictions", "usable": len(usable),
+                             "ignored_test_images": len(refs) - len(usable), "mismatched": len(wrong),
+                             "below": REFERENCES_TO_STOP})
+        checks["reference_predictions"] = {
+            "given": len(refs), "ignored_test_images": len(refs) - len(usable), "checked": len(usable),
+            "matched": len(usable) - len(wrong), "mismatched": len(wrong), "can_stop_the_run": can_stop}
+        log(f"reference predictions: {len(usable) - len(wrong)} of {len(usable)} usable match; "
+            f"{len(refs) - len(usable)} naming test images ignored"
+            + ("" if can_stop else f" (fewer than {REFERENCES_TO_STOP} usable: a warning, not a stop)"))
 
     # On the conformal-calibration images, never the test images: this check can stop a run, and the test
     # part decides nothing (docs/user_models.md, note of 7 October 2026).
@@ -187,7 +204,8 @@ def _check(settings_path: Path, images: Path, calib_images: Path | None, log) ->
     if not check["pass"]:
         why = [] if check["within_tolerance"] else [
             f"clean FP32 top-1 {check['measured']:.1%} on {check['n_items']} conformal-calibration images, "
-            f"against your stated {check['stated']:.1%} (allowed difference {check['tolerance']:.0%})"]
+            f"against your stated {check['stated']:.1%} (allowed difference {check['allowed_gap']:.1%}: the "
+            f"larger of {check['tolerance']:.0%} and the 99% half-width for {check['n_items']} images)"]
         if not check["above_chance"]:
             why.append(f"the lower end of its 95% interval ({check['ci95'][0]:.1%}) is not above chance "
                        f"({check['chance']:.1%})")

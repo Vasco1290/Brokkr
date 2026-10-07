@@ -9,9 +9,13 @@
   coverage and ECE).
 - agreement: how often the shrunk build's top answer equals FP32's (study lines: failed below 20%, warning
   below 90%).
-- expected_accuracy: Brokkr's clean FP32 top-1 must be within 5 points of the user's own figure, and above
-  chance; a large preprocessing or class-order mistake shows up here instead of in a quietly wrong label.
+- expected_accuracy: Brokkr's clean FP32 top-1 must not miss the user's own figure by more than both 5 points
+  and the 99% binomial half-width, and must be above chance; a large preprocessing or class-order mistake
+  shows up here instead of in a quietly wrong label.
 """
+
+import math
+from statistics import NormalDist
 
 import numpy as np
 import onnx
@@ -23,6 +27,7 @@ from brokkr_edge.schema import MIN_AGREEMENT_WITH_FP32
 
 WARN_AGREEMENT_BELOW = 0.90  # the study's warning line for INT8 agreement with FP32
 EXPECTED_ACCURACY_TOLERANCE = 0.05  # H, D6: 5 points
+Z99 = NormalDist().inv_cdf(0.995)  # 2.576: the two-sided 99% point of the normal distribution
 SUMS_TO_ONE = 1e-3  # a probability row sums to 1 within this
 BATCH = 32
 CHECK_THREADS = 4
@@ -188,17 +193,23 @@ def agreement(fp32_out: np.ndarray, shrunk_out: np.ndarray) -> dict:
 
 
 def expected_accuracy(correct: np.ndarray, stated: dict, n_classes: int) -> dict:
-    """Brokkr's clean FP32 top-1 on the test images against the user's own figure (H, D6).
+    """Brokkr's clean FP32 top-1 against the user's own figure (docs/user_models.md, notes of 7 October 2026).
 
-    Pass = |correct - stated x n| <= 0.05 x n (in whole images) and the 95% interval's lower end above chance.
+    The caller passes the conformal-calibration images (never the test images). The gap counts as too large
+    only if it is larger than BOTH 5 points AND the 99% binomial half-width at the stated accuracy p, so a
+    correct setup on few images is not stopped by chance. In whole images:
+    within = |correct - p x n| <= max(0.05 x n, 2.576 x sqrt(n x p x (1 - p))).
+    Pass = within, and the lower end of the measured 95% interval above chance (1 / number of classes).
     """
-    n, count = len(correct), int(correct.sum())
+    n, count, p = len(correct), int(correct.sum()), stated["top1"]
     ci = bootstrap_ci(correct.astype(np.float64))
-    within = abs(count - stated["top1"] * n) <= EXPECTED_ACCURACY_TOLERANCE * n
+    half_width = Z99 * math.sqrt(p * (1 - p) / n)
+    within = abs(count - p * n) <= max(EXPECTED_ACCURACY_TOLERANCE * n, Z99 * math.sqrt(n * p * (1 - p)))
     above_chance = ci[0] > 1.0 / n_classes
     return {"measured": count / n, "ci95": list(ci), "n_items": n, "correct": count,
-            "stated": stated["top1"], "stated_n_images": stated["n_images"],
+            "stated": p, "stated_n_images": stated["n_images"],
             "measured_on": stated["measured_on"],
-            "tolerance": EXPECTED_ACCURACY_TOLERANCE, "chance": 1.0 / n_classes,
+            "tolerance": EXPECTED_ACCURACY_TOLERANCE, "half_width_99": half_width,
+            "allowed_gap": max(EXPECTED_ACCURACY_TOLERANCE, half_width), "chance": 1.0 / n_classes,
             "within_tolerance": bool(within), "above_chance": bool(above_chance),
             "pass": bool(within and above_chance)}
