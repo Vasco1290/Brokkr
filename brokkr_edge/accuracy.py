@@ -15,7 +15,7 @@ from brokkr_edge.benchmark import make_session
 # ImageNet colour statistics that torchvision's pretrained models expect.
 IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-INTERPOLATIONS = {"bilinear": Image.BILINEAR, "bicubic": Image.BICUBIC}
+INTERPOLATIONS = {"bilinear": Image.BILINEAR, "bicubic": Image.BICUBIC, "nearest": Image.NEAREST}
 
 
 def preprocess(image: Image.Image, resize_size: int = 232, crop_size: int = 224,
