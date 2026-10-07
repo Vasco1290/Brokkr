@@ -11,8 +11,31 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (7 October 2026, step 3: seed-sensitivity M = 2.0 points, above 1.5: waiting for H)
+### Pick up here (7 October 2026, evening; step 3: H runs the content-v1 references next)
 Read this first.
+- **H's decisions of 7 October 2026 (evening)**, in `docs/user_models.md`, note "after the seed-sensitivity
+  outcome" (`d69afe6`): M = 2.0 points is **not adopted** (the line is not moved after the data); the six random
+  conditions are made **exact** instead of margined (decided after seeing the result; it sets no threshold, so it
+  does not depend on those numbers); both "(proposed)" readings of `67b8de6` approved; the cross-check (D14) now
+  needs an image-for-image match on all 13 conditions (clean, conformal threshold, INT8 build, all 12 damaged),
+  with the six random ones compared against content-v1 references; the test images serve only as an equality
+  reference. A draft limits sentence for random conditions is in the same note, "(proposed)", awaiting H.
+- **Next, started by H (too long for an assistant session): the content-v1 references.** From the repository
+  folder, on mains power, from the clean commit `a1278b1` or later:
+  `.venv/Scripts/python.exe scripts/53_content_v1_reference.py`
+  - **Expected runtime: about 30 to 40 minutes** (estimated from this laptop's 4.1 reproduction and
+    seed-sensitivity run times, 5,000 to 10,000 images per condition; not measured for this script). Disk: about
+    0.5 GB (12 score files of about 38 MB each, the measured size of a 4.1 saved run).
+  - **Output folder:** `results/crosscheck_reference_content_v1/` (12 schema-2 "diagnostic" records, names ending
+    `_seed-content-v1_crosscheck-reference`, never results, never on a label). It stops if the checkout has
+    uncommitted changes or the laptop is on battery; finished records are kept, so the same command resumes
+    after a stop. Dry run on 64 tuning images: PASS (check before measuring, 12 records, schema check, resume).
+  - **Do not edit the checkout until the run finishes** (every record notes whether the checkout was clean).
+  - Afterwards: `scripts/22_check_results.py` must still PASS.
+- **After the run:** the cross-check (D14, `docs/user_models.md` section 7 item 5 as replaced on 7 October):
+  MobileNetV3-Large through the user path with folders written from the study's own images, compared image for
+  image with the 4.1 records and these references. Then the slice that runs the conditions and makes the user
+  label (with the four label tests of section 7 item 2), then slice 2 (the EuroSAT model) and slice 3.
 - **H's second review (7 October 2026), done:** note `67b8de6` (D18's proposed points approved, with "M above 1.5
   points stops for review"; reference predictions use non-test images only, fewer than 20 usable warn; the
   expected-accuracy check stops only past both 5 points and the 99% binomial half-width; the scripts/43 rule
