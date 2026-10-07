@@ -23,9 +23,13 @@ Read this first.
 - **Waiting for H:** the "(proposed)" points of the 7 October note (severity left out of the seed; study labels
   gain `seed_scheme` at their next remake; the INT8-build match rule; the margin rule), and whether reference
   predictions may name test images. No code for D18 (seeds, seed-sensitivity script) until H replies.
-- **Reproduction check re-run** (H asked, because `brokkr_edge/accuracy.py` gained "nearest"):
-  `scripts/43_check_reproduction.py --out results/reproduction_2026-10-07`, started from the clean commit after
-  `40c357b`; its result is added here when it finishes. Do not change files in the checkout while it runs.
+- **Reproduction check re-run: PASS, 28 of 28** (H asked, because `brokkr_edge/accuracy.py` gained "nearest").
+  `scripts/43_check_reproduction.py` at the clean commit `6418b71` (7 October 2026, on mains power): INT8
+  repeatable (26 of 26 dry-run score files identical); all 28 records give identical top-1 on every image, and
+  all 28 score files are identical bit for bit to the 4.1 records. Output moved from
+  `results/reproduction_2026-10-07` to `data/checks/reproduction_2026-10-07` (gitignored) afterwards: its
+  `repeatability.json` and `reproduction_check.json` share names with `results/reproduction/`'s, which made
+  `scripts/22` stop ("two schema-1 files share a name"); after the move `scripts/22`: PASS, 1901 of 1901.
 - **Step 3's design is fixed** in `docs/user_models.md` (H's decisions D1–D17 of 6 October 2026), with the
   label-format additions in `docs/label_schema.md` (note of 6 October 2026); both committed before any code
   (`07c7a2d`, on `step-3`, which was first brought level with `main` at `1370387`). ROADMAP.md: step 3 `[~]`;
