@@ -25,9 +25,10 @@ from user_made_up import (
     write_unlabelled,
 )
 
+from brokkr_edge.cli import final_line
 from brokkr_edge.no_network import NetworkBlocked, no_network
 from brokkr_edge.user_checks import as_logits, check_outputs, check_pair, expected_accuracy, inspect_model
-from brokkr_edge.user_plan import REPOSITORY, check_out_folder, check_user_inputs
+from brokkr_edge.user_plan import NETWORK_WORDING, REPOSITORY, check_out_folder, check_user_inputs
 from brokkr_edge.user_settings import UserInputError
 
 PER_CLASS = 390  # enough for 512 INT8 images, then at least 200 conformal-calibration and 200 test images
@@ -168,6 +169,21 @@ def test_a_wrong_class_order_or_channel_order_is_caught_by_the_expected_accuracy
           preprocessing={**settings()["preprocessing"], "channel_order": "BGR"})
 
 
+def test_expected_accuracy_reads_the_conformal_calibration_images_never_the_test_images(made, tmp_path):
+    # Own split with a supplied build, so every calibration/ image is a conformal-calibration image.
+    good_calibration = tmp_path / "a"
+    write_images(good_calibration / "calibration", {c: 70 for c in CLASSES}, seed=21)
+    write_images(good_calibration / "test", {c: 70 for c in CLASSES}, seed=22, mislabelled=True)
+    result = check(made, images=good_calibration, split="own", **shrunk())["checks"]["expected_accuracy"]
+    assert result["part"] == "conformal_calibration" and result["n_items"] == 210
+    assert result["measured"] == 1.0  # the test/ pictures, all mislabelled, were not read
+    bad_calibration = tmp_path / "b"  # the same, the other way round: now the check must stop the run
+    write_images(bad_calibration / "calibration", {c: 70 for c in CLASSES}, seed=23, mislabelled=True)
+    write_images(bad_calibration / "test", {c: 70 for c in CLASSES}, seed=24)
+    stops(made, "clean FP32 top-1 0.0% on 210 conformal-calibration images", images=bad_calibration,
+          split="own", **shrunk())
+
+
 def test_expected_accuracy_rule_in_whole_images():
     correct = np.array([1] * 90 + [0] * 10)
     stated = {"top1": 0.95, "n_images": 500, "measured_on": "own validation"}
@@ -231,8 +247,20 @@ def test_no_network_blocks_and_counts_every_attempt():
 
 def test_a_full_check_makes_no_connection_attempt(made):
     plan = check(made, **shrunk())
+    assert plan["network"]["what"] == ("Python-level network connections blocked and counted; ONNX Runtime "
+                                       "telemetry switched off") == NETWORK_WORDING
     assert plan["network"]["connection_attempts"] == 0
     assert plan["network"]["onnxruntime_telemetry_events"] == "switched off"
+
+
+def test_the_last_line_says_what_a_failed_build_means_downstream(made):
+    assert final_line(check(made, **shrunk())) == "Checks PASS."
+    line = final_line(check(made, **shrunk("int8_rolled.onnx")))
+    assert line.startswith("Checks PASS for the FP32 model and the images, but the supplied INT8 build "
+                           "FAILED")
+    assert "agrees with FP32 on 0.0% of 256 images (failed below 20%)" in line
+    assert ("Downstream: FP32 numbers only; the INT8 rows will say \"INT8 build failed\" with this value, "
+            "and no INT8 numbers (as for MobileNetV3-Small).") in line
 
 
 def test_out_folder_inside_released_or_study_folders_is_refused(tmp_path):
@@ -250,7 +278,11 @@ def test_the_command_checks_and_writes_the_run_plan(made, tmp_path):
     out = tmp_path / "out"
     ok = command("--config", write_settings(made, **shrunk()), "--images", made / "images", "--out", out)
     assert ok.returncode == 0, ok.stderr
-    assert "Checks PASS" in ok.stdout and "not built yet" in ok.stdout
+    assert ok.stdout.splitlines()[-1] == "Checks PASS." and "not built yet" in ok.stdout
+    assert f"network: {NETWORK_WORDING} (0 connection attempts)" in ok.stdout
+    failed = command("--config", write_settings(made, **shrunk("int8_rolled.onnx")),
+                     "--images", made / "images", "--out", tmp_path / "failed")
+    assert failed.returncode == 0 and "INT8 build failed" in failed.stdout.splitlines()[-1]
     plan = json.loads((out / "run_plan.json").read_text(encoding="utf-8"))
     assert plan["kind"] == "brokkr-edge user run plan"
     bad = command("--config", write_settings(made, licences={}), "--images", made / "images",

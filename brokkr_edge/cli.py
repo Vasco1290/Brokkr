@@ -70,10 +70,25 @@ def test_own_model(parser, args) -> int:
     path = write_plan(plan, args.out)
     for w in plan["warnings"]:
         print(f"warning: {w}")
-    print(f"Checks PASS. Run plan: {path}")
+    network = plan["network"]
+    print(f"network: {network['what']} ({network['connection_attempts']} connection attempts)")
+    print(f"Run plan: {path}")
     print("Running the damage conditions and making the label are not built yet (step 3, next slice); "
           "nothing else was run.")
+    print(final_line(plan))
     return 0
+
+
+def final_line(plan: dict) -> str:
+    """The last line: what the checks mean for the label (docs/user_models.md, note of 7 October 2026)."""
+    shrunk = plan["models"].get("shrunk")
+    if shrunk and shrunk["status"] == "failed":
+        a = plan["checks"]["agreement_with_fp32"]
+        return (f"Checks PASS for the FP32 model and the images, but the supplied INT8 build FAILED: it "
+                f"agrees with FP32 on {a['agreement']:.1%} of {a['n_items']} images (failed below "
+                f"{a['failed_below']:.0%}). Downstream: FP32 numbers only; the INT8 rows will say "
+                "\"INT8 build failed\" with this value, and no INT8 numbers (as for MobileNetV3-Small).")
+    return "Checks PASS."
 
 
 if __name__ == "__main__":

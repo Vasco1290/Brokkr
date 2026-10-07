@@ -11,8 +11,21 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (7 October 2026, step 3: slice 1 done, waiting for H's review)
+### Pick up here (7 October 2026, step 3: slice 1 reviewed; waiting for H on the D18 method)
 Read this first.
+- **H reviewed slice 1 on 7 October 2026.** Dated note `40c357b` in `docs/user_models.md`, committed before the
+  code: the expected-accuracy check now reads the conformal-calibration images, never the test images; a failed
+  supplied INT8 build means FP32 numbers only, and the command's last line says so; the network wording is
+  "Python-level network connections blocked and counted; ONNX Runtime telemetry switched off"; **D18 decided**
+  (`content-v1` seeds for user runs, from each image's SHA-256 and the condition; the exact cross-check; a
+  tolerance for the six random conditions from a seed-sensitivity measurement whose method is fixed in the
+  note). The code for the first three points is in the next commit (pytest 477 passed before it was committed).
+- **Waiting for H:** the "(proposed)" points of the 7 October note (severity left out of the seed; study labels
+  gain `seed_scheme` at their next remake; the INT8-build match rule; the margin rule), and whether reference
+  predictions may name test images. No code for D18 (seeds, seed-sensitivity script) until H replies.
+- **Reproduction check re-run** (H asked, because `brokkr_edge/accuracy.py` gained "nearest"):
+  `scripts/43_check_reproduction.py --out results/reproduction_2026-10-07`, started from the clean commit after
+  `40c357b`; its result is added here when it finishes. Do not change files in the checkout while it runs.
 - **Step 3's design is fixed** in `docs/user_models.md` (H's decisions D1–D17 of 6 October 2026), with the
   label-format additions in `docs/label_schema.md` (note of 6 October 2026); both committed before any code
   (`07c7a2d`, on `step-3`, which was first brought level with `main` at `1370387`). ROADMAP.md: step 3 `[~]`;
@@ -21,8 +34,8 @@ Read this first.
   [--calib-images <folder>] --out <folder>` checks the settings file, the models and a supplied INT8 pair, lists
   and splits the images (Brokkr's split, the user's own split, the unlabelled calibration folder with its
   overlap check), applies the floors (200 test, 200 conformal calibration) and warnings, checks logits or
-  probabilities, the expected accuracy (5 points) and optional reference predictions, all with the network
-  blocked, and writes `run_plan.json` (no image file names, no absolute paths). It runs no damage and makes no
+  probabilities, the expected accuracy (5 points) and optional reference predictions, with Python-level
+  network connections blocked and counted and ONNX Runtime telemetry switched off, and writes `run_plan.json` (no image file names, no absolute paths). It runs no damage and makes no
   label yet. Code: `brokkr_edge/user_settings.py`, `user_images.py`, `user_checks.py`, `user_plan.py`,
   `no_network.py`; tests: `tests/test_user_*.py` with made-up data from `tests/user_made_up.py`.
 - **Checks on the clean commit `bed2025`** (7 October 2026): ruff PASS; pytest 475 passed; `scripts/22` PASS

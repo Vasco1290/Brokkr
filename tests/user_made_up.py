@@ -63,13 +63,15 @@ def picture(label, rng, size=12) -> Image.Image:
     return Image.fromarray(pixels.astype(np.uint8))
 
 
-def write_images(folder, per_class: dict, seed=0) -> Path:
-    """folder/<class>/<n>.png, per_class = {class name: count}. Every file is different."""
+def write_images(folder, per_class: dict, seed=0, mislabelled=False) -> Path:
+    """folder/<class>/<n>.png, per_class = {class name: count}. Every file is different. mislabelled: each
+    folder holds pictures of the next class's colour (so the tiny model is wrong on every one of them)."""
     rng = np.random.default_rng(seed)
     for name, count in per_class.items():
         (Path(folder) / name).mkdir(parents=True, exist_ok=True)
+        colour = (CLASSES.index(name) + 1) % 3 if mislabelled else CLASSES.index(name)
         for i in range(count):
-            picture(CLASSES.index(name), rng).save(Path(folder) / name / f"{i:05d}.png")
+            picture(colour, rng).save(Path(folder) / name / f"{i:05d}.png")
     return Path(folder)
 
 

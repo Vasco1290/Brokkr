@@ -10,9 +10,11 @@ finds problems (raising UserInputError with every problem of that stage):
 4. the split into parts, the floors and the warnings (brokkr_edge.user_images.plan_split);
 5. the outputs (logits or probabilities) and the shrunk build's agreement with FP32, on the first 256
    conformal-calibration images; the optional reference predictions;
-6. the expected accuracy: clean FP32 top-1 on the test images against the user's own figure.
+6. the expected accuracy: clean FP32 top-1 on the conformal-calibration images against the user's own
+   figure (never on the test images: the test part decides nothing; note of 7 October 2026).
 
-Everything runs with the network blocked (brokkr_edge.no_network) and ONNX Runtime's telemetry events off.
+While it runs: Python-level network connections blocked and counted; ONNX Runtime telemetry switched off
+(brokkr_edge.no_network; the wording is H's, 7 October 2026).
 The run plan names no image file and no absolute path: only counts, class names and fingerprints (the split
 is remade from the folder by its fixed seeds, and the fingerprints show it is the same folder). Running the
 damage conditions and making the label come in the next slice.
@@ -59,6 +61,7 @@ PLAN_VERSION = 1
 AGREEMENT_IMAGES = 256  # the first 256 conformal-calibration images (never test images)
 REPOSITORY = Path(__file__).resolve().parent.parent
 PROTECTED = ("published/labels", "labels", "results")  # released labels, working study labels, study records
+NETWORK_WORDING = "Python-level network connections blocked and counted; ONNX Runtime telemetry switched off"
 
 
 def check_out_folder(out) -> list:
@@ -90,8 +93,8 @@ def check_user_inputs(settings_path, images, calib_images=None, log=print) -> di
         plan = _check(Path(settings_path), Path(images), Path(calib_images) if calib_images else None, log)
     if attempts:  # an attempt some library caught and hid: still not allowed
         raise RuntimeError(f"network connections were attempted (and blocked): {attempts}")
-    plan["network"] = {"blocked": "every connection through Python's socket module, for the whole run",
-                       "connection_attempts": len(attempts), "onnxruntime_telemetry_events": telemetry}
+    plan["network"] = {"what": NETWORK_WORDING, "connection_attempts": len(attempts),
+                       "onnxruntime_telemetry_events": telemetry}
     return plan
 
 
@@ -143,9 +146,11 @@ def _check(settings_path: Path, images: Path, calib_images: Path | None, log) ->
     batch = 1 if isinstance(models["fp32"]["input"]["shape"][0], int) else BATCH
     sessions = {role: make_session(path, CHECK_THREADS)
                 for role, path in (("fp32", fp32_path), ("shrunk", shrunk_path)) if path is not None}
-    sample = split["conformal_calibration"][:AGREEMENT_IMAGES]
+    conformal = split["conformal_calibration"]
+    conformal_out = run(sessions["fp32"], [images / entries[i]["rel"] for i in conformal], prep, batch)
+    sample = conformal[:AGREEMENT_IMAGES]
     sample_paths = [images / entries[i]["rel"] for i in sample]
-    fp32_out = run(sessions["fp32"], sample_paths, prep, batch)
+    fp32_out = conformal_out[:AGREEMENT_IMAGES]
     _stop_if(check_outputs(fp32_out, declared, len(classes), "fp32"))
     checks = {"outputs": {"declared": declared, "pass": True, "n_items": len(sample)}}
     if shrunk:
@@ -173,15 +178,16 @@ def _check(settings_path: Path, images: Path, calib_images: Path | None, log) ->
         checks["reference_predictions"] = {"checked": len(refs), "matched": len(refs)}
         log(f"reference predictions: PASS ({len(refs)} of {len(refs)})")
 
-    test = split["test"]
-    test_out = run(sessions["fp32"], [images / entries[i]["rel"] for i in test], prep, batch)
-    correct = (test_out.argmax(axis=1) == np.asarray([labels[i] for i in test])).astype(np.int64)
-    check = expected_accuracy(correct, settings["expected_accuracy"], len(classes))
+    # On the conformal-calibration images, never the test images: this check can stop a run, and the test
+    # part decides nothing (docs/user_models.md, note of 7 October 2026).
+    correct = (conformal_out.argmax(axis=1) == np.asarray([labels[i] for i in conformal])).astype(np.int64)
+    check = {"part": "conformal_calibration",
+             **expected_accuracy(correct, settings["expected_accuracy"], len(classes))}
     checks["expected_accuracy"] = check
     if not check["pass"]:
         why = [] if check["within_tolerance"] else [
-            f"clean FP32 top-1 {check['measured']:.1%} on {check['n_items']} test images, against your "
-            f"stated {check['stated']:.1%} (allowed difference {check['tolerance']:.0%})"]
+            f"clean FP32 top-1 {check['measured']:.1%} on {check['n_items']} conformal-calibration images, "
+            f"against your stated {check['stated']:.1%} (allowed difference {check['tolerance']:.0%})"]
         if not check["above_chance"]:
             why.append(f"the lower end of its 95% interval ({check['ci95'][0]:.1%}) is not above chance "
                        f"({check['chance']:.1%})")
