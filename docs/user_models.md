@@ -350,3 +350,70 @@ iBean is not used (H, D17).
   INT8 build and the six conditions without random numbers. Claude's proposal: those must match image for
   image (PASS / FAIL); for the six random conditions the difference in top-1 is reported with its paired
   interval (same images, different patterns), not judged. Decide before slice 3.
+
+## Note added 7 October 2026, after H's review of slice 1 (`bed2025`), before any code for it
+
+Decided by H on 7 October 2026. Points marked "(proposed)" are Claude's and wait for H's confirmation. This
+note replaces the text above where they differ; the text above is not edited.
+
+**1. The expected-accuracy check measures on the conformal-calibration images, not the test images.** Section
+3 said "on the test part". The check can stop a run, and the test part never decides anything, so it now uses
+clean FP32 top-1 on every image of the conformal-calibration part. The rule is otherwise unchanged (within 5
+points, compared in whole images, and the lower end of the 95% interval above chance). Slice 1 measured it on
+the test part; that is corrected in the code, and a test shows which part it uses. At the floor (200
+conformal-calibration images) the worst-case 95% half-width is ±6.93 points (section 2, worked out, not
+measured). *Raised for H, not changed:* the optional reference predictions may name test images. They compare
+Brokkr's FP32 answer with the answer of the user's own code, never with the true class, so no accuracy on test
+images is read; but a test image can stop a run through them. H to decide whether they must name
+non-test images only.
+
+**2. A failed shrunk build, downstream.** As section 1 (item 4) says: the label shows FP32 numbers only; its
+INT8 rows say "INT8 build failed", with the agreement, the 20% line and the number of images; no INT8 number is
+shown (as on MobileNetV3-Small's label). The command's last line now says this explicitly when the supplied
+build failed.
+
+**3. Wording.** What the run does to the network is stated as "Python-level network connections blocked and
+counted; ONNX Runtime telemetry switched off", replacing "for the whole run, every connection through Python's
+socket module is blocked" (section 5), in the code, the run plan and STATUS.md as well.
+
+**4. D18, decided.**
+- **a. Seeds of a user run: `content-v1`.** A random condition's seed for one image is the first 4 bytes, read
+  as a big-endian whole number (0 to 2^32 − 1, the range NumPy's global generator accepts, which the ImageNet-C
+  code uses), of the SHA-256 of the UTF-8 text `<the image file's SHA-256 in hex>:<suite>/<damage type>`.
+  Adding or removing an image therefore changes no other image's damage. This replaces "each image's damage
+  seed is its position in that order" (section 2) for user runs. The study keeps its position seeds
+  (`position-study`). The run plan and the label record `"seed_scheme": "content-v1"`.
+  - (proposed) The condition name leaves out the severity, keeping the study's rule that one image gets the
+    same random pattern at every severity, so severities differ only in strength.
+  - (proposed) A label without the field is read as `position-study`. The released study labels gain the field
+    the next time they are remade for another reason, not now: remaking them for a field that changes no number
+    would be a release with nothing else in it.
+  - The six conditions without random numbers (darkness and defocus blur (Brokkr); contrast and defocus blur
+    (ImageNet-C), both severities) use no seed, so the scheme does not affect them.
+- **b. The exact cross-check** (section 7, item 5) must match the study image for image (PASS or FAIL) for clean,
+  the conformal threshold and the six conditions without random numbers, and for the INT8 build: (proposed) the
+  user path's INT8 file, built from the same 512 images in the same order, has the study file's SHA-256; if the
+  bytes differ, its scores must equal the study build's on every image of every compared record.
+- **c. The six random conditions get a tolerance, fixed before slice 3 runs, from a measurement.** Method, fixed
+  here before anything is measured:
+  - model: MobileNetV3-Large, its FP32 file and its Percentile 99.99 INT8 file (the study's files, the
+    cross-check's model);
+  - images: all 5,000 `conformal_calibration` images (never test images), the study's preprocessing;
+  - conditions: the six random ones: fog (Brokkr) s3, noise (Brokkr) s3, fog (ImageNet-C) s3 and s5, Gaussian
+    noise (ImageNet-C) s3 and s5;
+  - two seed sets: `position-study` (each image's dataset position) and `content-v1` (from the SHA-256 of each
+    image's original JPEG bytes as stored in the dataset, which is what the cross-check's folders will hold).
+    This is exactly the change the cross-check meets;
+  - measured: for each build and condition (12 cells), top-1 under `content-v1` minus top-1 under
+    `position-study` on the same images, in points, counted in whole images, with its paired bootstrap 95%
+    interval (1,000 resamples, seed 0);
+  - (proposed) the margin rule, fixed now so the margin is not chosen after seeing the numbers: M = the largest
+    absolute end of the 12 intervals, rounded up to the next 0.1 point. In the cross-check, each random cell's
+    user-path top-1 minus its 4.1 record's top-1 (10,000 test images) must lie within ±M points. The test part
+    has twice the images, so the spread from the seed alone is likely smaller there and M errs towards passing:
+    a real pipeline difference smaller than M would not be caught by these six cells (clean and the six exact
+    cells would still catch it);
+  - the script (`scripts/52_seed_sensitivity.py`) is written after H's review of this note; it writes
+    `results/checks/seed_sensitivity.json`; its run time is not known yet (if it is over about 10 minutes, H
+    starts it). After the run, the proposed M goes in a dated note, and the work stops for H's approval before
+    slice 3.
