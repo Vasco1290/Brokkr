@@ -453,3 +453,42 @@ to catch a wrong class order or wrong preprocessing, which cause much larger gap
 
 **4. A standing rule, added to `CLAUDE.md`** (H): any change to `brokkr_edge` code the study uses must pass
 `scripts/43_check_reproduction.py` (28 of 28) before merging, with the output pasted; no pytest test covers it.
+
+## Seed-sensitivity outcome (added 7 October 2026, after the run)
+
+Run once with `scripts/52_seed_sensitivity.py` at the clean commit `c8d7c3c`, on mains power, by the method fixed
+in the two notes of 7 October 2026 above; no reruns. A dry-run tool check on 64 tuning images (not part of the
+measurement; output outside `results/`) ran first and found one bug (the output folder was not created), fixed
+before the commit. The check before measuring passed: with position seeds, the seeded damage equals the study's
+own on the first batch of every condition. MobileNetV3-Large, 5,000 `conformal_calibration` images. Records:
+`results/seed_sensitivity/` (12 schema-2 diagnostic records, with the per-image answers) and
+`results/checks/seed_sensitivity.json`; `scripts/22` afterwards: PASS, 1913 of 1913 records.
+
+Top-1 under `content-v1` minus top-1 under `position-study`, same images, points, paired 95% interval:
+
+| Build | Condition | position-study | content-v1 | Difference | 95% interval |
+|---|---|---|---|---|---|
+| FP32 | fog (Brokkr) s3 | 71.36% | 71.60% | +0.24 (+12 images) | −0.36 to +0.84 |
+| INT8 | fog (Brokkr) s3 | 65.36% | 65.40% | +0.04 (+2) | −0.78 to +0.84 |
+| FP32 | noise (Brokkr) s3 | 52.26% | 52.28% | +0.02 (+1) | −0.94 to +1.02 |
+| INT8 | noise (Brokkr) s3 | 49.66% | 48.66% | −1.00 (−50) | −1.96 to −0.10 |
+| FP32 | fog (ImageNet-C) s3 | 63.62% | 63.14% | −0.48 (−24) | −1.24 to +0.40 |
+| INT8 | fog (ImageNet-C) s3 | 52.02% | 51.62% | −0.40 (−20) | −1.42 to +0.72 |
+| FP32 | fog (ImageNet-C) s5 | 40.68% | 40.90% | +0.22 (+11) | −0.86 to +1.24 |
+| INT8 | fog (ImageNet-C) s5 | 29.46% | 29.30% | −0.16 (−8) | −1.26 to +0.88 |
+| FP32 | Gaussian noise (ImageNet-C) s3 | 31.40% | 31.78% | +0.38 (+19) | −0.64 to +1.34 |
+| INT8 | Gaussian noise (ImageNet-C) s3 | 29.22% | 29.22% | +0.00 (0) | −0.94 to +0.92 |
+| FP32 | Gaussian noise (ImageNet-C) s5 | 1.12% | 0.94% | −0.18 (−9) | −0.44 to +0.06 |
+| INT8 | Gaussian noise (ImageNet-C) s5 | 1.40% | 1.54% | +0.14 (+7) | −0.18 to +0.48 |
+
+**By the rule: the largest absolute interval end is 1.96 points, so M = 2.0 points, which is above 1.5 points.
+M is not adopted; the work stops for H's review** (note of 7 October 2026, later the same day, point 1). No
+margin for the six random conditions is fixed, and slice 3 does not start, until H decides.
+
+### Exploratory, after the result (decides nothing)
+
+- The largest end comes from one cell, INT8 noise (Brokkr) s3 (−1.00 points, interval −1.96 to −0.10, the
+  only interval of the 12 that excludes zero). With 12 intervals at 95%, about one excluding zero by chance is
+  to be expected (likely chance, not tested). Without that cell the largest end would be 1.42 points (INT8 fog
+  (ImageNet-C) s3); that is reported, not used: the rule takes all 12 cells.
+- Gaussian noise (ImageNet-C) s5 is near floor for both builds (FP32 about 1%), so its cells say little.
