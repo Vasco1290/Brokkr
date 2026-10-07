@@ -417,3 +417,39 @@ socket module is blocked" (section 5), in the code, the run plan and STATUS.md a
     `results/checks/seed_sensitivity.json`; its run time is not known yet (if it is over about 10 minutes, H
     starts it). After the run, the proposed M goes in a dated note, and the work stops for H's approval before
     slice 3.
+
+## Note added 7 October 2026 (later the same day), after H's second review, before any code for it
+
+Decided by H on 7 October 2026. Points marked "(proposed)" are Claude's readings of H's words and wait for H's
+confirmation; the code follows them meanwhile. Nothing above is edited.
+
+**1. D18: the four "(proposed)" points of the note above are approved**, with one addition to the margin rule,
+fixed now, before any measurement: **if M is above 1.5 points, the work stops for review instead of adopting
+M** (a margin that large would mean the six random conditions are barely checked). When the released study
+labels are remade with `seed_scheme`, that change is listed in `docs/label_changes.json`, so
+`scripts/48_compare_labels.py` passes.
+
+**2. Reference predictions use only non-test images** (changes section 3, point 5). An entry naming an image of
+the test part is ignored, never run, and the number ignored is reported (run plan and output). If fewer than 20
+usable entries remain, the check warns instead of stopping. (proposed) Read as: with 20 or more usable entries,
+any mismatch stops the run, as before; with fewer, mismatches give a warning (counts only, no file names) and the
+run continues. Since at most 32 entries are allowed, at least 20 must fall outside the test part for this check
+to be able to stop a run. A test shows that a test image can never stop the run through this check.
+
+**3. The expected-accuracy check, changed after review, before any user data** (changes D6 and point 1 of the
+note above). The run stops only if the gap between measured and stated FP32 top-1 is larger than **both** 5
+points **and** the 99% binomial interval half-width for the number of conformal-calibration images used. H's
+reason: at the 200-image floor, a correct setup misses 5 points by chance about 1 time in 10; the check is meant
+to catch a wrong class order or wrong preprocessing, which cause much larger gaps.
+- (proposed) The half-width is the normal approximation at the user's stated accuracy p: 2.576 × √(p(1 − p)/n)
+  (the check asks whether the measured accuracy is surprising if the stated one is right). Compared in whole
+  images: stop if |correct − p × n| > max(0.05 × n, 2.576 × √(n × p × (1 − p))).
+- Worked out from that formula, not measured: at 200 images the half-width is 3.97 points for p = 0.95, 5.46 for
+  0.9, 7.29 for 0.8, 9.11 for 0.5; at 1,000 images 1.78, 2.44, 3.26 and 4.07.
+- (proposed) The second condition is unchanged: the lower end of the measured 95% interval must be above
+  chance (1 ÷ the number of classes).
+- Tests: (a) a correct model at 200 images with a 4-point chance gap passes; (b) a shuffled class order stops the
+  run.
+
+**4. A standing rule, added to `CLAUDE.md`** (H): any change to `brokkr_edge` code the study uses must pass
+`scripts/43_check_reproduction.py` (28 of 28) before merging, with the output pasted; no pytest test covers it.

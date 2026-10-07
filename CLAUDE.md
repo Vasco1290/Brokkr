@@ -68,6 +68,9 @@ else is built on its measurements.
 * Every number in a report (test counts, timings, accuracies, file counts) must come from a command
   run in the current session. If a number wasn't just measured, say so or don't state it. (Added
   26 September 2026, after a Stage 4 report stated "210 tests" that no command had produced.)
+* Any change to `brokkr_edge` code the study uses must pass `scripts/43_check_reproduction.py` (28 of 28
+  records reproduced) before merging, with its output pasted. No pytest test covers this. (Added by H,
+  7 October 2026; its output goes outside `results/`, e.g. `data/checks/`, so `scripts/22` still passes.)
 
 ## Research rule (from 6 October 2026; replaces the research freeze of 27 September 2026)
 
