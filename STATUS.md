@@ -1,18 +1,43 @@
 # Brokkr status
 
-Snapshot as of **6 October 2026** (step 2 done). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **7 October 2026** (step 3 in progress: design note and slice 1 done). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
 (catalog site and going public) is done** (6 October 2026): merged into `main` by pull request #7 (merge
-commit `45b8c07`, tag `site-v0`) and live at https://vasco1290.github.io/Brokkr/. **Next: step 3, testing a user's model.** The
+commit `45b8c07`, tag `site-v0`) and live at https://vasco1290.github.io/Brokkr/. **Step 3, testing a user's model, is in progress** (branch `step-3`). The
 research freeze ended when website v0 shipped; the research rule of 6 October 2026 replaces it (see
 "Research rule" below and `CLAUDE.md`).
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (6 October 2026, step 3 next)
+### Pick up here (7 October 2026, step 3: slice 1 done, waiting for H's review)
 Read this first.
+- **Step 3's design is fixed** in `docs/user_models.md` (H's decisions D1–D17 of 6 October 2026), with the
+  label-format additions in `docs/label_schema.md` (note of 6 October 2026); both committed before any code
+  (`07c7a2d`, on `step-3`, which was first brought level with `main` at `1370387`). ROADMAP.md: step 3 `[~]`;
+  PyTorch input and a speed bench for user labels moved to "Later versions" (after step 4).
+- **Slice 1 (the checks) is done** (`bed2025`): `brokkr-edge test --config <settings> --images <folder>
+  [--calib-images <folder>] --out <folder>` checks the settings file, the models and a supplied INT8 pair, lists
+  and splits the images (Brokkr's split, the user's own split, the unlabelled calibration folder with its
+  overlap check), applies the floors (200 test, 200 conformal calibration) and warnings, checks logits or
+  probabilities, the expected accuracy (5 points) and optional reference predictions, all with the network
+  blocked, and writes `run_plan.json` (no image file names, no absolute paths). It runs no damage and makes no
+  label yet. Code: `brokkr_edge/user_settings.py`, `user_images.py`, `user_checks.py`, `user_plan.py`,
+  `no_network.py`; tests: `tests/test_user_*.py` with made-up data from `tests/user_made_up.py`.
+- **Checks on the clean commit `bed2025`** (7 October 2026): ruff PASS; pytest 475 passed; `scripts/22` PASS
+  (1901 of 1901 records, 50 of 50 build records); `scripts/40` PASS (10 labels, docs wording); site build PASS
+  (12 checks, 17 pages, 61 files).
+- **Next, after H's review of slice 1:** running the conditions and making the user label are their own slice
+  (H's answer of 6 October 2026: slice 1 is checks only), and the label tests of `docs/user_models.md` section 7
+  item 2 come with it; then slice 2 (the EuroSAT test model, after the Copernicus terms, the image size and the
+  download checksum are confirmed, with a one-epoch timing first) and slice 3 (the end-to-end runs and the exact
+  cross-check). **Open for H: D18** (the exact cross-check cannot match the six damage conditions that use
+  random numbers; proposal in `docs/user_models.md`, last section), to decide before slice 3.
+- **Known product gap (H, D12):** user labels will show speed as "not measured"; a speed bench is planned after
+  step 4. **Parked (H, D1):** FP16 shrunk builds in a user-supplied pair.
+
+**The record of the step-2 wrap-up follows** (kept as it was written on 6 October 2026).
 - **Step 2 (catalog site and going public) is done (6 October 2026).** H merged pull request #7
   (`step-2-site` into `main`, merge commit `45b8c07`, tagged `site-v0`). On that clean commit: ruff PASS;
   pytest 393 passed; `scripts/22` PASS (1901 of 1901 records); `scripts/40` PASS (10 labels, README blocks,
