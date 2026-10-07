@@ -492,3 +492,42 @@ margin for the six random conditions is fixed, and slice 3 does not start, until
   to be expected (likely chance, not tested). Without that cell the largest end would be 1.42 points (INT8 fog
   (ImageNet-C) s3); that is reported, not used: the rule takes all 12 cells.
 - Gaussian noise (ImageNet-C) s5 is near floor for both builds (FP32 about 1%), so its cells say little.
+
+## Note added 7 October 2026 (evening), after the seed-sensitivity outcome, before any code for it
+
+Decided by H on 7 October 2026, **after seeing the seed-sensitivity result above**. Points marked "(proposed)"
+are Claude's and wait for H's confirmation. Nothing above is edited.
+
+**1. M = 2.0 points is not adopted.** The stop rule did its job; the line is not moved after the data.
+
+**2. The six random conditions are made exact instead of given a margin.** This was decided after seeing the
+result, but it does not depend on its numbers: it sets no threshold, margin or tolerance at all. It replaces
+the margin of D18 (c) with a reference built to match exactly, so the measured spread no longer enters any rule.
+
+**3. Both "(proposed)" readings of the second note of 7 October 2026 are approved:** with fewer than 20 usable
+reference predictions, mismatches only warn; the 99% half-width is worked out at the user's stated accuracy.
+
+**4. The new cross-check plan** (replaces D18 (b) and (c) and section 7, item 5, where they differ):
+- **a. The reference for the six random conditions** is the study's code for MobileNetV3-Large (its FP32 file and
+  its Percentile 99.99 INT8 file) on the 10,000 test images, with only the seed source swapped to `content-v1`
+  (from the SHA-256 of each image's original JPEG bytes, as stored in the dataset). The same check as
+  `scripts/52_seed_sensitivity.py` runs first: with position seeds, the damage must equal the study's on the
+  first batch of every condition, or the script stops. Script: `scripts/53_content_v1_reference.py`; same
+  settings as the 4.1 records (8 threads, thread spinning off, batch 32, the same caches and preprocessing).
+- **b. The cross-check (D14) then requires an image-for-image match on all 13 conditions:** clean, the conformal
+  threshold, the INT8 build and all 12 damaged conditions (the six without random numbers against the 4.1
+  records, the six random ones against these references). No margin anywhere.
+- **c. The references are marked so they cannot be mistaken for results:** schema-2 records of kind
+  "diagnostic" (never a result; the label maker reads only accuracy records from `results/breadth`), in their
+  own folder `results/crosscheck_reference_content_v1/`, every file name ending in
+  `_seed-content-v1_crosscheck-reference`, and their settings say `"seed_scheme": "content-v1"` and that they are
+  an equality reference for the step 3 cross-check only, never a result and never on a label.
+- **d. The test part is used here only as an equality reference:** these records set no number, threshold or
+  setting of any kind; they exist only so the user path can be compared with them for exact equality.
+
+**5. A limits sentence for labels with random conditions** (draft; exploratory wording; for H's approval).
+(proposed) "Fog and noise damage use a random pattern. In one exploratory check (MobileNetV3-Large, 5,000
+images), changing only that pattern moved top-1 by up to 1.0 point; the intervals on this label cover the
+choice of images only, not the choice of pattern." The figure is the largest absolute difference of the 12
+cells in the table above (INT8 noise (Brokkr) s3, −1.00 points); it is generated from
+`results/checks/seed_sensitivity.json`, never typed.
