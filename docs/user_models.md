@@ -561,3 +561,7 @@ intervals on this label cover the choice of images only, not the choice of patte
 - It is added to `limits` only on labels that tested at least one random condition (fog and noise (Brokkr), fog
   and Gaussian noise (ImageNet-C)). It is built with the slice that makes user labels; whether the released study
   labels gain it is decided when they are next remade, and would be listed in `docs/label_changes.json`.
+
+*Confirmed by H on 10 October 2026:* both "(proposed)" points of the note above: the model name and the image
+count in the limits sentence are read from `results/checks/seed_sensitivity.json` (`model`, `settings.n_images`),
+so no number in the sentence is typed; the figure is shown with one decimal, rounded up, never down.
