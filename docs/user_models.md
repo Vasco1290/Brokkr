@@ -531,3 +531,33 @@ images), changing only that pattern moved top-1 by up to 1.0 point; the interval
 choice of images only, not the choice of pattern." The figure is the largest absolute difference of the 12
 cells in the table above (INT8 noise (Brokkr) s3, −1.00 points); it is generated from
 `results/checks/seed_sensitivity.json`, never typed.
+
+## Content-v1 references (added 10 October 2026, after the run)
+
+Run once by H with `scripts/53_content_v1_reference.py` at the clean commit `206f9e1`, on mains power, by note 4a
+above; no reruns. The check before measuring passed (position seeds reproduce the study's damage on the first
+batch of every condition). 12 records in `results/crosscheck_reference_content_v1/` (MobileNetV3-Large, FP32 and
+Percentile 99.99 INT8, the six random conditions, 10,000 test images); each condition took 3.0 to 3.4 minutes
+for both builds (the script's own output). Checked afterwards: all 12 records are kind "diagnostic", record
+commit `206f9e1` with a clean tree and `"seed_scheme": "content-v1"`; `scripts/22` PASS (1925 of 1925 records,
+159 of them diagnostics); `scripts/40` PASS (10 labels); the site build PASS (17 pages, 61 files), and no file
+in `labels/`, `published/` or the built site mentions them.
+
+## Note added 10 October 2026: the limits sentence for random conditions, approved
+
+Decided by H on 10 October 2026: the draft sentence of note 5 above is approved, with one addition. Nothing
+above is edited. The sentence, as approved:
+
+"Fog and noise damage use a random pattern. In one exploratory check (MobileNetV3-Large, 5,000 images), changing
+only that pattern moved top-1 by up to 1.0 point; on other models, or with fewer images, it may be larger. The
+intervals on this label cover the choice of images only, not the choice of pattern."
+
+- **The figure is generated, never typed:** the largest absolute `difference` of the 12 cells in
+  `results/checks/seed_sensitivity.json` (`raw.cells`), in points. Today that is INT8 noise (Brokkr) s3, −1.00
+  points (−50 of 5,000 images), read from the record on 10 October 2026.
+- (proposed) The model name and the image count ("5,000") are read from the same record (`model`,
+  `settings.n_images`), so no number in the sentence is typed. The figure is shown with one decimal, rounded up
+  (never down), so the sentence never understates the measured spread.
+- It is added to `limits` only on labels that tested at least one random condition (fog and noise (Brokkr), fog
+  and Gaussian noise (ImageNet-C)). It is built with the slice that makes user labels; whether the released study
+  labels gain it is decided when they are next remade, and would be listed in `docs/label_changes.json`.
