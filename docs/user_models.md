@@ -766,3 +766,68 @@ with the remake and `scripts/48`; the schema, validator and renderer additions, 
 byte-identical; `to_int8`'s `input_name` and the user INT8 build; running the conditions; the reliability numbers
 and the label; the command's last steps. Then all checks, `scripts/43` (H), and a stop for H's review before the
 cross-check folder script.
+
+## Note added 10 October 2026 (later the same day): H's decisions on the 13 questions of the plan above
+
+Decided by H on 10 October 2026; the plan above is approved in direction. Nothing above is edited. Where a decision
+differs from the plan, it replaces it.
+
+**1. Records of user runs: `schema.py` is extended**, with guards. Study records must still have the source
+"brokkr"; user records get their own source value and the D11 device kinds (laptop, desktop, server,
+raspberry-pi-5, cloud-arm, other). `scripts/40` and `scripts/49` fail if any record with the user source feeds a
+published label or the site. Each guard has a test.
+
+**2. Reliability numbers:** the user path calls the `brokkr_edge/shift/` functions directly; `scripts/31` stays as
+it is. **Added to the cross-check:** for MobileNetV3-Large, calibration error (ECE), coverage (with its set size)
+and E-AURC from the user path must equal `scripts/31`'s records (`results/breadth_reliability/`) exactly.
+
+**3. Threads:** fixed at 8, thread spinning off, recorded in the label. No user option to change it for now.
+
+**4. `seed_scheme`:** `generated.seed_scheme`, one value for the whole label.
+
+**5. `checks.fp32_sanity` on a user label stores the full rule:** `measured` (the conformal-calibration part, with
+its dataset ID), `published` (the stated figure, "stated by the submitter", its image count and where it was
+measured), `tolerance` 0.05, `half_width_99`, `allowed_gap`, `chance` and `pass`; the validator recomputes `pass`.
+
+**6. The machine sentence on user labels:** "Accuracy was measured only on the machine that ran this test; it has
+not been checked on other hardware." The device kind is shown separately, marked as stated by the submitter, never
+inside this sentence.
+
+**7. The licence lines on user labels:** "This label's licence is chosen by the submitter; if submitted to Brokkr's
+catalog, it is published under CC BY 4.0." The model's code, weights and images licences are each followed by
+"declared by the submitter, not checked by Brokkr".
+
+**8. Speed rows on user labels:** one row per build for the submitter's machine only, no Raspberry Pi row, worded
+without stage numbers: "Speed: not measured (this version of brokkr-edge test does not measure speed)."
+
+**9. "few usable reference predictions"** is a fourth allowed kind of `summary.warnings`, rendered at the top with
+its counts and given a `limits` sentence. **A test:** every warning kind the checks can emit must be allowed in
+`summary.warnings` and have a `limits` sentence; it fails if a new kind is added without both.
+
+**10. Brokkr's own INT8 build crashes even after the `skip_symbolic_shape` retry:** the label is made, with FP32
+rows and "INT8 build failed". The label records only an error type and a plain reason, never the raw exception
+message or traceback (they can contain absolute paths). **A test:** a fake crash whose message contains a path; the
+label must not contain it.
+
+**11. The decoded pictures:** a memory-mapped file in `--out`, deleted once the label is written, and also on any
+handled failure or stop; a leftover from a hard crash is removed at the start of the next run; the disk-space guard
+checks there is room for it before decoding begins.
+
+**12. Commit on a user label:** outside a git checkout, `generated.commit` and `generated.dirty` are null, with the
+brokkr-edge version; inside a checkout they are recorded as on study labels, and a dirty checkout is recorded, not
+refused. **For step 4:** the package build refuses a dirty tree and embeds its source commit, so labels from pip
+installs record that commit instead of null. Any run used as evidence (such as the cross-check) still requires a
+clean checkout.
+
+**13. What `--out` holds:** `run_plan.json`, `int8_build.json` (and the INT8 file when Brokkr builds it),
+`records/` (the score records), and `label.json`, `label.md`, `label.html` at the top. If `--out` already holds a
+different run (a different run-plan fingerprint), the command refuses with a plain message; resuming the same run is
+allowed. The temporary decode file (point 11) has a clearly temporary name and never sits beside the label files
+after a finished run.
+
+**Sequencing: two steps.**
+- **Step A, refactor only:** the label-building code of `scripts/39` moves into `brokkr_edge/label_build.py`, with
+  no change in behaviour. Shown by: the ten labels remade into a scratch folder and compared with
+  `published/labels` by `scripts/48`; `tests/test_published_labels.py`; ruff; the full pytest; outputs pasted.
+  Then H runs `scripts/43`. **No user-path code until `scripts/43` passes 28 of 28.**
+- **Step B, the user path on top**, after H's review of step A.
