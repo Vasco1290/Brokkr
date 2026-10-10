@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **7 October 2026** (step 3 in progress: design note and slice 1 done). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **10 October 2026** (step 3 in progress: design note, slice 1 and the content-v1 references done). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -11,8 +11,31 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (7 October 2026, evening; step 3: H runs the content-v1 references next)
+### Pick up here (10 October 2026; step 3: plan the conditions-and-label slice next)
 Read this first.
+- **The order from here** (corrected on 10 October 2026; the entry of 7 October below had the cross-check before
+  the slice it needs, and `docs/user_models.md` section 7 has it after):
+  1. **The slice that runs the conditions and makes the user label**, with the four label tests of
+     `docs/user_models.md` section 7 item 2. H gave the go-ahead on 10 October 2026, **plan first, no code**: the
+     plan goes in `docs/user_models.md` as a dated note and waits for H's review.
+  2. **A script that writes the cross-check folders** from the study's own images (section 7 item 5).
+  3. **The cross-check (D14)**, all 13 conditions image for image, no margin. **H runs it** (longer than about
+     10 minutes).
+  4. Then slice 2 (the EuroSAT model) and the rest of slice 3.
+  The cross-check was not run on 10 October: today's user path runs slice 1's checks only (no INT8 build, no
+  conformal threshold, no damage; `brokkr_edge/cli.py` says so), so there was nothing to compare.
+- **Content-v1 references: done** (run by H at the clean commit `206f9e1`). All 12 records in
+  `results/crosscheck_reference_content_v1/` are kind "diagnostic", record `206f9e1` with a clean tree and
+  `seed_scheme` `content-v1`. Afterwards: `scripts/22` PASS (1925 of 1925 records, 159 diagnostics); `scripts/40`
+  PASS (10 labels); site build PASS (17 pages, 61 files); nothing in `labels/`, `published/` or the built site
+  mentions them. Record: `docs/user_models.md`, "Content-v1 references" (`1df94fe`).
+- **Limits sentence for random conditions: approved by H** (10 October 2026, with one addition), and both
+  "(proposed)" points of that note confirmed (`1df94fe`, `157ea11`): the figure, model name and image count are
+  read from `results/checks/seed_sensitivity.json`; the figure is rounded up; the sentence appears only on labels
+  where a random condition ran. Built with the conditions-and-label slice.
+
+**The entry of 7 October 2026 (evening) follows** (kept as it was written; its order of the cross-check and the
+next slice is corrected above).
 - **H's decisions of 7 October 2026 (evening)**, in `docs/user_models.md`, note "after the seed-sensitivity
   outcome" (`d69afe6`): M = 2.0 points is **not adopted** (the line is not moved after the data); the six random
   conditions are made **exact** instead of margined (decided after seeing the result; it sets no threshold, so it
@@ -54,9 +77,6 @@ Read this first.
   (`content-v1` seeds for user runs, from each image's SHA-256 and the condition; the exact cross-check; a
   tolerance for the six random conditions from a seed-sensitivity measurement whose method is fixed in the
   note). The code for the first three points is in the next commit (pytest 477 passed before it was committed).
-- **Waiting for H:** the "(proposed)" points of the 7 October note (severity left out of the seed; study labels
-  gain `seed_scheme` at their next remake; the INT8-build match rule; the margin rule), and whether reference
-  predictions may name test images. No code for D18 (seeds, seed-sensitivity script) until H replies.
 - **Reproduction check re-run: PASS, 28 of 28** (H asked, because `brokkr_edge/accuracy.py` gained "nearest").
   `scripts/43_check_reproduction.py` at the clean commit `6418b71` (7 October 2026, on mains power): INT8
   repeatable (26 of 26 dry-run score files identical); all 28 records give identical top-1 on every image, and
