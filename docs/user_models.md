@@ -565,3 +565,204 @@ intervals on this label cover the choice of images only, not the choice of patte
 *Confirmed by H on 10 October 2026:* both "(proposed)" points of the note above: the model name and the image
 count in the limits sentence are read from `results/checks/seed_sensitivity.json` (`model`, `settings.n_images`),
 so no number in the sentence is typed; the figure is shown with one decimal, rounded up, never down.
+
+## Note added 10 October 2026: plan for the slice that runs the conditions and makes the user label (before any code)
+
+Asked by H on 10 October 2026: plan first, no code. Nothing below is built. Points marked **(question for H)**
+wait for H's answer; points marked "(proposed)" are Claude's and are followed unless H says otherwise. The only
+numbers here are design settings, counts read from files on 10 October 2026, and run-time **estimates**, each
+with what it is based on.
+
+**What the slice does.** After slice 1's checks pass, the same command (`brokkr-edge test --config <settings>
+--images <folder> [--calib-images <folder>] --out <folder>`) goes on to: (1) build the INT8 file, unless the
+submitter supplied one; (2) run FP32 and INT8 on the clean conformal-calibration part and on the test part under
+the 13 conditions, saving each run's scores; (3) work out the reliability numbers; (4) write `label.json`,
+`label.md` and `label.html` to `--out`. The cross-check folder script and the cross-check come after this slice
+(STATUS.md, order of 10 October 2026).
+
+### a. Reuse or copy: one implementation for the study and the user path
+
+**Moves out of `scripts/39_make_labels.py` into a new module `brokkr_edge/label_build.py`** (functions that take
+numbers and arrays and never read files; `scripts/39` keeps only finding, checking and reading the study's
+records, and calls these):
+- `runtime_entry` (today `scripts/39` lines 135–150), unchanged;
+- the conditions block (each condition's ID, suite, damage, severity, modality, label);
+- the measurements: top-1, top-5, coverage with set size, ECE and E-AURC copied in, and `damage_drop` and
+  `shrinking_cost` computed with `brokkr_edge.label.paired` (unchanged);
+- the envelope rows, including the "INT8 build failed" rows of a failed build;
+- the failure block of a failed build;
+- the `limits` sentences: the study's sentences word for word, plus the user sentences of section b;
+- the label skeleton (the top-level fields in schema order).
+
+**Stays in `scripts/39` (study only):** the laptop latency rows, the FP32 sanity check against torchvision's
+published top-1, and the licences read from the study's build records.
+
+**Used as they are, not changed:** `brokkr_edge/label.py` (envelope rules, summary), `brokkr_edge/sweep.py`,
+`brokkr_edge/seeds.py`, `brokkr_edge/accuracy.py`, `brokkr_edge/shift/*`, `brokkr_edge/judge.py`, and from
+`brokkr_edge/test_run.py` the helpers `complete` and `keep_awake` (imported, unchanged). `test_run.run_model`
+stays the study's: it reads ImageNet from Parquet and uses position seeds, the input name "images" and
+ImageNet's mean and std.
+
+**New, user path only:**
+- `brokkr_edge/user_run.py`: decodes each user image once with the functions the study's picture caches use
+  (`accuracy.open_image`, `accuracy.resize_and_crop`), at the model's own crop size; applies the damage with
+  `seeds.damaged_batch_seeded` and `seeds.content_seed` (the code `scripts/52` and `scripts/53` use); normalises
+  with the user's mean, std, channel order and layout (`user_checks.prepare` is split into its two halves, so
+  slice 1 and this slice use the same code); runs with the model's own input name, in batches of 32 (1 for a
+  model with a fixed batch of 1); turns probabilities into logits with `user_checks.as_logits` before any
+  reliability number.
+- The INT8 build: `quantize.to_int8` with the study's recipe (Percentile 99.99, the 512 INT8-calibration images in
+  canonical order, batches of 32 in groups of 4), on the user's preprocessing. Build checks: finite outputs,
+  weights per channel (`quantize.weight_quantization`, unchanged) and `user_checks.agreement` on the first 256
+  conformal-calibration images (the same check as for a supplied pair). `quantize.check_int8_build` is not used:
+  it expects the input name "images" and 1,000 classes. If ONNX Runtime's preparation step crashes, one retry
+  with `skip_symbolic_shape`, recorded (D2).
+- The reliability numbers: see question 2 below.
+
+**Every shared function that changes** (code the study uses; each change only adds, so study outputs stay the
+same):
+
+| Where | Change | How "study unchanged" is shown |
+|---|---|---|
+| `scripts/39_make_labels.py` | assembly moved to `brokkr_edge/label_build.py` | remake the ten labels from a clean commit into a scratch folder; `scripts/48_compare_labels.py published/labels <scratch folder>` must PASS with no listed change (only commit and time differ); `scripts/40` PASS |
+| `brokkr_edge/quantize.py`, `to_int8` | new optional `input_name`, passed to `ImageBatches` (default `"images"`, so every study call is unchanged) | a test: building the made-up model with and without the argument gives byte-identical files; `scripts/43` |
+| `brokkr_edge/label_schema.py`, `check_label` | accepts the D11 device kinds and checks the user-label rules of section b; study rules unchanged | `tests/test_published_labels.py` and `scripts/40` PASS on the released labels |
+| `brokkr_edge/label_render.py` | warnings block, declarations, submitter-declared licences, the supplied-build failure sentence, the "stated by the submitter" check line; each shown only when its field exists | `tests/test_published_labels.py`: every released `label.html` still renders byte for byte; `scripts/48` |
+| `brokkr_edge/schema.py` | only if H chooses option (a) of question 1 | `scripts/22` PASS, same record count |
+
+**`scripts/43` before merging** (rule of 7 October 2026), from the clean commit at the end of the slice, on mains
+power, output outside `results/`:
+
+`.venv/Scripts/python.exe scripts/43_check_reproduction.py --out data/checks/reproduction_<date>`
+
+Run time: the run of 7 October 2026 finished its repeatability step at 05:13:51 UTC and wrote its 28 records
+between 05:17:27 and 06:23:24 UTC (timestamps read from its records on 10 October 2026; its start time is not in
+the files), so **about 70 minutes or a little more**. H runs it. Afterwards `scripts/22` must still PASS.
+
+### b. Everything the user label holds, and the decision behind each part
+
+| Part | What it holds | Decided in |
+|---|---|---|
+| `source` | `kind` "user-submitted", `verified` false, `how_made` "brokkr-edge test <version>", `submitted_by` from the settings file or null | section 6; `docs/label_schema.md` note of 6 Oct, 1 |
+| Badge | "User-submitted label — UNVERIFIED" at the top of `label.md` and `label.html` (already in the renderer) | section 6 |
+| IDs | `model_id` `user/<name>@<first 12 hex of the FP32 file's SHA-256>`, `model.publisher` "user"; build IDs come from it, so no ID can equal a study label's | section 6; label note 1 |
+| Where it is written | only to `--out`; an `--out` inside `published/labels/`, `labels/` or `results/` is refused (built in slice 1); the site reads `published/labels/` only | section 6 |
+| `model` | name, input (crop, layout, the stated preprocessing), outputs (number of classes, and the class names, which are printed on the label), declared code and weights licences | sections 3, 5 |
+| `builds` | FP32 reference; the labelled INT8 build either made by Brokkr (the study's recipe fields, calibration dataset `user/<name>:int8_calibration`, `skip_symbolic_shape` when the retry ran) or supplied (`method` "supplied by the submitter", `made_by`, `found`) | D1, D2; label note 4 |
+| Failed INT8 build | agreement below 20%: status "failed", a failure with the check, value, the 20% line, image count and part; FP32 measurements only; every INT8 envelope row "INT8 build failed"; the summary's Shrinking and Uncertainty lines "not measured: INT8 build failed"; for a supplied build, the sentence says it may be broken or not made from this FP32 model; the command's last line says so (built in slice 1) | section 1 item 4; label note 4; note of 7 Oct, 2 |
+| `seed_scheme` | "content-v1" (where it sits in the label: question 4) | D18 (a) |
+| `hardware` | this machine's fingerprint, `kind` as the submitter states it; "raspberry-pi-5" only on a machine that reports itself as one (built in slice 1) | D11; section 6 |
+| `runtimes` | one entry: ONNX Runtime version, CPU provider, threads, spinning | label note of 3 Oct, 1 |
+| `datasets` | `user/<name>:test`, `:conformal_calibration`, and `:int8_calibration` when Brokkr builds INT8; each with the declared licence and source, `split_mode`, the `folder_fingerprint` of that part, `labelled: false` for a `--calib-images` part, `disjoint_from` | label note 5; section 5 |
+| `conditions` | the study's 13, same IDs and names | section 4 |
+| `checks` | `fp32_sanity` from the expected-accuracy check (question 5); `outputs`; `reference_predictions` (counts only); `agreement_with_fp32` for the labelled build | label note 3; notes of 7 Oct |
+| `measurements`, `envelope`, `summary` | as on study labels: the test part; the conformal threshold from each build's clean conformal-calibration part; envelope version 1; the same summary | section 0 |
+| `summary.warnings` | "few images", "classes with few test images", "low agreement with FP32", and "few usable reference predictions" (question 9), rendered at the top, before the summary lines, every count a `label.json` number | section 2; label note 2; second note of 7 Oct, 2 |
+| `speed` | every row "not measured", reason "speed is not measured in step 3 user runs", `runtime_id` null (question 8 on the Raspberry Pi row) | D12; label note 7 |
+| `licences` | `brokkr_code` "Apache-2.0"; `model_code`, `model_weights`, `images` verbatim with `declared_by_submitter: true` ("not checked by Brokkr" when rendered); `label_data` D9's text; source: `run_plan.json` (question 7 on the wording) | D9; section 5; label note 6 |
+| `declarations` | `images_not_used_to_train_the_model: true` | D10; label note 6 |
+| `limits` | the study's general sentences (simulated damage; the ImageNet-C package sentence; one machine; chance with 12 conditions; coverage tuned on clean images; next steps are general suggestions; question 6 on "laptop"); and, only when they apply: one per warning; input not 224×224 (D8); licences and declarations not checked by Brokkr; near-duplicates not detected; the photo-rotation tag not applied; the expected-accuracy check may pass a small mistake; the random-condition sentence, only when a random condition ran (always, while all 13 conditions run; the code keeps the condition for P4) | label note 8; D8; note of 10 Oct |
+| No file names or paths | the label, its renders, the records and the run plan hold counts, class names and fingerprints only; scores are stored by canonical index; every `sources` file is a path relative to `--out` | section 5 |
+| `sources` | every record file in `--out`, with its SHA-256 and the check it passed | label schema, `sources` |
+
+### c. Tests
+
+The four label tests deferred from section 7 item 2, on the made-up model and images (`tests/user_made_up.py`),
+both when Brokkr builds INT8 and for a supplied pair:
+1. `check_label` passes on the label the command writes;
+2. `label.html` and `label.md` show the UNVERIFIED badge;
+3. every number in `label.md` and `label.html` is a `label.json` number (`unexplained_numbers` is empty);
+4. no image file name, file stem, absolute path or home folder appears in `label.json`, `label.md`,
+   `label.html`, `run_plan.json` or any record in `--out`.
+
+New tests:
+5. **Written before the damage code** (section 4): each of the 12 damaged conditions runs on pictures of 64×64
+   and 320×320, and on the made-up model's own size. If a condition cannot run at the made-up model's size, the
+   made-up model's size is raised in the tests to one where all 13 run (tests only), and that is reported.
+6. Failed builds: a supplied build below 20% agreement gives a label with FP32 rows only, "INT8 build failed"
+   rows, no INT8 measurement and the "may be broken or not made from this FP32 model" sentence.
+7. Brokkr's own INT8 build of the made-up model: the recipe fields; the `skip_symbolic_shape` retry recorded
+   when the first attempt crashes (the crash simulated in the test).
+8. `to_int8` with and without `input_name="images"` gives byte-identical files.
+9. Seeds: the user run uses `content_seed`; adding one image to the folder leaves every other test image's
+   damaged picture unchanged.
+10. The random-condition limits sentence appears only when a random condition ran; its figure, model and image
+    count come from a made-up `seed_sensitivity.json` in the test, and the figure is rounded up.
+11. Each warning appears in `summary.warnings` and as a `limits` sentence, with its counts from `label.json`.
+12. A probabilities model: coverage and ECE are worked out from `as_logits`, so softmax gives the model's own
+    probabilities back.
+13. No network for the whole command (slice 1's test, extended to the full run).
+14. Resume: a stopped run keeps its finished records and does not redo them.
+15. Study unchanged: `tests/test_published_labels.py` (existing) passes; the `label_build` functions do what
+    `scripts/39` did, shown by the remake and `scripts/48` (section a).
+
+Before merging: ruff, pytest, `scripts/22`, `scripts/40`, the site build (still 17 pages and 61 files),
+`scripts/48` on the remade labels, and `scripts/43` (H).
+
+### d. Steps longer than about 10 minutes (H runs them)
+- **`scripts/43`**: about 70 minutes (section a).
+- **The cross-check** (after this slice and the folder script): MobileNetV3-Large through the user path on
+  10,000 test images under 13 conditions and 5,000 clean conformal-calibration images, two builds, plus the INT8
+  build. **Estimate, not measured:** H's `scripts/53` run of 10 October took 3.0 to 3.4 minutes per condition
+  for two builds on 10,000 pictures already decoded; 13 conditions at that rate is about 40 to 45 minutes, plus
+  decoding the images and building INT8, so probably about an hour.
+- **Remaking the ten labels** for the `scripts/48` comparison: not timed. It reads saved scores and runs paired
+  bootstraps; if it passes 10 minutes in a session, it stops and H runs it.
+
+Everything else runs in a session: pytest on made-up models, ruff, `scripts/22`, `scripts/40`, the site build,
+`scripts/48`, and dry runs on 64 images or fewer, with output outside `results/`.
+
+### e. Questions for H (nothing below is decided)
+1. **Where user runs' records are checked.** `brokkr_edge/schema.py` accepts only the sources "brokkr" and
+   "community-submitted" and the device labels laptop, raspberry-pi-5 and cloud-arm, so a user run's records do
+   not pass `check_record`. (a) Add the source "user-submitted" and the device kinds of D11 to `schema.py`
+   (study code; additive; user records never go in `results/`, which slice 1 already refuses); or (b) give user
+   records their own small checker and leave `schema.py` alone. Claude would choose (a): one checker for every
+   record.
+2. **The reliability numbers.** `scripts/31` is one short loop (its lines 92–150) around the shared, tested functions in
+   `brokkr_edge/shift/` (ECE, conformal threshold and sets, E-AURC). (i) Move those lines into the package and
+   make `scripts/31` call them, shown unchanged by re-running it into a scratch folder and comparing every metric
+   with `results/breadth_reliability/` (run time not measured; possibly H's); or (ii) the user path calls the
+   same `brokkr_edge/shift/` functions directly and `scripts/31` stays as it is (its records are final). Claude
+   would choose (ii).
+3. **Threads.** The study ran with 8 threads, thread spinning off. Use the same fixed setting for user runs,
+   recorded on the label? The cross-check needs it to compare scores exactly: INT8 was shown repeatable bit for
+   bit at a fixed thread count, not across thread counts.
+4. **Where `seed_scheme` sits in the label.** (proposed) `generated.seed_scheme`, one value for the whole label (a
+   label without it is read as "position-study", note of 7 October 2026).
+5. **`checks.fp32_sanity` on a user label.** The label note of 6 October says `tolerance` 0.05; the rule became
+   "larger than both 5 points and the 99% half-width", measured on the conformal-calibration part (notes of 7
+   October). (proposed) Store `measured` from the conformal-calibration part with its dataset ID, `published`
+   (the stated figure, "stated by the submitter", its image count and where it was measured), `tolerance` 0.05,
+   `half_width_99`, `allowed_gap`, `chance` and `pass`; the validator recomputes `pass`.
+6. **Study sentences that name the laptop.** "Accuracy was measured on the laptop; it has not been checked on
+   other hardware." (proposed) On user labels: "Accuracy was measured on this machine only; it has not been
+   checked on other hardware." The other general sentences are kept word for word.
+7. **The licence lines.** The study line "This label's own numbers and text are Brokkr output, licensed
+   {label_data}" reads wrongly with D9's text. (proposed) On user labels: "This label's licence is chosen by the
+   submitter; labels submitted to Brokkr's catalog are CC BY 4.0 (step 4)", and "declared by the submitter, not
+   checked by Brokkr" after the model's code, weights and images licences.
+8. **The Raspberry Pi 5 speed row.** Study labels carry one ("no Raspberry Pi 5 yet"). (proposed) User labels have
+   one "not measured" row per build for the submitter's own machine only, and no Raspberry Pi row.
+9. **A warning kind not in the label note.** Slice 1 added "few usable reference predictions" (second note of 7
+   October, 2); the label note of 6 October lists three kinds. (proposed) Add it as a fourth allowed kind.
+10. **Brokkr's own INT8 build crashes even after the retry.** (a) Stop the run with no label, or (b) make the
+    label with FP32 rows and "INT8 build failed" (check "the INT8 build crashed, also with skip_symbolic_shape",
+    no value or line). Claude would choose (b), as for MobileNetV3-Small, but it needs the validator and the
+    renderer to accept a failure with no number.
+11. **The decoded pictures.** Decoding every image once for all 13 conditions means keeping the pictures on disk
+    during the run (crop × crop × 3 bytes each; at 224×224 and 10,000 test images about 1.5 GB, worked out, not
+    measured). (proposed) A memory-mapped file in `--out`, deleted once the label is written; a resumed run
+    decodes again.
+12. **Commit on a user label.** Outside a git checkout (after `pip install`, step 4) there is no commit.
+    (proposed) `generated.commit` and `generated.dirty` are null there, with the brokkr-edge version; inside a
+    checkout they are recorded as on study labels, and a dirty checkout is recorded, not refused (user labels are
+    unverified anyway).
+13. **What `--out` holds.** (proposed) `run_plan.json`, `int8_build.json` (and the INT8 file when Brokkr builds
+    it), `records/` (the score records), and `label.json`, `label.md`, `label.html`.
+
+**Order inside the slice, each step ending with its check:** the size test (c5); the move out of `scripts/39`,
+with the remake and `scripts/48`; the schema, validator and renderer additions, with the released labels still
+byte-identical; `to_int8`'s `input_name` and the user INT8 build; running the conditions; the reliability numbers
+and the label; the command's last steps. Then all checks, `scripts/43` (H), and a stop for H's review before the
+cross-check folder script.
