@@ -16,28 +16,32 @@ Rules (docs/label_schema.md; docs/hypotheses_stage4.md, notes of 29 September to
   and names its source file, checksum and field.
 - Laptop speed rows come from the latency records; the Raspberry Pi 5 rows say "not measured".
 - The licence section comes from the build records (note of 3 October 2026, point 6).
+
+This script finds, checks and reads the study's records; the label is put together by brokkr_edge.label_build,
+which the user path shares (docs/user_models.md, note of 10 October 2026).
 """
 
 import argparse
 import datetime
 import json
 import os
-import re
 import sys
 from pathlib import Path
 
-from brokkr_edge import __version__
 from brokkr_edge.fingerprint import git_info
 from brokkr_edge.judge import top1_correct
-from brokkr_edge.label import (
-    CI_LEVEL,
-    ENVELOPE_RULE,
-    envelope_state,
-    failed_lines,
-    line_states,
-    paired,
-    shrinking_cost_flags,
-    summary,
+from brokkr_edge.label_build import (
+    STUDY_MACHINE_SENTENCE,
+    assemble,
+    build_entry,
+    conditions_block,
+    derived_measurements,
+    envelope_rows,
+    failure_block,
+    general_limits,
+    generated_block,
+    measurement,
+    runtime_entry,
 )
 from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
 from brokkr_edge.label_schema import build_id as make_build_id
@@ -47,7 +51,6 @@ from brokkr_edge.label_schema import (
     dataset_id,
     hardware_id,
     model_id,
-    runtime_id,
 )
 from brokkr_edge.model_list import MODEL_LIST_FILE, load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
@@ -56,7 +59,6 @@ from brokkr_edge.schema import (
     check_build_record,
     check_record,
     condition,
-    condition_label,
     load_measurement,
 )
 
@@ -80,12 +82,6 @@ SANITY_TOLERANCE = 0.010  # FP32 clean top-1 within 1.0 point of torchvision's p
 THREAD_COUNTS = (1, 4)  # the laptop latency method's thread counts (note of 29 September 2026)
 BROKKR_CODE_LICENCE = "Apache-2.0"
 LABEL_DATA_LICENCE = "CC BY 4.0"
-# The vendored imagecorruptions copy's version, read from the first line of its notes ("# Vendored copy of
-# imagecorruptions 1.1.2"), for the ImageNet-C limit (H's fix list, 4 October 2026, item 1).
-IMAGECORRUPTIONS_VERSION = re.match(
-    r"# Vendored copy of imagecorruptions (\d+\.\d+\.\d+)\n",
-    Path("brokkr_edge/third_party/imagecorruptions/CHANGES.md").read_text(encoding="utf-8"),
-).group(1)
 RELIABILITY = {
     "coverage": ("conformal", "coverage"),
     "mean_set_size": ("conformal", "mean_set_size"),
@@ -132,22 +128,9 @@ def checked(path: Path) -> tuple:
     return record, arrays
 
 
-def runtime_entry(record: dict, path: Path) -> dict:
-    """One `runtimes` entry from a record's runtime block (docs/label_schema.md, note of 3 October 2026)."""
-    rt = record["runtime"]
-    return {
-        "runtime_id": runtime_id(rt["name"], rt["version"], rt["execution_provider"], rt["threads"],
-                                 rt.get("spinning")),
-        "name": rt["name"],
-        "version": rt["version"],
-        "execution_provider": rt["execution_provider"],
-        "threads": rt["threads"],
-        "intra_op_threads": rt.get("intra_op_threads"),
-        "inter_op_threads": rt.get("inter_op_threads"),
-        "spinning": rt.get("spinning"),
-        "graph_optimisation": rt.get("graph_optimisation"),
-        "sources": [source(path, "runtime")],
-    }
+def record_runtime(record: dict, path: Path) -> dict:
+    """The `runtimes` entry of a checked record."""
+    return runtime_entry(record["runtime"], [source(path, "runtime")])
 
 
 def utc(seconds: float) -> str:
@@ -202,29 +185,23 @@ def make_label(model: str) -> dict:
         failure = None
         if state == "failed":
             failed = [name for name, ok in build["build"]["checks"].items() if not ok]
-            failure = {
-                "check": failed[0],
-                "value": build["sanity_check"]["top1_agreement_with_fp32"],
-                "limit": MIN_AGREEMENT_WITH_FP32,
-                "n_items": build["sanity_check"]["n_images"],
-                "split": build["sanity_check"]["split"],
-                "sources": [
+            failure = failure_block(
+                failed[0],
+                build["sanity_check"]["top1_agreement_with_fp32"],
+                MIN_AGREEMENT_WITH_FP32,
+                build["sanity_check"]["n_images"],
+                build["sanity_check"]["split"],
+                [
                     source(path, "sanity_check.top1_agreement_with_fp32"),
                     source(path, "sanity_check.n_images"),
                     source(path, "sanity_check.split"),
                 ],
-            }
+            )
         bid = make_build_id(mid, "fp32" if precision == "fp32" else "int8", build["file"]["sha256"])
-        builds[role] = {
-            "build_id": bid,
-            "role": role,
-            "display_name": load_precision_display_names()[precision],
-            "precision": "fp32" if precision == "fp32" else "int8",
-            "recipe": recipe,
-            "file": {"sha256": build["file"]["sha256"], "size_bytes": build["file"]["size_bytes"]},
-            "status": state,
-            "failure": failure,
-        }
+        builds[role] = build_entry(
+            bid, role, load_precision_display_names()[precision], "fp32" if precision == "fp32" else "int8",
+            recipe, build["file"]["sha256"], build["file"]["size_bytes"], state, failure,
+        )
         status[role] = state
 
     # Records: accuracy (with scores) and reliability, for every usable build and condition.
@@ -262,7 +239,7 @@ def make_label(model: str) -> dict:
     hw_id = hardware_id("laptop", fp["cpu_model"], f"{fp['os']} {fp['os_release']}")
     runtimes, acc_runtime = [], {}  # each accuracy record's runtime (note of 3 October 2026)
     for key, (path, record) in acc.items():
-        rt = runtime_entry(record, path)
+        rt = record_runtime(record, path)
         if rt["runtime_id"] not in {r["runtime_id"] for r in runtimes}:
             runtimes.append(rt)
         acc_runtime[key] = rt["runtime_id"]
@@ -302,49 +279,22 @@ def make_label(model: str) -> dict:
             "disjoint_from": [test_id],
         },
     ]
-    conditions = [
-        {
-            "condition_id": condition_id(c["suite"], c["corruption"], c["severity"]),
-            "suite": c["suite"],
-            "damage": c["corruption"],
-            "severity": c["severity"] or None,
-            "modality": "image",
-            "label": condition_label(c),
-        }
-        for c in CONDITIONS
-    ]
+    conditions = conditions_block(CONDITIONS)
+    condition_ids = [c["condition_id"] for c in conditions]
 
-    # Measurements.
+    # Measurements: copied from the records, then the derived ones (label_build).
     measurements = []
-
-    def add(metric, role, cid, value, ci, n, settings, sources, paired_with=None):
-        """paired_with: the (role, condition) of a derived measurement's second record."""
-        rid = acc_runtime[(role, cid)]
-        if paired_with and acc_runtime[paired_with] != rid:
-            settings = {**settings, "paired_runtime_id": acc_runtime[paired_with]}
-        measurements.append(
-            {
-                "metric": metric,
-                "build_id": builds[role]["build_id"],
-                "dataset_id": test_id,
-                "condition_id": cid,
-                "hardware_id": hw_id,
-                "runtime_id": rid,
-                "value": value,
-                "ci95": ci,
-                "n_items": n,
-                "unit": "classes" if metric == "mean_set_size" else "fraction",
-                "settings": settings,
-                "sources": sources,
-            }
-        )
-
     details_conformal = {}
     for (role, cid), (path, record) in acc.items():
         n = record["data"]["n_images"]
+
+        def add(metric, value, ci, settings, sources, role=role, cid=cid, n=n):
+            measurements.append(measurement(metric, builds[role]["build_id"], test_id, cid, hw_id,
+                                            acc_runtime[(role, cid)], value, ci, n, settings, sources))
+
         for metric in ("top1", "top5"):
             m = record["metrics"][metric]
-            add(metric, role, cid, m["value"], m["ci95"], n, {}, [source(path, f"metrics.{metric}")])
+            add(metric, m["value"], m["ci95"], {}, [source(path, f"metrics.{metric}")])
         for metric, (kind, field) in RELIABILITY.items():
             rpath, rrec = rel[(role, cid, kind)]
             m = rrec["metrics"][field]
@@ -362,88 +312,16 @@ def make_label(model: str) -> dict:
                     "threshold": settings["threshold"],
                     "calibration_items": settings["calibration_items"],
                 }
-            add(metric, role, cid, m["value"], m["ci95"], n, settings, [source(rpath, f"metrics.{field}")])
-    for role in PRECISIONS:
-        if status[role] != "usable":
-            continue
-        clean_correct = correct[(role, "clean")][0]
-        for c in conditions[1:]:
-            cid = c["condition_id"]
-            p = paired(correct[(role, cid)][0], clean_correct)
-            add(
-                "damage_drop",
-                role,
-                cid,
-                p["value"],
-                p["ci95"],
-                p["n_items"],
-                {"paired_with": "clean", "bootstrap": p["bootstrap"]},
-                [
-                    source(acc[(role, cid)][0].with_suffix(".npz"), "logits, labels"),
-                    source(acc[(role, "clean")][0].with_suffix(".npz"), "logits, labels"),
-                ],
-                paired_with=(role, "clean"),
-            )
-    if status["labelled"] == "usable":
-        for c in conditions:
-            cid = c["condition_id"]
-            p = paired(correct[("labelled", cid)][0], correct[("reference", cid)][0])
-            add(
-                "shrinking_cost",
-                "labelled",
-                cid,
-                p["value"],
-                p["ci95"],
-                p["n_items"],
-                {"paired_with": builds["reference"]["build_id"], "bootstrap": p["bootstrap"]},
-                [
-                    source(acc[("labelled", cid)][0].with_suffix(".npz"), "logits, labels"),
-                    source(acc[("reference", cid)][0].with_suffix(".npz"), "logits, labels"),
-                ],
-                paired_with=("reference", cid),
-            )
+            add(metric, m["value"], m["ci95"], settings, [source(rpath, f"metrics.{field}")])
+    measurements += derived_measurements(
+        builds, status, condition_ids,
+        {key: c for key, (c, _) in correct.items()},
+        {key: source(path.with_suffix(".npz"), "logits, labels") for key, (path, _) in acc.items()},
+        acc_runtime, test_id, hw_id,
+    )
 
-    # Envelope and summary.
-    index = {(m["metric"], m["build_id"], m["condition_id"]): m for m in measurements}
-    rows = []
-    for role in ("reference", "labelled"):
-        bid = builds[role]["build_id"]
-        for c in conditions[1:]:
-            cid = c["condition_id"]
-            if status[role] != "usable":
-                f = builds[role]["failure"]
-                rows.append(
-                    {
-                        "build_id": bid,
-                        "condition_id": cid,
-                        "hardware_id": hw_id,
-                        "state": "INT8 build failed",
-                        "why": [f"build check failed: {f['check']}"],
-                        "failed": [],
-                        "line_states": None,
-                        "shrinking_cost_flags": [],
-                    }
-                )
-                continue
-            coverage_ci = index[("coverage", bid, cid)]["ci95"]
-            drop_ci = index[("damage_drop", bid, cid)]["ci95"]
-            state, why = envelope_state(coverage_ci, drop_ci)
-            flags = []
-            if role == "labelled":
-                fp32_top1 = index[("top1", builds["reference"]["build_id"], cid)]["value"]
-                flags = shrinking_cost_flags(index[("shrinking_cost", bid, cid)]["ci95"], fp32_top1)
-            rows.append(
-                {
-                    "build_id": bid,
-                    "condition_id": cid,
-                    "hardware_id": hw_id,
-                    "state": state,
-                    "why": why,
-                    "failed": failed_lines(coverage_ci, drop_ci),
-                    "line_states": line_states(coverage_ci, drop_ci),
-                    "shrinking_cost_flags": flags,
-                }
-            )
+    # Envelope (the summary is made from it by label_build.assemble).
+    rows = envelope_rows(builds, status, condition_ids[1:], measurements, hw_id)
 
     # Speed: laptop rows from the latency records (note of 3 October 2026), Raspberry Pi 5 not measured.
     speed, latency = [], {}
@@ -463,7 +341,7 @@ def make_label(model: str) -> dict:
                 sys.exit(f"REFUSED: {path} timed another file than the labelled build")
             if s["pinned_cpus"] != f["core_types"]["performance"]:
                 sys.exit(f"REFUSED: {path} was not pinned to the performance cores its fingerprint lists")
-            rt = runtime_entry(record, path)
+            rt = record_runtime(record, path)
             if rt["runtime_id"] not in {r["runtime_id"] for r in runtimes}:
                 runtimes.append(rt)
             physical = sorted({s["physical_core_of_each_cpu"][str(c)] for c in s["pinned_cpus"]})
@@ -544,28 +422,23 @@ def make_label(model: str) -> dict:
                     source(ref_build_path, "licence"), source(ref_build_path, "weights")],
     }
 
-    measured_fp32 = index[("top1", builds["reference"]["build_id"], "clean")]["value"]
+    measured_fp32 = next(m["value"] for m in measurements if (m["metric"], m["build_id"], m["condition_id"])
+                         == ("top1", builds["reference"]["build_id"], "clean"))
     published = entry["published"]["top1"]
-    n_damaged = len(conditions) - 1
-    label = {
-        "schema_version": 1,
-        "label_id": builds["labelled"]["build_id"],
-        "source": {
+    limits = general_limits(fp["cpu_model"], f"{fp['os']} {fp['os_release']}", len(conditions) - 1,
+                            STUDY_MACHINE_SENTENCE)
+    if any(not r["pinning"]["read_back"] for r in timed):
+        limits.append("Latency is laptop latency from one run on one machine; the CPU pin was not read back "
+                      "after it was set.")
+    label = assemble(
+        source={
             "kind": "official",
             "verified": True,
             "submitted_by": None,
             "how_made": "scripts/39_make_labels.py, from the 4.1 records",
         },
-        "generated": {
-            "by": f"brokkr-edge {__version__}",
-            "commit": git["commit"],
-            "dirty": git["dirty"],
-            "date_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-            "ci_level": CI_LEVEL,
-            "label_licence": LABEL_DATA_LICENCE,  # = licences.label_data
-            "envelope_rule": ENVELOPE_RULE["name"],
-        },
-        "model": {
+        generated=generated_block(git["commit"], git["dirty"], LABEL_DATA_LICENCE),  # = licences.label_data
+        model={
             "model_id": mid,
             "name": model,
             "display_name": entry["display_name"],
@@ -577,12 +450,12 @@ def make_label(model: str) -> dict:
             "outputs": entry["outputs"],
             "licence": entry["licence"],
         },
-        "builds": [builds["reference"], builds["labelled"]],
-        "hardware": hardware,
-        "runtimes": runtimes,
-        "datasets": datasets,
-        "conditions": conditions,
-        "checks": {
+        builds=builds,
+        hardware=hardware,
+        runtimes=runtimes,
+        datasets=datasets,
+        conditions=conditions,
+        checks={
             "fp32_sanity": {
                 "measured": measured_fp32,
                 "published": published,
@@ -595,38 +468,15 @@ def make_label(model: str) -> dict:
                 ],
             }
         },
-        "measurements": measurements,
-        "envelope": {"rule": ENVELOPE_RULE, "rows": rows},
-        "summary": summary(rows, builds["labelled"]["build_id"]),
-        "speed": speed,
-        "details": {"conformal": details_conformal},
-        "limits": [
-            "The damage is simulated (Brokkr's own and ImageNet-C corruptions); real fog, darkness "
-            "or noise may "
-            "affect the model differently.",
-            "The ImageNet-C conditions were made on these test images with the imagecorruptions package "
-            f"v{IMAGECORRUPTIONS_VERSION} (an extension of the ImageNet-C code), with a one-line fix so that "
-            "fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and "
-            "each model's own preprocessing were used, so the results are not directly comparable to the "
-            "released ImageNet-C files or to published ImageNet-C results.",
-            f"Measured on one machine: {fp['cpu_model']}, {fp['os']} {fp['os_release']}.",
-            f"With {n_damaged} conditions, an occasional result may cross a line by chance.",
-            "Coverage is for prediction sets tuned on clean calibration images; under damage there is no "
-            "coverage promise, and the label shows what was measured.",
-            "Accuracy was measured on the laptop; it has not been checked on other hardware.",
-            "The suggested next steps are general suggestions; they were not tested for this model.",
-        ]
-        + (
-            ["Latency is laptop latency from one run on one machine; the CPU pin was not read back after "
-             "it was set."]
-            if any(not r["pinning"]["read_back"] for r in timed)
-            else []
-        ),
-        "licences": licences,
-        "sources": [
-            {"file": f, "sha256": sha, "check": check} for f, (sha, check) in sorted(used_files.items())
-        ],
-    }
+        measurements=measurements,
+        rows=rows,
+        speed=speed,
+        details={"conformal": details_conformal},
+        limits=limits,
+        licences=licences,
+        sources=[{"file": f, "sha256": sha, "check": check}
+                 for f, (sha, check) in sorted(used_files.items())],
+    )
     if not label["checks"]["fp32_sanity"]["pass"]:
         sys.exit(f"REFUSED: {model}'s FP32 sanity check fails")
     return label
