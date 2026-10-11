@@ -287,4 +287,4 @@ Next: testing your own model (step 3). The full plan, in order and with dates:
 
 ---
 
-Built with AI coding assistance (Claude Code). Research design, decisions and reviews by H.
+Built by and research design, decisions and reviews by H.
