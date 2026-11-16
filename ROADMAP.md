@@ -497,7 +497,7 @@ labels show Pi rows.
 - Fast mode, and the menu of conditions and severities (P4). <!-- public -->
 - Testing a user's PyTorch model (moved out of step 3 by H, 6 October 2026; after step 4). <!-- public: Testing your own PyTorch model -->
 - A speed bench for user labels on the user's own machine (a known gap of step 3: user labels say "not measured"; after step 4). <!-- public: Speed measurements for labels of your own model -->
-- `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe. <!-- public: Automatic shrinking: try several recipes and recommend one -->
+- `shrink --auto`: trying recipes and recommending one (P5). Step 3's INT8 build uses one recipe. Extended into fix mode (diagnosis, diary, grid check): plan in `docs/fix_agent_plan.md`; starts after step 4 ships (H, 17 November 2026); its numbers approved by H, 17 November 2026. <!-- public: Automatic shrinking: try several recipes and recommend one -->
 - The GitHub Action. <!-- public: A GitHub Action that tests a model and attaches its label -->
 - Stage 5 (energy and heat on the Pi with a USB power meter). <!-- public: Energy and heat on the Raspberry Pi 5, with a USB power meter -->
 - Stage 6's installer script and camera demo. <!-- public: An installer script and a camera demo -->
