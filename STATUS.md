@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **10 October 2026** (step 3 in progress: design note, slice 1 and the content-v1 references done). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references and step A done; step A's reproduction check PASS 28 of 28; step B next, after H's review of step A). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -11,8 +11,26 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (10 October 2026; step 3: plan the conditions-and-label slice next)
+### Pick up here (17 November 2026; step 3: H reviews step A, then step B)
 Read this first.
+- **Step A's reproduction check: PASS, 28 of 28** (run by H on 17 November 2026, on mains power, from the
+  clean commit `2103353`, which holds step A `1bc3291` plus the fix-mode plan). `scripts/43_check_reproduction.py
+  --out data/checks/reproduction_2026-11-17`: INT8 repeatable (26 of 26 dry-run score files identical); all 28
+  records give identical top-1 on every image and all 28 score files are identical bit for bit to the 4.1
+  records; every new record notes commit `2103353`, not dirty. Verdict file:
+  `data/checks/reproduction_2026-11-17/reproduction_check.json` (gitignored). Afterwards `scripts/22`: PASS
+  (1925 of 1925 records, 50 of 50 build records).
+- **Not checked in this session:** step A's other checks named in the note of 10 October 2026 (the ten labels
+  remade into a scratch folder and compared by `scripts/48`, `tests/test_published_labels.py`, ruff, full pytest);
+  no output of them is recorded here.
+- **Next:** H's review of step A; then **step B**, the user path on top (`docs/user_models.md`, H's decisions of
+  10 October 2026).
+- **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
+  extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
+  by H the same day; the tries budget is confirmed again after its milestone 3.
+
+### Pick up here (10 October 2026; step 3: plan the conditions-and-label slice next)
+Earlier entry, kept as written.
 - **The order from here** (corrected on 10 October 2026; the entry of 7 October below had the cross-check before
   the slice it needs, and `docs/user_models.md` section 7 has it after):
   1. **The slice that runs the conditions and makes the user label**, with the four label tests of
