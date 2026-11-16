@@ -7,7 +7,7 @@ required field, so a record that can't be traced fails the check.
     {
       "schema_version": 2,
       "kind": "accuracy",                # or calibration, conformal, selective, speed, levels, diagnostic
-      "source": "brokkr",                # or "community-submitted" (hard rule 7)
+      "source": "brokkr",                # or "community-submitted" (hard rule 7), or "user-submitted"
       "model": {"name": ..., "weights": ..., "licence": ...},
       "precision": "int8_percentile99.99",
       "runtime": {"name": "onnxruntime", "version": ..., "execution_provider": ..., "threads": 4},
@@ -24,6 +24,11 @@ required field, so a record that can't be traced fails the check.
 Brokkr's own corruptions and ImageNet-C's share some names (fog, defocus blur), so a condition always
 says which suite it comes from, and condition_label() always prints it: "fog (Brokkr) s3".
 
+A user's own run (`brokkr-edge test --config`, step 3) writes records with the source "user-submitted"
+(H, 10 October 2026, decision 1): they may name any device kind the user may state (D11), and outside a git
+checkout their code commit and dirty flag are null (decision 12). Study records keep the stricter rules.
+User records never go in results/ (slice 1 refuses it), and no published label or site page may use one.
+
 Stage 1-3 files use schema version 1. from_v1() converts them in memory (the files are not changed),
 so everything from Stage 4 on can read old and new results the same way.
 """
@@ -38,9 +43,12 @@ from brokkr_edge.results import sha256_of, written_atomically
 
 SCHEMA_VERSION = 2
 KINDS = ("accuracy", "calibration", "conformal", "selective", "speed", "levels", "diagnostic")
-SOURCES = ("brokkr", "community-submitted")
+USER_SOURCE = "user-submitted"
+SOURCES = ("brokkr", "community-submitted", USER_SOURCE)
 SUITES = {"brokkr": "Brokkr", "imagenet-c": "ImageNet-C"}
 DEVICE_LABELS = ("laptop", "raspberry-pi-5", "cloud-arm")
+# The kinds a user may state for their own machine (H, D11; brokkr_edge.user_settings.DEVICE_KINDS).
+USER_DEVICE_LABELS = ("laptop", "desktop", "server", "raspberry-pi-5", "cloud-arm", "other")
 ARM_ARCHITECTURES = ("aarch64", "arm64")
 
 # Metrics each kind must have, and which of them need a 95% interval (measurement rules).
@@ -138,11 +146,15 @@ def check_record(r: dict) -> list:
     elif not (isinstance(rt.get("threads"), int) and rt["threads"] >= 1):
         problems.append("runtime threads must be a whole number >= 1")
 
-    problems += _check_device(r["device"])
+    problems += _check_device(r["device"], r["source"])
 
     code = r["code"]
-    if not (isinstance(code, dict) and _is_hex(code.get("commit"), 40)
-            and isinstance(code.get("dirty"), bool)):
+    outside_git = r["source"] == USER_SOURCE and isinstance(code, dict) and code.get("commit") is None
+    if outside_git:
+        if code.get("dirty") is not None:
+            problems.append("a user record made outside a git checkout has no dirty flag either")
+    elif not (isinstance(code, dict) and _is_hex(code.get("commit"), 40)
+              and isinstance(code.get("dirty"), bool)):
         problems.append("code needs a 40-character git commit and a dirty flag")
 
     if r["kind"] == "speed":
@@ -168,13 +180,14 @@ def check_record(r: dict) -> list:
     return problems
 
 
-def _check_device(device) -> list:
+def _check_device(device, source: str = "brokkr") -> list:
     if not (isinstance(device, dict) and isinstance(device.get("fingerprint"), dict)):
         return ["device needs a label and a fingerprint"]
     label, fp = device.get("label"), device["fingerprint"]
     board = fp.get("board_model") or ""
-    if label not in DEVICE_LABELS:
-        return [f"device label must be one of {DEVICE_LABELS}"]
+    allowed = USER_DEVICE_LABELS if source == USER_SOURCE else DEVICE_LABELS
+    if label not in allowed:
+        return [f"device label must be one of {allowed}"]
     if not (fp.get("os") and fp.get("os_release")):
         return ["the fingerprint must record the OS (os and os_release)"]
     # A label must match the machine it claims (hard rule 2: cloud ARM is never called a Pi).

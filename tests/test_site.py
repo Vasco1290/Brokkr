@@ -18,6 +18,7 @@ import site_checks  # noqa: E402
 import site_labels  # noqa: E402
 import site_pages  # noqa: E402
 import site_sources  # noqa: E402
+from user_label_example import user_label  # noqa: E402
 
 import brokkr_edge  # noqa: E402
 
@@ -170,13 +171,10 @@ def test_int8_slower_and_unstable_speed_rows_are_said_in_words(built):
 
 def test_a_user_submitted_label_shows_unverified(built):
     labs, figures = dict(built[0]), built[1]
-    fake = copy.deepcopy(labs["resnet18"])  # tests only
-    fake["source"] = {
-        **fake["source"],
-        "kind": "user-submitted",
-        "verified": False,
-        "submitted_by": "someone",
-    }
+    # tests only: ResNet-18's label rewritten into a user label's shape (tests/user_label_example.py; since
+    # 17 November 2026 a user label must follow the user rules of brokkr_edge.label_schema)
+    fake = user_label("published/labels/resnet18/label.json")
+    fake["source"]["submitted_by"] = "someone"
     labs["resnet18"] = fake
     assert site_labels.label_problems({"resnet18": fake}) == []
     pages, files = site_build.build(labs, figures, COMMIT)

@@ -55,7 +55,7 @@ from brokkr_edge.label import (
     summary,
 )
 from brokkr_edge.label_render import to_html, to_markdown, unexplained_numbers
-from brokkr_edge.label_schema import check_label
+from brokkr_edge.label_schema import check_label, study_label_problems
 from brokkr_edge.model_list import load_model_list, load_precision_display_names
 from brokkr_edge.results import sha256_of
 from brokkr_edge.schema import MIN_AGREEMENT_WITH_FP32, check_build_record
@@ -174,6 +174,12 @@ def check(folder: Path) -> list:
                if not Path(s["file"]).exists() or sha256_of(s["file"]) != s["sha256"]]
     if changed:
         return problems + [f"source changed or missing: {f}" for f in changed]
+
+    # No record from a user's run feeds a released label (H, 10 October 2026, decision 1).
+    problems += study_label_problems([
+        json.loads(Path(s["file"]).read_text(encoding="utf-8")) for s in label["sources"]
+        if s["file"].endswith(".json")
+    ])
 
     # 3. Builds match their build records.
     records = [

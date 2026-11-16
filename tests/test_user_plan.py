@@ -16,6 +16,7 @@ import pytest
 from user_made_up import (
     CLASSES,
     ROLLED,
+    SIZE,
     TWO_THIRDS,
     quantized,
     settings,
@@ -48,7 +49,7 @@ def made(tmp_path_factory):
     quantized(fp32, d / "int8.onnx")
     quantized(tiny_model(d / "rolled.onnx", weights=ROLLED), d / "int8_rolled.onnx")
     quantized(tiny_model(d / "two_thirds.onnx", weights=TWO_THIRDS), d / "int8_two_thirds.onnx")
-    quantized(tiny_model(d / "big.onnx", size=16), d / "int8_big.onnx", size=16)
+    quantized(tiny_model(d / "big.onnx", size=2 * SIZE), d / "int8_big.onnx", size=2 * SIZE)
     return d
 
 

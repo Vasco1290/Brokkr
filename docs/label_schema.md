@@ -656,3 +656,39 @@ verbatim, with `declared_by_submitter: true` ("not checked by Brokkr" when rende
 designed for 224×224 pictures, not comparable with Brokkr study labels); licences and declarations not checked
 by Brokkr; near-duplicate images not detected; the photo-rotation tag not applied; the expected-accuracy check
 catches large preprocessing mistakes but may pass a small one.
+
+## Note added 17 November 2026: the validator and renderer for user labels (step B), and one reading for H
+
+Built in step B (`docs/user_models.md`, plan of 10 October 2026, section a), following the note of 6 October 2026
+above and H's decisions of 10 October 2026. Schema version 1 stays; every rule below applies only to a label
+whose `source.kind` is `"user-submitted"`, so the ten released labels are checked and rendered exactly as before
+(`tests/test_published_labels.py`; `tests/test_user_label_rules.py`).
+
+**Validator (`brokkr_edge/label_schema.py`, `_check_user_label`):** `model.publisher` "user" and `model_id`
+`user/<name>@<12 hex>` matching the FP32 file; `how_made` "brokkr-edge test ..."; `generated.seed_scheme`
+"content-v1"; `generated.commit` and `dirty` both null outside a git checkout, else a commit and a flag (a dirty
+checkout is recorded, not refused); user dataset IDs, `split_mode`, `folder_fingerprint`; the images licence with
+`declared_by_submitter: true`; the D10 declaration; `checks.fp32_sanity` with the decision 5 fields, `pass`
+worked out again by the rule of `user_checks.expected_accuracy`; the four warning kinds and their fields (a test
+fails if slice 1's checks emit a kind the format does not allow); a supplied build's `made_by` and `found`; one
+machine, of a D11 kind; one "not measured" speed row per build with the reason "this version of brokkr-edge test
+does not measure speed" (decision 8); and no path from the user's machine anywhere in the label.
+
+**Renderer (`brokkr_edge/label_render.py`):** a Warnings section under the badge (only when there are warnings),
+each with its `label.json` counts; the licences as declared, each "declared by the submitter, not checked by
+Brokkr", the D10 declaration, and decision 7's licence sentence; "(<kind>, as stated by the submitter)" after the
+machine; the sanity line against the stated figure, and its glossary entry; the commit, or "none (made outside a
+git checkout)"; a supplied build's failure sentence ("It may be broken, or not made from this FP32 model; Brokkr
+cannot tell which."); a crashed build's failure with no number (decision 10). The site's provenance section uses
+the same sanity and commit lines.
+
+**One reading, approved by H on 17 November 2026 ("records only").** Decision 1 says `scripts/40` and `scripts/49` fail "if any record with the user
+source feeds a published label or the site". Read literally (records), `scripts/40` now fails if any source
+record of a released label says "user-submitted" (`study_label_problems`). The site reads no records, and the
+website plan (step 2) requires it to show a user-submitted label marked "unverified" (`tests/test_site.py`), so
+the site was given no guard that refuses user labels. H chose this reading over making the site refuse every
+user label: the risk is a user's numbers silently becoming study numbers, and a user label shown on the site is
+openly marked unverified.
+
+**Records (`brokkr_edge/schema.py`):** the source "user-submitted" is allowed; such a record may name any D11
+device kind and, outside a git checkout, has a null commit and dirty flag. Study records keep their rules.

@@ -288,3 +288,31 @@ def test_a_binary_file_is_fingerprinted_as_its_raw_bytes(tmp_path):
     (tmp_path / "scores.npz").write_bytes(data)
     assert sha256_of(tmp_path / "scores.npz") == hashlib.sha256(data).hexdigest()
 
+
+
+# ---- records of a user's own run (H, 10 October 2026, decisions 1 and 12) ----
+
+def test_a_user_record_may_state_any_d11_device_kind():
+    from brokkr_edge.schema import USER_DEVICE_LABELS
+    from brokkr_edge.user_settings import DEVICE_KINDS
+
+    assert set(USER_DEVICE_LABELS) == set(DEVICE_KINDS)
+    for kind in ("desktop", "server", "other", "laptop"):
+        record = accuracy_record(source="user-submitted")
+        record["device"]["label"] = kind
+        assert check_record(record) == [], kind
+
+
+def test_a_study_record_keeps_the_study_device_kinds():
+    record = accuracy_record()
+    record["device"]["label"] = "desktop"
+    assert any("device label must be one of" in p for p in check_record(record))
+
+
+def test_only_a_user_record_may_have_no_commit_outside_git():
+    user = accuracy_record(source="user-submitted", code={"commit": None, "dirty": None})
+    assert check_record(user) == []
+    half = accuracy_record(source="user-submitted", code={"commit": None, "dirty": True})
+    assert any("no dirty flag either" in p for p in check_record(half))
+    study = accuracy_record(code={"commit": None, "dirty": None})
+    assert any("40-character git commit" in p for p in check_record(study))

@@ -17,7 +17,11 @@ from PIL import Image
 from brokkr_edge.quantize import to_int8
 
 CLASSES = ["red", "green", "blue"]
-SIZE = 8  # the model's input: 8 x 8 pixels (pictures are 12 x 12, resized to 8 and cropped to 8)
+# The model's input: 32 x 32 pixels (pictures are 48 x 48, resized to 32 and cropped to 32). Raised from 8 on
+# 17 November 2026: the ImageNet-C damage code refuses pictures smaller than 32 x 32, and every user run
+# applies all 13 conditions (docs/user_models.md, section 4 and the note of 17 November 2026;
+# tests/test_user_damage_sizes.py).
+SIZE = 32
 PREP = {"resize": SIZE, "crop": SIZE, "interpolation": "bilinear", "mean": [0.5, 0.5, 0.5],
         "std": [0.5, 0.5, 0.5], "channel_order": "RGB", "layout": "NCHW"}
 ROLLED = np.roll(np.eye(3), 1, axis=0)  # answers the next class: agrees with FP32 on no image
@@ -55,7 +59,7 @@ def quantized(fp32_path, out_path, size=SIZE) -> Path:
     return to_int8(fp32_path, out_path, batches, method="minmax")
 
 
-def picture(label, rng, size=12) -> Image.Image:
+def picture(label, rng, size=48) -> Image.Image:
     pixels = rng.integers(0, 70, (size, size, 3))
     if label is None:
         label = int(rng.integers(0, 3))

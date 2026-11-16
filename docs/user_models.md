@@ -831,3 +831,36 @@ after a finished run.
   `published/labels` by `scripts/48`; `tests/test_published_labels.py`; ruff; the full pytest; outputs pasted.
   Then H runs `scripts/43`. **No user-path code until `scripts/43` passes 28 of 28.**
 - **Step B, the user path on top**, after H's review of step A.
+
+## Note added 17 November 2026: step B started; models smaller than 32 x 32 (before any code for it)
+
+**Step A:** `scripts/43` PASS, 28 of 28, run by H at the clean commit `2103353` (STATUS.md, 17 November 2026).
+H said to proceed with step B the same day.
+
+**The size test (plan of 10 October 2026, section c, test 5), written before the damage code:**
+`tests/test_user_damage_sizes.py`. Its first run found that **the ImageNet-C code refuses pictures smaller than
+32 x 32** (either side below 32 pixels; message "Image width and height must be at least 32 pixels"). Brokkr's
+own four conditions ran at every size tried (8, 16, 31, 32, 64 and 320 pixels). As the plan says, the made-up
+model of the tests was raised from 8 x 8 to 32 x 32 (`tests/user_made_up.py`; its pictures from 12 x 12 to
+48 x 48), the smallest size at which all 13 conditions run; two slice-1 tests that named the old size now use it.
+The test records the refusal below 32 so it cannot change unnoticed.
+
+**Question for H (nothing decided):** what does a user run do with a model whose crop is below 32 x 32? Section 4
+says every user run applies all 13 conditions ("no partial runs in step 3").
+- (a) **Proposed:** slice 1's checks refuse it before anything runs, with a plain message ("the ImageNet-C
+  conditions need pictures of at least 32 x 32; this model's crop is N"), and a test. Consistent with section 4.
+- (b) Run the clean condition and Brokkr's four, and show the 8 ImageNet-C conditions as "not tested" on the
+  label. This is a partial run, which section 4 rules out for step 3; it would belong with P4 (choosing
+  conditions).
+
+**H's decision (17 November 2026): option (b).** A model whose crop is below 32 x 32 runs the clean condition
+and Brokkr's four; the 8 ImageNet-C conditions are not tested. This replaces, for such models only, section 4's
+"no partial runs in step 3". How it is shown (proposed by Claude, approved by H on 17 November 2026), using the
+label format as it is, with no change to it:
+- The label's `conditions`, `measurements` and `envelope` hold only the 5 conditions that ran, as
+  `docs/label_schema.md` already says for a condition not run ("not in this list; the envelope shows it as 'not
+  tested'"); `summary.tested_conditions` is 5, and the summary's existing "Not tested" line covers the rest.
+- A `limits` sentence, only on such labels, with the crop read from the label: "The 8 ImageNet-C conditions were
+  not tested: their damage code needs pictures of at least 32 x 32 pixels, and this model's input is N x N."
+- Slice 1's run plan lists the conditions that will run, so the plan and the label agree; a test covers a model
+  below 32 x 32 (5 conditions, the sentence) and one at 32 x 32 (13 conditions, no sentence).

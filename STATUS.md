@@ -20,11 +20,32 @@ Read this first.
   records; every new record notes commit `2103353`, not dirty. Verdict file:
   `data/checks/reproduction_2026-11-17/reproduction_check.json` (gitignored). Afterwards `scripts/22`: PASS
   (1925 of 1925 records, 50 of 50 build records).
-- **Not checked in this session:** step A's other checks named in the note of 10 October 2026 (the ten labels
-  remade into a scratch folder and compared by `scripts/48`, `tests/test_published_labels.py`, ruff, full pytest);
-  no output of them is recorded here.
-- **Next:** H's review of step A; then **step B**, the user path on top (`docs/user_models.md`, H's decisions of
-  10 October 2026).
+- **Step A's other checks (17 November 2026, at `670819b`):** the ten labels remade by `scripts/39` into a
+  scratch folder outside the repository; `scripts/48 published/labels <scratch>`: PASS, 10 labels, only
+  `generated.commit` and `generated.date_utc` differ, 0 listed changes; `tests/test_published_labels.py` and
+  `tests/test_label_build.py`: 8 passed. Ruff and the full pytest were run with step B's first test changes
+  present (below): ruff PASS, pytest 534 passed.
+- **H said to proceed with step B (17 November 2026).** Done so far: **the size test** (plan section c, test 5),
+  `tests/test_user_damage_sizes.py`. It found that the ImageNet-C code refuses pictures below 32 x 32, so the
+  made-up test model was raised from 8 x 8 to 32 x 32 (`tests/user_made_up.py`). **Open for H:** what a user
+  run does with a model below 32 x 32 (`docs/user_models.md`, note of 17 November 2026; proposed: refuse in
+  slice 1's checks).
+- **H's decision on models below 32 x 32 (17 November 2026):** option (b), run clean and Brokkr's four, the
+  8 ImageNet-C conditions "not tested"; shown with the label format as it is (Claude's proposal, approved by H):
+  `docs/user_models.md`, note of 17 November 2026.
+- **Step B, piece 2 done (17 November 2026, not committed when written):** records, validator and renderer
+  for user labels (`brokkr_edge/schema.py`, `label_schema.py`, `label_render.py`; `web/site_pages.py` uses the
+  shared sanity and commit lines; `scripts/40` guard). Details: `docs/label_schema.md`, note of 17 November 2026.
+  Decision 1 is read as "records only" (approved by H, 17 November 2026): `scripts/40` fails if a released
+  label uses a user record; the site still shows user labels marked unverified. Tests: `tests/test_user_label_rules.py`, `tests/test_user_label_render.py` (on a stand-in user
+  label, `tests/user_label_example.py`), additions to `tests/test_schema.py`; `tests/test_site.py`'s user-label
+  test now uses the stand-in. Checks on the working tree: ruff PASS; pytest 589 passed; `scripts/22` PASS (1925
+  of 1925); `scripts/40` PASS (10 labels; every released `label.html` still renders byte for byte);
+  `scripts/49 --check` PASS (12 checks, 17 pages, 61 files). `brokkr_edge/schema.py` is study code:
+  `scripts/43` (H) before merging, at the end of the slice.
+- **Next in step B** (plan order): `to_int8`'s `input_name` and the user INT8 build; running the conditions;
+  the reliability numbers and the label (with the limits sentences, including the below-32 one); the command's
+  last steps. Then all checks, `scripts/43` (H), and H's review.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
   by H the same day; the tries budget is confirmed again after its milestone 3.

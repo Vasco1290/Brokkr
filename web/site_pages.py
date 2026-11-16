@@ -722,7 +722,7 @@ def provenance_section(label: dict) -> str:
         (
             "Made by",
             f"{esc(label['source']['how_made'])}; {esc(gen['by'])} at commit "
-            f"<span class=mono>{gen['commit'][:12]}</span>",
+            f"<span class=mono>{esc(LR.commit_text(gen))}</span>",
         ),
         ("Label schema version", f"<span class=mono>{f(label['schema_version'], 'int')}</span>"),
         (
@@ -732,12 +732,7 @@ def provenance_section(label: dict) -> str:
         ),
         ("Machine", f"{esc(hw['cpu_model'])}, {esc(hw['os'])} ({esc(hw['kind'])})"),
         ("Envelope rule", f"{esc(rule['name'])} ({esc(rule['fixed_in'])})"),
-        (
-            "FP32 sanity check",
-            f"clean top-1 {f(sanity['measured'], 'pct')} vs published "
-            f"{f(sanity['published'], 'pct')} ({esc(sanity['published_source'])}): "
-            f"{'PASS' if sanity['pass'] else 'FAIL'}",
-        ),
+        ("FP32 sanity check", esc(LR.sanity_text(sanity))),
     ]
     if lab["recipe"].get("skip_symbolic_shape"):
         facts.append(

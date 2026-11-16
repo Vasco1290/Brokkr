@@ -282,6 +282,67 @@ def _coverage(ix: dict, build: str, cond: str) -> str:
     return f"{_value(cov, 'pct')}, set size {_value(size, 'size', ci=False)}"
 
 
+# ---- parts of a user's label (docs/label_schema.md, note of 6 October 2026; H's decisions of 10 October
+# 2026). Each is shown only when its field exists, so study labels render exactly as before. ----
+SUPPLIED = "supplied by the submitter"
+DECLARED = "declared by the submitter, not checked by Brokkr"
+USER_LABEL_LICENCE = (  # decision 7
+    "This label's licence is chosen by the submitter; if submitted to Brokkr's catalog, it is published "
+    "under CC BY 4.0."
+)
+PART_WORDS = {"test": "test", "conformal_calibration": "conformal-calibration"}
+
+
+USER_TERMS = {  # glossary entries that read differently on a user label
+    "FP32 sanity check": "Brokkr's FP32 top-1 on clean images compared with the accuracy the submitter "
+    "stated for their own setup, to catch a large preprocessing or class-order mistake.",
+}
+
+
+def terms(label: dict) -> dict:
+    """The glossary of one label: TERMS, with a user label's own entries where they differ."""
+    return TERMS if label["source"]["kind"] == "official" else {**TERMS, **USER_TERMS}
+
+
+def commit_text(generated: dict) -> str:
+    """The commit that made the label; a label made outside a git checkout has none (decision 12)."""
+    commit = generated.get("commit")
+    return commit[:12] if commit else "none (made outside a git checkout)"
+
+
+def sanity_text(s: dict) -> str:
+    """The FP32 sanity check in one line: against torchvision's published figure (study labels) or against
+    the accuracy the submitter stated (user labels, decision 5)."""
+    verdict = "PASS" if s["pass"] else "FAIL"
+    stated = s["published"]
+    if not isinstance(stated, dict):
+        return (f"clean top-1 {fmt(s['measured'], 'pct')} vs published {fmt(stated, 'pct')} "
+                f"({s['published_source']}): {verdict}")
+    return (
+        f"clean top-1 {fmt(s['measured'], 'pct')} on {fmt(s['n_items'], 'int')} conformal-calibration images "
+        f"vs {fmt(stated['value'], 'pct')} stated by the submitter ({fmt(stated['n_images'], 'int')} images: "
+        f"{stated['measured_on']}); allowed difference {fmt(s['allowed_gap'], 'pct')}: {verdict}"
+    )
+
+
+def warning_text(w: dict) -> str:
+    """One warning of a user label, every count a label.json number (note of 6 October 2026, 2)."""
+    kind = w["kind"]
+    if kind == "few images":
+        return (f"Few images: the {PART_WORDS[w['part']]} part has {fmt(w['n_items'], 'int')} images; "
+                f"{fmt(w['recommended'], 'int')} or more are recommended.")
+    if kind == "classes with few test images":
+        names = ", ".join(str(c) for c in w["classes"])
+        return f"Classes with few test images (fewer than {fmt(w['below'], 'int')} each): {names}."
+    if kind == "low agreement with FP32":
+        return (f"Low agreement with FP32: the INT8 build's first answer matched FP32's on "
+                f"{fmt(w['agreement'], 'pct')} of {fmt(w['n_items'], 'int')} images (warning below "
+                f"{fmt(w['warn_below'], 'pct0')}).")
+    return (f"Few usable reference predictions: {fmt(w['usable'], 'int')} could be checked (fewer than "
+            f"{fmt(w['below'], 'int')}, so a mismatch does not stop the run); {fmt(w['mismatched'], 'int')} "
+            f"differed; {fmt(w['ignored_test_images'], 'int')} named test images and were not used.")
+
+
 def _build_name(build: dict) -> str:
     return build.get("display_name") or build["precision"].upper()
 
@@ -297,6 +358,14 @@ def _do_not_use(build: dict) -> str | None:
     if build["status"] != "failed":
         return None
     f = build["failure"]
+    if (build.get("recipe") or {}).get("method") == SUPPLIED and f.get("n_items"):
+        return (
+            f"Do not use this INT8 build: its first answer matched FP32's on only "
+            f"{fmt(f['value'], 'pct')} of {fmt(f['n_items'], 'int')} {f['split']} images, and a usable build "
+            f"needs at least "
+            f"{fmt(f['limit'], 'pct0')}. It may be broken, or not made from this FP32 model; Brokkr cannot "
+            f"tell which."
+        )
     if "agreement" in f["check"] and f.get("n_items"):
         return (
             f"This recipe broke the model, so do not use this INT8 build: its first answer matched FP32's "
@@ -491,6 +560,16 @@ def _speed(label: dict, ref: dict, lab: dict) -> tuple:
 def _licences(label: dict) -> list:
     """The label's licence section, from its `licences` field (built from the build records)."""
     lic = label["licences"]
+    if lic.get("declared_by_submitter"):
+        lines = [
+            f"Brokkr's code, which made this label: {lic['brokkr_code']}.",
+            f"The model's code: {lic['model_code']} ({DECLARED}).",
+            f"The model's weights: {lic['model_weights']} ({DECLARED}).",
+            f"The images: {lic['images']} ({DECLARED}).",
+        ]
+        if (label.get("declarations") or {}).get("images_not_used_to_train_the_model"):
+            lines.append(f"The images were not used to train the model ({DECLARED}).")
+        return lines + [USER_LABEL_LICENCE]
     lines = [
         f"Brokkr's code, which made this label: {lic['brokkr_code']}.",
         f"The model's code: {lic['model_code']}.",
@@ -519,6 +598,7 @@ def _sections(label: dict) -> dict:
             else "User-submitted label — UNVERIFIED"
         ),
         "do_not_use": _do_not_use(lab),
+        "warnings": [warning_text(w) for w in label["summary"].get("warnings", [])],
     }
     out["summary"] = _summary(label, ix)
     ds = {d["dataset_id"]: d for d in label["datasets"]}
@@ -534,7 +614,9 @@ def _sections(label: dict) -> dict:
     out["tested"] = [
         f"Images: {test['name']}, split {test['split']}, {fmt(test['n_items'], 'int')} items; "
         f"licence: {test['licence']}",
-        f"Machine: {hw['cpu_model']}, {hw['os']} ({hw['kind']}); accuracy runs: {accuracy_runtimes or '—'}",
+        f"Machine: {hw['cpu_model']}, {hw['os']} ({hw['kind']}"
+        f"{', as stated by the submitter' if label['source']['kind'] != 'official' else ''}); "
+        f"accuracy runs: {accuracy_runtimes or '—'}",
         f"Intervals: {fmt(level, 'pct0')} bootstrap intervals over the same items (paired for differences).",
         f"Envelope: {rule['name']} ({rule['fixed_in']}); {rule['harm_definition']}. A condition is "
         f"harmful if "
@@ -545,7 +627,7 @@ def _sections(label: dict) -> dict:
         f"Shrinking cost is marked \"large shrinking cost\" when its whole interval is below "
         f"{fmt(rule['large_shrinking_cost_below'], 'pts0')} points, and \"not informative\" when FP32 top-1 "
         f"under that condition is below {fmt(rule['near_floor_fp32_top1_below'], 'pct0')}.",
-        f"Label made by {label['generated']['by']} at commit {label['generated']['commit'][:12]}; label "
+        f"Label made by {label['generated']['by']} at commit {commit_text(label['generated'])}; label "
         f"schema version {fmt(label['schema_version'], 'int')}; label data licence "
         f"{label['generated']['label_licence']}.",
     ]
@@ -556,6 +638,8 @@ def _sections(label: dict) -> dict:
             fmt(b["file"]["size_bytes"], "mb") + " MB",
             "usable"
             if b["status"] == "usable"
+            else f"FAILED: {b['failure']['check']}"
+            if b["failure"].get("value") is None  # a crash has no number (decision 10)
             else f"FAILED: {b['failure']['check']} ({fmt(b['failure']['value'], 'pct')}; line "
             f"{fmt(b['failure']['limit'], 'pct0')})",
         ]
@@ -622,12 +706,7 @@ def _sections(label: dict) -> dict:
             "INT8 build setting not at its default: skip_symbolic_shape (ONNX Runtime's symbolic shape "
             "inference was skipped in the preparation step; Brokkr does this only where that step crashes)."
         )
-    s = label["checks"]["fp32_sanity"]
-    details.append(
-        f"FP32 sanity check: clean top-1 {fmt(s['measured'], 'pct')} vs published "
-        f"{fmt(s['published'], 'pct')} "
-        f"({s['published_source']}): {'PASS' if s['pass'] else 'FAIL'}."
-    )
+    details.append(f"FP32 sanity check: {sanity_text(label['checks']['fp32_sanity'])}.")
     out["details"] = details
     out["limits"] = label["limits"]
     out["licences"] = _licences(label)
@@ -681,6 +760,7 @@ def to_markdown(label: dict) -> str:
         parts.append(f"**{s['do_not_use']}**")
     parts += [
         f"**{s['badge']}**",
+        *(["## Warnings", "\n".join(f"- {line}" for line in s["warnings"])] if s["warnings"] else []),
         "## Summary",
         "\n".join(f"{'  ' * indent}- **{title}**{rest}" for indent, _, title, rest in s["summary"]),
         TERMS_NOTE,
@@ -699,7 +779,7 @@ def to_markdown(label: dict) -> str:
         "## Details",
         "\n".join(f"- {line}" for line in s["details"]),
         "## What the words mean",
-        "\n".join(f"- **{term}**: {text}" for term, text in TERMS.items()),
+        "\n".join(f"- **{term}**: {text}" for term, text in terms(label).items()),
         "## Limits",
         "\n".join(f"- {line}" for line in s["limits"]),
         "## Licences",
@@ -771,6 +851,7 @@ def to_html(label: dict) -> str:
         body.append(f'<p class="warning">{html.escape(s["do_not_use"])}</p>')
     body += [
         f'<p><span class="badge{" unverified" if unverified else ""}">{html.escape(s["badge"])}</span></p>',
+        *(["<h2>Warnings</h2>", items(s["warnings"])] if s["warnings"] else []),
         "<h2>Summary</h2>",
         f"<ul>{summary}</ul>",
         "<p><small>Hover over a dotted word for a plain explanation; all of them are listed under "
@@ -791,7 +872,7 @@ def to_html(label: dict) -> str:
         items(s["details"]),
         "<h2>What the words mean</h2>",
         "<dl>"
-        + "".join(f"<dt>{html.escape(t)}</dt><dd>{html.escape(x)}</dd>" for t, x in TERMS.items())
+        + "".join(f"<dt>{html.escape(t)}</dt><dd>{html.escape(x)}</dd>" for t, x in terms(label).items())
         + "</dl>",
         "<h2>Limits</h2>",
         items(s["limits"]),

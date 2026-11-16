@@ -4,7 +4,7 @@ Everything here is made up for the tests; nothing is a result.
 """
 
 import pytest
-from user_made_up import settings, tiny_model
+from user_made_up import SIZE, settings, tiny_model
 
 from brokkr_edge import user_settings
 from brokkr_edge.user_settings import UserInputError, check_settings, load_settings
@@ -67,7 +67,7 @@ def test_model_files_must_exist(base):
 
 
 @pytest.mark.parametrize("change, words", [
-    ({"crop": 9}, "crop cannot be larger"),
+    ({"crop": SIZE + 1}, "crop cannot be larger"),
     ({"interpolation": "lanczos"}, "interpolation must be"),
     ({"std": [0.5, 0.0, 0.5]}, "every std must be above zero"),
     ({"mean": [0.5, 0.5]}, "mean must be three numbers"),
