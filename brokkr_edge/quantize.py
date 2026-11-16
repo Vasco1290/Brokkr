@@ -99,7 +99,7 @@ class ImageBatches(CalibrationDataReader):
 def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
             group_batches: int | None = None, unrounded_output_ops: list | None = None,
             skip_symbolic_shape: bool = False, keep_float_outputs: list | None = None,
-            report: dict | None = None) -> Path:
+            report: dict | None = None, input_name: str = "images") -> Path:
     """Static INT8 quantization, using `calibration_batches` (arrays of shape (N, 3, H, W)).
 
     method: a key of INT8_METHODS.
@@ -117,6 +117,8 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
         the prepared model that produce them are passed to onnxruntime as nodes_to_exclude (SE1,
         brokkr_edge.se_float). Every name must be found, on a named node, or the build stops.
     report: if given, filled with what was done ("nodes_kept_float": the excluded node names).
+    input_name: the model's input name. The study's models all call it "images" (the default, so every study
+        call is unchanged); a user's model may name it anything (step 3, brokkr_edge.user_build).
     """
     out_path = Path(out_path)
     prepared = out_path.with_name(out_path.stem + "_prep.onnx")
@@ -143,7 +145,7 @@ def to_int8(fp32_path, out_path, calibration_batches, method: str = "minmax",
     quantize_static(
         str(prepared),
         str(out_path),
-        ImageBatches(calibration_batches),
+        ImageBatches(calibration_batches, input_name),
         quant_format=QuantFormat.QDQ,
         per_channel=True,
         weight_type=QuantType.QInt8,

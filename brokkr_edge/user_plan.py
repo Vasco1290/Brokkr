@@ -259,6 +259,54 @@ def _check(settings_path: Path, images: Path, calib_images: Path | None, log) ->
     }
 
 
+def rebuild_parts(plan: dict, images, calib_images=None) -> dict:
+    """Each part's images, remade from the folders by the plan's fixed seeds (the run plan names no file).
+
+    Returns {part: [{"path", "sha256", "label"}, ...] in canonical order}; the INT8 calibration part is None
+    when the user supplied the shrunk build.
+    Stops (UserInputError) if a folder or a part differs from what the plan's fingerprints say: the folders
+    changed after the checks ran, so the plan no longer describes them.
+    """
+    images, split = Path(images), plan["split"]
+    entries = scan_labelled(images, plan["classes"], split["mode"])["images"]
+    problems = []
+    if fingerprint(entries) != split["labelled_folder"]["fingerprint"]:
+        problems.append("the images folder changed after the checks ran; run the checks again")
+    unlabelled = None
+    if split["calibration_folder"] and calib_images is None:
+        problems.append("the checks used --calib-images; give the same folder again")
+    elif calib_images is not None and not split["calibration_folder"]:
+        problems.append("the checks ran without --calib-images; leave it out")
+    elif calib_images is not None:
+        unlabelled = scan_unlabelled(calib_images)["images"]
+        if fingerprint(unlabelled) != split["calibration_folder"]["fingerprint"]:
+            problems.append("the --calib-images folder changed after the checks ran; run the checks again")
+    _stop_if(problems)
+
+    labels = [e["label"] for e in entries]
+    parts = plan_split(labels, [e["part"] for e in entries], len(plan["classes"]), split["mode"],
+                       len(unlabelled) if unlabelled is not None else None,
+                       brokkr_builds_int8="shrunk" not in plan["models"])
+    out = {}
+    for name in ("int8_calibration", "conformal_calibration", "test"):
+        if name == "int8_calibration":
+            int8 = parts[name]
+            if int8 is None:
+                out[name] = None
+                continue
+            from_calib = int8["source"] == "calib-images"
+            root, pool, indices = (Path(calib_images), unlabelled, int8["indices"]) if from_calib else (
+                images, entries, int8["indices"])
+        else:
+            root, pool, indices = images, entries, parts[name]
+        members = [pool[i] for i in indices]
+        if fingerprint(members) != split["parts"][name]["fingerprint"]:
+            problems.append(f"the {name} part differs from the plan's; run the checks again")
+        out[name] = [{"path": root / e["rel"], "sha256": e["sha256"], "label": e["label"]} for e in members]
+    _stop_if(problems)
+    return out
+
+
 def write_plan(plan: dict, out) -> Path:
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)

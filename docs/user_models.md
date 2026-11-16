@@ -864,3 +864,25 @@ label format as it is, with no change to it:
   not tested: their damage code needs pictures of at least 32 x 32 pixels, and this model's input is N x N."
 - Slice 1's run plan lists the conditions that will run, so the plan and the label agree; a test covers a model
   below 32 x 32 (5 conditions, the sentence) and one at 32 x 32 (13 conditions, no sentence).
+
+## Note added 17 November 2026: step B, piece 3, Brokkr's INT8 build of a user's model (built)
+
+Built as the plan of 10 October 2026 (section a) says; recorded here where the plan left a detail open.
+- **`quantize.to_int8`** gained `input_name` (default "images"). Shown unchanged for the study: building the
+  made-up model with and without `input_name="images"` gives byte-identical files (test 8). `quantize.py` is study
+  code, so `scripts/43` (H) runs before merging, at the end of the slice.
+- **The parts are remade from the folders** (`user_plan.rebuild_parts`), because the run plan names no file: the
+  folders are listed again, split by the same fixed seeds, and every part's fingerprint must equal the plan's, or
+  the run stops ("the images folder changed after the checks ran").
+- **The build** (`brokkr_edge/user_build.py`): the study's recipe on the user's preprocessing and input name;
+  128 images per group, fed 32 at a time (one at a time for a model with a fixed batch of 1). A crash anywhere
+  in `to_int8` (not only in its preparation step) is retried once with `skip_symbolic_shape`; each attempt is
+  recorded with the error's type only. Two crashes: status "failed", check "the INT8 build crashed, also with
+  skip_symbolic_shape", no number (decision 10).
+- **Build checks** on the first 256 conformal-calibration images, or all of them when the part holds fewer
+  (as slice 1 does for a supplied build): outputs usable (`check_outputs`, role "shrunk"), int8 weights per
+  channel, top-1 agreement with FP32 (below 20% failed; below 90% the label warns).
+- **Files in `--out`** (decision 13): `int8.onnx` and `int8_build.json` (recipe, attempts, the calibration part's
+  count, source and fingerprint, the file's SHA-256 and size, checks, status, failure; no image name, no path).
+  A run started again reuses a finished build when the FP32 file and the INT8 file are unchanged.
+- Not yet wired into `brokkr-edge test`: that is the plan's last piece ("the command's last steps").

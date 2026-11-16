@@ -43,8 +43,11 @@ Read this first.
   of 1925); `scripts/40` PASS (10 labels; every released `label.html` still renders byte for byte);
   `scripts/49 --check` PASS (12 checks, 17 pages, 61 files). `brokkr_edge/schema.py` is study code:
   `scripts/43` (H) before merging, at the end of the slice.
-- **Next in step B** (plan order): `to_int8`'s `input_name` and the user INT8 build; running the conditions;
-  the reliability numbers and the label (with the limits sentences, including the below-32 one); the command's
+- **Step B, piece 3 done (17 November 2026, not committed when written):** Brokkr's INT8 build of a user's
+  model (`brokkr_edge/user_build.py`; `quantize.to_int8` gained `input_name`; `user_plan.rebuild_parts`).
+  Details: `docs/user_models.md`, note of 17 November 2026 (piece 3). Tests: `tests/test_user_build.py` (12,
+  tests 7 and 8). Checks: ruff PASS; pytest 601 passed. Not yet wired into the command (the last piece).
+- **Next in step B** (plan order): running the conditions; the reliability numbers and the label (with the limits sentences, including the below-32 one); the command's
   last steps. Then all checks, `scripts/43` (H), and H's review.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
