@@ -407,7 +407,7 @@ def key_facts(label: dict) -> str:
     out.append(
         fact(
             "File size, INT8",
-            f'{f(lab["file"]["size_bytes"], "mb")} <span class="unit">MB</span>',
+            f'{f(lab["file"]["size_bytes"], "mb")} <span class="unit">MB</span>' if lab["file"] else "—",
             f"FP32: {f(ref['file']['size_bytes'], 'mb')} MB",
         )
     )
@@ -747,8 +747,9 @@ def provenance_section(label: dict) -> str:
             b["display_name"],
             [
                 td("Role", esc(b["role"])),
-                td("File size", f'<span class="mono">{f(b["file"]["size_bytes"], "mb")} MB</span>'),
-                td("SHA-256", f'<span class="mono">{b["file"]["sha256"][:12]}…</span>'),
+                td("File size", f'<span class="mono">{f(b["file"]["size_bytes"], "mb")} MB</span>'
+                   if b["file"] else "—"),
+                td("SHA-256", f'<span class="mono">{b["file"]["sha256"][:12]}…</span>' if b["file"] else "—"),
                 td("Status", esc(b["status"]), "v-failed" if b["status"] == "failed" else ""),
             ],
         )

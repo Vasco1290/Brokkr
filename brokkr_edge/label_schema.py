@@ -12,6 +12,7 @@ study labels (decision 1).
 
 import math
 import re
+from statistics import NormalDist
 
 SCHEMA_VERSION = 1
 SOURCE_KINDS = ("official", "user-submitted")
@@ -76,7 +77,7 @@ USER_SEED_SCHEME = "content-v1"
 USER_SPEED_REASON = "this version of brokkr-edge test does not measure speed"  # decision 8
 SUPPLIED = "supplied by the submitter"
 SPLIT_MODES = ("brokkr", "own")
-Z99 = 2.576  # brokkr_edge.user_checks: the expected-accuracy check's 99% half-width
+Z99 = NormalDist().inv_cdf(0.995)  # 2.5758...: as brokkr_edge.user_checks computes it, not rounded
 # Each warning kind and the fields it must hold (decision 9 added the fourth).
 WARNING_FIELDS = {
     "few images": ("part", "n_items", "recommended"),
@@ -178,7 +179,11 @@ def check_label(label: dict) -> list:
             problems.append(f"build {b.get('build_id')}: status must be one of {BUILD_STATUSES}")
         if (b.get("status") == "failed") != bool(b.get("failure")):
             problems.append(f"build {b.get('build_id')}: a failed build needs its failure, a usable one none")
-        if not (
+        no_file = (  # a user's INT8 build that crashed twice has no file (decision 10)
+            source.get("kind") == USER_KIND and b.get("status") == "failed" and b.get("file") is None
+            and (b.get("failure") or {}).get("value") is None
+        )
+        if not no_file and not (
             len(str((b.get("file") or {}).get("sha256", ""))) == 64
             and _finite((b.get("file") or {}).get("size_bytes"))
         ):

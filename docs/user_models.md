@@ -911,3 +911,28 @@ here where a detail was open.
 - **Two bugs found by the tests and fixed:** a fresh `--out` made the INT8 build fail (the folder did not exist
   yet); on Windows, a crash left the decoded-picture file open, so it could not be deleted and that error hid the
   first one.
+
+## Note added 17 November 2026: step B, piece 5, the reliability numbers and the user label (built)
+
+Built as the plan of 10 October 2026 (section b) and H's decisions of 10 October 2026 say
+(`brokkr_edge/user_label.py`); recorded here where a detail was open.
+- **Reliability numbers** (decision 2): the calls of `scripts/31`, unchanged: ECE (15 bins), E-AURC, and LAC
+  prediction sets for a 90% target with the threshold from the same build's clean conformal-calibration part;
+  each with a 1,000-resample bootstrap interval, seed 0. They are worked out when the label is made, from the
+  saved scores, and are not saved as separate records; every number names the score file it came from.
+- **Envelope, summary, derived numbers:** `brokkr_edge.label_build` and `brokkr_edge.label`, the study's code.
+- **Inputs:** only the files in `--out`: `run_plan.json` (must equal the run's plan), `int8_build.json`, and the
+  records, each checked by `check_record` and its score file by its checksum; the records must come from one
+  machine and hold the same images in every condition. Any failure stops the label (`LabelError`), and so does a
+  page number that is not a `label.json` number.
+- **Limits:** `general_limits` gained an `imagenet_c` switch (default on, so study labels are unchanged): off, the
+  two ImageNet-C sentences are left out (models below 32 x 32). Then one sentence per warning, D8's sentence for a
+  crop other than 224, the below-32 sentence, the approved random-condition sentence (only when a random
+  condition ran), and the four sentences of label note 8. Wording of the sentences not fixed elsewhere is in the
+  code.
+- **The random-condition sentence** reads `results/checks/seed_sensitivity.json`, as approved. **Gap for step 4:**
+  `results/` is not in git or in an installed package, so a user who installs brokkr-edge with pip does not have
+  that file; the label stops with a plain message until step 4 ships the figure with the package.
+- **A crashed INT8 build** (decision 10) has no file: `builds[].file` is null, its ID ends `#int8:no-file`; the
+  validator accepts that only on a user label whose failure has no number; the label page and the site show "—".
+- **Exact factor:** the validator now uses the exact 99% factor (2.5758...), as `user_checks` does, not 2.576.

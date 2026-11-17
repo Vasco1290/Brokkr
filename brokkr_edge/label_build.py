@@ -193,17 +193,26 @@ def envelope_rows(builds: dict, status: dict, damaged_ids: list, measurements: l
     return rows
 
 
-def general_limits(cpu_model: str, os_name: str, n_damaged: int, machine_sentence: str) -> list:
+def general_limits(cpu_model: str, os_name: str, n_damaged: int, machine_sentence: str,
+                   imagenet_c: bool = True) -> list:
     """The plain sentences every label carries, in order; machine_sentence says where accuracy was
-    measured."""
-    return [
+    measured. imagenet_c False: a user label of a model below 32 x 32, where those conditions were not
+    tested (H, 17 November 2026), so the sentences about them are left out."""
+    simulated = (
         "The damage is simulated (Brokkr's own and ImageNet-C corruptions); real fog, darkness or noise may "
-        "affect the model differently.",
+        "affect the model differently."
+        if imagenet_c
+        else "The damage is simulated (Brokkr's own corruptions); real fog, darkness or noise may affect the "
+        "model differently."
+    )
+    package = [
         "The ImageNet-C conditions were made on these test images with the imagecorruptions package "
         f"v{imagecorruptions_version()} (an extension of the ImageNet-C code), with a one-line fix so that "
         "fog runs on NumPy 2, tested pixel-identical to the unmodified package's fog. Fixed seeds and each "
         "model's own preprocessing were used, so the results are not directly comparable to the released "
         "ImageNet-C files or to published ImageNet-C results.",
+    ] if imagenet_c else []
+    return [simulated, *package] + [
         f"Measured on one machine: {cpu_model}, {os_name}.",
         f"With {n_damaged} conditions, an occasional result may cross a line by chance.",
         "Coverage is for prediction sets tuned on clean calibration images; under damage there is no "

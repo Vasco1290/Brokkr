@@ -83,12 +83,12 @@ def compare_row(path: str, label: dict) -> str:
     else:
         cov = summary["coverage_failed"]["count"]
         cells.append(sort_td("Uncertainty unreliable", f'<span class="mono">{f(cov, "int")}</span>', cov))
-    size = lab["file"]["size_bytes"]
+    size = lab["file"]["size_bytes"] if lab["file"] else None  # a crashed user build has no file
     cells.append(
         sort_td(
             "INT8 file size",
-            f'<span class="mono">{f(size, "mb")} MB</span>'
-            f'<span class="sub">FP32 {f(ref["file"]["size_bytes"], "mb")} MB</span>',
+            (f'<span class="mono">{f(size, "mb")} MB</span>' if size is not None else "—")
+            + f'<span class="sub">FP32 {f(ref["file"]["size_bytes"], "mb")} MB</span>',
             size,
         )
     )

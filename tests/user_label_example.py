@@ -9,6 +9,7 @@ import copy
 import json
 import math
 from pathlib import Path
+from statistics import NormalDist
 
 STUDY = Path("published/labels/mobilenet_v3_large/label.json")
 NAME = "made-up-colours"
@@ -17,7 +18,7 @@ SPEED_REASON = "this version of brokkr-edge test does not measure speed"
 
 def fp32_sanity(measured: float, stated: float, n_items: int, n_classes: int, dataset_id: str) -> dict:
     """The expected-accuracy check as a user label stores it (decision 5), worked out by the stated rule."""
-    half_width = 2.576 * math.sqrt(stated * (1 - stated) / n_items)
+    half_width = NormalDist().inv_cdf(0.995) * math.sqrt(stated * (1 - stated) / n_items)
     allowed = max(0.05, half_width)
     ci95 = [measured - 0.01, measured + 0.01]
     return {"measured": measured, "ci95": ci95, "n_items": n_items, "dataset_id": dataset_id,

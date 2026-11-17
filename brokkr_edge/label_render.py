@@ -635,7 +635,7 @@ def _sections(label: dict) -> dict:
         [
             b["role"],
             _build_name(b),
-            fmt(b["file"]["size_bytes"], "mb") + " MB",
+            fmt(b["file"]["size_bytes"], "mb") + " MB" if b["file"] else "— (no file: the build crashed)",
             "usable"
             if b["status"] == "usable"
             else f"FAILED: {b['failure']['check']}"

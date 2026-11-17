@@ -24,7 +24,8 @@ Read this first.
   scratch folder outside the repository; `scripts/48 published/labels <scratch>`: PASS, 10 labels, only
   `generated.commit` and `generated.date_utc` differ, 0 listed changes; `tests/test_published_labels.py` and
   `tests/test_label_build.py`: 8 passed. Ruff and the full pytest were run with step B's first test changes
-  present (below): ruff PASS, pytest 534 passed.
+  present (below): pytest 534 passed; ruff first failed on 7 long lines in those new test files, then PASS
+  once they were wrapped.
 - **H said to proceed with step B (17 November 2026).** Done so far: **the size test** (plan section c, test 5),
   `tests/test_user_damage_sizes.py`. It found that the ImageNet-C code refuses pictures below 32 x 32, so the
   made-up test model was raised from 8 x 8 to 32 x 32 (`tests/user_made_up.py`). **Open for H:** what a user
@@ -53,8 +54,19 @@ Read this first.
   fixed (fresh `--out` broke the INT8 build; Windows kept a crashed run's decoded file open). Details:
   `docs/user_models.md`, note of 17 November 2026 (piece 4). Tests: `tests/test_user_run.py` (12; plan tests 9,
   12, 14). Checks: ruff PASS; pytest 614 passed.
-- **Next in step B** (plan order): the reliability numbers and the label (with the limits sentences, including the below-32 one); the command's
-  last steps. Then all checks, `scripts/43` (H), and H's review.
+- **Step B, piece 5 done (17 November 2026, not committed when written):** the reliability numbers and the
+  user label (`brokkr_edge/user_label.py`; `general_limits` gained an `imagenet_c` switch, default unchanged; a
+  crashed build may have no file on a user label; the validator's exact 99% factor). End to end on the made-up
+  model: plan, INT8 build, 13 conditions, label passing `check_label` with every page number a label number.
+  Details: `docs/user_models.md`, note of 17 November 2026 (piece 5). Tests: `tests/test_user_label.py` (25;
+  plan tests 1-4, 6, 10, 11). Checks on the working tree: ruff PASS; pytest 639 passed; `scripts/22` PASS
+  (1925 of 1925); `scripts/40` PASS (10 labels); `scripts/49 --check` PASS (17 pages, 61 files). The remake of the
+  ten labels compared by `scripts/48` differs only in `generated.dirty` (made from uncommitted code): **to be run
+  again from the clean commit.** **Gap for step 4:** the random-condition sentence reads
+  `results/checks/seed_sensitivity.json`, which a pip install will not have.
+- **Next in step B** (plan order): the command's last steps (wiring checks, build, run and label into
+  `brokkr-edge test --config`; `--out` refusing a different run; no network for the whole command, test 13).
+  Then all checks, `scripts/43` (H), and H's review.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
   by H the same day; the tries budget is confirmed again after its milestone 3.

@@ -48,8 +48,10 @@ Where fix mode could matter, from the labels and Stage 4:
 - **MobileNetV3-Small's INT8 build is broken:** it matched FP32's first answer on 2.73% of 256 tuning
   images (README). Why is a parked question.
 - **Large shrinking costs under damage:** 6 of the 9 usable INT8 builds have at least one condition where
-  INT8 is far below FP32 (README, exploratory). EfficientNet-B0's extra gap at darkness (Brokkr) s5 is
-  −43.7 points (README figure, H21).
+  INT8 is far below FP32 (README, exploratory). EfficientNet-B0's shrinking cost at darkness (Brokkr) s5 is
+  −43.72 points against −4.78 on clean images, an extra gap of −38.94 points (its label,
+  `published/labels/efficientnet_b0/label.json`; corrected on 17 November 2026: this line first called −43.7 the
+  extra gap).
 - **Coverage lost to shrinking, held-out conditions** (computed on 17 November 2026 from the 9 usable
   labels; the 8 ImageNet-C conditions, leaving out cells where FP32 top-1 is below 10%): 58 cells; INT8
   coverage minus FP32 coverage ranges from −47.92 points (MobileNetV3-Large, contrast s5: FP32 60.55%,

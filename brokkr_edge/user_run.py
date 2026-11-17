@@ -42,6 +42,8 @@ from brokkr_edge.user_checks import as_logits, cropped, normalised
 from brokkr_edge.user_settings import UserInputError
 
 THREADS = 8  # decision 3: the study's setting, recorded on the label
+# The builds' names in record file names: FP32, Brokkr's own INT8 build, or one the submitter supplied.
+FP32, INT8_BROKKR, INT8_SUPPLIED = "fp32", "int8_percentile99.99", "int8_supplied"
 DECODED = ".brokkr-decoded-{part}.tmp.npy"  # a clearly temporary name (decision 13)
 SPARE_BYTES = 10**9  # free space kept beyond the decoded pictures
 SEED_SCHEME = "content-v1"
