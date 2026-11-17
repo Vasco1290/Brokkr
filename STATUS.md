@@ -61,8 +61,10 @@ Read this first.
   Details: `docs/user_models.md`, note of 17 November 2026 (piece 5). Tests: `tests/test_user_label.py` (25;
   plan tests 1-4, 6, 10, 11). Checks on the working tree: ruff PASS; pytest 639 passed; `scripts/22` PASS
   (1925 of 1925); `scripts/40` PASS (10 labels); `scripts/49 --check` PASS (17 pages, 61 files). The remake of the
-  ten labels compared by `scripts/48` differs only in `generated.dirty` (made from uncommitted code): **to be run
-  again from the clean commit.** **Gap for step 4:** the random-condition sentence reads
+  ten labels compared by `scripts/48` differed only in `generated.dirty` (made from uncommitted code). **Rerun
+  from the clean commit `8dc0ce0` (17 November 2026): `scripts/39` ok for all 10 (0 schema problems, 0
+  unexplained numbers); `scripts/48`: PASS, 10 labels, only `generated.commit` and `generated.date_utc` differ,
+  0 listed changes.** **Gap for step 4:** the random-condition sentence reads
   `results/checks/seed_sensitivity.json`, which a pip install will not have.
 - **Next in step B** (plan order): the command's last steps (wiring checks, build, run and label into
   `brokkr-edge test --config`; `--out` refusing a different run; no network for the whole command, test 13).
