@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references and step A done; step A's reproduction check PASS 28 of 28; step B next, after H's review of step A). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references, step A and step B's code done; next: H's `scripts/43` run and H's review of step B). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -11,7 +11,7 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (17 November 2026; step 3: H reviews step A, then step B)
+### Pick up here (17 November 2026; step 3: step B's code done; next H's `scripts/43` run and review)
 Read this first.
 - **Step A's reproduction check: PASS, 28 of 28** (run by H on 17 November 2026, on mains power, from the
   clean commit `2103353`, which holds step A `1bc3291` plus the fix-mode plan). `scripts/43_check_reproduction.py
@@ -47,7 +47,8 @@ Read this first.
 - **Step B, piece 3 done (17 November 2026, not committed when written):** Brokkr's INT8 build of a user's
   model (`brokkr_edge/user_build.py`; `quantize.to_int8` gained `input_name`; `user_plan.rebuild_parts`).
   Details: `docs/user_models.md`, note of 17 November 2026 (piece 3). Tests: `tests/test_user_build.py` (12,
-  tests 7 and 8). Checks: ruff PASS; pytest 601 passed. Not yet wired into the command (the last piece).
+  tests 7 and 8; 13 since piece 4 added one). Checks: ruff PASS; pytest 601 passed. Wired into the command in
+  piece 6.
 - **Step B, piece 4 done (17 November 2026, not committed when written):** running the conditions
   (`brokkr_edge/user_run.py`; the run plan lists its conditions; `user_checks.prepare` split in two). On the
   made-up model: 28 records (2 builds x 14 runs), all passing the record checker. Two bugs found by tests and
@@ -66,9 +67,17 @@ Read this first.
   unexplained numbers); `scripts/48`: PASS, 10 labels, only `generated.commit` and `generated.date_utc` differ,
   0 listed changes.** **Gap for step 4:** the random-condition sentence reads
   `results/checks/seed_sensitivity.json`, which a pip install will not have.
-- **Next in step B** (plan order): the command's last steps (wiring checks, build, run and label into
-  `brokkr-edge test --config`; `--out` refusing a different run; no network for the whole command, test 13).
-  Then all checks, `scripts/43` (H), and H's review.
+- **Step B, piece 6 done (17 November 2026, not committed when written): step B's code is complete.**
+  `brokkr-edge test --config ... --out <folder>` runs every step and writes the label
+  (`brokkr_edge/user_command.py`, `cli.py`); `--out` holding a different run is refused, the same run is carried
+  on (decision 13); the network is blocked for the whole command (test 13); exit codes 0, 2, 3. Details:
+  `docs/user_models.md`, note of 17 November 2026 (piece 6). Tests: `tests/test_user_command.py` (7). Checks on
+  the working tree: ruff PASS; pytest 646 passed; `scripts/22` PASS (1925 of 1925); `scripts/40` PASS (10
+  labels); `scripts/49 --check` PASS (17 pages, 61 files).
+- **Next (step B's end, plan order):** H runs `scripts/43` from the clean commit (study code changed in step B:
+  `quantize.py`, `schema.py`, `label_build.py`, `label_render.py`, `label_schema.py`, `cli.py`); output outside
+  `results/`, e.g. `data/checks/reproduction_<date>`. Then H's review of step B. Then the cross-check folder
+  script, the cross-check (H), slice 2 (EuroSAT) and slice 3.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
   by H the same day; the tries budget is confirmed again after its milestone 3.

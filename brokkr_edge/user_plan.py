@@ -16,12 +16,13 @@ finds problems (raising UserInputError with every problem of that stage):
 While it runs: Python-level network connections blocked and counted; ONNX Runtime telemetry switched off
 (brokkr_edge.no_network; the wording is H's, 7 October 2026).
 The run plan names no image file and no absolute path: only counts, class names and fingerprints (the split
-is remade from the folder by its fixed seeds, and the fingerprints show it is the same folder). Running the
-damage conditions and making the label come in the next slice.
+is remade from the folder by its fixed seeds, and the fingerprints show it is the same folder: see
+rebuild_parts). The INT8 build, the conditions and the label follow (brokkr_edge.user_command).
 """
 
 import datetime
 import json
+from hashlib import sha256
 from pathlib import Path
 
 import numpy as np
@@ -316,6 +317,30 @@ def rebuild_parts(plan: dict, images, calib_images=None) -> dict:
         out[name] = [{"path": root / e["rel"], "sha256": e["sha256"], "label": e["label"]} for e in members]
     _stop_if(problems)
     return out
+
+
+VOLATILE = ("made_utc", "network")  # differ between two runs of the same inputs
+
+
+def plan_fingerprint(plan: dict) -> str:
+    """SHA-256 of the plan without its time and network counts: equal for two runs of the same inputs."""
+    stable = {k: v for k, v in plan.items() if k not in VOLATILE}
+    return sha256(json.dumps(stable, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def same_run_problems(plan: dict, out) -> list:
+    """Decision 13: --out may hold this run (it is carried on), never a different one."""
+    path = Path(out) / "run_plan.json"
+    if not path.is_file():
+        return []
+    try:
+        old = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        old = {}
+    if plan_fingerprint(old) != plan_fingerprint(plan):
+        return [f"--out already holds a different run (its run_plan.json differs from these inputs'): use an "
+                f"empty folder, or the same inputs to carry that run on ({path})"]
+    return []
 
 
 def write_plan(plan: dict, out) -> Path:

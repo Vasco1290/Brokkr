@@ -936,3 +936,20 @@ Built as the plan of 10 October 2026 (section b) and H's decisions of 10 October
 - **A crashed INT8 build** (decision 10) has no file: `builds[].file` is null, its ID ends `#int8:no-file`; the
   validator accepts that only on a user label whose failure has no number; the label page and the site show "—".
 - **Exact factor:** the validator now uses the exact 99% factor (2.5758...), as `user_checks` does, not 2.576.
+
+## Note added 17 November 2026: step B, piece 6, the command from start to label (built)
+
+`brokkr-edge test --config <settings> --images <folder> [--calib-images <folder>] --out <folder>` now runs every
+step (`brokkr_edge/user_command.py`): the checks and the run plan; `--out` checked for another run; the parts
+remade from the folders; Brokkr's INT8 build unless one was supplied; the conditions; the label.
+- **Decision 13, another run in `--out`:** refused when `--out/run_plan.json` differs from the new plan in
+  anything but its time and network counts (`user_plan.plan_fingerprint`); the same inputs carry the run on,
+  reusing the INT8 build and every complete record.
+- **Test 13, no network:** the whole command runs inside one `no_network` block (the checks' own block nests
+  inside it), with ONNX Runtime telemetry switched off; an attempt anywhere, even one some code catches and
+  hides, stops the command.
+- **Exit codes:** 0 a label was made; 2 the inputs cannot be used (nothing past the checks runs); 3 the run's files
+  could not make a valid label.
+- **The last line** says what the label holds: FP32 and INT8 under N damaged conditions, or, when the INT8
+  build (Brokkr's or supplied) failed, FP32 numbers only and "INT8 build failed".
+- `tests/test_user_plan.py`'s command test now expects a label instead of "not built yet".

@@ -3,7 +3,7 @@
     brokkr-edge test --model mobilenet_v3_large
     brokkr-edge test --model mobilenet_v3_large --split tuning --limit 64 --out <folder>   (a dry run)
     brokkr-edge test --config my_model.json --images <folder> [--calib-images <folder>] --out <folder>
-        (a user's own model, docs/user_models.md; today it runs the checks and writes the run plan only)
+        (a user's own model, docs/user_models.md: the checks, the INT8 build, the conditions and the label)
 
 Also runnable without installing the command: python -m brokkr_edge.cli test ...
 """
@@ -49,38 +49,51 @@ def main(argv=None) -> int:
 
 
 def test_own_model(parser, args) -> int:
-    """Check a user's model and images and write the run plan; exit code 2 if the inputs cannot be used."""
+    """Test a user's model and write its label in --out. Exit code 2: the inputs cannot be used; 3: the run's
+    files could not make a valid label."""
     if not (args.images and args.out):
         parser.error("--config needs --images and --out")
     if args.split != "test" or args.limit is not None:
         parser.error("--split and --limit go with --model")
-    from brokkr_edge.user_plan import check_out_folder, check_user_inputs, write_plan
+    from brokkr_edge.user_command import run_user_test
+    from brokkr_edge.user_label import LabelError
+    from brokkr_edge.user_plan import NETWORK_WORDING, check_out_folder
     from brokkr_edge.user_settings import UserInputError
 
     try:
         problems = check_out_folder(args.out)
         if problems:
             raise UserInputError(problems)
-        plan = check_user_inputs(args.config, args.images, args.calib_images)
+        result = run_user_test(args.config, args.images, args.calib_images, args.out)
     except UserInputError as e:
         print("Stopped: your inputs cannot be used yet. Every problem found:", file=sys.stderr)
         for problem in e.problems:
             print(f"  - {problem}", file=sys.stderr)
         return 2
-    path = write_plan(plan, args.out)
-    for w in plan["warnings"]:
+    except LabelError as e:
+        print(f"Stopped: the label could not be made: {e}", file=sys.stderr)
+        return 3
+    for w in result["plan"]["warnings"]:
         print(f"warning: {w}")
-    network = plan["network"]
-    print(f"network: {network['what']} ({network['connection_attempts']} connection attempts)")
-    print(f"Run plan: {path}")
-    print("Running the damage conditions and making the label are not built yet (step 3, next slice); "
-          "nothing else was run.")
-    print(final_line(plan))
+    print(f"network: {NETWORK_WORDING} ({result['network_attempts']} connection attempts)")
+    print(f"Label: {result['paths'][2]} (label.json and label.md beside it)")
+    print(final_line(result["plan"], result["label"]))
     return 0
 
 
-def final_line(plan: dict) -> str:
-    """The last line: what the checks mean for the label (docs/user_models.md, note of 7 October 2026)."""
+def final_line(plan: dict, label: dict | None = None) -> str:
+    """The last line: what the checks mean for the label (docs/user_models.md, note of 7 October 2026), and,
+    once the label is made, what it holds."""
+    if label is not None:
+        lab = next(b for b in label["builds"] if b["role"] == "labelled")
+        tested = label["summary"]["tested_conditions"]
+        if lab["status"] == "failed":
+            who = "the supplied INT8 build" if "shrunk" in plan["models"] else "Brokkr's INT8 build"
+            return (f"Label made (user-submitted, UNVERIFIED), but {who} FAILED "
+                    f"({lab['failure']['check']}): FP32 numbers only for {tested} damaged conditions; the "
+                    f"INT8 rows say \"INT8 build failed\".")
+        return (f"Label made (user-submitted, UNVERIFIED): FP32 and INT8 under {tested} damaged conditions "
+                f"and clean images.")
     shrunk = plan["models"].get("shrunk")
     if shrunk and shrunk["status"] == "failed":
         a = plan["checks"]["agreement_with_fp32"]

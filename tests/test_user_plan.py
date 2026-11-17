@@ -342,10 +342,11 @@ def command(*args):
 
 
 def test_the_command_checks_and_writes_the_run_plan(made, tmp_path):
+    """Since step B (17 November 2026) the command goes on to the label: tests/test_user_command.py."""
     out = tmp_path / "out"
     ok = command("--config", write_settings(made, **shrunk()), "--images", made / "images", "--out", out)
     assert ok.returncode == 0, ok.stderr
-    assert ok.stdout.splitlines()[-1] == "Checks PASS." and "not built yet" in ok.stdout
+    assert ok.stdout.splitlines()[-1].startswith("Label made (user-submitted, UNVERIFIED): FP32 and INT8")
     assert f"network: {NETWORK_WORDING} (0 connection attempts)" in ok.stdout
     failed = command("--config", write_settings(made, **shrunk("int8_rolled.onnx")),
                      "--images", made / "images", "--out", tmp_path / "failed")
