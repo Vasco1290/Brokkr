@@ -131,6 +131,12 @@ def test_a_resumed_run_reuses_the_build(made, plan, parts, built, monkeypatch):
     assert build(made, plan, parts, out) == record
 
 
+def test_the_build_makes_its_out_folder(made, plan, parts, tmp_path):
+    """Found 17 November 2026: a fresh --out made both attempts crash, as the folder did not exist yet."""
+    record = build(made, plan, parts, tmp_path / "new" / "out")
+    assert record["status"] == "usable" and record["attempts"][0]["error"] is None
+
+
 def test_a_crash_is_retried_with_skip_symbolic_shape(made, plan, parts, tmp_path, monkeypatch):
     real = user_build.to_int8
 

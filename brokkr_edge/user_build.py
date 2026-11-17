@@ -120,6 +120,7 @@ def build_int8(plan: dict, fp32_path, parts: dict, out, log=print) -> dict:
     parts: brokkr_edge.user_plan.rebuild_parts(plan, ...), the images of each part.
     """
     out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)  # before the build: to_int8 writes its files into it
     fp32_sha256 = plan["models"]["fp32"]["sha256"]
     record_path, int8_file = out / RECORD_FILE, out / INT8_FILE
     found = _reusable(record_path, fp32_sha256)
@@ -150,7 +151,6 @@ def build_int8(plan: dict, fp32_path, parts: dict, out, log=print) -> dict:
         value = checks["agreement_with_fp32"]["agreement"]
         log(f"INT8 build: {record['status']}; top-1 agreement with FP32 {value:.1%} on {len(sample)} images"
             + (" (made with skip_symbolic_shape after a crash)" if skip else ""))
-    out.mkdir(parents=True, exist_ok=True)
     with written_atomically(record_path) as tmp:
         tmp.write_text(json.dumps(record, indent=2), encoding="utf-8", newline="\n")
     return record

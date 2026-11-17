@@ -31,6 +31,7 @@ from brokkr_edge import __version__
 from brokkr_edge.benchmark import make_session
 from brokkr_edge.no_network import no_network
 from brokkr_edge.results import sha256_of, written_atomically
+from brokkr_edge.test_run import CONDITIONS
 from brokkr_edge.user_checks import (
     BATCH,
     CHECK_THREADS,
@@ -63,6 +64,15 @@ REFERENCES_TO_STOP = 20  # fewer usable reference predictions than this only war
 REPOSITORY = Path(__file__).resolve().parent.parent
 PROTECTED = ("published/labels", "labels", "results")  # released labels, working study labels, study records
 NETWORK_WORDING = "Python-level network connections blocked and counted; ONNX Runtime telemetry switched off"
+IMAGENET_C_SMALLEST = 32  # the ImageNet-C code refuses smaller pictures (tests/test_user_damage_sizes.py)
+
+
+def conditions_for(crop: int) -> list:
+    """The conditions a user run applies: the study's 13; below 32 x 32, clean and Brokkr's four, and the 8
+    ImageNet-C conditions are not tested (H, 17 November 2026, option b; docs/user_models.md)."""
+    if crop >= IMAGENET_C_SMALLEST:
+        return [dict(c) for c in CONDITIONS]
+    return [dict(c) for c in CONDITIONS if c["suite"] in (None, "brokkr")]
 
 
 def check_out_folder(out) -> list:
@@ -234,6 +244,7 @@ def _check(settings_path: Path, images: Path, calib_images: Path | None, log) ->
                        f"made by Brokkr: Percentile 99.99, {INT8_CALIBRATION_IMAGES} calibration images"),
         "classes": classes,
         "preprocessing": prep,
+        "conditions": conditions_for(prep["crop"]),
         "split": {
             "mode": settings["split"], "seeds": SEEDS, "floors": FLOORS, "recommended": RECOMMENDED,
             "caps": CAPS,

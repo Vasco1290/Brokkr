@@ -129,8 +129,18 @@ def check_pair(fp32: dict, shrunk: dict, fp32_sha256: str, shrunk_sha256: str) -
 def prepare(path, prep: dict) -> np.ndarray:
     """One image as the model takes it: resize the shorter side, centre crop, scale to 0-1, subtract the mean,
     divide by the std (RGB order), then reorder channels and dimensions as stated. Photo-rotation tags are not
-    applied (docs/user_models.md, section 3)."""
-    pixels = resize_and_crop(open_image(path), prep["resize"], prep["crop"], prep["interpolation"])
+    applied (docs/user_models.md, section 3). Two halves, so the damage can go in between
+    (brokkr_edge.user_run): cropped() gives the uint8 picture, normalised() the model's input."""
+    return normalised(cropped(path, prep), prep)
+
+
+def cropped(path, prep: dict) -> np.ndarray:
+    """The image resized and centre-cropped: uint8, (crop, crop, 3), RGB."""
+    return resize_and_crop(open_image(path), prep["resize"], prep["crop"], prep["interpolation"])
+
+
+def normalised(pixels: np.ndarray, prep: dict) -> np.ndarray:
+    """A uint8 RGB picture as the model takes it: mean, std, channel order and layout as stated."""
     x = (pixels.astype(np.float32) / 255.0 - np.asarray(prep["mean"], np.float32)) / np.asarray(prep["std"],
                                                                                                 np.float32)
     if prep["channel_order"] == "BGR":

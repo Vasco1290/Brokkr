@@ -886,3 +886,28 @@ Built as the plan of 10 October 2026 (section a) says; recorded here where the p
   count, source and fingerprint, the file's SHA-256 and size, checks, status, failure; no image name, no path).
   A run started again reuses a finished build when the FP32 file and the INT8 file are unchanged.
 - Not yet wired into `brokkr-edge test`: that is the plan's last piece ("the command's last steps").
+
+## Note added 17 November 2026: step B, piece 4, running the conditions (built)
+
+Built as the plan of 10 October 2026 (section a) and H's decisions of 10 October 2026 (3, 11, 13) say; recorded
+here where a detail was open.
+- **The run plan lists its conditions** (`user_plan.conditions_for`): the study's 13, or, for a crop below 32,
+  clean and Brokkr's four (H's option (b) of 17 November 2026).
+- **`user_checks.prepare` is split into its two halves**, `cropped` (decode, resize, centre crop) and
+  `normalised` (mean, std, channel order, layout); `prepare` calls both, so slice 1 is unchanged.
+- **The run** (`brokkr_edge/user_run.py`): the clean conformal-calibration part, then the test part under each
+  condition; each build on the same pictures; 8 threads, spinning off; batches of 32 (1 for a fixed batch of 1);
+  content-v1 seeds; probabilities saved as logits.
+- **Before anything runs:** the ImageNet-C packages must be importable (else the run stops with the install
+  command, as section 4 says), and `--out` must have room for the decoded pictures plus 1 GB.
+- **The decoded pictures** (decision 11): one memory-mapped file per part in `--out`, named
+  `.brokkr-decoded-<part>.tmp.npy`, closed and deleted when the part's runs end, also after a crash; any leftover is
+  deleted when the next run starts. They are deleted when the runs end rather than when the label is written,
+  because the label needs only the saved scores; so they never sit beside the label files.
+- **Records** in `--out/records/`: `<build>_<part>_<suite>_<damage>_s<severity>.json` and its `.npz` (logits,
+  labels, positions within the part); source "user-submitted", the device kind as stated, the user's dataset
+  `user/<name>`, the images licence, `derived_from` the build's SHA-256. No image name and no path. A complete record
+  is not run again.
+- **Two bugs found by the tests and fixed:** a fresh `--out` made the INT8 build fail (the folder did not exist
+  yet); on Windows, a crash left the decoded-picture file open, so it could not be deleted and that error hid the
+  first one.

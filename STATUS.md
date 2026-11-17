@@ -47,7 +47,13 @@ Read this first.
   model (`brokkr_edge/user_build.py`; `quantize.to_int8` gained `input_name`; `user_plan.rebuild_parts`).
   Details: `docs/user_models.md`, note of 17 November 2026 (piece 3). Tests: `tests/test_user_build.py` (12,
   tests 7 and 8). Checks: ruff PASS; pytest 601 passed. Not yet wired into the command (the last piece).
-- **Next in step B** (plan order): running the conditions; the reliability numbers and the label (with the limits sentences, including the below-32 one); the command's
+- **Step B, piece 4 done (17 November 2026, not committed when written):** running the conditions
+  (`brokkr_edge/user_run.py`; the run plan lists its conditions; `user_checks.prepare` split in two). On the
+  made-up model: 28 records (2 builds x 14 runs), all passing the record checker. Two bugs found by tests and
+  fixed (fresh `--out` broke the INT8 build; Windows kept a crashed run's decoded file open). Details:
+  `docs/user_models.md`, note of 17 November 2026 (piece 4). Tests: `tests/test_user_run.py` (12; plan tests 9,
+  12, 14). Checks: ruff PASS; pytest 614 passed.
+- **Next in step B** (plan order): the reliability numbers and the label (with the limits sentences, including the below-32 one); the command's
   last steps. Then all checks, `scripts/43` (H), and H's review.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
