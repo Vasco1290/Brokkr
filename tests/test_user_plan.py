@@ -8,8 +8,6 @@ tests only: no number here is a result.
 import json
 import shutil
 import socket
-import subprocess
-import sys
 
 import numpy as np
 import pytest
@@ -18,6 +16,7 @@ from user_made_up import (
     ROLLED,
     SIZE,
     TWO_THIRDS,
+    command,
     quantized,
     settings,
     tiny_model,
@@ -334,11 +333,6 @@ def test_out_folder_inside_released_or_study_folders_is_refused(tmp_path):
     for inside in ("published/labels/x", "labels/x", "results/x"):
         assert check_out_folder(REPOSITORY / inside)
     assert check_out_folder(tmp_path / "out") == []
-
-
-def command(*args):
-    return subprocess.run([sys.executable, "-m", "brokkr_edge.cli", "test", *map(str, args)],
-                          capture_output=True, text=True, cwd=REPOSITORY)
 
 
 def test_the_command_checks_and_writes_the_run_plan(made, tmp_path):

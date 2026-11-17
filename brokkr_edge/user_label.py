@@ -103,12 +103,18 @@ def reliability(logits, labels, q: float) -> dict:
 # ---- the sentences ----
 
 
-def random_condition_sentence(path=SEED_SENSITIVITY) -> str:
+def random_condition_sentence(path=None) -> str:
     """H's approved sentence (note of 10 October 2026), every number read from the seed-sensitivity record:
-    the largest change in points, with one decimal, rounded up; the model; the image count."""
-    path = Path(path)
+    the largest change in points, with one decimal, rounded up; the model; the image count.
+
+    path: the record; None means SEED_SENSITIVITY, read when called (so a test can point it elsewhere)."""
+    path = Path(path or SEED_SENSITIVITY)
     if not path.is_file():
-        raise LabelError(f"the random-condition limit needs Brokkr's record {path.name} (results/checks/)")
+        raise LabelError(
+            "the label's sentence on random damage (fog and noise) needs Brokkr's record "
+            "results/checks/seed_sensitivity.json, which this copy of Brokkr does not have: it is not yet "
+            "shipped with the code"
+        )
     record = json.loads(path.read_text(encoding="utf-8"))
     largest = max(abs(c["difference"]) for c in record["raw"]["cells"]) * 100
     figure = math.ceil(round(largest * 10, 6)) / 10  # rounded up, never down; round() drops float dust
@@ -146,6 +152,20 @@ def warning_limit(w: dict) -> str:
     )
 
 
+def random_damage(conditions: list) -> bool:
+    """Whether any of these conditions uses a random pattern (fog or noise)."""
+    return any((c["suite"], c["corruption"]) in RANDOM_DAMAGE for c in conditions)
+
+
+def check_label_sources(plan: dict, seed_sensitivity=None) -> None:
+    """Stop before anything runs if the label could not be made at the end: the run plan's conditions
+    include random damage and Brokkr's seed-sensitivity record is missing or unreadable (raises
+    LabelError). The command calls this right after the checks, so the missing file costs seconds, not the
+    whole run."""
+    if random_damage(plan["conditions"]):
+        random_condition_sentence(seed_sensitivity)
+
+
 def user_limits(plan: dict, hw: dict, warnings: list, conditions: list, seed_sensitivity) -> list:
     """The study's general sentences (with decision 6's machine sentence), then the user ones that apply."""
     crop = plan["preprocessing"]["crop"]
@@ -163,7 +183,7 @@ def user_limits(plan: dict, hw: dict, warnings: list, conditions: list, seed_sen
             f"The 8 ImageNet-C conditions were not tested: their damage code needs pictures of at "
             f"least 32 x 32 pixels, and this model's input is {crop} x {crop}."
         )
-    if any((c["suite"], c["corruption"]) in RANDOM_DAMAGE for c in conditions):
+    if random_damage(conditions):
         limits.append(random_condition_sentence(seed_sensitivity))
     return limits + [
         "The licences, and the declaration that the images were not used to train the model, are the "
@@ -179,8 +199,9 @@ def user_limits(plan: dict, hw: dict, warnings: list, conditions: list, seed_sen
 # ---- the label ----
 
 
-def make_label(plan: dict, out, seed_sensitivity=SEED_SENSITIVITY) -> dict:
-    """The label of the run in `out` (run_plan.json, int8_build.json when Brokkr built INT8, records/)."""
+def make_label(plan: dict, out, seed_sensitivity=None) -> dict:
+    """The label of the run in `out` (run_plan.json, int8_build.json when Brokkr built INT8, records/).
+    seed_sensitivity: as for random_condition_sentence."""
     out = Path(out)
     used = {}  # path in --out -> (SHA-256, what checked it)
 

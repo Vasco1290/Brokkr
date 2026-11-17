@@ -43,6 +43,19 @@ else is built on its measurements.
    Brokkr's own measurements without that flag.
 8. Every model and dataset used or listed has its licence recorded. No licence recorded = not used.
 
+## User experience rule (H, 17 November 2026: the main priority)
+
+* Brokkr exists to make the user's work easy: a procedure that normally takes a long time should become short.
+  A user arriving at the platform must not be overwhelmed, and the platform carries no unnecessary or
+  complicated extras.
+* Every user-facing part (website, install, settings, images needed, waiting time, the label, messages) is
+  kept smooth and simple. Before adding a user-facing option, field, check, page or file, ask whether a user
+  needs it; if not, leave it out or keep it inside.
+* Rigour stays, but inside: the hard rules and measurement rules are unchanged, and are shown in plain words
+  first, with the detail available but not in the way. Where a hard rule costs the user effort (e.g. rule 8,
+  licences), keep the rule and make that step as easy as possible.
+* At the end of each task, suggest what would make the user's path shorter (rule 5: suggested, not built).
+
 ## Measurement rules
 
 * Speed: fix the thread count, warm up (>=20 runs), then time (>=100 runs). Report p50/p95/p99, not just

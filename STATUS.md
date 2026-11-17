@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references, step A and step B's code done, step B's `scripts/43` PASS; next: H's review of step B). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references, step A and step B's code done, step B's `scripts/43` PASS; next: the cross-check, then step 4, with the EuroSAT model after step 4 (H, 17 November 2026)). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -11,8 +11,18 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (17 November 2026; step 3: step B's code done and `scripts/43` PASS; next H's review)
+### Pick up here (17 November 2026; step 3: step B done; next the cross-check folder script, then step 4)
 Read this first.
+- **Fixed during H's review (17 November 2026, not committed when written): a missing seed record now stops a
+  user run at the start, not after it.** Every user label reads `results/checks/seed_sensitivity.json`, and
+  `results/` is gitignored, so **a fresh clone (not only a pip install, as the gap below first said) lacks
+  it**: the command ran every step, then stopped at the label with exit code 3. On a fresh clone of `43b39e9`
+  the user-path tests gave 20 failed, 5 errors, 32 passed. Now `user_label.check_label_sources` stops the run
+  right after the checks (exit code 3, nothing written), and every test uses a made-up stand-in record
+  (`tests/conftest.py`). Same fresh clone with the fix: 59 passed, 1 skipped (the test that reads the real
+  record). This copy: ruff PASS; pytest 649 passed; `scripts/22` PASS (1925 of 1925). No study code changed
+  (`user_label.py`, `user_command.py` and tests only), so no new `scripts/43`. Details: `docs/user_models.md`,
+  note of 17 November 2026 (missing seed record). Shipping the figure with the package is still step 4's.
 - **Step B's reproduction check: PASS, 28 of 28** (run by H on 17 November 2026, on mains power, from the
   clean commit `fac6da2`, which holds all of step B's code). `scripts/43_check_reproduction.py --out
   data/checks/reproduction_2026-11-17b`: INT8 repeatable (26 of 26 dry-run score files identical in two runs);
@@ -83,8 +93,15 @@ Read this first.
   `docs/user_models.md`, note of 17 November 2026 (piece 6). Tests: `tests/test_user_command.py` (7). Checks on
   the working tree: ruff PASS; pytest 646 passed; `scripts/22` PASS (1925 of 1925); `scripts/40` PASS (10
   labels); `scripts/49 --check` PASS (17 pages, 61 files).
-- **Next (plan order):** H's review of step B (`scripts/43` done: PASS at `fac6da2`, top of this list). Then
-  the cross-check folder script, the cross-check (H), slice 2 (EuroSAT) and slice 3.
+- **Next (order changed by H, 17 November 2026):** the cross-check folder script, then the cross-check (H),
+  then step 3's close (item 6: checks, ROADMAP, STATUS, README), then **step 4** (label submission, PyPI and
+  quick start). The EuroSAT test model (slice 2) and items 3 and 4 move to after step 4 ships
+  (`docs/user_models.md`, note of 17 November 2026, new order; ROADMAP step 3). H's review of step B led to the
+  seed-record fix above.
+- **User experience rule (H, 17 November 2026, the main priority):** make the user's work easy; nothing
+  overwhelming or unnecessary on the platform; rigour stays inside (CLAUDE.md). Step 4 should carry the
+  simplifications that fit it (quick start; a settings file filled in for known models and a plain answer
+  first on the label were suggested, not yet approved).
 - **Second gap for step 4 (found 17 November 2026; H agreed to list it):** the copied ImageNet-C code
   (`brokkr_edge/third_party/imagecorruptions/corruptions.py`) uses two old imports that print deprecation
   warnings in pytest (seen in `tests/test_user_command.py`): `from scipy.ndimage.interpolation import

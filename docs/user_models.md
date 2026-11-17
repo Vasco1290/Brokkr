@@ -960,3 +960,35 @@ remade from the folders; Brokkr's INT8 build unless one was supplied; the condit
 (`data/checks/reproduction_2026-11-17b`; INT8 repeatable, 26 of 26 dry-run score files identical; all 28 score
 files identical bit for bit to the 4.1 records). Afterwards `scripts/22`: PASS (1925 of 1925 records). Step B's
 changes to study code leave the study's results unchanged. Next: H's review of step B.
+
+## Note added 17 November 2026: a missing seed record now stops the run at the start (after H's review question)
+
+**Found while answering H's question on what could fail (17 November 2026):** every user label includes the
+random-damage limit sentence (fog and noise always run, also below 32 x 32), whose figure is read from
+`results/checks/seed_sensitivity.json`. `results/` is gitignored, so **a fresh clone, not only a pip install, does
+not have it**. The command then ran every step and stopped only at the label (exit code 3), after the whole run.
+The tests also read the file on this laptop: on a fresh clone of `43b39e9`, the three user-path test files gave 20
+failed, 5 errors, 32 passed.
+
+**Fixed (H said to fix it now):**
+- `user_label.check_label_sources` reads the record right after the checks, when the run plan includes random
+  damage; `run_user_test` calls it before anything is written to `--out`. A missing or unreadable record stops
+  the command in seconds with exit code 3 and says the file is not yet shipped with the code.
+- The record's path is read when called, not fixed when the module loads, so tests can point it elsewhere.
+- Every test now uses a made-up stand-in record (`tests/conftest.py`, `tests/user_made_up.py`); one test reads
+  Brokkr's real record when it is present and is skipped otherwise. The command tests run `brokkr-edge test` in
+  a separate Python as before, now handed the stand-in's path.
+- Still for step 4: ship the figure with the package, so a fresh clone or a pip install can make a label at all.
+
+## Note added 17 November 2026: new order, step 4 before the EuroSAT model (H)
+
+**Decided by H, 17 November 2026,** under the new user experience rule (CLAUDE.md: make the user's work easy;
+real users sooner): after the cross-check, step 4 (label submission, PyPI and quick start) comes next.
+- **Step 3 now closes with:** section 7, items 1 and 2 (done: slice 1 and step B, on the made-up model), item 5
+  (the cross-check folder script, then the exact cross-check on MobileNetV3-Large, run by H) and item 6 (ruff,
+  pytest, `scripts/22`, `scripts/40`, the site; ROADMAP, STATUS and the README updated). This meets ROADMAP's
+  "done when" for step 3 (a made-up model and one real torchvision model with a folder of images).
+- **Moved to after step 4 ships:** slice 2 (the EuroSAT test user model, section 8) and items 3 and 4 (its two
+  end-to-end runs: Brokkr shrinks it; a pair built outside Brokkr's pipeline). Their plan is unchanged.
+- **Known gap meanwhile:** a supplied pair (a shrunk build the user made) is tested end to end only on the
+  made-up model until item 4 runs; Brokkr's own INT8 build is tested on a real model by the cross-check.

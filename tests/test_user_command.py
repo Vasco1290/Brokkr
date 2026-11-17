@@ -4,16 +4,13 @@ tests/user_made_up.py. Nothing here is a result."""
 
 import json
 import socket
-import subprocess
-import sys
 
 import pytest
-from user_made_up import CLASSES, ROLLED, quantized, tiny_model, write_images, write_settings
+from user_made_up import CLASSES, ROLLED, command, quantized, tiny_model, write_images, write_settings
 
 from brokkr_edge import cli, user_command
 from brokkr_edge.label_schema import check_label
 from brokkr_edge.user_label import LabelError
-from brokkr_edge.user_plan import REPOSITORY
 from brokkr_edge.user_settings import UserInputError
 
 PER_CLASS = 390
@@ -31,11 +28,6 @@ def made(tmp_path_factory):
     tiny_model(d / "other.onnx", weights=[[2, 0, 0], [0, 2, 0], [0, 0, 2]])  # another model, same answers
     quantized(tiny_model(d / "rolled.onnx", weights=ROLLED), d / "int8_rolled.onnx")  # agrees on no image
     return d
-
-
-def command(*args):
-    return subprocess.run([sys.executable, "-m", "brokkr_edge.cli", "test", *map(str, args)],
-                          capture_output=True, text=True, cwd=REPOSITORY)
 
 
 @pytest.fixture(scope="module")
@@ -116,3 +108,14 @@ def test_inputs_that_cannot_be_used_stop_before_anything_is_written(made, tmp_pa
         user_command.run_user_test(write_settings(made, licences={}), made / "images", None, tmp_path / "o",
                                    log=quiet)
     assert not (tmp_path / "o").exists()
+
+
+def test_a_missing_seed_record_stops_in_seconds_before_anything_is_written(made, tmp_path):
+    """A fresh clone has no results/checks/seed_sensitivity.json: the command stops right after the checks,
+    with exit code 3, before any build or condition runs, and writes nothing in --out."""
+    out = tmp_path / "out"
+    run = command("--config", write_settings(made), "--images", made / "images", "--out", out,
+                  seed_sensitivity=tmp_path / "missing.json")
+    assert run.returncode == 3
+    assert "results/checks/seed_sensitivity.json, which this copy of Brokkr does not have" in run.stderr
+    assert not out.exists()

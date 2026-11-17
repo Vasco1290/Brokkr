@@ -8,14 +8,25 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from user_made_up import CLASSES, PREP, ROLLED, quantized, tiny_model, write_images, write_settings
+from user_made_up import (
+    CLASSES,
+    PREP,
+    ROLLED,
+    made_up_seed_sensitivity,
+    quantized,
+    tiny_model,
+    write_images,
+    write_settings,
+)
 
 from brokkr_edge import user_build
 from brokkr_edge.label_render import unexplained_numbers
 from brokkr_edge.label_schema import check_label
 from brokkr_edge.user_build import build_int8
 from brokkr_edge.user_label import (
+    SEED_SENSITIVITY,
     LabelError,
+    check_label_sources,
     make_label,
     random_condition_sentence,
     user_limits,
@@ -193,24 +204,18 @@ def test_a_changed_score_file_stops_the_label(made, tmp_path):
 
 # ---- test 10: the random-condition sentence ----
 
-def made_up_sensitivity(path: Path, differences: list) -> Path:
-    cells = [{"difference": d} for d in differences]
-    path.write_text(json.dumps({"model": "mobilenet_v3_large", "settings": {"n_images": 1234},
-                                "raw": {"cells": cells}}), encoding="utf-8")
-    return path
-
-
 def test_10_the_random_condition_figure_is_read_and_rounded_up(tmp_path):
-    sentence = random_condition_sentence(made_up_sensitivity(tmp_path / "s.json", [0.004, -0.0123, 0.01]))
+    record = made_up_seed_sensitivity(tmp_path / "s.json", [0.004, -0.0123, 0.01])
+    sentence = random_condition_sentence(record)
     assert "(MobileNetV3-Large, 1,234 images)" in sentence and "by up to 1.3 points;" in sentence
-    exact = random_condition_sentence(made_up_sensitivity(tmp_path / "t.json", [-0.01]))
+    exact = random_condition_sentence(made_up_seed_sensitivity(tmp_path / "t.json", [-0.01]))
     assert "by up to 1.0 point;" in exact  # 0.01 is 1.0 point, not rounded up to 1.1 by float dust
 
 
 def test_10_the_sentence_appears_only_when_a_random_condition_ran(brokkr_built, tmp_path):
     _, plan, label = brokkr_built
     hw = label["hardware"][0]
-    sensitivity = made_up_sensitivity(tmp_path / "s.json", [0.02])
+    sensitivity = made_up_seed_sensitivity(tmp_path / "s.json", [0.02])
     random_ran = user_limits(plan, hw, [], plan["conditions"], sensitivity)
     assert any(s.startswith("Fog and noise damage use a random pattern.") for s in random_ran)
     calm = [c for c in plan["conditions"] if c["corruption"] in ("clean", "darkness", "contrast")]
@@ -237,3 +242,22 @@ def test_11_each_warning_of_the_run_is_also_a_limit(brokkr_built):
 ])
 def test_11_every_warning_kind_has_its_sentence_with_its_counts(warning, words):
     assert words in warning_limit(warning)
+
+
+def test_10_a_missing_seed_record_is_found_before_the_run(brokkr_built, tmp_path):
+    """check_label_sources stops a plan with random damage when the record is missing; a plan without random
+    damage does not need it."""
+    _, plan, _ = brokkr_built
+    with pytest.raises(LabelError, match="this copy of Brokkr does not have"):
+        check_label_sources(plan, tmp_path / "missing.json")
+    no_random = {**plan, "conditions": [c for c in plan["conditions"]
+                                        if c["corruption"] not in ("fog", "noise", "gaussian_noise")]}
+    assert len(no_random["conditions"]) == 7  # clean and the 6 conditions without a random pattern
+    check_label_sources(no_random, tmp_path / "missing.json")
+
+
+@pytest.mark.skipif(not SEED_SENSITIVITY.is_file(), reason="Brokkr's seed record is not on this machine")
+def test_10_the_real_seed_record_gives_the_sentence():
+    """The other tests use a made-up stand-in (tests/conftest.py); this one reads Brokkr's own record."""
+    sentence = random_condition_sentence(SEED_SENSITIVITY)
+    assert sentence.startswith("Fog and noise damage use a random pattern. In one exploratory check (")

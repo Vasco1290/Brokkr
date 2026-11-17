@@ -8,13 +8,17 @@ weights give the "wrong" builds the tests need.
 
 import itertools
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
 from onnx import TensorProto, helper, numpy_helper
 from PIL import Image
 
+from brokkr_edge import user_label
 from brokkr_edge.quantize import to_int8
+from brokkr_edge.user_plan import REPOSITORY
 
 CLASSES = ["red", "green", "blue"]
 # The model's input: 32 x 32 pixels (pictures are 48 x 48, resized to 32 and cropped to 32). Raised from 8 on
@@ -114,3 +118,26 @@ def write_settings(folder, **changes) -> Path:
     path = Path(folder) / f"settings_{next(_numbers)}.json"
     path.write_text(json.dumps(settings(**changes)), encoding="utf-8")
     return path
+
+
+def made_up_seed_sensitivity(path, differences=(0.01,)) -> Path:
+    """A made-up stand-in for Brokkr's seed-sensitivity record (results/checks/seed_sensitivity.json, which is
+    gitignored, so a fresh clone does not have it). tests/conftest.py points every test at one, so no test
+    depends on that file being on this machine. Made up: nothing here is a result."""
+    cells = [{"difference": d} for d in differences]
+    Path(path).write_text(json.dumps({"model": "mobilenet_v3_large", "settings": {"n_images": 1234},
+                                      "raw": {"cells": cells}}), encoding="utf-8")
+    return Path(path)
+
+
+# `brokkr-edge test` in a separate Python, with the seed-sensitivity record this test session uses.
+_CLI = ("import sys; from pathlib import Path; import brokkr_edge.user_label as u; "
+        "u.SEED_SENSITIVITY = Path(sys.argv[1]); from brokkr_edge import cli; "
+        "sys.exit(cli.main(sys.argv[2:]))")
+
+
+def command(*args, seed_sensitivity=None):
+    """`brokkr-edge test ...` as a separate process; seed_sensitivity None: the record this session uses."""
+    record = seed_sensitivity or user_label.SEED_SENSITIVITY
+    return subprocess.run([sys.executable, "-c", _CLI, str(record), "test", *map(str, args)],
+                          capture_output=True, text=True, cwd=REPOSITORY)

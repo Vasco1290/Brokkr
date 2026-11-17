@@ -438,6 +438,11 @@ model with a folder of images, the command produces a schema-valid `label.json` 
 `source: user-submitted`; the same for PyTorch input (moved to after step 4 by H, 6 October 2026). The full
 list is in `docs/user_models.md`, section 7.
 
+*Order changed by H, 17 November 2026 (CLAUDE.md, user experience rule: real users sooner):* step 3 closes
+with the exact cross-check on MobileNetV3-Large (section 7, items 1, 2, 5 and 6), which meets the "done when"
+above; the EuroSAT test user model (slice 2) and its two end-to-end runs (items 3 and 4, including a pair built
+outside Brokkr) move to after step 4 ships. Step 4 comes next.
+
 ### 4. Label submission, PyPI and quick start `[ ]`, done by 19 October <!-- public -->
 - A GitHub pull-request template for submitting a `label.json`, with an automatic check (schema
   validation; the label is marked "user-submitted, unverified"). The template says submitters license
