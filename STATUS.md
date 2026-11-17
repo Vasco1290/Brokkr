@@ -85,6 +85,14 @@ Read this first.
   labels); `scripts/49 --check` PASS (17 pages, 61 files).
 - **Next (plan order):** H's review of step B (`scripts/43` done: PASS at `fac6da2`, top of this list). Then
   the cross-check folder script, the cross-check (H), slice 2 (EuroSAT) and slice 3.
+- **Second gap for step 4 (found 17 November 2026; H agreed to list it):** the copied ImageNet-C code
+  (`brokkr_edge/third_party/imagecorruptions/corruptions.py`) uses two old imports that print deprecation
+  warnings in pytest (seen in `tests/test_user_command.py`): `from scipy.ndimage.interpolation import
+  map_coordinates` (SciPy says the `interpolation` namespace goes in SciPy 2.0) and `from pkg_resources import
+  resource_filename` (setuptools deprecates `pkg_resources`). Installed here: SciPy 1.15.3, setuptools 78.1.0;
+  nothing fails today. A future SciPy or setuptools would make the import fail on a fresh `pip install`. Fix in
+  step 4: `from scipy.ndimage import map_coordinates` and `importlib.resources` for the file path. It is study
+  code, so `scripts/43` (H) before merging.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
   by H the same day; the tries budget is confirmed again after its milestone 3.
