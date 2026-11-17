@@ -953,3 +953,10 @@ remade from the folders; Brokkr's INT8 build unless one was supplied; the condit
 - **The last line** says what the label holds: FP32 and INT8 under N damaged conditions, or, when the INT8
   build (Brokkr's or supplied) failed, FP32 numbers only and "INT8 build failed".
 - `tests/test_user_plan.py`'s command test now expects a label instead of "not built yet".
+
+## Outcome added 17 November 2026: step B's reproduction check
+
+**Step B:** `scripts/43` PASS, 28 of 28, run by H at the clean commit `fac6da2`, which holds all of step B's code
+(`data/checks/reproduction_2026-11-17b`; INT8 repeatable, 26 of 26 dry-run score files identical; all 28 score
+files identical bit for bit to the 4.1 records). Afterwards `scripts/22`: PASS (1925 of 1925 records). Step B's
+changes to study code leave the study's results unchanged. Next: H's review of step B.

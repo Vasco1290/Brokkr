@@ -1,6 +1,6 @@
 # Brokkr status
 
-Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references, step A and step B's code done; next: H's `scripts/43` run and H's review of step B). **Stages 1, 2 and 3 are complete** and merged into `main`
+Snapshot as of **17 November 2026** (step 3 in progress: design note, slice 1, the content-v1 references, step A and step B's code done, step B's `scripts/43` PASS; next: H's review of step B). **Stages 1, 2 and 3 are complete** and merged into `main`
 (merge commit `be01206`, tagged `report-1`: Brokkr Technical Report 1, `docs/writeup.md`). **Stage 4's
 research and Platform plan step 1 (labels) are done** and merged into `main` (pull request #4, merge
 commit `0422a8c`; tag `stage-4-done` on `790c197`); 4.1's summary tables script is not built. **Step 2
@@ -11,8 +11,17 @@ research freeze ended when website v0 shipped; the research rule of 6 October 20
 
 ## 0. Start here (a new session needs nothing else)
 
-### Pick up here (17 November 2026; step 3: step B's code done; next H's `scripts/43` run and review)
+### Pick up here (17 November 2026; step 3: step B's code done and `scripts/43` PASS; next H's review)
 Read this first.
+- **Step B's reproduction check: PASS, 28 of 28** (run by H on 17 November 2026, on mains power, from the
+  clean commit `fac6da2`, which holds all of step B's code). `scripts/43_check_reproduction.py --out
+  data/checks/reproduction_2026-11-17b`: INT8 repeatable (26 of 26 dry-run score files identical in two runs);
+  all 28 records give identical top-1 on every image and all 28 score files are identical bit for bit to the
+  4.1 records; every new record notes commit `fac6da2`, not dirty. Verdict file:
+  `data/checks/reproduction_2026-11-17b/reproduction_check.json` (gitignored). Afterwards `scripts/22`: PASS
+  (1925 of 1925 records, 50 of 50 build records). So step B's changes to study code (`quantize.py`,
+  `schema.py`, `label_build.py`, `label_render.py`, `label_schema.py`, `cli.py`) leave the study's results
+  unchanged.
 - **Step A's reproduction check: PASS, 28 of 28** (run by H on 17 November 2026, on mains power, from the
   clean commit `2103353`, which holds step A `1bc3291` plus the fix-mode plan). `scripts/43_check_reproduction.py
   --out data/checks/reproduction_2026-11-17`: INT8 repeatable (26 of 26 dry-run score files identical); all 28
@@ -74,10 +83,8 @@ Read this first.
   `docs/user_models.md`, note of 17 November 2026 (piece 6). Tests: `tests/test_user_command.py` (7). Checks on
   the working tree: ruff PASS; pytest 646 passed; `scripts/22` PASS (1925 of 1925); `scripts/40` PASS (10
   labels); `scripts/49 --check` PASS (17 pages, 61 files).
-- **Next (step B's end, plan order):** H runs `scripts/43` from the clean commit (study code changed in step B:
-  `quantize.py`, `schema.py`, `label_build.py`, `label_render.py`, `label_schema.py`, `cli.py`); output outside
-  `results/`, e.g. `data/checks/reproduction_<date>`. Then H's review of step B. Then the cross-check folder
-  script, the cross-check (H), slice 2 (EuroSAT) and slice 3.
+- **Next (plan order):** H's review of step B (`scripts/43` done: PASS at `fac6da2`, top of this list). Then
+  the cross-check folder script, the cross-check (H), slice 2 (EuroSAT) and slice 3.
 - **Fix mode planned (17 November 2026):** `docs/fix_agent_plan.md` (`2103353`): `brokkr-edge shrink --auto`
   extended with diagnosis, a diary and a grid check. **Starts after step 4 ships** (H); its numbers approved
   by H the same day; the tries budget is confirmed again after its milestone 3.
